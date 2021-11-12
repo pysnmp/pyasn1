@@ -73,7 +73,7 @@ params.update({
     'maintainer': 'Ilya Etingof <etingof@gmail.com>',
     'author': 'Ilya Etingof',
     'author_email': 'etingof@gmail.com',
-    'url': 'https://github.com/etingof/pyasn1',
+    'url': 'https://github.com/pysnmp/pyasn1',
     'platforms': ['any'],
     'classifiers': [x for x in classifiers.split('\n') if x],
     'license': 'BSD',

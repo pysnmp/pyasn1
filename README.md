@@ -169,17 +169,20 @@ could be found in the pyasn1-modules
 How to get pyasn1
 -----------------
 
+This project is forked from pyasn1 documentation is not current
+
 The pyasn1 package is distributed under terms and conditions of 2-clause
 BSD [license](http://snmplabs.com/pyasn1/license.html). Source code is freely
-available as a GitHub [repo](https://github.com/etingof/pyasn1).
+available as a GitHub [repo](https://github.com/pysnmp/pyasn1).
 
 You could `pip install pyasn1` or download it from [PyPI](https://pypi.org/project/pyasn1).
 
 If something does not work as expected, 
-[open an issue](https://github.com/etingof/pyasn1/issues) at GitHub or
+[open an issue](https://github.com/pysnmp/pyasn1/issues) at GitHub or
 post your question [on Stack Overflow](https://stackoverflow.com/questions/ask)
 or try browsing pyasn1 
 [mailing list archives](https://sourceforge.net/p/pyasn1/mailman/pyasn1-users/).
 
 Copyright (c) 2005-2020, [Ilya Etingof](mailto:etingof@gmail.com).
 All rights reserved.
+Copyright (c) 2021- [Splunk Inc.]
