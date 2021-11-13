@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pysnmp-pyasn1"
-version = "0.4.12"
+version = "0.4.9"
 description = "ASN.1 types and codecs"
 authors = ["rfaircloth-splunk <rfaircloth@splunk.com>"]
 license = "BSD-2-Clause"
