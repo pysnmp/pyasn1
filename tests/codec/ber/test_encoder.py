@@ -748,28 +748,23 @@ class RealEncoderWithSchemaTestCase(BaseTestCase):
 
 class UniversalStringEncoderTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(
-            char.UniversalString("abc")
-        ) == ints2octs(
+        assert encoder.encode(char.UniversalString("abc")) == ints2octs(
             (28, 12, 0, 0, 0, 97, 0, 0, 0, 98, 0, 0, 0, 99)
         ), "Incorrect encoding"
 
 
 class UniversalStringEncoderWithSchemaTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(
-            "abc",
-            asn1Spec=char.UniversalString(),
-        ) == ints2octs(
+        assert encoder.encode("abc", asn1Spec=char.UniversalString(),) == ints2octs(
             (28, 12, 0, 0, 0, 97, 0, 0, 0, 98, 0, 0, 0, 99)
         ), "Incorrect encoding"
 
 
 class BMPStringEncoderTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(
-            char.BMPString("abc")
-        ) == ints2octs((30, 6, 0, 97, 0, 98, 0, 99)), "Incorrect encoding"
+        assert encoder.encode(char.BMPString("abc")) == ints2octs(
+            (30, 6, 0, 97, 0, 98, 0, 99)
+        ), "Incorrect encoding"
 
 
 class BMPStringEncoderWithSchemaTestCase(BaseTestCase):
@@ -785,9 +780,9 @@ class BMPStringEncoderWithSchemaTestCase(BaseTestCase):
 
 class UTF8StringEncoderTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(
-            char.UTF8String("abc")
-        ) == ints2octs((12, 3, 97, 98, 99)), "Incorrect encoding"
+        assert encoder.encode(char.UTF8String("abc")) == ints2octs(
+            (12, 3, 97, 98, 99)
+        ), "Incorrect encoding"
 
 
 class UTF8StringEncoderWithSchemaTestCase(BaseTestCase):

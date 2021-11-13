@@ -11,8 +11,6 @@ import sys
 from pyasn1 import error
 from pyasn1.type import univ
 
-_PY2 = sys.version_info < (3,)
-
 
 class CachingStreamWrapper(io.IOBase):
     """Wrapper around non-seekable streams.
@@ -110,10 +108,7 @@ def asSeekableStream(substrate):
 
     try:
         # Special case: impossible to set attributes on `file` built-in
-        if _PY2 and isinstance(substrate, file):
-            return io.BufferedReader(substrate)
-
-        elif substrate.seekable():  # Will fail for most invalid types
+        if substrate.seekable():  # Will fail for most invalid types
             return substrate
 
         else:

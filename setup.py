@@ -42,10 +42,6 @@ def howto_install_setuptools():
     )
 
 
-if sys.version_info[:2] < (2, 7):
-    print("ERROR: this package requires Python 2.7 or later!")
-    sys.exit(1)
-
 try:
     from setuptools import Command, setup
 

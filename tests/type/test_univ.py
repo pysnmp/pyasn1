@@ -631,11 +631,7 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
     def testEncodeError(self):
         serialized = ints2octs((0xFF, 0xFE))
 
-        if sys.version_info < (3, 0):
-            text = serialized.decode("iso-8859-1")
-
-        else:
-            text = octs2str(serialized)
+        text = octs2str(serialized)
 
         try:
             univ.OctetString(text, encoding="us-ascii")
@@ -649,11 +645,7 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
         octetString = univ.OctetString(serialized, encoding="us-ascii")
 
         try:
-            if sys.version_info < (3, 0):
-                unicode(octetString)
-
-            else:
-                str(octetString)
+            str(octetString)
 
         except PyAsn1UnicodeDecodeError:
             pass
