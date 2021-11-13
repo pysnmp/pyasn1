@@ -28,7 +28,7 @@
         {
           "replacements": [
             {
-              "files": ["solnlib/__init__.py"],
+              "files": ["pyasn1/__init__.py"],
               "from": "__version__ ?=.*",
               "to": "__version__ = \"${nextRelease.version}\"",
               "results": [
