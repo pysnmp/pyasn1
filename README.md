@@ -12,6 +12,8 @@ protocol (SNMP) but then generalized to be suitable for a wide range
 of protocols based on
 [ASN.1 specification](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-X.208-198811-W!!PDF-E&type=items).
 
+This project has been forked for ongoing maintenance and modernization.
+
 Features
 --------
 
@@ -160,27 +162,26 @@ Python built-ins codecs. The extremely compact PER encoding is expected
 to be introduced in the upcoming pyasn1 release.
 
 More information on pyasn1 APIs can be found in the
-[documentation](http://snmplabs.com/pyasn1/),
+[documentation](http://snmplabs.com/pysnmp/pyasn1/docs),
 compiled ASN.1 modules for different protocols and file formats
 could be found in the pyasn1-modules 
-[repo](https://github.com/etingof/pyasn1-modules).
+[repo](https://github.com/pysnmp/pyasn1-modules).
 
 How to get pyasn1
 -----------------
 
-This project is forked from pyasn1 documentation is not current
+This project is forked from pyasn1
 
 The pyasn1 package is distributed under terms and conditions of 2-clause
 BSD [license](http://snmplabs.com/pyasn1/license.html). Source code is freely
 available as a GitHub [repo](https://github.com/pysnmp/pyasn1).
 
-You could `pip install pyasn1` or download it from [PyPI](https://pypi.org/project/pyasn1).
+You could `pip install pysnmp-pyasn1` or download it from [PyPI](https://pypi.org/project/pysnmp-pyasn1).
 
 If something does not work as expected, 
 [open an issue](https://github.com/pysnmp/pyasn1/issues) at GitHub or
 post your question [on Stack Overflow](https://stackoverflow.com/questions/ask)
-or try browsing pyasn1 
-[mailing list archives](https://sourceforge.net/p/pyasn1/mailman/pyasn1-users/).
+or try browsing pyasn1 .
 
 Copyright (c) 2005-2020, [Ilya Etingof](mailto:etingof@gmail.com).
 All rights reserved.
