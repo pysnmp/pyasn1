@@ -40,7 +40,7 @@ class AbstractPayloadDecoder:
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         """Decode value with fixed byte length.
 
@@ -59,7 +59,7 @@ class AbstractPayloadDecoder:
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         """Decode value with undefined length.
 
@@ -105,7 +105,7 @@ class RawPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if substrateFun:
             asn1Object = self._createComponent(asn1Spec, tagSet, "", **options)
@@ -125,7 +125,7 @@ class RawPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if substrateFun:
             asn1Object = self._createComponent(asn1Spec, tagSet, "", **options)
@@ -160,7 +160,7 @@ class IntegerPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
 
         if tagSet[0].tagFormat != tag.tagFormatSimple:
@@ -201,7 +201,7 @@ class BitStringPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
 
         if substrateFun:
@@ -289,7 +289,7 @@ class BitStringPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
 
         if substrateFun:
@@ -311,7 +311,7 @@ class BitStringPayloadDecoder(AbstractSimplePayloadDecoder):
                 self.protoComponent,
                 substrateFun=substrateFun,
                 allowEoo=True,
-                **options
+                **options,
             ):
 
                 if component is eoo.endOfOctets:
@@ -350,7 +350,7 @@ class OctetStringPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if substrateFun:
             asn1Object = self._createComponent(asn1Spec, tagSet, noValue, **options)
@@ -404,7 +404,7 @@ class OctetStringPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if substrateFun and substrateFun is not self.substrateCollector:
             asn1Object = self._createComponent(asn1Spec, tagSet, noValue, **options)
@@ -425,7 +425,7 @@ class OctetStringPayloadDecoder(AbstractSimplePayloadDecoder):
                 self.protoComponent,
                 substrateFun=substrateFun,
                 allowEoo=True,
-                **options
+                **options,
             ):
 
                 if isinstance(component, SubstrateUnderrunError):
@@ -454,7 +454,7 @@ class NullPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
 
         if tagSet[0].tagFormat != tag.tagFormatSimple:
@@ -484,7 +484,7 @@ class ObjectIdentifierPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
@@ -551,7 +551,7 @@ class RealPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
@@ -728,7 +728,7 @@ class ConstructedPayloadDecoderBase(AbstractConstructedPayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if tagSet[0].tagFormat != tag.tagFormatConstructed:
             raise error.PyAsn1Error("Constructed tag format expected")
@@ -991,7 +991,7 @@ class ConstructedPayloadDecoderBase(AbstractConstructedPayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if tagSet[0].tagFormat != tag.tagFormatConstructed:
             raise error.PyAsn1Error("Constructed tag format expected")
@@ -1016,7 +1016,7 @@ class ConstructedPayloadDecoderBase(AbstractConstructedPayloadDecoder):
                 tagSet=tagSet,
                 decodeFun=decodeFun,
                 length=length,
-                **dict(options, allowEoo=True)
+                **dict(options, allowEoo=True),
             ):
                 if isinstance(asn1Object, SubstrateUnderrunError):
                     yield asn1Object
@@ -1197,7 +1197,7 @@ class ConstructedPayloadDecoderBase(AbstractConstructedPayloadDecoder):
                                     for component in decodeFun(
                                         stream,
                                         asn1Spec=openType,
-                                        **dict(options, allowEoo=True)
+                                        **dict(options, allowEoo=True),
                                     ):
                                         if isinstance(
                                             component, SubstrateUnderrunError
@@ -1216,7 +1216,7 @@ class ConstructedPayloadDecoderBase(AbstractConstructedPayloadDecoder):
                                 for component in decodeFun(
                                     stream,
                                     asn1Spec=openType,
-                                    **dict(options, allowEoo=True)
+                                    **dict(options, allowEoo=True),
                                 ):
                                     if isinstance(component, SubstrateUnderrunError):
                                         yield component
@@ -1305,7 +1305,7 @@ class ChoicePayloadDecoder(ConstructedPayloadDecoderBase):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if asn1Spec is None:
             asn1Object = self.protoComponent.clone(tagSet=tagSet)
@@ -1368,7 +1368,7 @@ class ChoicePayloadDecoder(ConstructedPayloadDecoderBase):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if asn1Spec is None:
             asn1Object = self.protoComponent.clone(tagSet=tagSet)
@@ -1397,7 +1397,7 @@ class ChoicePayloadDecoder(ConstructedPayloadDecoderBase):
                 iterator = decodeFun(
                     substrate,
                     asn1Object.componentType.tagMapUnique,
-                    **dict(options, allowEoo=True)
+                    **dict(options, allowEoo=True),
                 )
 
             else:
@@ -1407,7 +1407,7 @@ class ChoicePayloadDecoder(ConstructedPayloadDecoderBase):
                     tagSet,
                     length,
                     state,
-                    **dict(options, allowEoo=True)
+                    **dict(options, allowEoo=True),
                 )
 
             for component in iterator:
@@ -1456,7 +1456,7 @@ class AnyPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if asn1Spec is None:
             isUntagged = True
@@ -1506,7 +1506,7 @@ class AnyPayloadDecoder(AbstractSimplePayloadDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         if asn1Spec is None:
             isTagged = False
@@ -1735,7 +1735,7 @@ class SingleItemDecoder:
         state=stDecodeTag,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
 
         allowEoo = options.pop("allowEoo", False)
@@ -2053,7 +2053,7 @@ class SingleItemDecoder:
                         stGetValueDecoder,
                         self,
                         substrateFun,
-                        **options
+                        **options,
                     ):
                         if isinstance(value, SubstrateUnderrunError):
                             yield value
@@ -2067,7 +2067,7 @@ class SingleItemDecoder:
                         stGetValueDecoder,
                         self,
                         substrateFun,
-                        **options
+                        **options,
                     ):
                         if isinstance(value, SubstrateUnderrunError):
                             yield value

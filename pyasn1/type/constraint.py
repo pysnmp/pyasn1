@@ -37,9 +37,7 @@ class AbstractConstraint:
             self._testValue(value, idx)
 
         except error.ValueConstraintError:
-            raise error.ValueConstraintError(
-                f"{self} failed at: {sys.exc_info()[1]!r}"
-            )
+            raise error.ValueConstraintError(f"{self} failed at: {sys.exc_info()[1]!r}")
 
     def __repr__(self):
         representation = "%s object" % (self.__class__.__name__)
@@ -253,9 +251,7 @@ class ValueRangeConstraint(AbstractConstraint):
 
     def _setValues(self, values):
         if len(values) != 2:
-            raise error.PyAsn1Error(
-                f"{self.__class__.__name__}: bad constraint values"
-            )
+            raise error.PyAsn1Error(f"{self.__class__.__name__}: bad constraint values")
         self.start, self.stop = values
         if self.start > self.stop:
             raise error.PyAsn1Error(
@@ -756,9 +752,7 @@ class ConstraintsUnion(AbstractConstraintSet):
             else:
                 return
 
-        raise error.ValueConstraintError(
-            f'all of {self._values} failed for "{value}"'
-        )
+        raise error.ValueConstraintError(f'all of {self._values} failed for "{value}"')
 
 
 # TODO:

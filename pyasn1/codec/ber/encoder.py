@@ -585,7 +585,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         substrate += encodeFun(
                             component,
                             asn1Spec,
-                            **dict(options, wrapType=wrapType.componentType)
+                            **dict(options, wrapType=wrapType.componentType),
                         )
 
                     else:
@@ -641,7 +641,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         substrate += encodeFun(
                             component,
                             componentSpec,
-                            **dict(options, wrapType=componentSpec.componentType)
+                            **dict(options, wrapType=componentSpec.componentType),
                         )
 
                     else:

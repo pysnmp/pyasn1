@@ -173,11 +173,9 @@ class NamedTypes:
         )
 
         self.__requiredComponents = frozenset(
-            
-                idx
-                for idx, nt in enumerate(self.__namedTypes)
-                if not nt.isOptional and not nt.isDefaulted
-            
+            idx
+            for idx, nt in enumerate(self.__namedTypes)
+            if not nt.isOptional and not nt.isDefaulted
         )
         self.__keys = frozenset(namedType.name for namedType in self.__namedTypes)
         self.__values = tuple(namedType.asn1Object for namedType in self.__namedTypes)

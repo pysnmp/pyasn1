@@ -696,9 +696,7 @@ class BitString(base.SimpleAsn1Type):
                 elif value[-2:] == "'H":
                     return self.fromHexString(value[1:-2], internalFormat=True)
                 else:
-                    raise error.PyAsn1Error(
-                        f"Bad BIT STRING value notation {value}"
-                    )
+                    raise error.PyAsn1Error(f"Bad BIT STRING value notation {value}")
 
             elif (
                 self.namedValues and not value.isdigit()
@@ -1314,9 +1312,7 @@ class Real(base.SimpleAsn1Type):
             if isinstance(value[0], float) and self._inf and value[0] in self._inf:
                 return value[0]
             if value[1] not in (2, 10):
-                raise error.PyAsn1Error(
-                    f"Prohibited base for Real value: {value[1]}"
-                )
+                raise error.PyAsn1Error(f"Prohibited base for Real value: {value[1]}")
             if value[1] == 10:
                 value = self.__normalizeBase10(value)
             return value

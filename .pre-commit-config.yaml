@@ -8,10 +8,10 @@ repos:
     rev: 21.9b0
     hooks:
     -   id: black
--   repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
-    hooks:
-    -   id: isort
+# -   repo: https://github.com/PyCQA/isort
+#     rev: 5.10.1
+#     hooks:
+#     -   id: isort
 # -   repo: local
 #     hooks:
 #       - id: actionlint
