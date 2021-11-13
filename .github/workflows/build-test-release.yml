@@ -98,16 +98,16 @@ jobs:
       - name: run tests
         run: |
           poetry install
-          poetry run pytest --junitxml=test-results/results.xml --cov=pysnmp-pyasn1 --cov-report=html tests
+          poetry run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: unit tests test-results
           path: test-results
-      - uses: actions/upload-artifact@v2.2.4
+      - uses: codecov/codecov-action@v2
         with:
-          name: unit tests htmlcov report
-          path: htmlcov
-
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          flags: "${{ matrix.os }}" "${{ matrix.poetry-version }}"
+          fail_ci_if_error: true # optional (default = false)
   publish:
     name: Build Release
     needs:
