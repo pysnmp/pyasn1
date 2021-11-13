@@ -1,4 +1,8 @@
 
+Revision 1.0.2, released 2021-11-13
+
+- Release based on 0.4.8 from new repo and ci
+
 Revision 0.4.8, released 16-11-2019
 -----------------------------------
 
