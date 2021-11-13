@@ -27,7 +27,7 @@ FLAG_MAP = {
 LOGGEE_MAP = {}
 
 
-class Printer(object):
+class Printer:
     # noinspection PyShadowingNames
     def __init__(self, logger=None, handler=None, formatter=None):
         if logger is None:
@@ -54,7 +54,7 @@ class Printer(object):
         return "<python logging>"
 
 
-class Debug(object):
+class Debug:
     defaultPrinter = Printer()
 
     def __init__(self, *flags, **options):
@@ -74,7 +74,7 @@ class Debug(object):
             self._printer = self.defaultPrinter
 
         self._printer(
-            "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))
+            "running pyasn1 {}, debug flags {}".format(__version__, ", ".join(flags))
         )
 
         for flag in flags:
@@ -90,11 +90,11 @@ class Debug(object):
                 raise error.PyAsn1Error("bad debug flag %s" % flag)
 
             self._printer(
-                "debug category '%s' %s" % (flag, inverse and "disabled" or "enabled")
+                "debug category '{}' {}".format(flag, inverse and "disabled" or "enabled")
             )
 
     def __str__(self):
-        return "logger %s, flags %x" % (self._printer, self._flags)
+        return f"logger {self._printer}, flags {self._flags:x}"
 
     def __call__(self, msg):
         self._printer(msg)
@@ -137,7 +137,7 @@ def hexdump(octets):
     )
 
 
-class Scope(object):
+class Scope:
     def __init__(self):
         self._list = []
 
