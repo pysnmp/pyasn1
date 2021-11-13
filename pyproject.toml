@@ -21,6 +21,8 @@ classifiers = [
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+readme = README.md
+
 packages = [
     { include = "pyasn1" },
 ]
