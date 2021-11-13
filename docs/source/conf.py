@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # PyASN1 documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun 27 23:15:54 2015.
@@ -46,9 +45,9 @@ source_suffix = ".rst"
 master_doc = "contents"
 
 # General information about the project.
-project = u"ASN.1 types and codecs"
-copyright = u"2005-2020, Ilya Etingof <etingof@gmail.com>"
-author = u"Ilya Etingof <etingof@gmail.com>"
+project = "ASN.1 types and codecs"
+copyright = "2005-2020, Ilya Etingof <etingof@gmail.com>"
+author = "Ilya Etingof <etingof@gmail.com>"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -242,8 +241,8 @@ latex_documents = [
     (
         master_doc,
         "PyASN1.tex",
-        u"PyASN1 Documentation",
-        u"Ilya Etingof \\textless{}etingof@gmail.com\\textgreater{}",
+        "PyASN1 Documentation",
+        "Ilya Etingof \\textless{}etingof@gmail.com\\textgreater{}",
         "manual",
     ),
 ]
@@ -273,7 +272,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "pyasn1", u"PyASN1 Documentation", [author], 1)]
+man_pages = [(master_doc, "pyasn1", "PyASN1 Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -288,7 +287,7 @@ texinfo_documents = [
     (
         master_doc,
         "PyASN1",
-        u"PyASN1 Documentation",
+        "PyASN1 Documentation",
         author,
         "PyASN1",
         "One line description of project.",
