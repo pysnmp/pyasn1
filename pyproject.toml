@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "pysnmp-pyasn1"
+version = "0.4.12"
+description = "ASN.1 types and codecs"
+authors = ["rfaircloth-splunk <rfaircloth@splunk.com>"]
+license = "BSD-2-Clause"
+repository = "https://github.com/pysnmp/pyasn1"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Telecommunications Industry",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Communications",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+readme = "README.md"
+
+packages = [
+    { include = "pyasn1" },
+]
+include = ["docs", "tests"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+Sphinx = "^4.3.0"
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

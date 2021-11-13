@@ -1,25 +1,7 @@
-# Python stuff
-*.pyc
+*.idea
+*.DS_Store*
 __pycache__
-
-# vim swapfiles
-*.sw?
-
-# python packaging
-MANIFEST
-dist/
-build/
-*.egg-info/
-
-# PyCharm stuff
-.idea/
-
-# Sphinx template
-docs/source/.templates/layout.html
-
-# Eclipse stuff
-.project
-.pydevproject
-
-# Virtual envs
-venv*
+*.pyc
+*.pyo
+.venv
+dist
