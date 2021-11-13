@@ -105,8 +105,8 @@ jobs:
           path: test-results
       - uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          flags: "${{ matrix.os }}", "${{ matrix.poetry-version }}"
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.os }}, ${{ matrix.poetry-version }}
           fail_ci_if_error: true # optional (default = false)
   publish:
     name: Build Release
