@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 
-class AbstractConstraint(object):
+class AbstractConstraint:
     def __init__(self, *values):
         self._valueMap = set()
         self._setValues(values)
@@ -38,7 +38,7 @@ class AbstractConstraint(object):
 
         except error.ValueConstraintError:
             raise error.ValueConstraintError(
-                "%s failed at: %r" % (self, sys.exc_info()[1])
+                f"{self} failed at: {sys.exc_info()[1]!r}"
             )
 
     def __repr__(self):
@@ -254,7 +254,7 @@ class ValueRangeConstraint(AbstractConstraint):
     def _setValues(self, values):
         if len(values) != 2:
             raise error.PyAsn1Error(
-                "%s: bad constraint values" % (self.__class__.__name__,)
+                f"{self.__class__.__name__}: bad constraint values"
             )
         self.start, self.stop = values
         if self.start > self.stop:
@@ -757,7 +757,7 @@ class ConstraintsUnion(AbstractConstraintSet):
                 return
 
         raise error.ValueConstraintError(
-            'all of %s failed for "%s"' % (self._values, value)
+            f'all of {self._values} failed for "{value}"'
         )
 
 

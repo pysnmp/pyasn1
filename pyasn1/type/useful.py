@@ -27,7 +27,7 @@ class ObjectDescriptor(char.GraphicString):
     typeId = char.GraphicString.getTypeId()
 
 
-class TimeMixIn(object):
+class TimeMixIn:
 
     _yearsDigits = 4
     _hasSubsecond = False

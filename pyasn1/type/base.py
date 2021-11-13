@@ -12,7 +12,7 @@ from pyasn1.type import constraint, tag, tagmap
 __all__ = ["Asn1Item", "Asn1Type", "SimpleAsn1Type", "ConstructedAsn1Type"]
 
 
-class Asn1Item(object):
+class Asn1Item:
     @classmethod
     def getTypeId(cls, increment=1):
         try:
@@ -165,7 +165,7 @@ class Asn1Type(Asn1Item):
 Asn1ItemBase = Asn1Type
 
 
-class NoValue(object):
+class NoValue:
     """Create a singleton instance of NoValue class.
 
     The *NoValue* sentinel object represents an instance of ASN.1 schema
@@ -282,19 +282,19 @@ class SimpleAsn1Type(Asn1Type):
 
             except error.PyAsn1Error:
                 exType, exValue, exTb = sys.exc_info()
-                raise exType("%s at %s" % (exValue, self.__class__.__name__))
+                raise exType(f"{exValue} at {self.__class__.__name__}")
 
         self._value = value
 
     def __repr__(self):
-        representation = "%s %s object" % (
+        representation = "{} {} object".format(
             self.__class__.__name__,
             self.isValue and "value" or "schema",
         )
 
         for attr, value in self.readOnly.items():
             if value:
-                representation += ", %s %s" % (attr, value)
+                representation += f", {attr} {value}"
 
         if self.isValue:
             value = self.prettyPrint()
@@ -463,7 +463,7 @@ class SimpleAsn1Type(Asn1Type):
         return self.prettyOut(self._value)
 
     def prettyPrintType(self, scope=0):
-        return "%s -> %s" % (self.tagSet, self.__class__.__name__)
+        return f"{self.tagSet} -> {self.__class__.__name__}"
 
 
 # Backward compatibility
@@ -543,14 +543,14 @@ class ConstructedAsn1Type(Asn1Type):
         return kwargs
 
     def __repr__(self):
-        representation = "%s %s object" % (
+        representation = "{} {} object".format(
             self.__class__.__name__,
             self.isValue and "value" or "schema",
         )
 
         for attr, value in self.readOnly.items():
             if value is not noValue:
-                representation += ", %s=%r" % (attr, value)
+                representation += f", {attr}={value!r}"
 
         if self.isValue and self.components:
             representation += ", payload [%s]" % ", ".join(

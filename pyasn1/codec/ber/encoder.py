@@ -24,7 +24,7 @@ __all__ = ["Encoder", "encode"]
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
 
 
-class AbstractItemEncoder(object):
+class AbstractItemEncoder:
     supportIndefLenMode = True
 
     # An outcome of otherwise legit call `encodeFun(eoo.endOfOctets)`
@@ -106,7 +106,7 @@ class AbstractItemEncoder(object):
 
                 except error.PyAsn1Error:
                     exc = sys.exc_info()
-                    raise error.PyAsn1Error("Error encoding %r: %s" % (value, exc[1]))
+                    raise error.PyAsn1Error(f"Error encoding {value!r}: {exc[1]}")
 
                 if LOG:
                     LOG(
@@ -319,7 +319,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             second = oid[1]
 
         except IndexError:
-            raise error.PyAsn1Error("Short OID %s" % (value,))
+            raise error.PyAsn1Error(f"Short OID {value}")
 
         if 0 <= second <= 39:
             if first == 1:
@@ -329,13 +329,13 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             elif first == 2:
                 oid = (second + 80,) + oid[2:]
             else:
-                raise error.PyAsn1Error("Impossible first/second arcs at %s" % (value,))
+                raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
 
         elif first == 2:
             oid = (second + 80,) + oid[2:]
 
         else:
-            raise error.PyAsn1Error("Impossible first/second arcs at %s" % (value,))
+            raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
 
         octets = ()
 
@@ -358,7 +358,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
                 octets += res
 
             else:
-                raise error.PyAsn1Error("Negative OID arc %s at %s" % (subOid, value))
+                raise error.PyAsn1Error(f"Negative OID arc {subOid} at {value}")
 
         return octets, False, False
 
@@ -564,12 +564,12 @@ class SequenceEncoder(AbstractItemEncoder):
 
                     if namedType.isOptional and not component.isValue:
                         if LOG:
-                            LOG("not encoding OPTIONAL component %r" % (namedType,))
+                            LOG(f"not encoding OPTIONAL component {namedType!r}")
                         continue
 
                     if namedType.isDefaulted and component == namedType.asn1Object:
                         if LOG:
-                            LOG("not encoding DEFAULT component %r" % (namedType,))
+                            LOG(f"not encoding DEFAULT component {namedType!r}")
                         continue
 
                     if omitEmptyOptionals:
@@ -598,7 +598,7 @@ class SequenceEncoder(AbstractItemEncoder):
                             substrate += encodeFun(chunk, wrapType, **options)
 
                             if LOG:
-                                LOG("wrapped with wrap type %r" % (wrapType,))
+                                LOG(f"wrapped with wrap type {wrapType!r}")
 
                 else:
                     substrate += encodeFun(component, asn1Spec, **options)
@@ -612,17 +612,17 @@ class SequenceEncoder(AbstractItemEncoder):
 
                 except KeyError:
                     raise error.PyAsn1Error(
-                        'Component name "%s" not found in %r' % (namedType.name, value)
+                        f'Component name "{namedType.name}" not found in {value!r}'
                     )
 
                 if namedType.isOptional and namedType.name not in value:
                     if LOG:
-                        LOG("not encoding OPTIONAL component %r" % (namedType,))
+                        LOG(f"not encoding OPTIONAL component {namedType!r}")
                     continue
 
                 if namedType.isDefaulted and component == namedType.asn1Object:
                     if LOG:
-                        LOG("not encoding DEFAULT component %r" % (namedType,))
+                        LOG(f"not encoding DEFAULT component {namedType!r}")
                     continue
 
                 if omitEmptyOptionals:
@@ -654,7 +654,7 @@ class SequenceEncoder(AbstractItemEncoder):
                             substrate += encodeFun(chunk, componentSpec, **options)
 
                             if LOG:
-                                LOG("wrapped with wrap type %r" % (componentSpec,))
+                                LOG(f"wrapped with wrap type {componentSpec!r}")
 
                 else:
                     substrate += encodeFun(component, componentSpec, **options)
@@ -685,7 +685,7 @@ class SequenceOfEncoder(AbstractItemEncoder):
                 chunk = encodeFun(chunk, wrapType, **options)
 
                 if LOG:
-                    LOG("wrapped with wrap type %r" % (wrapType,))
+                    LOG(f"wrapped with wrap type {wrapType!r}")
 
             chunks.append(chunk)
 
@@ -799,7 +799,7 @@ TYPE_MAP = {
 }
 
 
-class SingleItemEncoder(object):
+class SingleItemEncoder:
     fixedDefLengthMode = None
     fixedChunkSize = None
 
@@ -865,7 +865,7 @@ class SingleItemEncoder(object):
                 concreteEncoder = self._tagMap[baseTagSet]
 
             except KeyError:
-                raise error.PyAsn1Error("No encoder for %r (%s)" % (value, tagSet))
+                raise error.PyAsn1Error(f"No encoder for {value!r} ({tagSet})")
 
             if LOG:
                 LOG(
@@ -885,7 +885,7 @@ class SingleItemEncoder(object):
         return substrate
 
 
-class Encoder(object):
+class Encoder:
     SINGLE_ITEM_ENCODER = SingleItemEncoder
 
     def __init__(self, **options):

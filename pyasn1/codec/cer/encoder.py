@@ -30,7 +30,7 @@ class RealEncoder(encoder.RealEncoder):
 # specialized GeneralStringEncoder here
 
 
-class TimeEncoderMixIn(object):
+class TimeEncoderMixIn:
     Z_CHAR = ord("Z")
     PLUS_CHAR = ord("+")
     MINUS_CHAR = ord("-")
@@ -197,7 +197,7 @@ class SetEncoder(encoder.SequenceEncoder):
 
                 except KeyError:
                     raise error.PyAsn1Error(
-                        'Component name "%s" not found in %r' % (namedType.name, value)
+                        f'Component name "{namedType.name}" not found in {value!r}'
                     )
 
                 if namedType.isOptional and namedType.name not in value:

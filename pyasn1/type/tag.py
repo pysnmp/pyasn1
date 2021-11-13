@@ -43,7 +43,7 @@ tagCategoryExplicit = 0x02
 tagCategoryUntagged = 0x04
 
 
-class Tag(object):
+class Tag:
     """Create ASN.1 tag
 
     Represents ASN.1 tag that can be attached to a ASN.1 type to make
@@ -74,12 +74,12 @@ class Tag(object):
         self.__hash = hash(self.__tagClassId)
 
     def __repr__(self):
-        representation = "[%s:%s:%s]" % (
+        representation = "[{}:{}:{}]".format(
             self.__tagClass,
             self.__tagFormat,
             self.__tagId,
         )
-        return "<%s object, tag %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, tag {representation}>"
 
     def __eq__(self, other):
         return self.__tagClassId == other
@@ -165,7 +165,7 @@ class Tag(object):
         return self.__tagId
 
 
-class TagSet(object):
+class TagSet:
     """Create a collection of ASN.1 tags
 
     Represents a combination of :class:`~pyasn1.type.tag.Tag` objects
@@ -205,21 +205,21 @@ class TagSet(object):
         self.__baseTag = baseTag
         self.__superTags = superTags
         self.__superTagsClassId = tuple(
-            [(superTag.tagClass, superTag.tagId) for superTag in superTags]
+            (superTag.tagClass, superTag.tagId) for superTag in superTags
         )
         self.__lenOfSuperTags = len(superTags)
         self.__hash = hash(self.__superTagsClassId)
 
     def __repr__(self):
         representation = "-".join(
-            ["%s:%s:%s" % (x.tagClass, x.tagFormat, x.tagId) for x in self.__superTags]
+            [f"{x.tagClass}:{x.tagFormat}:{x.tagId}" for x in self.__superTags]
         )
         if representation:
             representation = "tags " + representation
         else:
             representation = "untagged"
 
-        return "<%s object, %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, {representation}>"
 
     def __add__(self, superTag):
         return self.__class__(self.__baseTag, *self.__superTags + (superTag,))

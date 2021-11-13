@@ -11,7 +11,7 @@ from pyasn1 import error
 __all__ = ["NamedValues"]
 
 
-class NamedValues(object):
+class NamedValues:
     """Create named values object.
 
     The |NamedValues| object represents a collection of string names
@@ -66,7 +66,7 @@ class NamedValues(object):
 
                 except ValueError:
                     raise error.PyAsn1Error(
-                        "Not a proper attribute-value pair %r" % (namedValue,)
+                        f"Not a proper attribute-value pair {namedValue!r}"
                     )
 
             else:
@@ -74,20 +74,20 @@ class NamedValues(object):
                 continue
 
             if name in self.__names:
-                raise error.PyAsn1Error("Duplicate name %s" % (name,))
+                raise error.PyAsn1Error(f"Duplicate name {name}")
 
             if number in self.__numbers:
-                raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
+                raise error.PyAsn1Error(f"Duplicate number  {name}={number}")
 
             self.__names[name] = number
             self.__numbers[number] = name
 
         for name, number in kwargs.items():
             if name in self.__names:
-                raise error.PyAsn1Error("Duplicate name %s" % (name,))
+                raise error.PyAsn1Error(f"Duplicate name {name}")
 
             if number in self.__numbers:
-                raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
+                raise error.PyAsn1Error(f"Duplicate number  {name}={number}")
 
             self.__names[name] = number
             self.__numbers[number] = name
@@ -99,7 +99,7 @@ class NamedValues(object):
             for name in anonymousNames:
 
                 if name in self.__names:
-                    raise error.PyAsn1Error("Duplicate name %s" % (name,))
+                    raise error.PyAsn1Error(f"Duplicate name {name}")
 
                 self.__names[name] = number
                 self.__numbers[number] = name
@@ -112,7 +112,7 @@ class NamedValues(object):
         if len(representation) > 64:
             representation = representation[:32] + "..." + representation[-32:]
 
-        return "<%s object, enums %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, enums {representation}>"
 
     def __eq__(self, other):
         return dict(self) == other
@@ -190,5 +190,5 @@ class NamedValues(object):
 
         except KeyError:
             raise error.PyAsn1Error(
-                "Unknown bit identifier(s): %s" % (set(names).difference(self.__names),)
+                f"Unknown bit identifier(s): {set(names).difference(self.__names)}"
             )

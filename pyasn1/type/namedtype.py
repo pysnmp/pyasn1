@@ -18,7 +18,7 @@ except NameError:
     any = lambda x: bool(filter(bool, x))
 
 
-class NamedType(object):
+class NamedType:
     """Create named field object for a constructed ASN.1 type.
 
     The |NamedType| object represents a single name and ASN.1 type of a constructed ASN.1 type.
@@ -45,12 +45,12 @@ class NamedType(object):
         self.__openType = openType
 
     def __repr__(self):
-        representation = "%s=%r" % (self.name, self.asn1Object)
+        representation = f"{self.name}={self.asn1Object!r}"
 
         if self.openType:
             representation += ", open type %r" % self.openType
 
-        return "<%s object, type %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, type {representation}>"
 
     def __eq__(self, other):
         return self.__nameAndType == other
@@ -112,7 +112,7 @@ class DefaultedNamedType(NamedType):
     isDefaulted = True
 
 
-class NamedTypes(object):
+class NamedTypes:
     """Create a collection of named fields for a constructed ASN.1 type.
 
     The NamedTypes object represents a collection of named fields of a constructed ASN.1 type.
@@ -173,21 +173,21 @@ class NamedTypes(object):
         )
 
         self.__requiredComponents = frozenset(
-            [
+            
                 idx
                 for idx, nt in enumerate(self.__namedTypes)
                 if not nt.isOptional and not nt.isDefaulted
-            ]
+            
         )
-        self.__keys = frozenset([namedType.name for namedType in self.__namedTypes])
-        self.__values = tuple([namedType.asn1Object for namedType in self.__namedTypes])
+        self.__keys = frozenset(namedType.name for namedType in self.__namedTypes)
+        self.__values = tuple(namedType.asn1Object for namedType in self.__namedTypes)
         self.__items = tuple(
-            [(namedType.name, namedType.asn1Object) for namedType in self.__namedTypes]
+            (namedType.name, namedType.asn1Object) for namedType in self.__namedTypes
         )
 
     def __repr__(self):
         representation = ", ".join(["%r" % x for x in self.__namedTypes])
-        return "<%s object, types %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, types {representation}>"
 
     def __eq__(self, other):
         return self.__namedTypes == other
@@ -243,7 +243,7 @@ class NamedTypes(object):
     def clone(self):
         return self.__class__(*self.__namedTypes)
 
-    class PostponedError(object):
+    class PostponedError:
         def __init__(self, errorMsg):
             self.__errorMsg = errorMsg
 
@@ -261,7 +261,7 @@ class NamedTypes(object):
             for _tagSet in tagMap.presentTypes:
                 if _tagSet in tagToPosMap:
                     return NamedTypes.PostponedError(
-                        "Duplicate component tag %s at %s" % (_tagSet, namedType)
+                        f"Duplicate component tag {_tagSet} at {namedType}"
                     )
                 tagToPosMap[_tagSet] = idx
 
@@ -272,7 +272,7 @@ class NamedTypes(object):
         for idx, namedType in enumerate(self.__namedTypes):
             if namedType.name in nameToPosMap:
                 return NamedTypes.PostponedError(
-                    "Duplicate component name %s at %s" % (namedType.name, namedType)
+                    f"Duplicate component name {namedType.name} at {namedType}"
                 )
             nameToPosMap[namedType.name] = idx
 
@@ -340,7 +340,7 @@ class NamedTypes(object):
             return self.__tagToPosMap[tagSet]
 
         except KeyError:
-            raise error.PyAsn1Error("Type %s not found" % (tagSet,))
+            raise error.PyAsn1Error(f"Type {tagSet} not found")
 
     def getNameByPosition(self, idx):
         """Return field name by its position in fields set.
@@ -388,7 +388,7 @@ class NamedTypes(object):
             return self.__nameToPosMap[name]
 
         except KeyError:
-            raise error.PyAsn1Error("Name %s not found" % (name,))
+            raise error.PyAsn1Error(f"Name {name} not found")
 
     def getTagMapNearPosition(self, idx):
         """Return ASN.1 types that are allowed at or past given field position.
@@ -494,7 +494,7 @@ class NamedTypes(object):
             for tagSet in tagMap:
                 if unique and tagSet in presentTypes:
                     return NamedTypes.PostponedError(
-                        "Non-unique tagSet %s of %s at %s" % (tagSet, namedType, self)
+                        f"Non-unique tagSet {tagSet} of {namedType} at {self}"
                     )
                 presentTypes[tagSet] = namedType.asn1Object
             skipTypes.update(tagMap.skipTypes)
@@ -503,7 +503,7 @@ class NamedTypes(object):
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
                 return NamedTypes.PostponedError(
-                    "Duplicate default ASN.1 type at %s" % (self,)
+                    f"Duplicate default ASN.1 type at {self}"
                 )
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)
