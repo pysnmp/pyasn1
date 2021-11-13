@@ -7,12 +7,23 @@
 import sys
 
 from pyasn1 import error
-from pyasn1.type import tag
-from pyasn1.type import univ
+from pyasn1.type import tag, univ
 
-__all__ = ['NumericString', 'PrintableString', 'TeletexString', 'T61String', 'VideotexString',
-           'IA5String', 'GraphicString', 'VisibleString', 'ISO646String',
-           'GeneralString', 'UniversalString', 'BMPString', 'UTF8String']
+__all__ = [
+    "NumericString",
+    "PrintableString",
+    "TeletexString",
+    "T61String",
+    "VideotexString",
+    "IA5String",
+    "GraphicString",
+    "VisibleString",
+    "ISO646String",
+    "GeneralString",
+    "UniversalString",
+    "BMPString",
+    "UTF8String",
+]
 
 NoValue = univ.NoValue
 noValue = univ.noValue
@@ -55,6 +66,7 @@ class AbstractCharacterString(univ.OctetString):
     """
 
     if sys.version_info[0] <= 2:
+
         def __str__(self):
             try:
                 # `str` is Py2 text representation
@@ -64,7 +76,8 @@ class AbstractCharacterString(univ.OctetString):
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeEncodeError(
                     "Can't encode string '%s' with codec "
-                    "%s" % (self._value, self.encoding), exc
+                    "%s" % (self._value, self.encoding),
+                    exc,
                 )
 
         def __unicode__(self):
@@ -77,7 +90,7 @@ class AbstractCharacterString(univ.OctetString):
                 elif isinstance(value, str):
                     return value.decode(self.encoding)
                 elif isinstance(value, (tuple, list)):
-                    return self.prettyIn(''.join([chr(x) for x in value]))
+                    return self.prettyIn("".join([chr(x) for x in value]))
                 elif isinstance(value, univ.OctetString):
                     return value.asOctets().decode(self.encoding)
                 else:
@@ -87,7 +100,8 @@ class AbstractCharacterString(univ.OctetString):
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeDecodeError(
                     "Can't decode string '%s' with codec "
-                    "%s" % (value, self.encoding), exc
+                    "%s" % (value, self.encoding),
+                    exc,
                 )
 
         def asOctets(self, padding=True):
@@ -97,6 +111,7 @@ class AbstractCharacterString(univ.OctetString):
             return tuple([ord(x) for x in str(self)])
 
     else:
+
         def __str__(self):
             # `unicode` is Py3 text representation
             return str(self._value)
@@ -108,7 +123,8 @@ class AbstractCharacterString(univ.OctetString):
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeEncodeError(
                     "Can't encode string '%s' with codec "
-                    "%s" % (self._value, self.encoding), exc
+                    "%s" % (self._value, self.encoding),
+                    exc,
                 )
 
         def prettyIn(self, value):
@@ -128,7 +144,8 @@ class AbstractCharacterString(univ.OctetString):
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeDecodeError(
                     "Can't decode string '%s' with codec "
-                    "%s" % (value, self.encoding), exc
+                    "%s" % (value, self.encoding),
+                    exc,
                 )
 
         def asOctets(self, padding=True):
@@ -166,7 +183,7 @@ class NumericString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 18)
     )
-    encoding = 'us-ascii'
+    encoding = "us-ascii"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -181,7 +198,7 @@ class PrintableString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 19)
     )
-    encoding = 'us-ascii'
+    encoding = "us-ascii"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -196,7 +213,7 @@ class TeletexString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 20)
     )
-    encoding = 'iso-8859-1'
+    encoding = "iso-8859-1"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -218,7 +235,7 @@ class VideotexString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 21)
     )
-    encoding = 'iso-8859-1'
+    encoding = "iso-8859-1"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -233,7 +250,7 @@ class IA5String(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 22)
     )
-    encoding = 'us-ascii'
+    encoding = "us-ascii"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -248,7 +265,7 @@ class GraphicString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 25)
     )
-    encoding = 'iso-8859-1'
+    encoding = "iso-8859-1"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -263,7 +280,7 @@ class VisibleString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 26)
     )
-    encoding = 'us-ascii'
+    encoding = "us-ascii"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -275,6 +292,7 @@ class ISO646String(VisibleString):
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
+
 class GeneralString(AbstractCharacterString):
     __doc__ = AbstractCharacterString.__doc__
 
@@ -284,7 +302,7 @@ class GeneralString(AbstractCharacterString):
     tagSet = AbstractCharacterString.tagSet.tagImplicitly(
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 27)
     )
-    encoding = 'iso-8859-1'
+    encoding = "iso-8859-1"
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()

@@ -6,22 +6,17 @@
 #
 from collections import OrderedDict
 
-from pyasn1 import debug
-from pyasn1 import error
-from pyasn1.type import base
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import univ
-from pyasn1.type import useful
+from pyasn1 import debug, error
+from pyasn1.type import base, char, tag, univ, useful
 
-__all__ = ['encode']
+__all__ = ["encode"]
 
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
 
 
 class AbstractItemEncoder(object):
     def encode(self, value, encodeFun, **options):
-        raise error.PyAsn1Error('Not implemented')
+        raise error.PyAsn1Error("Not implemented")
 
 
 class BooleanEncoder(AbstractItemEncoder):
@@ -131,7 +126,7 @@ TAG_MAP = {
     # useful types
     useful.ObjectDescriptor.tagSet: OctetStringEncoder(),
     useful.GeneralizedTime.tagSet: OctetStringEncoder(),
-    useful.UTCTime.tagSet: OctetStringEncoder()
+    useful.UTCTime.tagSet: OctetStringEncoder(),
 }
 
 
@@ -167,7 +162,7 @@ TYPE_MAP = {
     # useful types
     useful.ObjectDescriptor.typeId: OctetStringEncoder(),
     useful.GeneralizedTime.typeId: OctetStringEncoder(),
-    useful.UTCTime.typeId: OctetStringEncoder()
+    useful.UTCTime.typeId: OctetStringEncoder(),
 }
 
 
@@ -177,18 +172,21 @@ class SingleItemEncoder(object):
     TYPE_MAP = TYPE_MAP
 
     def __init__(self, **options):
-        self._tagMap = options.get('tagMap', self.TAG_MAP)
-        self._typeMap = options.get('typeMap', self.TYPE_MAP)
+        self._tagMap = options.get("tagMap", self.TAG_MAP)
+        self._typeMap = options.get("typeMap", self.TYPE_MAP)
 
     def __call__(self, value, **options):
         if not isinstance(value, base.Asn1Item):
             raise error.PyAsn1Error(
-                'value is not valid (should be an instance of an ASN.1 Item)')
+                "value is not valid (should be an instance of an ASN.1 Item)"
+            )
 
         if LOG:
             debug.scope.push(type(value).__name__)
-            LOG('encoder called for type %s '
-                '<%s>' % (type(value).__name__, value.prettyPrint()))
+            LOG(
+                "encoder called for type %s "
+                "<%s>" % (type(value).__name__, value.prettyPrint())
+            )
 
         tagSet = value.tagSet
 
@@ -197,24 +195,27 @@ class SingleItemEncoder(object):
 
         except KeyError:
             # use base type for codec lookup to recover untagged types
-            baseTagSet = tag.TagSet(
-                value.tagSet.baseTag, value.tagSet.baseTag)
+            baseTagSet = tag.TagSet(value.tagSet.baseTag, value.tagSet.baseTag)
 
             try:
                 concreteEncoder = self._tagMap[baseTagSet]
 
             except KeyError:
-                raise error.PyAsn1Error('No encoder for %s' % (value,))
+                raise error.PyAsn1Error("No encoder for %s" % (value,))
 
         if LOG:
-            LOG('using value codec %s chosen by '
-                '%s' % (concreteEncoder.__class__.__name__, tagSet))
+            LOG(
+                "using value codec %s chosen by "
+                "%s" % (concreteEncoder.__class__.__name__, tagSet)
+            )
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
         if LOG:
-            LOG('encoder %s produced: '
-                '%s' % (type(concreteEncoder).__name__, repr(pyObject)))
+            LOG(
+                "encoder %s produced: "
+                "%s" % (type(concreteEncoder).__name__, repr(pyObject))
+            )
             debug.scope.pop()
 
         return pyObject
@@ -227,8 +228,7 @@ class Encoder(object):
         self._singleItemEncoder = self.SINGLE_ITEM_ENCODER(**options)
 
     def __call__(self, pyObject, asn1Spec=None, **options):
-        return self._singleItemEncoder(
-            pyObject, asn1Spec=asn1Spec, **options)
+        return self._singleItemEncoder(pyObject, asn1Spec=asn1Spec, **options)
 
 
 #: Turns ASN.1 object into a Python built-in type object(s).

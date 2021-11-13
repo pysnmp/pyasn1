@@ -7,10 +7,9 @@
 import unittest
 
 suite = unittest.TestLoader().loadTestsFromNames(
-    ['tests.codec.cer.test_encoder.suite',
-     'tests.codec.cer.test_decoder.suite']
+    ["tests.codec.cer.test_encoder.suite", "tests.codec.cer.test_decoder.suite"]
 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)

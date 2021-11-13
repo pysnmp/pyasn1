@@ -7,10 +7,8 @@
 import sys
 import unittest
 
+from pyasn1.type import constraint, error
 from tests.base import BaseTestCase
-
-from pyasn1.type import constraint
-from pyasn1.type import error
 
 
 class SingleValueConstraintTestCase(BaseTestCase):
@@ -22,17 +20,17 @@ class SingleValueConstraintTestCase(BaseTestCase):
         self.c2 = constraint.SingleValueConstraint(*self.v2)
 
     def testCmp(self):
-        assert self.c1 == self.c1, 'comparison fails'
+        assert self.c1 == self.c1, "comparison fails"
 
     def testHash(self):
-        assert hash(self.c1) != hash(self.c2), 'hash() fails'
+        assert hash(self.c1) != hash(self.c2), "hash() fails"
 
     def testGoodVal(self):
         try:
             self.c1(1)
 
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -40,7 +38,7 @@ class SingleValueConstraintTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testContains(self):
         for v in self.v1:
@@ -75,7 +73,7 @@ class ContainedSubtypeConstraintTestCase(BaseTestCase):
         try:
             self.c1(12)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -83,7 +81,7 @@ class ContainedSubtypeConstraintTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class ValueRangeConstraintTestCase(BaseTestCase):
@@ -95,7 +93,7 @@ class ValueRangeConstraintTestCase(BaseTestCase):
         try:
             self.c1(1)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -103,7 +101,7 @@ class ValueRangeConstraintTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class ValueSizeConstraintTestCase(BaseTestCase):
@@ -113,140 +111,140 @@ class ValueSizeConstraintTestCase(BaseTestCase):
 
     def testGoodVal(self):
         try:
-            self.c1('a')
+            self.c1("a")
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
-            self.c1('abc')
+            self.c1("abc")
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class PermittedAlphabetConstraintTestCase(SingleValueConstraintTestCase):
     def setUp(self):
-        self.v1 = 'A', 'B'
-        self.v2 = 'C', 'D'
+        self.v1 = "A", "B"
+        self.v2 = "C", "D"
         self.c1 = constraint.PermittedAlphabetConstraint(*self.v1)
         self.c2 = constraint.PermittedAlphabetConstraint(*self.v2)
 
     def testGoodVal(self):
         try:
-            self.c1('A')
+            self.c1("A")
 
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
-            self.c1('E')
+            self.c1("E")
 
         except error.ValueConstraintError:
             pass
 
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class WithComponentsConstraintTestCase(BaseTestCase):
-
     def testGoodVal(self):
         c = constraint.WithComponentsConstraint(
-            ('A', constraint.ComponentPresentConstraint()),
-            ('B', constraint.ComponentAbsentConstraint()))
-
-        try:
-            c({'A': 1})
-
-        except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
-
-    def testGoodValWithExtraFields(self):
-        c = constraint.WithComponentsConstraint(
-            ('A', constraint.ComponentPresentConstraint()),
-            ('B', constraint.ComponentAbsentConstraint())
+            ("A", constraint.ComponentPresentConstraint()),
+            ("B", constraint.ComponentAbsentConstraint()),
         )
 
         try:
-            c({'A': 1, 'C': 2})
+            c({"A": 1})
 
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
+
+    def testGoodValWithExtraFields(self):
+        c = constraint.WithComponentsConstraint(
+            ("A", constraint.ComponentPresentConstraint()),
+            ("B", constraint.ComponentAbsentConstraint()),
+        )
+
+        try:
+            c({"A": 1, "C": 2})
+
+        except error.ValueConstraintError:
+            assert 0, "constraint check fails"
 
     def testEmptyConstraint(self):
         c = constraint.WithComponentsConstraint()
 
         try:
-            c({'A': 1})
+            c({"A": 1})
 
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         c = constraint.WithComponentsConstraint(
-            ('A', constraint.ComponentPresentConstraint())
+            ("A", constraint.ComponentPresentConstraint())
         )
 
         try:
-            c({'B': 2})
+            c({"B": 2})
 
         except error.ValueConstraintError:
             pass
 
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadValExtraFields(self):
         c = constraint.WithComponentsConstraint(
-            ('A', constraint.ComponentPresentConstraint())
+            ("A", constraint.ComponentPresentConstraint())
         )
 
         try:
-            c({'B': 2, 'C': 3})
+            c({"B": 2, "C": 3})
 
         except error.ValueConstraintError:
             pass
 
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class ConstraintsIntersectionTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
         self.c1 = constraint.ConstraintsIntersection(
-            constraint.SingleValueConstraint(4),
-            constraint.ValueRangeConstraint(2, 4)
+            constraint.SingleValueConstraint(4), constraint.ValueRangeConstraint(2, 4)
         )
 
     def testCmp1(self):
-        assert constraint.SingleValueConstraint(4) in self.c1, '__cmp__() fails'
+        assert constraint.SingleValueConstraint(4) in self.c1, "__cmp__() fails"
 
     def testCmp2(self):
-        assert constraint.SingleValueConstraint(5) not in self.c1, \
-            '__cmp__() fails'
+        assert constraint.SingleValueConstraint(5) not in self.c1, "__cmp__() fails"
 
     def testCmp3(self):
-        c = constraint.ConstraintsUnion(constraint.ConstraintsIntersection(
-            constraint.SingleValueConstraint(4),
-            constraint.ValueRangeConstraint(2, 4))
+        c = constraint.ConstraintsUnion(
+            constraint.ConstraintsIntersection(
+                constraint.SingleValueConstraint(4),
+                constraint.ValueRangeConstraint(2, 4),
+            )
         )
-        assert self.c1 in c, '__cmp__() fails'
+        assert self.c1 in c, "__cmp__() fails"
 
     def testCmp4(self):
         c = constraint.ConstraintsUnion(
             constraint.ConstraintsIntersection(constraint.SingleValueConstraint(5))
         )
-        assert self.c1 not in c, '__cmp__() fails'
+        assert self.c1 not in c, "__cmp__() fails"
 
     def testGoodVal(self):
         try:
             self.c1(4)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -254,46 +252,44 @@ class ConstraintsIntersectionTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class InnerTypeConstraintTestCase(BaseTestCase):
     def testConst1(self):
-        c = constraint.InnerTypeConstraint(
-            constraint.SingleValueConstraint(4)
-        )
+        c = constraint.InnerTypeConstraint(constraint.SingleValueConstraint(4))
         try:
             c(4, 32)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
         try:
             c(5, 32)
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testConst2(self):
         c = constraint.InnerTypeConstraint(
-            (0, constraint.SingleValueConstraint(4), 'PRESENT'),
-            (1, constraint.SingleValueConstraint(4), 'ABSENT')
+            (0, constraint.SingleValueConstraint(4), "PRESENT"),
+            (1, constraint.SingleValueConstraint(4), "ABSENT"),
         )
         try:
             c(4, 0)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
         try:
             c(4, 1)
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
         try:
             c(3, 0)
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
         # Constraints compositions
 
@@ -302,15 +298,14 @@ class ConstraintsIntersectionRangeTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
         self.c1 = constraint.ConstraintsIntersection(
-            constraint.ValueRangeConstraint(1, 9),
-            constraint.ValueRangeConstraint(2, 5)
+            constraint.ValueRangeConstraint(1, 9), constraint.ValueRangeConstraint(2, 5)
         )
 
     def testGoodVal(self):
         try:
             self.c1(3)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -318,15 +313,14 @@ class ConstraintsIntersectionRangeTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class ConstraintsUnionTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
         self.c1 = constraint.ConstraintsUnion(
-            constraint.SingleValueConstraint(5),
-            constraint.ValueRangeConstraint(1, 3)
+            constraint.SingleValueConstraint(5), constraint.ValueRangeConstraint(1, 3)
         )
 
     def testGoodVal(self):
@@ -334,7 +328,7 @@ class ConstraintsUnionTestCase(BaseTestCase):
             self.c1(2)
             self.c1(5)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -342,21 +336,19 @@ class ConstraintsUnionTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 class ConstraintsExclusionTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
-        self.c1 = constraint.ConstraintsExclusion(
-            constraint.ValueRangeConstraint(2, 4)
-        )
+        self.c1 = constraint.ConstraintsExclusion(constraint.ValueRangeConstraint(2, 4))
 
     def testGoodVal(self):
         try:
             self.c1(6)
         except error.ValueConstraintError:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
     def testBadVal(self):
         try:
@@ -364,10 +356,11 @@ class ConstraintsExclusionTestCase(BaseTestCase):
         except error.ValueConstraintError:
             pass
         else:
-            assert 0, 'constraint check fails'
+            assert 0, "constraint check fails"
 
 
 # Constraints derivations
+
 
 class DirectDerivationTestCase(BaseTestCase):
     def setUp(self):
@@ -380,12 +373,12 @@ class DirectDerivationTestCase(BaseTestCase):
         )
 
     def testGoodVal(self):
-        assert self.c1.isSuperTypeOf(self.c2), 'isSuperTypeOf failed'
-        assert not self.c1.isSubTypeOf(self.c2), 'isSubTypeOf failed'
+        assert self.c1.isSuperTypeOf(self.c2), "isSuperTypeOf failed"
+        assert not self.c1.isSubTypeOf(self.c2), "isSubTypeOf failed"
 
     def testBadVal(self):
-        assert not self.c2.isSuperTypeOf(self.c1), 'isSuperTypeOf failed'
-        assert self.c2.isSubTypeOf(self.c1), 'isSubTypeOf failed'
+        assert not self.c2.isSuperTypeOf(self.c1), "isSuperTypeOf failed"
+        assert self.c2.isSubTypeOf(self.c1), "isSubTypeOf failed"
 
 
 class IndirectDerivationTestCase(BaseTestCase):
@@ -405,16 +398,17 @@ class IndirectDerivationTestCase(BaseTestCase):
         )
 
     def testGoodVal(self):
-        assert self.c1.isSuperTypeOf(self.c2), 'isSuperTypeOf failed'
-        assert not self.c1.isSubTypeOf(self.c2), 'isSubTypeOf failed'
+        assert self.c1.isSuperTypeOf(self.c2), "isSuperTypeOf failed"
+        assert not self.c1.isSubTypeOf(self.c2), "isSubTypeOf failed"
 
     def testBadVal(self):
-        assert not self.c2.isSuperTypeOf(self.c1), 'isSuperTypeOf failed'
-        assert self.c2.isSubTypeOf(self.c1), 'isSubTypeOf failed'
+        assert not self.c2.isSuperTypeOf(self.c1), "isSuperTypeOf failed"
+        assert self.c2.isSubTypeOf(self.c1), "isSubTypeOf failed"
+
 
 # TODO: how to apply size constraints to constructed types?
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)

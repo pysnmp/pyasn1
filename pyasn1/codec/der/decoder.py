@@ -7,7 +7,7 @@
 from pyasn1.codec.cer import decoder
 from pyasn1.type import univ
 
-__all__ = ['decode', 'StreamingDecoder']
+__all__ = ["decode", "StreamingDecoder"]
 
 
 class BitStringPayloadDecoder(decoder.BitStringPayloadDecoder):
@@ -23,9 +23,11 @@ RealPayloadDecoder = decoder.RealPayloadDecoder
 
 TAG_MAP = decoder.TAG_MAP.copy()
 TAG_MAP.update(
-    {univ.BitString.tagSet: BitStringPayloadDecoder(),
-     univ.OctetString.tagSet: OctetStringPayloadDecoder(),
-     univ.Real.tagSet: RealPayloadDecoder()}
+    {
+        univ.BitString.tagSet: BitStringPayloadDecoder(),
+        univ.OctetString.tagSet: OctetStringPayloadDecoder(),
+        univ.Real.tagSet: RealPayloadDecoder(),
+    }
 )
 
 TYPE_MAP = decoder.TYPE_MAP.copy()

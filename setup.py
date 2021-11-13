@@ -33,7 +33,8 @@ Topic :: Software Development :: Libraries :: Python Modules
 
 
 def howto_install_setuptools():
-    print("""
+    print(
+        """
    Error: You need setuptools Python package!
 
    It's very easy to install it, just type:
@@ -42,7 +43,8 @@ def howto_install_setuptools():
    python ez_setup.py
 
    Then you could make eggs from this package.
-""")
+"""
+    )
 
 
 if sys.version_info[:2] < (2, 7):
@@ -50,42 +52,45 @@ if sys.version_info[:2] < (2, 7):
     sys.exit(1)
 
 try:
-    from setuptools import setup, Command
+    from setuptools import Command, setup
 
-    params = {
-        'zip_safe': True
-    }
+    params = {"zip_safe": True}
 
 except ImportError:
     for arg in sys.argv:
-        if 'egg' in arg:
+        if "egg" in arg:
             howto_install_setuptools()
             sys.exit(1)
-    from distutils.core import setup, Command
+    from distutils.core import Command, setup
 
     params = {}
 
-params.update({
-    'name': 'pyasn1',
-    'version': open(os.path.join('pyasn1', '__init__.py')).read().split('\'')[1],
-    'description': 'ASN.1 types and codecs',
-    'long_description': 'Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)',
-    'maintainer': 'Ilya Etingof <etingof@gmail.com>',
-    'author': 'Ilya Etingof',
-    'author_email': 'etingof@gmail.com',
-    'url': 'https://github.com/pysnmp/pyasn1',
-    'platforms': ['any'],
-    'classifiers': [x for x in classifiers.split('\n') if x],
-    'license': 'BSD',
-    'packages': ['pyasn1',
-                 'pyasn1.type',
-                 'pyasn1.compat',
-                 'pyasn1.codec',
-                 'pyasn1.codec.ber',
-                 'pyasn1.codec.cer',
-                 'pyasn1.codec.der',
-                 'pyasn1.codec.native'],
-    'python_requires': '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*'})
+params.update(
+    {
+        "name": "pyasn1",
+        "version": open(os.path.join("pyasn1", "__init__.py")).read().split("'")[1],
+        "description": "ASN.1 types and codecs",
+        "long_description": "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)",
+        "maintainer": "Ilya Etingof <etingof@gmail.com>",
+        "author": "Ilya Etingof",
+        "author_email": "etingof@gmail.com",
+        "url": "https://github.com/pysnmp/pyasn1",
+        "platforms": ["any"],
+        "classifiers": [x for x in classifiers.split("\n") if x],
+        "license": "BSD",
+        "packages": [
+            "pyasn1",
+            "pyasn1.type",
+            "pyasn1.compat",
+            "pyasn1.codec",
+            "pyasn1.codec.ber",
+            "pyasn1.codec.cer",
+            "pyasn1.codec.der",
+            "pyasn1.codec.native",
+        ],
+        "python_requires": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+    }
+)
 
 
 class PyTest(Command):
@@ -98,15 +103,14 @@ class PyTest(Command):
         pass
 
     def run(self):
-        suite = unittest.TestLoader().loadTestsFromNames(
-            ['tests.__main__.suite']
-        )
+        suite = unittest.TestLoader().loadTestsFromNames(["tests.__main__.suite"])
 
         unittest.TextTestRunner(verbosity=2).run(suite)
 
-params['cmdclass'] = {
-    'test': PyTest,
-    'tests': PyTest,
+
+params["cmdclass"] = {
+    "test": PyTest,
+    "tests": PyTest,
 }
 
 setup(**params)

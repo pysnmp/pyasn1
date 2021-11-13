@@ -5,12 +5,12 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 from pyasn1 import error
-from pyasn1.codec.streaming import readFromStream
 from pyasn1.codec.ber import decoder
+from pyasn1.codec.streaming import readFromStream
 from pyasn1.compat.octets import oct2int
 from pyasn1.type import univ
 
-__all__ = ['decode', 'StreamingDecoder']
+__all__ = ["decode", "StreamingDecoder"]
 
 SubstrateUnderrunError = error.SubstrateUnderrunError
 
@@ -18,13 +18,20 @@ SubstrateUnderrunError = error.SubstrateUnderrunError
 class BooleanPayloadDecoder(decoder.AbstractSimplePayloadDecoder):
     protoComponent = univ.Boolean(0)
 
-    def valueDecoder(self, substrate, asn1Spec,
-                     tagSet=None, length=None, state=None,
-                     decodeFun=None, substrateFun=None,
-                     **options):
+    def valueDecoder(
+        self,
+        substrate,
+        asn1Spec,
+        tagSet=None,
+        length=None,
+        state=None,
+        decodeFun=None,
+        substrateFun=None,
+        **options
+    ):
 
         if length != 1:
-            raise error.PyAsn1Error('Not single-octet Boolean payload')
+            raise error.PyAsn1Error("Not single-octet Boolean payload")
 
         for chunk in readFromStream(substrate, length, options):
             if isinstance(chunk, SubstrateUnderrunError):
@@ -33,16 +40,16 @@ class BooleanPayloadDecoder(decoder.AbstractSimplePayloadDecoder):
         byte = oct2int(chunk[0])
 
         # CER/DER specifies encoding of TRUE as 0xFF and FALSE as 0x0, while
-        # BER allows any non-zero value as TRUE; cf. sections 8.2.2. and 11.1 
+        # BER allows any non-zero value as TRUE; cf. sections 8.2.2. and 11.1
         # in https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf
-        if byte == 0xff:
+        if byte == 0xFF:
             value = 1
 
         elif byte == 0x00:
             value = 0
 
         else:
-            raise error.PyAsn1Error('Unexpected Boolean payload: %s' % byte)
+            raise error.PyAsn1Error("Unexpected Boolean payload: %s" % byte)
 
         yield self._createComponent(asn1Spec, tagSet, value, **options)
 
@@ -54,10 +61,12 @@ RealPayloadDecoder = decoder.RealPayloadDecoder
 
 TAG_MAP = decoder.TAG_MAP.copy()
 TAG_MAP.update(
-    {univ.Boolean.tagSet: BooleanPayloadDecoder(),
-     univ.BitString.tagSet: BitStringPayloadDecoder(),
-     univ.OctetString.tagSet: OctetStringPayloadDecoder(),
-     univ.Real.tagSet: RealPayloadDecoder()}
+    {
+        univ.Boolean.tagSet: BooleanPayloadDecoder(),
+        univ.BitString.tagSet: BitStringPayloadDecoder(),
+        univ.OctetString.tagSet: OctetStringPayloadDecoder(),
+        univ.Real.tagSet: RealPayloadDecoder(),
+    }
 )
 
 TYPE_MAP = decoder.TYPE_MAP.copy()

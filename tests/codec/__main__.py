@@ -7,13 +7,15 @@
 import unittest
 
 suite = unittest.TestLoader().loadTestsFromNames(
-    ['tests.codec.test_streaming.suite',
-     'tests.codec.ber.__main__.suite',
-     'tests.codec.cer.__main__.suite',
-     'tests.codec.der.__main__.suite',
-     'tests.codec.native.__main__.suite']
+    [
+        "tests.codec.test_streaming.suite",
+        "tests.codec.ber.__main__.suite",
+        "tests.codec.cer.__main__.suite",
+        "tests.codec.der.__main__.suite",
+        "tests.codec.native.__main__.suite",
+    ]
 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)

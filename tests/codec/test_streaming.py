@@ -13,9 +13,8 @@ try:
 except ImportError:
     import unittest
 
-from tests.base import BaseTestCase
-
 from pyasn1.codec import streaming
+from tests.base import BaseTestCase
 
 
 class CachingStreamWrapperTestCase(BaseTestCase):
@@ -71,5 +70,5 @@ class CachingStreamWrapperTestCase(BaseTestCase):
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)
