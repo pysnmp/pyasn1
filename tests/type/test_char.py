@@ -14,7 +14,7 @@ from pyasn1.type import char, constraint, univ
 from tests.base import BaseTestCase
 
 
-class AbstractStringTestCase(object):
+class AbstractStringTestCase:
 
     initializer = ()
     encoding = "us-ascii"

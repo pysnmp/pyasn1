@@ -53,7 +53,7 @@ class OctetsTestCase(BaseTestCase):
         assert octets.isStringType(bytes()) == False
 
     def test_ensureString(self):
-        assert "abc".encode() == octets.ensureString("abc".encode())
+        assert b"abc" == octets.ensureString(b"abc")
         assert bytes([1, 2, 3]) == octets.ensureString([1, 2, 3])
 
 
