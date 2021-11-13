@@ -20,11 +20,6 @@ Intended Audience :: Telecommunications Industry
 License :: OSI Approved :: BSD License
 Natural Language :: English
 Operating System :: OS Independent
-Programming Language :: Python :: 2
-Programming Language :: Python :: 2.7
-Programming Language :: Python :: 3
-Programming Language :: Python :: 3.5
-Programming Language :: Python :: 3.6
 Programming Language :: Python :: 3.7
 Programming Language :: Python :: 3.8
 Topic :: Communications
@@ -71,7 +66,7 @@ params.update(
         "version": open(os.path.join("pyasn1", "__init__.py")).read().split("'")[1],
         "description": "ASN.1 types and codecs",
         "long_description": "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)",
-        "maintainer": "Ilya Etingof <etingof@gmail.com>",
+        "maintainer": "Splunk <rfaircloth@splunk.com>",
         "author": "Ilya Etingof",
         "author_email": "etingof@gmail.com",
         "url": "https://github.com/pysnmp/pyasn1",
@@ -88,7 +83,7 @@ params.update(
             "pyasn1.codec.der",
             "pyasn1.codec.native",
         ],
-        "python_requires": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+        "python_requires": ">=3.7",
     }
 )
 
