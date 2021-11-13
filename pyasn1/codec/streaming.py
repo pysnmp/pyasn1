@@ -184,8 +184,7 @@ def peekIntoStream(substrate, size=-1):
     else:
         current_position = substrate.tell()
         try:
-            for chunk in readFromStream(substrate, size):
-                yield chunk
+            yield from readFromStream(substrate, size)
 
         finally:
             substrate.seek(current_position)
