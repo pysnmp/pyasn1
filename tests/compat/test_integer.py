@@ -18,33 +18,19 @@ from pyasn1.compat import integer
 
 class IntegerTestCase(BaseTestCase):
 
-    if sys.version_info[0] > 2:
 
-        def test_from_bytes_zero(self):
-            assert 0 == integer.from_bytes(bytes([0]), signed=False)
+    def test_from_bytes_zero(self):
+        assert 0 == integer.from_bytes(bytes([0]), signed=False)
 
-        def test_from_bytes_unsigned(self):
-            assert -66051 == integer.from_bytes(bytes([254, 253, 253]), signed=True)
+    def test_from_bytes_unsigned(self):
+        assert -66051 == integer.from_bytes(bytes([254, 253, 253]), signed=True)
 
-        def test_from_bytes_signed(self):
-            assert 66051 == integer.from_bytes(bytes([0, 1, 2, 3]), signed=False)
+    def test_from_bytes_signed(self):
+        assert 66051 == integer.from_bytes(bytes([0, 1, 2, 3]), signed=False)
 
-        def test_from_bytes_empty(self):
-            assert 0 == integer.from_bytes(bytes([]))
+    def test_from_bytes_empty(self):
+        assert 0 == integer.from_bytes(bytes([]))
 
-    else:
-
-        def test_from_bytes_zero(self):
-            assert 0 == integer.from_bytes('\x00', signed=False)
-
-        def test_from_bytes_unsigned(self):
-            assert -66051 == integer.from_bytes('\xfe\xfd\xfd', signed=True)
-
-        def test_from_bytes_signed(self):
-            assert 66051 == integer.from_bytes('\x01\x02\x03', signed=False)
-
-        def test_from_bytes_empty(self):
-            assert 0 == integer.from_bytes('')
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

@@ -63,12 +63,8 @@ class AbstractConstraint(object):
     def __ge__(self, other):
         return self._values >= other
 
-    if sys.version_info[0] <= 2:
-        def __nonzero__(self):
-            return self._values and True or False
-    else:
-        def __bool__(self):
-            return self._values and True or False
+    def __bool__(self):
+        return self._values and True or False
 
     def __hash__(self):
         return self.__hash

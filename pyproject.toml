@@ -30,6 +30,8 @@ python = "^3.7"
 Sphinx = "^4.3.0"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
+mypy = "^0.910"
+pytest-mypy = "^0.8.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

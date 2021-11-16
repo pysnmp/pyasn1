@@ -148,20 +148,13 @@ class NoValueTestCase(BaseTestCase):
     
     def testSizeOf(self):
         try:
-            if hasattr(sys, 'getsizeof'):
-                sys.getsizeof(univ.noValue)
-
-            # TODO: remove when Py2.5 support is gone
-            elif sys.version_info > (2, 6):
-                raise unittest.SkipTest("no sys.getsizeof() method")
+            sys.getsizeof(univ.noValue)
 
         except PyAsn1Error:
             assert False, 'sizeof failed for NoValue object'
 
         except TypeError:
-            # TODO: remove when Py2.5 support is gone
-            if sys.version_info > (2, 6):
-                raise unittest.SkipTest("sys.getsizeof() raises TypeError")
+            raise unittest.SkipTest("sys.getsizeof() raises TypeError")
 
 
 class IntegerTestCase(BaseTestCase):
@@ -210,25 +203,17 @@ class IntegerTestCase(BaseTestCase):
     def testDivInt(self):
         assert univ.Integer(4) / 2 == 2, '__div__() fails'
 
-    if sys.version_info[0] > 2:
-        def testDivFloat(self):
-            assert univ.Integer(3) / 2 == 1.5, '__div__() fails'
+    def testDivFloat(self):
+        assert univ.Integer(3) / 2 == 1.5, '__div__() fails'
 
-        def testRdivFloat(self):
-            assert 3 / univ.Integer(2) == 1.5, '__rdiv__() fails'
-    else:
-        def testDivFloat(self):
-            assert univ.Integer(3) / 2 == 1, '__div__() fails'
-
-        def testRdivFloat(self):
-            assert 3 / univ.Integer(2) == 1, '__rdiv__() fails'
+    def testRdivFloat(self):
+        assert 3 / univ.Integer(2) == 1.5, '__rdiv__() fails'
 
     def testRdivInt(self):
         assert 6 / univ.Integer(3) == 2, '__rdiv__() fails'
 
-    if sys.version_info[0] > 2:
-        def testTrueDiv(self):
-            assert univ.Integer(3) / univ.Integer(2) == 1.5, '__truediv__() fails'
+    def testTrueDiv(self):
+        assert univ.Integer(3) / univ.Integer(2) == 1.5, '__truediv__() fails'
 
     def testFloorDiv(self):
         assert univ.Integer(3) // univ.Integer(2) == 1, '__floordiv__() fails'
@@ -278,9 +263,8 @@ class IntegerTestCase(BaseTestCase):
     def testCeil(self):
         assert math.ceil(univ.Integer(1)) == 1, '__ceil__() fails'
 
-    if sys.version_info[0:2] > (2, 5):
-        def testTrunc(self):
-            assert math.trunc(univ.Integer(1)) == 1, '__trunc__() fails'
+    def testTrunc(self):
+        assert math.trunc(univ.Integer(1)) == 1, '__trunc__() fails'
 
     def testPrettyIn(self):
         assert univ.Integer('3') == 3, 'prettyIn() fails'
@@ -437,9 +421,8 @@ class BitStringTestCase(BaseTestCase):
         assert self.b.clone("'A98A'H")[1] == 0
         assert self.b.clone("'A98A'H")[2] == 1
 
-    if sys.version_info[:2] > (2, 4):
-        def testReverse(self):
-            assert list(reversed(univ.BitString([0, 0, 1]))) == list(univ.BitString([1, 0, 0]))
+    def testReverse(self):
+        assert list(reversed(univ.BitString([0, 0, 1]))) == list(univ.BitString([1, 0, 0]))
 
     def testAsOctets(self):
         assert self.b.clone(hexValue='A98A').asOctets() == ints2octs((0xa9, 0x8a)), 'testAsOctets() fails'
@@ -498,17 +481,10 @@ class OctetStringWithUnicodeMixIn(object):
             assert univ.OctetString(univ.Integer(123)) == univ.OctetString('123')
 
     def testSerialised(self):
-        if sys.version_info[0] < 3:
-            assert str(univ.OctetString(self.encodedPythonString, encoding=self.encoding)) == self.encodedPythonString, '__str__() fails'
-        else:
-            assert bytes(univ.OctetString(self.encodedPythonString, encoding=self.encoding)) == self.encodedPythonString, '__str__() fails'
+        assert bytes(univ.OctetString(self.encodedPythonString, encoding=self.encoding)) == self.encodedPythonString, '__str__() fails'
 
     def testPrintable(self):
-        if sys.version_info[0] < 3:
-            assert str(univ.OctetString(self.encodedPythonString, encoding=self.encoding)) == self.encodedPythonString, '__str__() fails'
-            assert unicode(univ.OctetString(self.pythonString, encoding=self.encoding)) == self.pythonString, 'unicode init fails'
-        else:
-            assert str(univ.OctetString(self.pythonString, encoding=self.encoding)) == self.pythonString, 'unicode init fails'
+        assert str(univ.OctetString(self.pythonString, encoding=self.encoding)) == self.pythonString, 'unicode init fails'
 
     def testSeq(self):
         assert univ.OctetString(self.encodedPythonString)[0] == self.encodedPythonString[0], '__getitem__() fails'
@@ -539,9 +515,8 @@ class OctetStringWithUnicodeMixIn(object):
         assert self.encodedPythonString in s
         assert self.encodedPythonString * 2 not in s
 
-    if sys.version_info[:2] > (2, 4):
-       def testReverse(self):
-           assert list(reversed(univ.OctetString(self.encodedPythonString))) == list(reversed(self.encodedPythonString))
+    def testReverse(self):
+        assert list(reversed(univ.OctetString(self.encodedPythonString))) == list(reversed(self.encodedPythonString))
 
 
 class OctetStringWithAsciiTestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
@@ -553,11 +528,7 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
     def testEncodeError(self):
         serialized = ints2octs((0xff, 0xfe))
 
-        if sys.version_info < (3, 0):
-            text = serialized.decode('iso-8859-1')
-
-        else:
-            text = octs2str(serialized)
+        text = octs2str(serialized)
 
         try:
             univ.OctetString(text, encoding='us-ascii')
@@ -567,8 +538,7 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
 
         # TODO: remove when Py2.5 support is gone
         else:
-            if sys.version_info > (2, 6):
-                assert False, 'Unicode encoding error not caught'
+            assert False, 'Unicode encoding error not caught'
 
     def testDecodeError(self):
         serialized = ints2octs((0xff, 0xfe))
@@ -576,19 +546,14 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
         octetString = univ.OctetString(serialized, encoding='us-ascii')
 
         try:
-            if sys.version_info < (3, 0):
-                unicode(octetString)
-
-            else:
-                str(octetString)
+            str(octetString)
 
         except PyAsn1UnicodeDecodeError:
             pass
 
         # TODO: remove when Py2.5 support is gone
         else:
-            if sys.version_info > (2, 6):
-                assert False, 'Unicode decoding error not caught'
+            assert False, 'Unicode decoding error not caught'
 
 
 class OctetStringWithUtf8TestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
@@ -601,13 +566,9 @@ class OctetStringWithUtf16TestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
     encoding = 'utf-16-be'
 
 
-if sys.version_info[0] > 2:
-
-    # Somehow comparison of UTF-32 encoded strings does not work in Py2
-
-    class OctetStringWithUtf32TestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
-        initializer = (0, 0, 4, 48, 0, 0, 4, 49, 0, 0, 4, 50)
-        encoding = 'utf-32-be'
+class OctetStringWithUtf32TestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
+    initializer = (0, 0, 4, 48, 0, 0, 4, 49, 0, 0, 4, 50)
+    encoding = 'utf-32-be'
 
 
 class OctetStringTestCase(BaseTestCase):
@@ -860,9 +821,8 @@ class RealTestCase(BaseTestCase):
     def testCeil(self):
         assert math.ceil(univ.Real(1.2)) == 2.0, '__ceil__() fails'
 
-    if sys.version_info[0:2] > (2, 5):
-        def testTrunc(self):
-            assert math.trunc(univ.Real(1.1)) == 1.0, '__trunc__() fails'
+    def testTrunc(self):
+        assert math.trunc(univ.Real(1.1)) == 1.0, '__trunc__() fails'
 
     def testTag(self):
         assert univ.Real().tagSet == tag.TagSet(
@@ -932,8 +892,6 @@ class ObjectIdentifier(BaseTestCase):
 
     def testUnicode(self):
         s = '1.3.6'
-        if sys.version_info[0] < 3:
-            s = s.decode()
         assert univ.ObjectIdentifier(s) == (1, 3, 6), 'unicode init fails'
 
     def testTag(self):
