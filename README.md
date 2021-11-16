@@ -170,11 +170,9 @@ could be found in the pyasn1-modules
 How to get pyasn1
 -----------------
 
-This project is forked from pyasn1
-
-The pyasn1 package is distributed under terms and conditions of 2-clause
-BSD [license](http://snmplabs.com/pyasn1/license.html). Source code is freely
-available as a GitHub [repo](https://github.com/pysnmp/pyasn1).
+This project is forked from pyasn1. The pyasn1 package is distributed under terms
+and conditions of 2-clause BSD [license](http://snmplabs.com/pyasn1/license.html). 
+Source code is freely available as a GitHub [repo](https://github.com/pysnmp/pyasn1).
 
 You could `pip install pysnmp-pyasn1` or download it from [PyPI](https://pypi.org/project/pysnmp-pyasn1).
 
