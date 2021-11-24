@@ -5,7 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
-__all__ = ['callable']
+__all__ = ["callable"]
 
 
 callable = callable

@@ -17,8 +17,6 @@ from pyasn1.compat import integer
 
 
 class IntegerTestCase(BaseTestCase):
-
-
     def test_from_bytes_zero(self):
         assert 0 == integer.from_bytes(bytes([0]), signed=False)
 
@@ -32,8 +30,7 @@ class IntegerTestCase(BaseTestCase):
         assert 0 == integer.from_bytes(bytes([]))
 
 
-
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)
