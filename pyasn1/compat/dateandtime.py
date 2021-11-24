@@ -7,7 +7,7 @@
 import time
 from datetime import datetime
 
-__all__ = ['strptime']
+__all__ = ["strptime"]
 
 
 def strptime(text, dateFormat):
