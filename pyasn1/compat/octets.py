@@ -5,10 +5,9 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
-ints2octs = bytes
 # noinspection PyPep8
-int2oct = lambda x: ints2octs((x,))
-null = ints2octs()
+int2oct = lambda x: bytes((x,))
+null = bytes()
 # noinspection PyPep8
 oct2int = lambda x: x
 # noinspection PyPep8
@@ -21,5 +20,3 @@ octs2str = lambda x: x.decode("iso-8859-1")
 isOctetsType = lambda s: isinstance(s, bytes)
 # noinspection PyPep8
 isStringType = lambda s: isinstance(s, str)
-# noinspection PyPep8
-ensureString = bytes

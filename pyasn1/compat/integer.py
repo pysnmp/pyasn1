@@ -6,7 +6,7 @@
 #
 import sys
 
-from pyasn1.compat.octets import oct2int, null, ensureString
+from pyasn1.compat.octets import oct2int, null
 
 
 def from_bytes(octets, signed=False):

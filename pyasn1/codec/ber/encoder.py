@@ -13,7 +13,6 @@ from pyasn1.compat.integer import to_bytes
 from pyasn1.compat.octets import (
     int2oct,
     oct2int,
-    ints2octs,
     null,
     str2octs,
     isOctetsType,
@@ -33,7 +32,7 @@ class AbstractItemEncoder(object):
 
     # An outcome of otherwise legit call `encodeFun(eoo.endOfOctets)`
     eooIntegerSubstrate = (0, 0)
-    eooOctetsSubstrate = ints2octs(eooIntegerSubstrate)
+    eooOctetsSubstrate = bytes(eooIntegerSubstrate)
 
     # noinspection PyMethodMayBeStatic
     def encodeTag(self, singleTag, isConstructed):
@@ -137,7 +136,7 @@ class AbstractItemEncoder(object):
                     % (
                         isConstructed and "constructed " or "",
                         singleTag,
-                        debug.hexdump(ints2octs(header)),
+                        debug.hexdump(bytes(header)),
                     )
                 )
 
@@ -146,11 +145,11 @@ class AbstractItemEncoder(object):
             if LOG:
                 LOG(
                     "encoded %s octets (tag + payload) into %s"
-                    % (len(substrate), debug.hexdump(ints2octs(header)))
+                    % (len(substrate), debug.hexdump(bytes(header)))
                 )
 
             if isOctets:
-                substrate = ints2octs(header) + substrate
+                substrate = bytes(header) + substrate
 
                 if not defModeOverride:
                     substrate += self.eooOctetsSubstrate
@@ -162,7 +161,7 @@ class AbstractItemEncoder(object):
                     substrate += self.eooIntegerSubstrate
 
         if not isOctets:
-            substrate = ints2octs(substrate)
+            substrate = bytes(substrate)
 
         return substrate
 

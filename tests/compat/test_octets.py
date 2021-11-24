@@ -17,11 +17,11 @@ from pyasn1.compat import octets
 
 
 class OctetsTestCase(BaseTestCase):
-    def test_ints2octs(self):
-        assert [1, 2, 3] == list(octets.ints2octs([1, 2, 3]))
+    def test_bytes(self):
+        assert [1, 2, 3] == list(bytes([1, 2, 3]))
 
-    def test_ints2octs_empty(self):
-        assert not octets.ints2octs([])
+    def test_bytes_empty(self):
+        assert not bytes([])
 
     def test_int2oct(self):
         assert [12] == list(octets.int2oct(12))
@@ -57,9 +57,9 @@ class OctetsTestCase(BaseTestCase):
         assert octets.isStringType(123) == False
         assert octets.isStringType(bytes()) == False
 
-    def test_ensureString(self):
-        assert "abc".encode() == octets.ensureString("abc".encode())
-        assert bytes([1, 2, 3]) == octets.ensureString([1, 2, 3])
+    def test_bytes(self):
+        assert "abc".encode() == bytes("abc".encode())
+        assert bytes([1, 2, 3]) == bytes([1, 2, 3])
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

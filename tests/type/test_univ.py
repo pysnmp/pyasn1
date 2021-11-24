@@ -22,7 +22,7 @@ from pyasn1.type import constraint
 from pyasn1.type import namedtype
 from pyasn1.type import namedval
 from pyasn1.type import error
-from pyasn1.compat.octets import str2octs, ints2octs, octs2ints, octs2str
+from pyasn1.compat.octets import str2octs, octs2ints, octs2str
 from pyasn1.error import PyAsn1Error
 from pyasn1.error import PyAsn1UnicodeEncodeError, PyAsn1UnicodeDecodeError
 
@@ -508,7 +508,7 @@ class BitStringTestCase(BaseTestCase):
         )
 
     def testAsOctets(self):
-        assert self.b.clone(hexValue="A98A").asOctets() == ints2octs(
+        assert self.b.clone(hexValue="A98A").asOctets() == bytes(
             (0xA9, 0x8A)
         ), "testAsOctets() fails"
 
@@ -555,7 +555,7 @@ class OctetStringWithUnicodeMixIn(object):
     encoding = "us-ascii"
 
     def setUp(self):
-        self.pythonString = ints2octs(self.initializer).decode(self.encoding)
+        self.pythonString = bytes(self.initializer).decode(self.encoding)
         self.encodedPythonString = self.pythonString.encode(self.encoding)
         self.numbersString = tuple(octs2ints(self.encodedPythonString))
 
@@ -644,7 +644,7 @@ class OctetStringWithAsciiTestCase(OctetStringWithUnicodeMixIn, BaseTestCase):
 
 class OctetStringUnicodeErrorTestCase(BaseTestCase):
     def testEncodeError(self):
-        serialized = ints2octs((0xFF, 0xFE))
+        serialized = bytes((0xFF, 0xFE))
 
         text = octs2str(serialized)
 
@@ -659,7 +659,7 @@ class OctetStringUnicodeErrorTestCase(BaseTestCase):
             assert False, "Unicode encoding error not caught"
 
     def testDecodeError(self):
-        serialized = ints2octs((0xFF, 0xFE))
+        serialized = bytes((0xFF, 0xFE))
 
         octetString = univ.OctetString(serialized, encoding="us-ascii")
 
@@ -707,15 +707,15 @@ class OctetStringTestCase(BaseTestCase):
     def testBinStr(self):
         assert univ.OctetString(
             binValue="1000010111101110101111000000111011"
-        ) == ints2octs((133, 238, 188, 14, 192)), "bin init fails"
+        ) == bytes((133, 238, 188, 14, 192)), "bin init fails"
 
     def testHexStr(self):
-        assert univ.OctetString(hexValue="FA9823C43E43510DE3422") == ints2octs(
+        assert univ.OctetString(hexValue="FA9823C43E43510DE3422") == bytes(
             (250, 152, 35, 196, 62, 67, 81, 13, 227, 66, 32)
         ), "hex init fails"
 
     def testTuple(self):
-        assert univ.OctetString((1, 2, 3, 4, 5)) == ints2octs(
+        assert univ.OctetString((1, 2, 3, 4, 5)) == bytes(
             (1, 2, 3, 4, 5)
         ), "tuple init failed"
 
@@ -739,7 +739,7 @@ class OctetStringTestCase(BaseTestCase):
         class OctetString(univ.OctetString):
             pass
 
-        assert OctetString(hexValue="FA9823C43E43510DE3422") == ints2octs(
+        assert OctetString(hexValue="FA9823C43E43510DE3422") == bytes(
             (250, 152, 35, 196, 62, 67, 81, 13, 227, 66, 32)
         )
 

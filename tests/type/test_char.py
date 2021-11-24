@@ -18,7 +18,6 @@ from tests.base import BaseTestCase
 from pyasn1.type import char
 from pyasn1.type import univ
 from pyasn1.type import constraint
-from pyasn1.compat.octets import ints2octs
 from pyasn1.error import PyAsn1Error
 
 
@@ -32,9 +31,9 @@ class AbstractStringTestCase(object):
         BaseTestCase.setUp(self)
 
         self.asn1String = self.asn1Type(
-            ints2octs(self.initializer), encoding=self.encoding
+            bytes(self.initializer), encoding=self.encoding
         )
-        self.pythonString = ints2octs(self.initializer).decode(self.encoding)
+        self.pythonString = bytes(self.initializer).decode(self.encoding)
 
     def testUnicode(self):
         assert self.asn1String == self.pythonString, "unicode init fails"

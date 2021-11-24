@@ -9,7 +9,7 @@ import sys
 
 from pyasn1 import error
 from pyasn1.codec.ber import eoo
-from pyasn1.compat import binary
+
 from pyasn1.compat import integer
 from pyasn1.compat import octets
 from pyasn1.type import base
@@ -608,7 +608,7 @@ class BitString(base.SimpleAsn1Type):
 
     def asBinary(self):
         """Get |ASN.1| value as a text string of bits."""
-        binString = binary.bin(self._value)[2:]
+        binString = bin(self._value)[2:]
         return "0" * (len(self._value) - len(binString)) + binString
 
     @classmethod
@@ -984,7 +984,7 @@ class OctetString(base.SimpleAsn1Type):
 
         r.append(byte)
 
-        return octets.ints2octs(r)
+        return bytes(r)
 
     @staticmethod
     def fromHexString(value):
@@ -1006,7 +1006,7 @@ class OctetString(base.SimpleAsn1Type):
         if p:
             r.append(int(p + "0", 16))
 
-        return octets.ints2octs(r)
+        return bytes(r)
 
     # Immutable sequence object protocol
 

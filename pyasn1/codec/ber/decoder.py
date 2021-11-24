@@ -8,7 +8,7 @@ from pyasn1 import debug
 from pyasn1 import error
 from pyasn1.codec.ber import eoo
 from pyasn1.compat.integer import from_bytes
-from pyasn1.compat.octets import oct2int, octs2ints, ints2octs, null
+from pyasn1.compat.octets import oct2int, octs2ints, null
 from pyasn1.type import base
 from pyasn1.type import char
 from pyasn1.type import tag
@@ -1526,7 +1526,7 @@ class Decoder(object):
         # Tag & TagSet objects caches
         self.__tagCache = {}
         self.__tagSetCache = {}
-        self.__eooSentinel = ints2octs((0, 0))
+        self.__eooSentinel = bytes((0, 0))
 
     def __call__(
         self,

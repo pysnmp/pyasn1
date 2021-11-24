@@ -13,16 +13,16 @@ except ImportError:
 
 from tests.base import BaseTestCase
 
-from pyasn1.compat import binary
+
 
 
 class BinaryTestCase(BaseTestCase):
     def test_bin_zero(self):
-        assert "0b0" == binary.bin(0)
+        assert "0b0" == bin(0)
 
     def test_bin_noarg(self):
         try:
-            binary.bin()
+            bin()
 
         except TypeError:
             pass
@@ -33,17 +33,17 @@ class BinaryTestCase(BaseTestCase):
     def test_bin_allones(self):
         assert (
             "0b1111111111111111111111111111111111111111111111111111111111111111"
-            == binary.bin(0xFFFFFFFFFFFFFFFF)
+            == bin(0xFFFFFFFFFFFFFFFF)
         )
 
     def test_bin_allzeros(self):
-        assert "0b0" == binary.bin(0x0000000)
+        assert "0b0" == bin(0x0000000)
 
     def test_bin_pos(self):
-        assert "0b1000000010000000100000001" == binary.bin(0x01010101)
+        assert "0b1000000010000000100000001" == bin(0x01010101)
 
     def test_bin_neg(self):
-        assert "-0b1000000010000000100000001" == binary.bin(-0x01010101)
+        assert "-0b1000000010000000100000001" == bin(-0x01010101)
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
