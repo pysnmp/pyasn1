@@ -751,18 +751,6 @@ class BitString(base.SimpleAsn1Type):
             raise error.PyAsn1Error("Bad BitString initializer type '%s'" % (value,))
 
 
-try:
-    # noinspection PyStatementEffect
-    all
-
-except NameError:  # Python 2.4
-    # noinspection PyShadowingBuiltins
-    def all(iterable):
-        for element in iterable:
-            if not element:
-                return False
-        return True
-
 
 class OctetString(base.SimpleAsn1Type):
     """Create |ASN.1| schema or value object.
