@@ -391,9 +391,7 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         assert s[1][0] == univ.OctetString(hexValue="02010c")
 
     def testDontDecodeOpenTypesChoiceOne(self):
-        s, r = decoder.decode(
-            bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s
-        )
+        s, r = decoder.decode(bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s)
         assert not r
         assert s[0] == 1
         assert s[1][0] == bytes((2, 1, 12))

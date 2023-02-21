@@ -33,9 +33,7 @@ class LargeTagDecoderTestCase(BaseTestCase):
         )
 
     def testLongTag(self):
-        assert (
-            decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
-        )
+        assert decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
 
     def testTagsEquivalence(self):
         integer = univ.Integer(2).subtype(
@@ -146,9 +144,10 @@ class BitStringDecoderTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert decoder.decode(
-            bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))
-        ) == ((1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1), null)
+        assert decoder.decode(bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))) == (
+            (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
+            null,
+        )
 
     def testDefModeChunkedSubst(self):
         assert (
@@ -1013,9 +1012,7 @@ class SequenceOfDecoderTestCase(BaseTestCase):
 
     def testDefMode(self):
         assert decoder.decode(
-            bytes(
-                (48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-            )
+            bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
         ) == (self.s, null)
 
     def testIndefMode(self):
@@ -1316,9 +1313,7 @@ class SetOfDecoderTestCase(BaseTestCase):
 
     def testDefMode(self):
         assert decoder.decode(
-            bytes(
-                (49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-            )
+            bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
         ) == (self.s, null)
 
     def testIndefMode(self):
@@ -2504,9 +2499,7 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         assert s[1][0] == univ.OctetString(hexValue="02010c")
 
     def testDontDecodeOpenTypesChoiceOne(self):
-        s, r = decoder.decode(
-            bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s
-        )
+        s, r = decoder.decode(bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s)
         assert not r
         assert s[0] == 1
         assert s[1][0] == bytes((2, 1, 12))
