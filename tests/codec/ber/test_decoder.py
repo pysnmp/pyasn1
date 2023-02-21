@@ -33,9 +33,7 @@ class LargeTagDecoderTestCase(BaseTestCase):
         )
 
     def testLongTag(self):
-        assert (
-            decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
-        )
+        assert decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
 
     def testTagsEquivalence(self):
         integer = univ.Integer(2).subtype(
@@ -146,27 +144,22 @@ class BitStringDecoderTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert decoder.decode(
-            bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))
-        ) == ((1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1), null)
+        assert decoder.decode(bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))) == (
+            (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
+            null,
+        )
 
     def testDefModeChunkedSubst(self):
-        assert (
-            decoder.decode(
-                bytes((35, 8, 3, 2, 0, 169, 3, 2, 1, 138)),
-                substrateFun=lambda a, b, c: (b, b[c:]),
-            )
-            == (bytes((3, 2, 0, 169, 3, 2, 1, 138)), str2octs(""))
-        )
+        assert decoder.decode(
+            bytes((35, 8, 3, 2, 0, 169, 3, 2, 1, 138)),
+            substrateFun=lambda a, b, c: (b, b[c:]),
+        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138)), str2octs(""))
 
     def testIndefModeChunkedSubst(self):
-        assert (
-            decoder.decode(
-                bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0)),
-                substrateFun=lambda a, b, c: (b, str2octs("")),
-            )
-            == (bytes((3, 2, 0, 169, 3, 2, 1, 138, 0, 0)), str2octs(""))
-        )
+        assert decoder.decode(
+            bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0)),
+            substrateFun=lambda a, b, c: (b, str2octs("")),
+        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138, 0, 0)), str2octs(""))
 
     def testTypeChecking(self):
         try:
@@ -179,138 +172,126 @@ class BitStringDecoderTestCase(BaseTestCase):
 
 class OctetStringDecoderTestCase(BaseTestCase):
     def testDefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        4,
-                        15,
-                        81,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        32,
-                        102,
-                        111,
-                        120,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    4,
+                    15,
+                    81,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    32,
+                    102,
+                    111,
+                    120,
                 )
             )
-            == (str2octs("Quick brown fox"), null)
-        )
+        ) == (str2octs("Quick brown fox"), null)
 
     def testIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        36,
-                        128,
-                        4,
-                        15,
-                        81,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        32,
-                        102,
-                        111,
-                        120,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    36,
+                    128,
+                    4,
+                    15,
+                    81,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    32,
+                    102,
+                    111,
+                    120,
+                    0,
+                    0,
                 )
             )
-            == (str2octs("Quick brown fox"), null)
-        )
+        ) == (str2octs("Quick brown fox"), null)
 
     def testDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        36,
-                        23,
-                        4,
-                        4,
-                        81,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        4,
-                        111,
-                        119,
-                        110,
-                        32,
-                        4,
-                        3,
-                        102,
-                        111,
-                        120,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    36,
+                    23,
+                    4,
+                    4,
+                    81,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    4,
+                    111,
+                    119,
+                    110,
+                    32,
+                    4,
+                    3,
+                    102,
+                    111,
+                    120,
                 )
             )
-            == (str2octs("Quick brown fox"), null)
-        )
+        ) == (str2octs("Quick brown fox"), null)
 
     def testIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        36,
-                        128,
-                        4,
-                        4,
-                        81,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        4,
-                        111,
-                        119,
-                        110,
-                        32,
-                        4,
-                        3,
-                        102,
-                        111,
-                        120,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    36,
+                    128,
+                    4,
+                    4,
+                    81,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    4,
+                    111,
+                    119,
+                    110,
+                    32,
+                    4,
+                    3,
+                    102,
+                    111,
+                    120,
+                    0,
+                    0,
                 )
             )
-            == (str2octs("Quick brown fox"), null)
-        )
+        ) == (str2octs("Quick brown fox"), null)
 
     def testDefModeChunkedSubst(self):
         assert decoder.decode(
@@ -777,12 +758,9 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
         )
 
     def testNonLeading0x80(self):
-        assert (
-            decoder.decode(
-                bytes((6, 5, 85, 4, 129, 128, 0)),
-            )
-            == ((2, 5, 4, 16384), null)
-        )
+        assert decoder.decode(
+            bytes((6, 5, 85, 4, 129, 128, 0)),
+        ) == ((2, 5, 4, 16384), null)
 
     def testLeading0x80Case1(self):
         try:
@@ -849,66 +827,60 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
             assert 0, "reserved length tolerated"
 
     def testLarge1(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        0x06,
-                        0x11,
-                        0x83,
-                        0xC6,
-                        0xDF,
-                        0xD4,
-                        0xCC,
-                        0xB3,
-                        0xFF,
-                        0xFF,
-                        0xFE,
-                        0xF0,
-                        0xB8,
-                        0xD6,
-                        0xB8,
-                        0xCB,
-                        0xE2,
-                        0xB7,
-                        0x17,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    0x06,
+                    0x11,
+                    0x83,
+                    0xC6,
+                    0xDF,
+                    0xD4,
+                    0xCC,
+                    0xB3,
+                    0xFF,
+                    0xFF,
+                    0xFE,
+                    0xF0,
+                    0xB8,
+                    0xD6,
+                    0xB8,
+                    0xCB,
+                    0xE2,
+                    0xB7,
+                    0x17,
                 )
             )
-            == ((2, 18446744073709551535184467440737095), null)
-        )
+        ) == ((2, 18446744073709551535184467440737095), null)
 
     def testLarge2(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        0x06,
-                        0x13,
-                        0x88,
-                        0x37,
-                        0x83,
-                        0xC6,
-                        0xDF,
-                        0xD4,
-                        0xCC,
-                        0xB3,
-                        0xFF,
-                        0xFF,
-                        0xFE,
-                        0xF0,
-                        0xB8,
-                        0xD6,
-                        0xB8,
-                        0xCB,
-                        0xE2,
-                        0xB6,
-                        0x47,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    0x06,
+                    0x13,
+                    0x88,
+                    0x37,
+                    0x83,
+                    0xC6,
+                    0xDF,
+                    0xD4,
+                    0xCC,
+                    0xB3,
+                    0xFF,
+                    0xFF,
+                    0xFE,
+                    0xF0,
+                    0xB8,
+                    0xD6,
+                    0xB8,
+                    0xCB,
+                    0xE2,
+                    0xB6,
+                    0x47,
                 )
             )
-            == ((2, 999, 18446744073709551535184467440737095), null)
-        )
+        ) == ((2, 999, 18446744073709551535184467440737095), null)
 
 
 class RealDecoderTestCase(BaseTestCase):
@@ -1013,117 +985,101 @@ class SequenceOfDecoderTestCase(BaseTestCase):
 
     def testDefMode(self):
         assert decoder.decode(
-            bytes(
-                (48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-            )
+            bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
         ) == (self.s, null)
 
     def testIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        19,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    19,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testSchemalessDecoder(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-                ),
-                asn1Spec=univ.SequenceOf(),
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
+            asn1Spec=univ.SequenceOf(),
+        ) == (self.s, null)
 
 
 class ExpTaggedSequenceOfDecoderTestCase(BaseTestCase):
@@ -1198,114 +1154,100 @@ class SequenceOfDecoderWithSchemaTestCase(BaseTestCase):
         self.s.setComponentByPosition(0, univ.OctetString("quick brown"))
 
     def testDefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        19,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    19,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
 
 class SetOfDecoderTestCase(BaseTestCase):
@@ -1316,117 +1258,101 @@ class SetOfDecoderTestCase(BaseTestCase):
 
     def testDefMode(self):
         assert decoder.decode(
-            bytes(
-                (49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-            )
+            bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
         ) == (self.s, null)
 
     def testIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        19,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    19,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testSchemalessDecoder(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-                ),
-                asn1Spec=univ.SetOf(),
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
+            asn1Spec=univ.SetOf(),
+        ) == (self.s, null)
 
 
 class SetOfDecoderWithSchemaTestCase(BaseTestCase):
@@ -1436,114 +1362,100 @@ class SetOfDecoderWithSchemaTestCase(BaseTestCase):
         self.s.setComponentByPosition(0, univ.OctetString("quick brown"))
 
     def testDefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        19,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    19,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
 
 class SequenceDecoderTestCase(BaseTestCase):
@@ -1561,150 +1473,138 @@ class SequenceDecoderTestCase(BaseTestCase):
         self.s.setComponentByPosition(2, univ.Integer(1))
 
     def testWithOptionalAndDefaultedDefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        18,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    18,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        24,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    24,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeSubst(self):
         assert decoder.decode(
@@ -1919,145 +1819,133 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
 
     def testWithOptionalDefMode(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        15,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    15,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionaIndefMode(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalDefModeChunked(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        21,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    21,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalIndefModeChunked(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithDefaultedDefMode(self):
         self.__initWithDefaulted()
@@ -2087,157 +1975,145 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
 
     def testWithOptionalAndDefaultedDefMode(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        18,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    18,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        24,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    24,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        48,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    48,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
 
 class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
@@ -2504,9 +2380,7 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         assert s[1][0] == univ.OctetString(hexValue="02010c")
 
     def testDontDecodeOpenTypesChoiceOne(self):
-        s, r = decoder.decode(
-            bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s
-        )
+        s, r = decoder.decode(bytes((48, 8, 2, 1, 1, 49, 3, 2, 1, 12)), asn1Spec=self.s)
         assert not r
         assert s[0] == 1
         assert s[1][0] == bytes((2, 1, 12))
@@ -2643,150 +2517,138 @@ class SetDecoderTestCase(BaseTestCase):
         self.s.setComponentByPosition(2, univ.Integer(1))
 
     def testWithOptionalAndDefaultedDefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        18,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    18,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        24,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    24,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
                 )
             )
-            == (self.s, null)
-        )
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeSubst(self):
         assert decoder.decode(
@@ -3001,145 +2863,133 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
 
     def testWithOptionalDefMode(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        15,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    15,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalIndefMode(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalDefModeChunked(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        21,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    21,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalIndefModeChunked(self):
         self.__initWithOptional()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithDefaultedDefMode(self):
         self.__initWithDefaulted()
@@ -3169,229 +3019,211 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
 
     def testWithOptionalAndDefaultedDefMode(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        18,
-                        5,
-                        0,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    18,
+                    5,
+                    0,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeReordered(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        18,
-                        2,
-                        1,
-                        1,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        5,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    18,
+                    2,
+                    1,
+                    1,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    5,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefModeReordered(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        2,
-                        1,
-                        1,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        11,
-                        113,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    2,
+                    1,
+                    1,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        24,
-                        5,
-                        0,
-                        36,
-                        17,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        2,
-                        1,
-                        1,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    24,
+                    5,
+                    0,
+                    36,
+                    17,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    2,
+                    1,
+                    1,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        49,
-                        128,
-                        5,
-                        0,
-                        36,
-                        128,
-                        4,
-                        4,
-                        113,
-                        117,
-                        105,
-                        99,
-                        4,
-                        4,
-                        107,
-                        32,
-                        98,
-                        114,
-                        4,
-                        3,
-                        111,
-                        119,
-                        110,
-                        0,
-                        0,
-                        2,
-                        1,
-                        1,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    49,
+                    128,
+                    5,
+                    0,
+                    36,
+                    128,
+                    4,
+                    4,
+                    113,
+                    117,
+                    105,
+                    99,
+                    4,
+                    4,
+                    107,
+                    32,
+                    98,
+                    114,
+                    4,
+                    3,
+                    111,
+                    119,
+                    110,
+                    0,
+                    0,
+                    2,
+                    1,
+                    1,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
 
 class SequenceOfWithExpTaggedOctetStringDecoder(BaseTestCase):
@@ -3525,34 +3357,31 @@ class ChoiceDecoderTestCase(BaseTestCase):
 
     def testUndefLength(self):
         self.s.setComponentByPosition(2, univ.OctetString("abcdefgh"))
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        36,
-                        128,
-                        4,
-                        3,
-                        97,
-                        98,
-                        99,
-                        4,
-                        3,
-                        100,
-                        101,
-                        102,
-                        4,
-                        2,
-                        103,
-                        104,
-                        0,
-                        0,
-                    )
-                ),
-                asn1Spec=self.s,
-            )
-            == (self.s, null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    36,
+                    128,
+                    4,
+                    3,
+                    97,
+                    98,
+                    99,
+                    4,
+                    3,
+                    100,
+                    101,
+                    102,
+                    4,
+                    2,
+                    103,
+                    104,
+                    0,
+                    0,
+                )
+            ),
+            asn1Spec=self.s,
+        ) == (self.s, null)
 
     def testExplicitTag(self):
         s = self.s.subtype(
@@ -3624,24 +3453,18 @@ class AnyDecoderTestCase(BaseTestCase):
         ) == (s, null)
 
     def testByUntaggedSubst(self):
-        assert (
-            decoder.decode(
-                bytes((4, 3, 102, 111, 120)),
-                asn1Spec=self.s,
-                substrateFun=lambda a, b, c: (b, b[c:]),
-            )
-            == (bytes((4, 3, 102, 111, 120)), str2octs(""))
-        )
+        assert decoder.decode(
+            bytes((4, 3, 102, 111, 120)),
+            asn1Spec=self.s,
+            substrateFun=lambda a, b, c: (b, b[c:]),
+        ) == (bytes((4, 3, 102, 111, 120)), str2octs(""))
 
     def testTaggedExSubst(self):
-        assert (
-            decoder.decode(
-                bytes((164, 5, 4, 3, 102, 111, 120)),
-                asn1Spec=self.s,
-                substrateFun=lambda a, b, c: (b, b[c:]),
-            )
-            == (bytes((164, 5, 4, 3, 102, 111, 120)), str2octs(""))
-        )
+        assert decoder.decode(
+            bytes((164, 5, 4, 3, 102, 111, 120)),
+            asn1Spec=self.s,
+            substrateFun=lambda a, b, c: (b, b[c:]),
+        ) == (bytes((164, 5, 4, 3, 102, 111, 120)), str2octs(""))
 
 
 class EndOfOctetsTestCase(BaseTestCase):

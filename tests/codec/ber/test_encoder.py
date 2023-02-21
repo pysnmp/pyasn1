@@ -533,9 +533,9 @@ class NullEncoderWithSchemaTestCase(BaseTestCase):
 
 class ObjectIdentifierEncoderTestCase(BaseTestCase):
     def testOne(self):
-        assert encoder.encode(
-            univ.ObjectIdentifier((1, 3, 6, 0, 0xFFFFE))
-        ) == bytes((6, 6, 43, 6, 0, 191, 255, 126))
+        assert encoder.encode(univ.ObjectIdentifier((1, 3, 6, 0, 0xFFFFE))) == bytes(
+            (6, 6, 43, 6, 0, 191, 255, 126)
+        )
 
     def testEdge1(self):
         assert encoder.encode(univ.ObjectIdentifier((0, 39))) == bytes((6, 1, 39))
@@ -571,9 +571,7 @@ class ObjectIdentifierEncoderTestCase(BaseTestCase):
 
     def testEdge8(self):
         # 10000101|00000000
-        assert encoder.encode(univ.ObjectIdentifier((2, 560))) == bytes(
-            (6, 2, 133, 0)
-        )
+        assert encoder.encode(univ.ObjectIdentifier((2, 560))) == bytes((6, 2, 133, 0))
 
     def testEdge9(self):
         # 10001000|10000100|10000111|0000010
@@ -2953,9 +2951,7 @@ class AnyEncoderWithSchemaTestCase(BaseTestCase):
         self.v = encoder.encode(univ.OctetString("fox"))
 
     def testUntagged(self):
-        assert encoder.encode(self.v, asn1Spec=self.s) == bytes(
-            (4, 3, 102, 111, 120)
-        )
+        assert encoder.encode(self.v, asn1Spec=self.s) == bytes((4, 3, 102, 111, 120))
 
     def testTaggedEx(self):
         s = self.s.subtype(

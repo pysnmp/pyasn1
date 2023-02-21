@@ -30,9 +30,7 @@ class AbstractStringTestCase(object):
     def setUp(self):
         BaseTestCase.setUp(self)
 
-        self.asn1String = self.asn1Type(
-            bytes(self.initializer), encoding=self.encoding
-        )
+        self.asn1String = self.asn1Type(bytes(self.initializer), encoding=self.encoding)
         self.pythonString = bytes(self.initializer).decode(self.encoding)
 
     def testUnicode(self):

@@ -6,6 +6,7 @@
 #
 
 # noinspection PyPep8
+ints2octs = bytes
 int2oct = lambda x: bytes((x,))
 null = bytes()
 # noinspection PyPep8
@@ -20,3 +21,4 @@ octs2str = lambda x: x.decode("iso-8859-1")
 isOctetsType = lambda s: isinstance(s, bytes)
 # noinspection PyPep8
 isStringType = lambda s: isinstance(s, str)
+ensureString = bytes

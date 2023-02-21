@@ -57,32 +57,29 @@ class BitStringDecoderTestCase(BaseTestCase):
 
 class OctetStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
-        assert (
-            decoder.decode(
-                bytes(
-                    (
-                        4,
-                        15,
-                        81,
-                        117,
-                        105,
-                        99,
-                        107,
-                        32,
-                        98,
-                        114,
-                        111,
-                        119,
-                        110,
-                        32,
-                        102,
-                        111,
-                        120,
-                    )
-                ),
-            )
-            == (str2octs("Quick brown fox"), null)
-        )
+        assert decoder.decode(
+            bytes(
+                (
+                    4,
+                    15,
+                    81,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                    32,
+                    102,
+                    111,
+                    120,
+                )
+            ),
+        ) == (str2octs("Quick brown fox"), null)
 
     def testLongMode(self):
         assert decoder.decode(

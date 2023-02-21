@@ -14,8 +14,6 @@ except ImportError:
 from tests.base import BaseTestCase
 
 
-
-
 class BinaryTestCase(BaseTestCase):
     def test_bin_zero(self):
         assert "0b0" == bin(0)

@@ -16,12 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-        with:
-          python-version: "3.10"
-      - name: Install actionlint
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/v1.6.3/scripts/download-actionlint.bash)
-      - uses: pre-commit/action@v2.0.3
+      - uses: pre-commit/action@v3.0.0
 
   review_secrets:
     name: security-detect-secrets
@@ -107,7 +102,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.os }}, ${{ matrix.poetry-version }}
-          fail_ci_if_error: true # optional (default = false)
   publish:
     name: Build Release
     needs:
@@ -139,7 +133,7 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2.6.0
         with:
-          semantic_version: 17
+          semantic_version: 18
           extra_plugins: |
             @semantic-release/exec
             @semantic-release/git
