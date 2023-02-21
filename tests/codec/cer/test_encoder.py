@@ -32,9 +32,7 @@ class BooleanEncoderTestCase(BaseTestCase):
 
 class BitStringEncoderTestCase(BaseTestCase):
     def testShortMode(self):
-        assert encoder.encode(univ.BitString((1, 0) * 5)) == bytes(
-            (3, 3, 6, 170, 128)
-        )
+        assert encoder.encode(univ.BitString((1, 0) * 5)) == bytes((3, 3, 6, 170, 128))
 
     def testLongMode(self):
         assert encoder.encode(univ.BitString((1, 0) * 501)) == bytes(
@@ -108,9 +106,7 @@ class GeneralizedTimeEncoderTestCase(BaseTestCase):
             assert 0, "Decimal comma tolerated"
 
     def testWithSubseconds(self):
-        assert encoder.encode(
-            useful.GeneralizedTime("20170801120112.59Z")
-        ) == bytes(
+        assert encoder.encode(useful.GeneralizedTime("20170801120112.59Z")) == bytes(
             (
                 24,
                 18,
@@ -136,9 +132,7 @@ class GeneralizedTimeEncoderTestCase(BaseTestCase):
         )
 
     def testWithSubsecondsWithZeros(self):
-        assert encoder.encode(
-            useful.GeneralizedTime("20170801120112.099Z")
-        ) == bytes(
+        assert encoder.encode(useful.GeneralizedTime("20170801120112.099Z")) == bytes(
             (
                 24,
                 18,
@@ -164,9 +158,7 @@ class GeneralizedTimeEncoderTestCase(BaseTestCase):
         )
 
     def testWithSubsecondsMax(self):
-        assert encoder.encode(
-            useful.GeneralizedTime("20170801120112.999Z")
-        ) == bytes(
+        assert encoder.encode(useful.GeneralizedTime("20170801120112.999Z")) == bytes(
             (
                 24,
                 19,
@@ -193,9 +185,7 @@ class GeneralizedTimeEncoderTestCase(BaseTestCase):
         )
 
     def testWithSubsecondsMin(self):
-        assert encoder.encode(
-            useful.GeneralizedTime("20170801120112.000Z")
-        ) == bytes(
+        assert encoder.encode(useful.GeneralizedTime("20170801120112.000Z")) == bytes(
             (24, 15, 50, 48, 49, 55, 48, 56, 48, 49, 49, 50, 48, 49, 49, 50, 90)
         )
 
@@ -297,17 +287,13 @@ class SequenceOfEncoderWithSchemaTestCase(BaseTestCase):
         self.s.clear()
         self.s.append("a")
         self.s.append("ab")
-        assert encoder.encode(self.s) == bytes(
-            (48, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0)
-        )
+        assert encoder.encode(self.s) == bytes((48, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0))
 
     def testIndefMode2(self):
         self.s.clear()
         self.s.append("ab")
         self.s.append("a")
-        assert encoder.encode(self.s) == bytes(
-            (48, 128, 4, 2, 97, 98, 4, 1, 97, 0, 0)
-        )
+        assert encoder.encode(self.s) == bytes((48, 128, 4, 2, 97, 98, 4, 1, 97, 0, 0))
 
     def testIndefMode3(self):
         self.s.clear()
@@ -367,18 +353,14 @@ class SetOfEncoderWithSchemaTestCase(BaseTestCase):
         self.s.append("a")
         self.s.append("ab")
 
-        assert encoder.encode(self.s) == bytes(
-            (49, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0)
-        )
+        assert encoder.encode(self.s) == bytes((49, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0))
 
     def testIndefMode2(self):
         self.s.clear()
         self.s.append("ab")
         self.s.append("a")
 
-        assert encoder.encode(self.s) == bytes(
-            (49, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0)
-        )
+        assert encoder.encode(self.s) == bytes((49, 128, 4, 1, 97, 4, 2, 97, 98, 0, 0))
 
     def testIndefMode3(self):
         self.s.clear()

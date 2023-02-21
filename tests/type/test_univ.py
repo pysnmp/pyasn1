@@ -705,9 +705,9 @@ class OctetStringTestCase(BaseTestCase):
         assert HexDefault() == univ.OctetString(hexValue="FA9823C43E43510DE3422")
 
     def testBinStr(self):
-        assert univ.OctetString(
-            binValue="1000010111101110101111000000111011"
-        ) == bytes((133, 238, 188, 14, 192)), "bin init fails"
+        assert univ.OctetString(binValue="1000010111101110101111000000111011") == bytes(
+            (133, 238, 188, 14, 192)
+        ), "bin init fails"
 
     def testHexStr(self):
         assert univ.OctetString(hexValue="FA9823C43E43510DE3422") == bytes(

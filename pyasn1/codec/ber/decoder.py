@@ -544,7 +544,7 @@ class RealDecoder(AbstractSimpleDecoder):
                 p = -p
 
             sf = fo >> 2 & 0x03  # scale bits
-            p *= 2 ** sf
+            p *= 2**sf
             value = (p, 2, e)
 
         elif fo & 0x40:  # infinite value

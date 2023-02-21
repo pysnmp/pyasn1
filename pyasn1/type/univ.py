@@ -751,7 +751,6 @@ class BitString(base.SimpleAsn1Type):
             raise error.PyAsn1Error("Bad BitString initializer type '%s'" % (value,))
 
 
-
 class OctetString(base.SimpleAsn1Type):
     """Create |ASN.1| schema or value object.
 
