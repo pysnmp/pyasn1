@@ -190,4 +190,3 @@ wire representation:
 
     with open('.ssh/id_rsa.new', 'w') as key_file:
         key_file.write(b64_serialisation)
-
