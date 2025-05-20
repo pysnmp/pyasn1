@@ -100,8 +100,9 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.os }}, ${{ matrix.python }}
-  publish:
-    name: Build Release
+  release:
+    name: Create Release
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     needs:
       - pre-commit
       - semgrep
@@ -119,16 +120,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install build twine poetry
-      - name: Semantic Release
+      - name: Run Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 24
@@ -138,13 +134,12 @@ jobs:
             @google/semantic-release-replace-plugin
         env:
           GITHUB_TOKEN: ${{ secrets.SEMREL_TOKEN }}
-          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          # Don't publish to PyPI here, the tag push will trigger the publish workflow
+          GITHUB_OUTPUT: /tmp/semantic_release_output
 
   update-semver:
     name: Move Repository semver tags
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
