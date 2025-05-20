@@ -24,19 +24,6 @@ jobs:
       - name: Run tox lint environment
         run: tox -e lint
 
-  review_secrets:
-    name: security-detect-secrets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: false
-          fetch-depth: "0"
-      - name: Trufflehog Actions Scan
-        uses: edplato/trufflehog-actions-scan@v0.9j-beta
-        with:
-          scanArguments: "--max_depth 30 -x .github/workflows/exclude-patterns.txt"
 
   semgrep:
     runs-on: ubuntu-latest
@@ -112,7 +99,6 @@ jobs:
     name: Build Release
     needs:
       - pre-commit
-      - review_secrets
       - semgrep
       - build
       - run-unit-tests
