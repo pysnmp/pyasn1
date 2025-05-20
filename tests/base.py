@@ -5,11 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
+import unittest
 
 from pyasn1 import debug
 

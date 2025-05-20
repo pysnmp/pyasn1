@@ -7,11 +7,7 @@
 import pickle
 import sys
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
+import unittest
 
 from tests.base import BaseTestCase
 

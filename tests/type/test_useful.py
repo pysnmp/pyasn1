@@ -9,11 +9,7 @@ import pickle
 import sys
 from copy import deepcopy
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
+import unittest
 
 from tests.base import BaseTestCase
 
