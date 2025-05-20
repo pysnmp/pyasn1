@@ -16,6 +16,12 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    # Make sure these classifiers are in your setup.py
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
 ]
 readme = "README.md"
 packages = [
@@ -28,10 +34,7 @@ python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^4.3.0"
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
 mypy = "^0.910"
-pytest-mypy = "^0.8.1"
 black = "^21.11b0"
 isort = "^5.10.1"
 pyflakes = "^2.4.0"
@@ -39,5 +42,5 @@ autoflake = "^1.4"
 pre-commit = "^2.15.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
