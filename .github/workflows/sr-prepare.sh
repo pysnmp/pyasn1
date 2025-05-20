@@ -3,10 +3,17 @@
 set -eE
 set -v
 # shellcheck disable=SC1091,SC2086
-# Only build if dist directory is empty or doesn't exist
-if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
-  echo "Building package with poetry"
-  poetry build
-else
-  echo "Using existing build artifacts from dist directory"
+# Create distributions but don't publish - publishing will be done by tox in the publish-to-pypi workflow
+echo "Preparing release: Building distributions for version ${1:-unknown}"
+
+# Clean existing dist directory to avoid mixing versions
+if [ -d "dist" ]; then
+  rm -rf dist
 fi
+
+# Create distribution using both poetry (for wheels) and build (for sdist)
+python -m pip install --upgrade pip
+python -m pip install build poetry
+python -m build
+echo "Distribution files prepared for publishing:"
+ls -la dist/
