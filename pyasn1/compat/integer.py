@@ -1,13 +1,10 @@
+# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
-
-from pyasn1.compat.octets import oct2int, null
-
 
 def from_bytes(octets, signed=False):
     return int.from_bytes(bytes(octets), "big", signed=signed)

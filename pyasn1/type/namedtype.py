@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
 
 from pyasn1 import error
 from pyasn1.type import tag
@@ -12,9 +12,10 @@ from pyasn1.type import tagmap
 
 __all__ = ["NamedType", "OptionalNamedType", "DefaultedNamedType", "NamedTypes"]
 
+
+# Define any function if not available in this Python version
 try:
     any
-
 except NameError:
     any = lambda x: bool(filter(bool, x))
 

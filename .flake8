@@ -33,6 +33,7 @@ select = E,W,F
 # Per-file-ignores for specific files with too many issues to fix at once
 per-file-ignores =
     # Files with line length issues
+    pyasn1/codec/ber/decoder.py:E501
     pyasn1/codec/*/*.py:E501
     pyasn1/type/base.py:E501
     pyasn1/type/univ.py:E501,E741,F821,F841
