@@ -6,6 +6,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
+
 def from_bytes(octets, signed=False):
     return int.from_bytes(bytes(octets), "big", signed=signed)
 
