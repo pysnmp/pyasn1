@@ -30,16 +30,17 @@ packages = [
 include = ["docs", "tests"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 Sphinx = "^4.3.0"
-mypy = "^0.910"
-black = "^21.11b0"
-isort = "^5.10.1"
-pyflakes = "^2.4.0"
-autoflake = "^1.4"
-pre-commit = "^2.15.0"
+isort = "^6.0.1"
+black = "^25.1.0"
+pyflakes = "^3.3.2"
+autoflake = "^2.3.1"
+flake8 = "^7.2.0"
+pre-commit = "^4.2.0"
+mypy = "^1.15.0"
 
 [build-system]
 requires = ["setuptools>=42", "wheel"]

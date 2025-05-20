@@ -396,10 +396,10 @@ Revision 0.1.8, released 22-06-2015
 - When comparing ASN.1 types, by-tag and/or by-constraints matching
   can now be performed with the isSuperTypeOf()/isSameTypeWith() optional
   flags.
-- Constructed types now verify their consistency by invoking 
+- Constructed types now verify their consistency by invoking
   isSameTypeWith(matchTags=True, matchConstraints=False) and
   isSuperTypeOf(matchTags=False, matchConstraints=True) for each of their
-  components rather than isSuperTypeOf() as it used to be. Constriants check 
+  components rather than isSuperTypeOf() as it used to be. Constriants check
   could be enforced to isSameTypeWith() with the strictConstraints=True
   constructed classes attribute.
 - Constructed types can now be initialized with new .setComponents() method
@@ -407,7 +407,7 @@ Revision 0.1.8, released 22-06-2015
   reflect this change.
 - NamedTypes() and NamedValues() made comparable.
 - Test coverage extended to cover pyasn1 types __repr__() function.
-- The abs(Integer()) & abs(Real()) operation now returns respective pyasn1 
+- The abs(Integer()) & abs(Real()) operation now returns respective pyasn1
   type, not a Python type.
 - More Python magic methods implementations added to Integer & Real classes
   (e.g.  __pos__, __neg__, __round__, __floor__, __ceil__, __trunc__)
@@ -447,7 +447,7 @@ Revision 0.1.7
   marker is now detected by both tag and value. Otherwise zero values may
   interfere with end-of-octets marker.
 - Fix to decoder to fail in cases where tagFormat indicates inappropriate
-  format for the type (e.g. BOOLEAN is always PRIMITIVE, SET is always 
+  format for the type (e.g. BOOLEAN is always PRIMITIVE, SET is always
   CONSTRUCTED and OCTET STRING is either of the two)
 - Fix to REAL type encoder to force primitive encoding form encoding.
 - Fix to CHOICE decoder to handle explicitly tagged, indefinite length
@@ -495,7 +495,7 @@ Revision 0.1.4
 - Obsolete __init__.MajorVersionId replaced with __init__.__version__
   which is now in-sync with distutils.
 - Package classifiers updated.
-- The __init__.py's made non-empty (rumors are that they may be optimized 
+- The __init__.py's made non-empty (rumors are that they may be optimized
   out by package managers).
 - Bail out gracefully whenever Python version is older than 2.4.
 - Fix to Real codec exponent encoding (should be in 2's complement form),
@@ -606,7 +606,7 @@ Revision 0.0.13a
 Revision 0.0.12a
 ----------------
 
-- The individual tag/length/value processing methods of 
+- The individual tag/length/value processing methods of
   encoder.AbstractItemEncoder renamed (leading underscore stripped)
   to promote overloading in cases where partial substrate processing
   is required.
@@ -618,7 +618,7 @@ Revision 0.0.11a
 ----------------
 
 - Decoder can now treat values of unknown types as opaque OctetString.
-- Fix to Set/SetOf type decoder to handle uninitialized scalar SetOf 
+- Fix to Set/SetOf type decoder to handle uninitialized scalar SetOf
   components correctly.
 
 Revision 0.0.10a
@@ -665,14 +665,14 @@ Revision 0.0.5a
 ---------------
 
 - Integer BER codec reworked fixing negative values encoding bug.
-- clone() and subtype() methods of Constructed ASN.1 classes now 
+- clone() and subtype() methods of Constructed ASN.1 classes now
   accept optional cloneValueFlag flag which controls original value
-  inheritance. The default is *not* to inherit original value for 
+  inheritance. The default is *not* to inherit original value for
   performance reasons (this may affect backward compatibility).
   Performance penalty may be huge on deeply nested Constructed objects
   re-creation.
 - Base ASN.1 types (pyasn1.type.univ.*) do not have default values
-  anymore. They remain uninitialized acting as ASN.1 types. In 
+  anymore. They remain uninitialized acting as ASN.1 types. In
   this model, initialized ASN.1 types represent either types with
   default value installed or a type instance.
 - Decoders' prototypes are now class instances rather than classes.
@@ -704,7 +704,7 @@ Revision 0.0.3a
 Revision 0.0.2a
 ---------------
 
-* ConstraintsIntersection.isSuperTypeOf() and 
+* ConstraintsIntersection.isSuperTypeOf() and
   ConstraintsIntersection.hasConstraint() implemented
 * Bugfix to NamedValues initialization code
 * +/- operators added to NamedValues objects
