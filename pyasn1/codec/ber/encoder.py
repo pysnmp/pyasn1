@@ -7,21 +7,11 @@
 #
 import sys
 
-from pyasn1 import debug
-from pyasn1 import error
+from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.compat.integer import to_bytes
-from pyasn1.compat.octets import (
-    int2oct,
-    oct2int,
-    null,
-    str2octs,
-    isOctetsType,
-)
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import univ
-from pyasn1.type import useful
+from pyasn1.compat.octets import int2oct, isOctetsType, null, oct2int, str2octs
+from pyasn1.type import char, tag, univ, useful
 
 __all__ = ["encode"]
 

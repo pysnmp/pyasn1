@@ -8,20 +8,13 @@
 import math
 import pickle
 import sys
-
 import unittest
 
+from pyasn1.compat.octets import octs2ints, octs2str, str2octs
+from pyasn1.error import (PyAsn1Error, PyAsn1UnicodeDecodeError,
+                          PyAsn1UnicodeEncodeError)
+from pyasn1.type import constraint, error, namedtype, namedval, tag, univ
 from tests.base import BaseTestCase
-
-from pyasn1.type import univ
-from pyasn1.type import tag
-from pyasn1.type import constraint
-from pyasn1.type import namedtype
-from pyasn1.type import namedval
-from pyasn1.type import error
-from pyasn1.compat.octets import str2octs, octs2ints, octs2str
-from pyasn1.error import PyAsn1Error
-from pyasn1.error import PyAsn1UnicodeEncodeError, PyAsn1UnicodeDecodeError
 
 
 class NoValueTestCase(BaseTestCase):

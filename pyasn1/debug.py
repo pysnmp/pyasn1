@@ -8,8 +8,7 @@
 import logging
 import sys
 
-from pyasn1 import __version__
-from pyasn1 import error
+from pyasn1 import __version__, error
 from pyasn1.compat.octets import octs2ints
 
 __all__ = ["Debug", "setLogger", "hexdump"]

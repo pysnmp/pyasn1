@@ -8,11 +8,8 @@
 import datetime
 
 from pyasn1 import error
-from pyasn1.compat import dateandtime
-from pyasn1.compat import string
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import univ
+from pyasn1.compat import dateandtime, string
+from pyasn1.type import char, tag, univ
 
 __all__ = ["ObjectDescriptor", "GeneralizedTime", "UTCTime"]
 

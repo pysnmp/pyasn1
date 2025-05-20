@@ -8,8 +8,7 @@
 import sys
 
 from pyasn1 import error
-from pyasn1.type import tag
-from pyasn1.type import univ
+from pyasn1.type import tag, univ
 
 __all__ = [
     "NumericString",

@@ -6,16 +6,11 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
-
 import unittest
 
-from tests.base import BaseTestCase
-
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
 from pyasn1.codec.der import encoder
+from pyasn1.type import namedtype, opentype, tag, univ
+from tests.base import BaseTestCase
 
 
 class OctetStringEncoderTestCase(BaseTestCase):

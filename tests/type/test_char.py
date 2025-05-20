@@ -7,15 +7,11 @@
 #
 import pickle
 import sys
-
 import unittest
 
-from tests.base import BaseTestCase
-
-from pyasn1.type import char
-from pyasn1.type import univ
-from pyasn1.type import constraint
 from pyasn1.error import PyAsn1Error
+from pyasn1.type import char, constraint, univ
+from tests.base import BaseTestCase
 
 
 class AbstractStringTestCase(object):

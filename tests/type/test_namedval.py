@@ -6,12 +6,10 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
-
 import unittest
 
-from tests.base import BaseTestCase
-
 from pyasn1.type import namedval
+from tests.base import BaseTestCase
 
 
 class NamedValuesCaseBase(BaseTestCase):

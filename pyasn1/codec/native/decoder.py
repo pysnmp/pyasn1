@@ -5,13 +5,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from pyasn1 import debug
-from pyasn1 import error
-from pyasn1.type import base
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import univ
-from pyasn1.type import useful
+from pyasn1 import debug, error
+from pyasn1.type import base, char, tag, univ, useful
 
 __all__ = ["decode"]
 

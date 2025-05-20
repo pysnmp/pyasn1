@@ -12,15 +12,10 @@ try:
 except ImportError:
     import unittest
 
-from tests.base import BaseTestCase
-
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
-from pyasn1.type import useful
 from pyasn1.codec.cer import encoder
 from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, opentype, tag, univ, useful
+from tests.base import BaseTestCase
 
 
 class BooleanEncoderTestCase(BaseTestCase):

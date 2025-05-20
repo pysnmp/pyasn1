@@ -12,9 +12,8 @@ try:
 except ImportError:
     import unittest
 
-from tests.base import BaseTestCase
-
 from pyasn1.compat import octets
+from tests.base import BaseTestCase
 
 
 class OctetsTestCase(BaseTestCase):

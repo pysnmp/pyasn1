@@ -5,8 +5,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from pyasn1.type import base
-from pyasn1.type import tag
+from pyasn1.type import base, tag
 
 __all__ = ["endOfOctets"]
 

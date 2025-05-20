@@ -6,13 +6,10 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
-
 import unittest
 
+from pyasn1 import debug, error
 from tests.base import BaseTestCase
-
-from pyasn1 import debug
-from pyasn1 import error
 
 
 class DebugCaseBase(BaseTestCase):

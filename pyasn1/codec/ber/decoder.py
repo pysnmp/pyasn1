@@ -5,17 +5,11 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from pyasn1 import debug
-from pyasn1 import error
+from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.compat.integer import from_bytes
-from pyasn1.compat.octets import oct2int, octs2ints, null
-from pyasn1.type import base
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import tagmap
-from pyasn1.type import univ
-from pyasn1.type import useful
+from pyasn1.compat.octets import null, oct2int, octs2ints
+from pyasn1.type import base, char, tag, tagmap, univ, useful
 
 __all__ = ["decode"]
 

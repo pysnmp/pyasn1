@@ -6,15 +6,12 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
-
 import unittest
 
-from tests.base import BaseTestCase
-
-from pyasn1.type import namedtype
-from pyasn1.type import univ
 from pyasn1.codec.native import decoder
 from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, univ
+from tests.base import BaseTestCase
 
 
 class BadAsn1SpecTestCase(BaseTestCase):

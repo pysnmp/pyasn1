@@ -8,13 +8,11 @@
 import datetime
 import pickle
 import sys
+import unittest
 from copy import deepcopy
 
-import unittest
-
-from tests.base import BaseTestCase
-
 from pyasn1.type import useful
+from tests.base import BaseTestCase
 
 
 class FixedOffset(datetime.tzinfo):
