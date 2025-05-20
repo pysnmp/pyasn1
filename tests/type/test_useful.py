@@ -96,10 +96,7 @@ class GeneralizedTimeTestCase(BaseTestCase):
         )
 
     def testToDateTime8(self):
-        assert (
-            datetime.datetime(2017, 7, 11, 0)
-            == useful.GeneralizedTime("2017071100").asDateTime
-        )
+        assert datetime.datetime(2017, 7, 11, 0) == useful.GeneralizedTime("2017071100").asDateTime
 
     def testCopy(self):
         dt = useful.GeneralizedTime("20170916234254+0130").asDateTime
@@ -126,17 +123,12 @@ class GeneralizedTimePicklingTestCase(unittest.TestCase):
 class UTCTimeTestCase(BaseTestCase):
     def testFromDateTime(self):
         assert (
-            useful.UTCTime.fromDateTime(
-                datetime.datetime(2017, 7, 11, 0, 1, 2, tzinfo=UTC)
-            )
+            useful.UTCTime.fromDateTime(datetime.datetime(2017, 7, 11, 0, 1, 2, tzinfo=UTC))
             == "170711000102Z"
         )
 
     def testToDateTime0(self):
-        assert (
-            datetime.datetime(2017, 7, 11, 0, 1, 2)
-            == useful.UTCTime("170711000102").asDateTime
-        )
+        assert datetime.datetime(2017, 7, 11, 0, 1, 2) == useful.UTCTime("170711000102").asDateTime
 
     def testToDateTime1(self):
         assert (
@@ -157,10 +149,7 @@ class UTCTimeTestCase(BaseTestCase):
         )
 
     def testToDateTime4(self):
-        assert (
-            datetime.datetime(2017, 7, 11, 0, 1)
-            == useful.UTCTime("1707110001").asDateTime
-        )
+        assert datetime.datetime(2017, 7, 11, 0, 1) == useful.UTCTime("1707110001").asDateTime
 
 
 class UTCTimePicklingTestCase(unittest.TestCase):

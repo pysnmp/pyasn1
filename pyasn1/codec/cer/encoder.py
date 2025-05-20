@@ -95,9 +95,7 @@ class TimeEncoderMixIn(object):
 
         options.update(maxChunkSize=1000)
 
-        return encoder.OctetStringEncoder.encodeValue(
-            self, value, asn1Spec, encodeFun, **options
-        )
+        return encoder.OctetStringEncoder.encodeValue(self, value, asn1Spec, encodeFun, **options)
 
 
 class GeneralizedTimeEncoder(TimeEncoderMixIn, encoder.OctetStringEncoder):

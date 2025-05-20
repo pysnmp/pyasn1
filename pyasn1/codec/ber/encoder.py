@@ -115,9 +115,7 @@ class AbstractItemEncoder(object):
                     defModeOverride = True
 
                     if LOG:
-                        LOG(
-                            "overridden encoding mode into definitive for primitive type"
-                        )
+                        LOG("overridden encoding mode into definitive for primitive type")
 
             header = self.encodeTag(singleTag, isConstructed)
 
@@ -410,9 +408,7 @@ class RealEncoder(AbstractItemEncoder):
                 mantissa[i], encBase[i], exponent[i]
             )
 
-            if abs(exponent[i]) < abs(e) or (
-                abs(exponent[i]) == abs(e) and mantissa[i] < m
-            ):
+            if abs(exponent[i]) < abs(e) or (abs(exponent[i]) == abs(e) and mantissa[i] < m):
                 e = exponent[i]
                 m = int(mantissa[i])
                 encbase = encBase[i]
@@ -539,10 +535,7 @@ class SequenceEncoder(AbstractItemEncoder):
         omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
 
         if LOG:
-            LOG(
-                "%sencoding empty OPTIONAL components"
-                % (omitEmptyOptionals and "not " or "")
-            )
+            LOG("%sencoding empty OPTIONAL components" % (omitEmptyOptionals and "not " or ""))
 
         if asn1Spec is None:
             # instance of ASN.1 schema
@@ -577,9 +570,7 @@ class SequenceEncoder(AbstractItemEncoder):
                     if wrapType.typeId in (univ.SetOf.typeId, univ.SequenceOf.typeId):
 
                         substrate += encodeFun(
-                            component,
-                            asn1Spec,
-                            **dict(options, wrapType=wrapType.componentType)
+                            component, asn1Spec, **dict(options, wrapType=wrapType.componentType)
                         )
 
                     else:
@@ -635,7 +626,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         substrate += encodeFun(
                             component,
                             componentSpec,
-                            **dict(options, wrapType=componentSpec.componentType)
+                            **dict(options, wrapType=componentSpec.componentType),
                         )
 
                     else:
@@ -811,8 +802,7 @@ class Encoder(object):
 
         except AttributeError:
             raise error.PyAsn1Error(
-                "Value %r is not ASN.1 type instance "
-                'and "asn1Spec" not given' % (value,)
+                "Value %r is not ASN.1 type instance " 'and "asn1Spec" not given' % (value,)
             )
 
         if LOG:
@@ -822,9 +812,7 @@ class Encoder(object):
                 % (
                     not options.get("defMode", True) and "in" or "",
                     options.get("maxChunkSize", 0),
-                    asn1Spec is None
-                    and value.prettyPrintType()
-                    or asn1Spec.prettyPrintType(),
+                    asn1Spec is None and value.prettyPrintType() or asn1Spec.prettyPrintType(),
                     value,
                 )
             )

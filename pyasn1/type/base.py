@@ -128,10 +128,7 @@ class Asn1Type(Asn1Item):
         return (
             not matchTags
             or (self.tagSet.isSuperTagSetOf(other.tagSet))
-            and (
-                not matchConstraints
-                or self.subtypeSpec.isSuperTypeOf(other.subtypeSpec)
-            )
+            and (not matchConstraints or self.subtypeSpec.isSuperTypeOf(other.subtypeSpec))
         )
 
     @staticmethod
@@ -246,9 +243,7 @@ class NoValue(object):
         if attr in self.skipMethods:
             raise AttributeError("Attribute %s not present" % attr)
 
-        raise error.PyAsn1Error(
-            'Attempted "%s" operation on ASN.1 schema object' % attr
-        )
+        raise error.PyAsn1Error('Attempted "%s" operation on ASN.1 schema object' % attr)
 
     def __repr__(self):
         return "<%s object>" % self.__class__.__name__
@@ -557,9 +552,7 @@ class ConstructedAsn1Type(Asn1Type):
                 representation += ", %s=%r" % (attr, value)
 
         if self.isValue and self.components:
-            representation += ", payload [%s]" % ", ".join(
-                [repr(x) for x in self.components]
-            )
+            representation += ", payload [%s]" % ", ".join([repr(x) for x in self.components])
 
         return "<%s>" % representation
 

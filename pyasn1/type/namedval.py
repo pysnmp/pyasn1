@@ -66,9 +66,7 @@ class NamedValues(object):
                     name, number = namedValue
 
                 except ValueError:
-                    raise error.PyAsn1Error(
-                        "Not a proper attribute-value pair %r" % (namedValue,)
-                    )
+                    raise error.PyAsn1Error("Not a proper attribute-value pair %r" % (namedValue,))
 
             else:
                 anonymousNames.append(namedValue)

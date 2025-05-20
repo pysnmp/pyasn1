@@ -321,9 +321,7 @@ class TagSet(object):
             New *TagSet* object
         """
         if self.__superTags:
-            superTag = Tag(
-                superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId
-            )
+            superTag = Tag(superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId)
         return self[:-1] + superTag
 
     def isSuperTagSetOf(self, tagSet):

@@ -157,9 +157,7 @@ class NamedTypes(object):
         self.__minTagSet = self.__computeMinTagSet()
         self.__nameToPosMap = self.__computeNameToPosMap()
         self.__tagToPosMap = self.__computeTagToPosMap()
-        self.__ambiguousTypes = (
-            "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
-        )
+        self.__ambiguousTypes = "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
         self.__uniqueTagMap = self.__computeTagMaps(unique=True)
         self.__nonUniqueTagMap = self.__computeTagMaps(unique=False)
         self.__hasOptionalOrDefault = any(
@@ -169,9 +167,7 @@ class NamedTypes(object):
                 if namedType.isDefaulted or namedType.isOptional
             ]
         )
-        self.__hasOpenTypes = any(
-            [True for namedType in self.__namedTypes if namedType.openType]
-        )
+        self.__hasOpenTypes = any([True for namedType in self.__namedTypes if namedType.openType])
 
         self.__requiredComponents = frozenset(
             [
@@ -290,9 +286,7 @@ class NamedTypes(object):
             if len(partialAmbiguousTypes) == len(self.__namedTypes):
                 ambiguousTypes[idx] = self
             else:
-                ambiguousTypes[idx] = NamedTypes(
-                    *partialAmbiguousTypes, **dict(terminal=True)
-                )
+                ambiguousTypes[idx] = NamedTypes(*partialAmbiguousTypes, **dict(terminal=True))
         return ambiguousTypes
 
     def getTypeByPosition(self, idx):
@@ -503,9 +497,7 @@ class NamedTypes(object):
             if defaultType is None:
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
-                return NamedTypes.PostponedError(
-                    "Duplicate default ASN.1 type at %s" % (self,)
-                )
+                return NamedTypes.PostponedError("Duplicate default ASN.1 type at %s" % (self,))
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)
 

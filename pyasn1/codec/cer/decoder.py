@@ -25,7 +25,7 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
         state=None,
         decodeFun=None,
         substrateFun=None,
-        **options
+        **options,
     ):
         head, tail = substrate[:length], substrate[length:]
         if not head or length != 1:

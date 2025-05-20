@@ -33,9 +33,7 @@ class TagCmpTestCase(TagTestCaseBase):
 
     def testSequence(self):
         assert (
-            self.t1[0] == self.t2[0]
-            and self.t1[1] == self.t2[1]
-            and self.t1[2] == self.t2[2]
+            self.t1[0] == self.t2[0] and self.t1[1] == self.t2[1] and self.t1[2] == self.t2[2]
         ), "tag sequence protocol fails"
 
 
@@ -43,13 +41,9 @@ class TagSetTestCaseBase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
 
-        self.ts1 = tag.initTagSet(
-            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
-        )
+        self.ts1 = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12))
 
-        self.ts2 = tag.initTagSet(
-            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
-        )
+        self.ts2 = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12))
 
 
 class TagSetReprTestCase(TagSetTestCaseBase):
@@ -70,18 +64,14 @@ class TagSetCmpTestCase(TagSetTestCaseBase):
 
 class TaggingTestSuite(TagSetTestCaseBase):
     def testImplicitTag(self):
-        t = self.ts1.tagImplicitly(
-            tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 14)
-        )
+        t = self.ts1.tagImplicitly(tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 14))
         assert t == tag.TagSet(
             tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 12),
             tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 14),
         ), "implicit tagging went wrong"
 
     def testExplicitTag(self):
-        t = self.ts1.tagExplicitly(
-            tag.Tag(tag.tagClassPrivate, tag.tagFormatSimple, 32)
-        )
+        t = self.ts1.tagExplicitly(tag.Tag(tag.tagClassPrivate, tag.tagFormatSimple, 32))
         assert t == tag.TagSet(
             tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12),
             tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12),

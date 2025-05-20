@@ -83,9 +83,7 @@ class Debug(object):
         else:
             self._printer = self.defaultPrinter
 
-        self._printer(
-            "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))
-        )
+        self._printer("running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags)))
 
         for flag in flags:
             inverse = flag and flag[0] in ("!", "~")
@@ -99,9 +97,7 @@ class Debug(object):
             except KeyError:
                 raise error.PyAsn1Error("bad debug flag %s" % flag)
 
-            self._printer(
-                "debug category '%s' %s" % (flag, inverse and "disabled" or "enabled")
-            )
+            self._printer("debug category '%s' %s" % (flag, inverse and "disabled" or "enabled"))
 
     def __str__(self):
         return "logger %s, flags %x" % (self._printer, self._flags)

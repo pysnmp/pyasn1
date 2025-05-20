@@ -440,17 +440,13 @@ class BitString(base.SimpleAsn1Type):
         if value is noValue:
             if kwargs:
                 try:
-                    value = self.fromBinaryString(
-                        kwargs.pop("binValue"), internalFormat=True
-                    )
+                    value = self.fromBinaryString(kwargs.pop("binValue"), internalFormat=True)
 
                 except KeyError:
                     pass
 
                 try:
-                    value = self.fromHexString(
-                        kwargs.pop("hexValue"), internalFormat=True
-                    )
+                    value = self.fromHexString(kwargs.pop("hexValue"), internalFormat=True)
 
                 except KeyError:
                     pass
@@ -481,9 +477,7 @@ class BitString(base.SimpleAsn1Type):
     def __lt__(self, other):
         other = self.prettyIn(other)
         return (
-            len(self._value) < len(other)
-            or len(self._value) == len(other)
-            and self._value < other
+            len(self._value) < len(other) or len(self._value) == len(other) and self._value < other
         )
 
     def __le__(self, other):
@@ -497,9 +491,7 @@ class BitString(base.SimpleAsn1Type):
     def __gt__(self, other):
         other = self.prettyIn(other)
         return (
-            len(self._value) > len(other)
-            or len(self._value) == len(other)
-            and self._value > other
+            len(self._value) > len(other) or len(self._value) == len(other) and self._value > other
         )
 
     def __ge__(self, other):
@@ -563,15 +555,11 @@ class BitString(base.SimpleAsn1Type):
         return self * value
 
     def __lshift__(self, count):
-        return self.clone(
-            SizedInteger(self._value << count).setBitLength(len(self._value) + count)
-        )
+        return self.clone(SizedInteger(self._value << count).setBitLength(len(self._value) + count))
 
     def __rshift__(self, count):
         return self.clone(
-            SizedInteger(self._value >> count).setBitLength(
-                max(0, len(self._value) - count)
-            )
+            SizedInteger(self._value >> count).setBitLength(max(0, len(self._value) - count))
         )
 
     def __int__(self):
@@ -623,9 +611,9 @@ class BitString(base.SimpleAsn1Type):
             )
 
         if prepend is not None:
-            value = SizedInteger(
-                (SizedInteger(prepend) << len(value)) | value
-            ).setBitLength(len(prepend) + len(value))
+            value = SizedInteger((SizedInteger(prepend) << len(value)) | value).setBitLength(
+                len(prepend) + len(value)
+            )
 
         if not internalFormat:
             value = cls(value)
@@ -650,9 +638,9 @@ class BitString(base.SimpleAsn1Type):
             )
 
         if prepend is not None:
-            value = SizedInteger(
-                (SizedInteger(prepend) << len(value)) | value
-            ).setBitLength(len(prepend) + len(value))
+            value = SizedInteger((SizedInteger(prepend) << len(value)) | value).setBitLength(
+                len(prepend) + len(value)
+            )
 
         if not internalFormat:
             value = cls(value)
@@ -673,9 +661,9 @@ class BitString(base.SimpleAsn1Type):
         )
 
         if prepend is not None:
-            value = SizedInteger(
-                (SizedInteger(prepend) << len(value)) | value
-            ).setBitLength(len(prepend) + len(value))
+            value = SizedInteger((SizedInteger(prepend) << len(value)) | value).setBitLength(
+                len(prepend) + len(value)
+            )
 
         if not internalFormat:
             value = cls(value)
@@ -689,21 +677,15 @@ class BitString(base.SimpleAsn1Type):
             if not value:
                 return SizedInteger(0).setBitLength(0)
 
-            elif (
-                value[0] == "'"
-            ):  # "'1011'B" -- ASN.1 schema representation (deprecated)
+            elif value[0] == "'":  # "'1011'B" -- ASN.1 schema representation (deprecated)
                 if value[-2:] == "'B":
                     return self.fromBinaryString(value[1:-2], internalFormat=True)
                 elif value[-2:] == "'H":
                     return self.fromHexString(value[1:-2], internalFormat=True)
                 else:
-                    raise error.PyAsn1Error(
-                        "Bad BIT STRING value notation %s" % (value,)
-                    )
+                    raise error.PyAsn1Error("Bad BIT STRING value notation %s" % (value,))
 
-            elif (
-                self.namedValues and not value.isdigit()
-            ):  # named bits like 'Urgent, Active'
+            elif self.namedValues and not value.isdigit():  # named bits like 'Urgent, Active'
                 names = [x.strip() for x in value.split(",")]
 
                 try:
@@ -859,18 +841,13 @@ class OctetString(base.SimpleAsn1Type):
             except UnicodeEncodeError:
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeEncodeError(
-                    "Can't encode string '%s' with '%s' "
-                    "codec" % (value, self.encoding),
+                    "Can't encode string '%s' with '%s' " "codec" % (value, self.encoding),
                     exc,
                 )
-        elif isinstance(
-            value, OctetString
-        ):  # a shortcut, bytes() would work the same way
+        elif isinstance(value, OctetString):  # a shortcut, bytes() would work the same way
             return value.asOctets()
 
-        elif isinstance(
-            value, base.SimpleAsn1Type
-        ):  # this mostly targets Integer objects
+        elif isinstance(value, base.SimpleAsn1Type):  # this mostly targets Integer objects
             return self.prettyIn(str(value))
 
         elif isinstance(value, (tuple, list)):
@@ -1066,9 +1043,7 @@ class Null(OctetString):
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
     #: associated with |ASN.1| type.
     tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x05))
-    subtypeSpec = OctetString.subtypeSpec + constraint.SingleValueConstraint(
-        octets.str2octs("")
-    )
+    subtypeSpec = OctetString.subtypeSpec + constraint.SingleValueConstraint(octets.str2octs(""))
 
     # Optimization for faster codec lookup
     typeId = OctetString.getTypeId()
@@ -1219,9 +1194,7 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         if len(tupleOfInts) == len(value):
             return tupleOfInts
 
-        raise error.PyAsn1Error(
-            "Malformed Object ID %s at %s" % (value, self.__class__.__name__)
-        )
+        raise error.PyAsn1Error("Malformed Object ID %s at %s" % (value, self.__class__.__name__))
 
     def prettyOut(self, value):
         return ".".join([str(x) for x in value])
@@ -1315,9 +1288,7 @@ class Real(base.SimpleAsn1Type):
             if isinstance(value[0], float) and self._inf and value[0] in self._inf:
                 return value[0]
             if value[1] not in (2, 10):
-                raise error.PyAsn1Error(
-                    "Prohibited base for Real value: %s" % (value[1],)
-                )
+                raise error.PyAsn1Error("Prohibited base for Real value: %s" % (value[1],))
             if value[1] == 10:
                 value = self.__normalizeBase10(value)
             return value
@@ -1609,9 +1580,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         if args:
             for key, value in zip(("componentType", "tagSet", "subtypeSpec"), args):
                 if key in kwargs:
-                    raise error.PyAsn1Error(
-                        "Conflicting positional and keyword params!"
-                    )
+                    raise error.PyAsn1Error("Conflicting positional and keyword params!")
                 kwargs["componentType"] = value
 
         self._componentValues = noValue
@@ -1765,8 +1734,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         if isinstance(idx, slice):
             indices = tuple(range(len(self)))
             return [
-                self.getComponentByPosition(subidx, default, instantiate)
-                for subidx in indices[idx]
+                self.getComponentByPosition(subidx, default, instantiate) for subidx in indices[idx]
             ]
 
         if idx < 0:
@@ -1874,20 +1842,15 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
                 raise error.PyAsn1Error("Component type not defined")
 
         elif not isinstance(value, base.Asn1Item):
-            if componentType is not None and isinstance(
-                componentType, base.SimpleAsn1Type
-            ):
+            if componentType is not None and isinstance(componentType, base.SimpleAsn1Type):
                 value = componentType.clone(value=value)
 
-            elif currentValue is not noValue and isinstance(
-                currentValue, base.SimpleAsn1Type
-            ):
+            elif currentValue is not noValue and isinstance(currentValue, base.SimpleAsn1Type):
                 value = currentValue.clone(value=value)
 
             else:
                 raise error.PyAsn1Error(
-                    "Non-ASN.1 value %r and undefined component"
-                    " type at %r" % (value, self)
+                    "Non-ASN.1 value %r and undefined component" " type at %r" % (value, self)
                 )
 
         elif componentType is not None and (matchTags or matchConstraints):
@@ -1906,8 +1869,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
                 # additional properties associated with componentType
                 if componentType.typeId != Any.typeId:
                     raise error.PyAsn1Error(
-                        "Component value is tag-incompatible: %r vs "
-                        "%r" % (value, componentType)
+                        "Component value is tag-incompatible: %r vs " "%r" % (value, componentType)
                     )
 
         componentValues[idx] = value
@@ -2049,9 +2011,7 @@ class SequenceOf(SequenceOfAndSetOfBase):
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
     #: associated with |ASN.1| type.
-    tagSet = tag.initTagSet(
-        tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10)
-    )
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10))
 
     #: Default :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
@@ -2072,9 +2032,7 @@ class SetOf(SequenceOfAndSetOfBase):
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
     #: associated with |ASN.1| type.
-    tagSet = tag.initTagSet(
-        tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11)
-    )
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11))
 
     #: Default :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
@@ -2330,9 +2288,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             except KeyError:
                 raise error.PyAsn1Error("Name %s not found" % (name,))
 
-        return self.getComponentByPosition(
-            idx, default=default, instantiate=instantiate
-        )
+        return self.getComponentByPosition(idx, default=default, instantiate=instantiate)
 
     def setComponentByName(
         self,
@@ -2555,13 +2511,10 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
                 else:
                     raise error.PyAsn1Error(
-                        "%s can cast only scalar values"
-                        % componentType.__class__.__name__
+                        "%s can cast only scalar values" % componentType.__class__.__name__
                     )
 
-            elif currentValue is not noValue and isinstance(
-                currentValue, base.SimpleAsn1Type
-            ):
+            elif currentValue is not noValue and isinstance(currentValue, base.SimpleAsn1Type):
                 value = currentValue.clone(value=value)
 
             else:
@@ -2585,8 +2538,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 ):
                     if not componentType[idx].openType:
                         raise error.PyAsn1Error(
-                            "Component value is tag-incompatible: %r vs %r"
-                            % (value, componentType)
+                            "Component value is tag-incompatible: %r vs %r" % (value, componentType)
                         )
 
         if componentTypeLen or idx in self._dynamicNames:
@@ -2725,9 +2677,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     def prettyPrintType(self, scope=0):
         scope += 1
         representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
-        for idx, componentType in enumerate(
-            self.componentType.values() or self._componentValues
-        ):
+        for idx, componentType in enumerate(self.componentType.values() or self._componentValues):
             representation += " " * scope
             if self.componentType:
                 representation += '"%s"' % self.componentType.getNameByPosition(idx)
@@ -2759,9 +2709,7 @@ class Sequence(SequenceAndSetBase):
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
     #: associated with |ASN.1| type.
-    tagSet = tag.initTagSet(
-        tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10)
-    )
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10))
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
@@ -2794,9 +2742,7 @@ class Set(SequenceAndSetBase):
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
     #: associated with |ASN.1| type.
-    tagSet = tag.initTagSet(
-        tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11)
-    )
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11))
 
     #: Default collection of ASN.1 types of component (e.g. :py:class:`~pyasn1.type.namedtype.NamedType`)
     #: object representing ASN.1 type allowed within |ASN.1| type
@@ -2813,9 +2759,7 @@ class Set(SequenceAndSetBase):
     def getComponent(self, innerFlag=False):
         return self
 
-    def getComponentByType(
-        self, tagSet, default=noValue, instantiate=True, innerFlag=False
-    ):
+    def getComponentByType(self, tagSet, default=noValue, instantiate=True, innerFlag=False):
         """Returns |ASN.1| type component by ASN.1 tag.
 
         Parameters
@@ -2981,9 +2925,7 @@ class Choice(Set):
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
     #: imposing constraints on |ASN.1| type initialization values.
-    subtypeSpec = constraint.ConstraintsIntersection(
-        constraint.ValueSizeConstraint(1, 1)
-    )
+    subtypeSpec = constraint.ConstraintsIntersection(constraint.ValueSizeConstraint(1, 1))
 
     # Disambiguation ASN.1 types identification
     typeId = Set.getTypeId()
@@ -3065,9 +3007,7 @@ class Choice(Set):
             else:
                 tagSet = component.tagSet
             if isinstance(component, base.ConstructedAsn1Type):
-                myClone.setComponentByType(
-                    tagSet, component.clone(cloneValueFlag=cloneValueFlag)
-                )
+                myClone.setComponentByType(tagSet, component.clone(cloneValueFlag=cloneValueFlag))
             else:
                 myClone.setComponentByType(tagSet, component.clone())
 
@@ -3075,9 +3015,7 @@ class Choice(Set):
         __doc__ = Set.__doc__
 
         if self._currentIdx is None or self._currentIdx != idx:
-            return Set.getComponentByPosition(
-                self, idx, default=default, instantiate=instantiate
-            )
+            return Set.getComponentByPosition(self, idx, default=default, instantiate=instantiate)
 
         return self._componentValues[idx]
 
@@ -3123,9 +3061,7 @@ class Choice(Set):
         self
         """
         oldIdx = self._currentIdx
-        Set.setComponentByPosition(
-            self, idx, value, verifyConstraints, matchTags, matchConstraints
-        )
+        Set.setComponentByPosition(self, idx, value, verifyConstraints, matchTags, matchConstraints)
         self._currentIdx = idx
         if oldIdx is not None and oldIdx != idx:
             self._componentValues[oldIdx] = noValue

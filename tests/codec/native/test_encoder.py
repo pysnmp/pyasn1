@@ -68,10 +68,7 @@ class NullEncoderTestCase(BaseTestCase):
 
 class ObjectIdentifierEncoderTestCase(BaseTestCase):
     def testOne(self):
-        assert (
-            encoder.encode(univ.ObjectIdentifier((1, 3, 6, 0, 12345)))
-            == "1.3.6.0.12345"
-        )
+        assert encoder.encode(univ.ObjectIdentifier((1, 3, 6, 0, 12345))) == "1.3.6.0.12345"
 
 
 class RealEncoderTestCase(BaseTestCase):

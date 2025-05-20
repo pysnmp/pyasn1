@@ -180,16 +180,11 @@ class Encoder(object):
 
     def __call__(self, value, **options):
         if not isinstance(value, base.Asn1Item):
-            raise error.PyAsn1Error(
-                "value is not valid (should be an instance of an ASN.1 Item)"
-            )
+            raise error.PyAsn1Error("value is not valid (should be an instance of an ASN.1 Item)")
 
         if LOG:
             debug.scope.push(type(value).__name__)
-            LOG(
-                "encoder called for type %s <%s>"
-                % (type(value).__name__, value.prettyPrint())
-            )
+            LOG("encoder called for type %s <%s>" % (type(value).__name__, value.prettyPrint()))
 
         tagSet = value.tagSet
 
@@ -207,18 +202,12 @@ class Encoder(object):
                 raise error.PyAsn1Error("No encoder for %s" % (value,))
 
         if LOG:
-            LOG(
-                "using value codec %s chosen by %s"
-                % (concreteEncoder.__class__.__name__, tagSet)
-            )
+            LOG("using value codec %s chosen by %s" % (concreteEncoder.__class__.__name__, tagSet))
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
         if LOG:
-            LOG(
-                "encoder %s produced: %s"
-                % (type(concreteEncoder).__name__, repr(pyObject))
-            )
+            LOG("encoder %s produced: %s" % (type(concreteEncoder).__name__, repr(pyObject)))
             debug.scope.pop()
 
         return pyObject

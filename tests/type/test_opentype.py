@@ -79,9 +79,7 @@ class TaggedAnyOpenTypeTestCase(BaseTestCase):
         class Sequence(univ.Sequence):
             componentType = namedtype.NamedTypes(
                 namedtype.NamedType("id", univ.Integer()),
-                namedtype.NamedType(
-                    "blob", self.taggedAny, openType=opentype.OpenType(name="id")
-                ),
+                namedtype.NamedType("blob", self.taggedAny, openType=opentype.OpenType(name="id")),
             )
 
         self.s = Sequence()

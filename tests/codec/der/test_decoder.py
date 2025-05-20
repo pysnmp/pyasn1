@@ -224,9 +224,7 @@ class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1] == bytes(
-            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-        )
+        assert s[1] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
 
 
 class SequenceDecoderWithImplicitlyTaggedOpenTypesTestCase(BaseTestCase):
@@ -418,9 +416,7 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1][0] == bytes(
-            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
-        )
+        assert s[1][0] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
 
 
 class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
@@ -433,9 +429,7 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            implicitTag=tag.Tag(
-                                tag.tagClassContext, tag.tagFormatSimple, 3
-                            )
+                            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
                         )
                     ),
                     openType=openType,
@@ -474,9 +468,7 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            explicitTag=tag.Tag(
-                                tag.tagClassContext, tag.tagFormatSimple, 3
-                            )
+                            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
                         )
                     ),
                     openType=openType,

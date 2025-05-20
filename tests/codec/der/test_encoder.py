@@ -121,9 +121,7 @@ class SetWithTaggedChoiceEncoderTestCase(BaseTestCase):
     def testWithUntaggedChoice(self):
 
         c = univ.Choice(
-            componentType=namedtype.NamedTypes(
-                namedtype.NamedType("premium", univ.Boolean())
-            )
+            componentType=namedtype.NamedTypes(namedtype.NamedType("premium", univ.Boolean()))
         )
 
         s = univ.Set(
@@ -141,9 +139,7 @@ class SetWithTaggedChoiceEncoderTestCase(BaseTestCase):
     def testWithTaggedChoice(self):
 
         c = univ.Choice(
-            componentType=namedtype.NamedTypes(
-                namedtype.NamedType("premium", univ.Boolean())
-            )
+            componentType=namedtype.NamedTypes(namedtype.NamedType("premium", univ.Boolean()))
         ).subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 7))
 
         s = univ.Set(
@@ -177,9 +173,7 @@ class SequenceEncoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         self.s[0] = 1
         self.s[1] = univ.Integer(12)
 
-        assert encoder.encode(self.s, asn1Spec=self.s) == bytes(
-            (48, 5, 2, 1, 1, 49, 50)
-        )
+        assert encoder.encode(self.s, asn1Spec=self.s) == bytes((48, 5, 2, 1, 1, 49, 50))
 
     def testEncodeOpenTypeChoiceTwo(self):
         self.s.clear()
@@ -294,9 +288,7 @@ class SequenceEncoderWithUntaggedSetOfOpenTypesTestCase(BaseTestCase):
         self.s[0] = 1
         self.s[1].append(univ.Integer(12))
 
-        assert encoder.encode(self.s, asn1Spec=self.s) == bytes(
-            (48, 7, 2, 1, 1, 49, 2, 49, 50)
-        )
+        assert encoder.encode(self.s, asn1Spec=self.s) == bytes((48, 7, 2, 1, 1, 49, 2, 49, 50))
 
     def testEncodeOpenTypeChoiceTwo(self):
         self.s.clear()
@@ -364,9 +356,7 @@ class SequenceEncoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            implicitTag=tag.Tag(
-                                tag.tagClassContext, tag.tagFormatSimple, 3
-                            )
+                            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
                         )
                     ),
                     openType=openType,
@@ -397,9 +387,7 @@ class SequenceEncoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            explicitTag=tag.Tag(
-                                tag.tagClassContext, tag.tagFormatSimple, 3
-                            )
+                            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
                         )
                     ),
                     openType=openType,
@@ -482,9 +470,7 @@ class NestedOptionalSequenceEncoderTestCase(BaseTestCase):
 
     def testDefModeOptionalWithDefaultAndOptional(self):
         s = self.__initOptionalWithDefaultAndOptional()
-        assert encoder.encode(s) == bytes(
-            (48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123)
-        )
+        assert encoder.encode(s) == bytes((48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123))
 
     def testDefModeOptionalWithDefault(self):
         s = self.__initOptionalWithDefault()
@@ -500,9 +486,7 @@ class NestedOptionalSequenceEncoderTestCase(BaseTestCase):
 
     def testDefModeDefaultWithDefaultAndOptional(self):
         s = self.__initDefaultWithDefaultAndOptional()
-        assert encoder.encode(s) == bytes(
-            (48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123)
-        )
+        assert encoder.encode(s) == bytes((48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123))
 
     def testDefModeDefaultWithDefault(self):
         s = self.__initDefaultWithDefault()
@@ -561,9 +545,7 @@ class NestedOptionalChoiceEncoderTestCase(BaseTestCase):
 
     def testDefModeOptionalWithDefaultAndOptional(self):
         s = self.__initOptionalWithDefaultAndOptional()
-        assert encoder.encode(s) == bytes(
-            (48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123)
-        )
+        assert encoder.encode(s) == bytes((48, 11, 48, 9, 4, 4, 116, 101, 115, 116, 2, 1, 123))
 
     def testDefModeOptionalWithDefault(self):
         s = self.__initOptionalWithDefault()
@@ -613,9 +595,7 @@ class NestedOptionalSequenceOfEncoderTestCase(BaseTestCase):
 class EmptyInnerFieldOfSequenceEncoderTestCase(BaseTestCase):
     def testInitializedOptionalNullIsEncoded(self):
         self.s = univ.Sequence(
-            componentType=namedtype.NamedTypes(
-                namedtype.OptionalNamedType("null", univ.Null())
-            )
+            componentType=namedtype.NamedTypes(namedtype.OptionalNamedType("null", univ.Null()))
         )
 
         self.s.clear()
@@ -624,9 +604,7 @@ class EmptyInnerFieldOfSequenceEncoderTestCase(BaseTestCase):
 
     def testUninitializedOptionalNullIsNotEncoded(self):
         self.s = univ.Sequence(
-            componentType=namedtype.NamedTypes(
-                namedtype.OptionalNamedType("null", univ.Null())
-            )
+            componentType=namedtype.NamedTypes(namedtype.OptionalNamedType("null", univ.Null()))
         )
 
         self.s.clear()
@@ -634,9 +612,7 @@ class EmptyInnerFieldOfSequenceEncoderTestCase(BaseTestCase):
 
     def testInitializedDefaultNullIsNotEncoded(self):
         self.s = univ.Sequence(
-            componentType=namedtype.NamedTypes(
-                namedtype.DefaultedNamedType("null", univ.Null(""))
-            )
+            componentType=namedtype.NamedTypes(namedtype.DefaultedNamedType("null", univ.Null("")))
         )
 
         self.s.clear()

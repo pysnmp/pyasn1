@@ -30,9 +30,8 @@ class BinaryTestCase(BaseTestCase):
             assert 0, "bin() tolerates no arguments"
 
     def test_bin_allones(self):
-        assert (
-            "0b1111111111111111111111111111111111111111111111111111111111111111"
-            == bin(0xFFFFFFFFFFFFFFFF)
+        assert "0b1111111111111111111111111111111111111111111111111111111111111111" == bin(
+            0xFFFFFFFFFFFFFFFF
         )
 
     def test_bin_allzeros(self):
