@@ -30,7 +30,6 @@ jobs:
       - name: Run tox lint environment
         run: tox -e lint
 
-
   semgrep:
     runs-on: ubuntu-latest
     name: security-sast-semgrep

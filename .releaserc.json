@@ -35,7 +35,7 @@
             "files": [
               "pyproject.toml"
             ],
-            "from": "version ?=.*",
+            "from": "^version ?=.*",
             "results": [
               {
                 "file": "pyproject.toml",
