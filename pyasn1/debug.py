@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -9,7 +8,6 @@ import logging
 import sys
 
 from pyasn1 import __version__, error
-from pyasn1.compat.octets import octs2ints
 
 __all__ = ["Debug", "setLogger", "hexdump"]
 
@@ -28,7 +26,7 @@ FLAG_MAP = {
 LOGGEE_MAP = {}
 
 
-class Printer(object):
+class Printer:
     # noinspection PyShadowingNames
     def __init__(self, logger=None, handler=None, formatter=None):
         if logger is None:
@@ -55,17 +53,10 @@ class Printer(object):
         return "<python logging>"
 
 
-if hasattr(logging, "NullHandler"):
-    NullHandler = logging.NullHandler
-
-else:
-    # Python 2.6 and older
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
+NullHandler = logging.NullHandler
 
 
-class Debug(object):
+class Debug:
     defaultPrinter = Printer()
 
     def __init__(self, *flags, **options):
@@ -83,7 +74,9 @@ class Debug(object):
         else:
             self._printer = self.defaultPrinter
 
-        self._printer("running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags)))
+        self._printer(
+            "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))
+        )
 
         for flag in flags:
             inverse = flag and flag[0] in ("!", "~")
@@ -97,7 +90,9 @@ class Debug(object):
             except KeyError:
                 raise error.PyAsn1Error("bad debug flag %s" % flag)
 
-            self._printer("debug category '%s' %s" % (flag, inverse and "disabled" or "enabled"))
+            self._printer(
+                "debug category '%s' %s" % (flag, inverse and "disabled" or "enabled")
+            )
 
     def __str__(self):
         return "logger %s, flags %x" % (self._printer, self._flags)
@@ -138,12 +133,12 @@ def hexdump(octets):
     return " ".join(
         [
             "%s%.2X" % (n % 16 == 0 and ("\n%.5d: " % n) or "", x)
-            for n, x in zip(range(len(octets)), octs2ints(octets))
+            for n, x in zip(range(len(octets)), octets)
         ]
     )
 
 
-class Scope(object):
+class Scope:
     def __init__(self):
         self._list = []
 

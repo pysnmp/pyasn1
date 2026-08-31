@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -7,8 +6,14 @@
 #
 from pyasn1 import error
 from pyasn1.codec.ber import encoder
-from pyasn1.compat.octets import null, str2octs
 from pyasn1.type import univ, useful
+
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
+
+
+_null = b""
 
 __all__ = ["encode"]
 
@@ -31,7 +36,7 @@ class RealEncoder(encoder.RealEncoder):
 # specialized GeneralStringEncoder here
 
 
-class TimeEncoderMixIn(object):
+class TimeEncoderMixIn:
     Z_CHAR = ord("Z")
     PLUS_CHAR = ord("+")
     MINUS_CHAR = ord("-")
@@ -95,7 +100,9 @@ class TimeEncoderMixIn(object):
 
         options.update(maxChunkSize=1000)
 
-        return encoder.OctetStringEncoder.encodeValue(self, value, asn1Spec, encodeFun, **options)
+        return encoder.OctetStringEncoder.encodeValue(
+            self, value, asn1Spec, encodeFun, **options
+        )
 
 
 class GeneralizedTimeEncoder(TimeEncoderMixIn, encoder.OctetStringEncoder):
@@ -114,25 +121,25 @@ class SetOfEncoder(encoder.SequenceOfEncoder):
 
         # sort by serialised and padded components
         if len(chunks) > 1:
-            zero = str2octs("\x00")
+            zero = _str2octs("\x00")
             maxLen = max(map(len, chunks))
             paddedChunks = [(x.ljust(maxLen, zero), x) for x in chunks]
             paddedChunks.sort(key=lambda x: x[0])
 
             chunks = [x[1] for x in paddedChunks]
 
-        return null.join(chunks), True, True
+        return _null.join(chunks), True, True
 
 
 class SequenceOfEncoder(encoder.SequenceOfEncoder):
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
 
         if options.get("ifNotEmpty", False) and not len(value):
-            return null, True, True
+            return _null, True, True
 
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
-        return null.join(chunks), True, True
+        return _null.join(chunks), True, True
 
 
 class SetEncoder(encoder.SequenceEncoder):
@@ -157,7 +164,7 @@ class SetEncoder(encoder.SequenceEncoder):
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
 
-        substrate = null
+        substrate = _null
 
         comps = []
         compsMap = {}

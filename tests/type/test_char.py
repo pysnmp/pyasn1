@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -14,7 +13,7 @@ from pyasn1.type import char, constraint, univ
 from tests.base import BaseTestCase
 
 
-class AbstractStringTestCase(object):
+class AbstractStringTestCase:
 
     initializer = ()
     encoding = "us-ascii"
@@ -48,26 +47,34 @@ class AbstractStringTestCase(object):
             assert False, "Size constraint failed"
 
     def testSerialised(self):
-        assert bytes(self.asn1String) == self.pythonString.encode(self.encoding), "__str__() fails"
+        assert bytes(self.asn1String) == self.pythonString.encode(
+            self.encoding
+        ), "__str__() fails"
 
     def testPrintable(self):
         assert str(self.asn1String) == self.pythonString, "__str__() fails"
 
     def testInit(self):
         assert self.asn1Type(self.pythonString) == self.pythonString
-        assert self.asn1Type(self.pythonString.encode(self.encoding)) == self.pythonString
+        assert (
+            self.asn1Type(self.pythonString.encode(self.encoding)) == self.pythonString
+        )
         assert (
             self.asn1Type(univ.OctetString(self.pythonString.encode(self.encoding)))
             == self.pythonString
         )
         assert self.asn1Type(self.asn1Type(self.pythonString)) == self.pythonString
-        assert self.asn1Type(self.initializer, encoding=self.encoding) == self.pythonString
+        assert (
+            self.asn1Type(self.initializer, encoding=self.encoding) == self.pythonString
+        )
 
     def testInitFromAsn1(self):
         assert self.asn1Type(self.asn1Type(self.pythonString)) == self.pythonString
         assert (
             self.asn1Type(
-                univ.OctetString(self.pythonString.encode(self.encoding), encoding=self.encoding)
+                univ.OctetString(
+                    self.pythonString.encode(self.encoding), encoding=self.encoding
+                )
             )
             == self.pythonString
         )

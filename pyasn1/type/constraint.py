@@ -24,7 +24,7 @@ __all__ = [
 ]
 
 
-class AbstractConstraint(object):
+class AbstractConstraint:
     def __init__(self, *values):
         self._valueMap = set()
         self._setValues(values)

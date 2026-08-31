@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -12,14 +11,7 @@ from pyasn1.type import tag, tagmap
 __all__ = ["NamedType", "OptionalNamedType", "DefaultedNamedType", "NamedTypes"]
 
 
-# Define any function if not available in this Python version
-try:
-    any
-except NameError:
-    any = lambda x: bool(filter(bool, x))
-
-
-class NamedType(object):
+class NamedType:
     """Create named field object for a constructed ASN.1 type.
 
     The |NamedType| object represents a single name and ASN.1 type of a constructed ASN.1 type.
@@ -113,7 +105,7 @@ class DefaultedNamedType(NamedType):
     isDefaulted = True
 
 
-class NamedTypes(object):
+class NamedTypes:
     """Create a collection of named fields for a constructed ASN.1 type.
 
     The NamedTypes object represents a collection of named fields of a constructed ASN.1 type.
@@ -157,7 +149,9 @@ class NamedTypes(object):
         self.__minTagSet = self.__computeMinTagSet()
         self.__nameToPosMap = self.__computeNameToPosMap()
         self.__tagToPosMap = self.__computeTagToPosMap()
-        self.__ambiguousTypes = "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
+        self.__ambiguousTypes = (
+            "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
+        )
         self.__uniqueTagMap = self.__computeTagMaps(unique=True)
         self.__nonUniqueTagMap = self.__computeTagMaps(unique=False)
         self.__hasOptionalOrDefault = any(
@@ -167,7 +161,9 @@ class NamedTypes(object):
                 if namedType.isDefaulted or namedType.isOptional
             ]
         )
-        self.__hasOpenTypes = any([True for namedType in self.__namedTypes if namedType.openType])
+        self.__hasOpenTypes = any(
+            [True for namedType in self.__namedTypes if namedType.openType]
+        )
 
         self.__requiredComponents = frozenset(
             [
@@ -240,7 +236,7 @@ class NamedTypes(object):
     def clone(self):
         return self.__class__(*self.__namedTypes)
 
-    class PostponedError(object):
+    class PostponedError:
         def __init__(self, errorMsg):
             self.__errorMsg = errorMsg
 
@@ -286,7 +282,9 @@ class NamedTypes(object):
             if len(partialAmbiguousTypes) == len(self.__namedTypes):
                 ambiguousTypes[idx] = self
             else:
-                ambiguousTypes[idx] = NamedTypes(*partialAmbiguousTypes, **dict(terminal=True))
+                ambiguousTypes[idx] = NamedTypes(
+                    *partialAmbiguousTypes, **dict(terminal=True)
+                )
         return ambiguousTypes
 
     def getTypeByPosition(self, idx):
@@ -497,7 +495,9 @@ class NamedTypes(object):
             if defaultType is None:
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
-                return NamedTypes.PostponedError("Duplicate default ASN.1 type at %s" % (self,))
+                return NamedTypes.PostponedError(
+                    "Duplicate default ASN.1 type at %s" % (self,)
+                )
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)
 

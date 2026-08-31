@@ -1,10 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "pysnmp-pyasn1"
 version = "1.1.4-beta.4"
 description = "ASN.1 types and codecs"
-authors = ["rfaircloth-splunk <rfaircloth@splunk.com>"]
+readme = "README.md"
 license = "BSD-2-Clause"
-repository = "https://github.com/pysnmp/pyasn1"
+requires-python = ">=3.10"
+authors = [
+    {name = "rfaircloth-splunk", email = "rfaircloth@splunk.com"},
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -14,63 +21,50 @@ classifiers = [
     "Intended Audience :: Telecommunications Industry",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    # Make sure these classifiers are in your setup.py
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
 ]
-readme = "README.md"
-packages = [
-    { include = "pyasn1" },
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+    "pylint>=3.0",
+    "mypy>=1.0",
+    "Sphinx>=4.3",
+    "pre-commit>=3.0",
 ]
-include = ["docs", "tests"]
 
-[tool.poetry.dependencies]
-python = "^3.9"
+[tool.hatch.build.targets.wheel]
+packages = ["pyasn1"]
 
-[tool.poetry.group.dev.dependencies]
-Sphinx = "^4.3.0"
-isort = "^6.0.1"
-black = "^25.1.0"
-pyflakes = "^3.3.2"
-autoflake = "^2.3.1"
-flake8 = "^7.2.0"
-pre-commit = "^4.2.0"
-mypy = "^1.15.0"
+[tool.ruff]
+target-version = "py310"
+line-length = 88
 
-[build-system]
-requires = ["setuptools>=42", "wheel", "build"]
-build-backend = "setuptools.build_meta"
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+
+[tool.pylint.messages_control]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0903",  # too-few-public-methods
+    "R0913",  # too-many-arguments
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.basic]
+good-names = ["e", "f", "i", "j", "k", "n", "o", "s", "x", "id", "dt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
-
-# Configure Black formatting
-[tool.black]
-line-length = 100
-target-version = ["py39", "py310", "py311", "py312", "py313"]
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.tox
-  | \.venv
-  | _build
-  | build
-  | dist
-)/
-'''
-
-# Configure isort to be compatible with black
-[tool.isort]
-profile = "black"
-line_length = 100
-multi_line_output = 3
-include_trailing_comma = true
-skip_gitignore = true
-skip_glob = ["*.pyi", ".git/*", ".tox/*", ".venv/*", "build/*", "dist/*"]

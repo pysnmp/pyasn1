@@ -7,7 +7,6 @@
 #
 from pyasn1 import error
 from pyasn1.codec.ber import decoder
-from pyasn1.compat.octets import oct2int
 from pyasn1.type import univ
 
 __all__ = ["decode"]
@@ -30,7 +29,7 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
         head, tail = substrate[:length], substrate[length:]
         if not head or length != 1:
             raise error.PyAsn1Error("Not single-octet Boolean payload")
-        byte = oct2int(head[0])
+        byte = head[0]
         # CER/DER specifies encoding of TRUE as 0xFF and FALSE as 0x0, while
         # BER allows any non-zero value as TRUE; cf. sections 8.2.2. and 11.1
         # in https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf

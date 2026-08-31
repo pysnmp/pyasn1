@@ -13,7 +13,7 @@ __all__ = ["decode"]
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
 
 
-class AbstractScalarDecoder(object):
+class AbstractScalarDecoder:
     def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
         return asn1Spec.clone(pyObject)
 
@@ -23,7 +23,7 @@ class BitStringDecoder(AbstractScalarDecoder):
         return asn1Spec.clone(univ.BitString.fromBinaryString(pyObject))
 
 
-class SequenceOrSetDecoder(object):
+class SequenceOrSetDecoder:
     def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
         asn1Value = asn1Spec.clone()
 
@@ -38,7 +38,7 @@ class SequenceOrSetDecoder(object):
         return asn1Value
 
 
-class SequenceOfOrSetOfDecoder(object):
+class SequenceOfOrSetOfDecoder:
     def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
         asn1Value = asn1Spec.clone()
 
@@ -48,7 +48,7 @@ class SequenceOfOrSetOfDecoder(object):
         return asn1Value
 
 
-class ChoiceDecoder(object):
+class ChoiceDecoder:
     def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
         asn1Value = asn1Spec.clone()
 
@@ -130,7 +130,7 @@ typeMap = {
 }
 
 
-class Decoder(object):
+class Decoder:
 
     # noinspection PyDefaultArgument
     def __init__(self, tagMap, typeMap):
