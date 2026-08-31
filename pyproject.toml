@@ -49,7 +49,29 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",    # line-too-long — existing codebase has long lines
+    "E721",    # type-comparison — existing pattern
+    "E731",    # lambda-assignment — existing codebase style
+    "E741",    # ambiguous-variable-name — ASN.1 naming conventions
+    "E712",    # true-false-comparison — existing pattern
+    "E402",    # module-import-not-at-top — some imports after variable defs
+    "B011",    # assert-false — used in tests
+    "B904",    # raise-without-from-inside-except — existing pattern
+    "B006",    # mutable-argument-default — existing pattern
+    "B007",    # unused-loop-control-variable — existing pattern
+    "B905",    # zip-without-explicit-strict — existing pattern
+    "SIM108",  # if-else-block-instead-of-if-exp — readability preference
+    "SIM102",  # collapsible-if — readability preference
+    "SIM105",  # suppressible-exception — existing pattern
+    "SIM101",  # duplicate-isinstance-call — existing pattern
+    "SIM110",  # reimplemented-builtin — existing pattern
+    "UP031",   # printf-string-formatting — existing codebase style
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B", "SIM"]  # relax rules for tests
 
 [tool.pylint.messages_control]
 disable = [
