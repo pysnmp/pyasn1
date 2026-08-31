@@ -3,27 +3,8 @@ Revision 1.1.4-beta.4, unreleased
 ---------------------------------
 
 - Replaced hand-rolled internal type wrappers with Python standard
-  library base types to reduce boilerplate and improve familiarity:
+  library base types to reduce boilerplate code
 
-  * `Tag` is now a `collections.namedtuple` subclass instead of a
-    custom tuple-like class.  Equality and hashing intentionally
-    consider only `(tagClass, tagId)`, preserving the original
-    behaviour where `tagFormat` is excluded from comparison.
-  * `NamedType` is now a `collections.namedtuple` subclass with fields
-    `(name, asn1Object, openType)`.  Iteration and indexing expose only
-    `(name, asn1Object)` so the original 2-tuple duck-type behaviour is
-    preserved; `openType` is excluded from equality and hashing.
-  * `OpenType` is now a `dict` subclass instead of a custom dict-like
-    class.  An empty `OpenType` remains truthy via a `__bool__` override
-    so downstream type-checking code can distinguish "has an open type"
-    from "no open type".
-  * `NamedValues` is now a `dict` subclass with a reverse index for
-    bidirectional name↔number lookup, replacing the custom dict-like
-    implementation.
-
-  All public APIs are unchanged.  Full test suite passes (1179 tests,
-  including 60 new tests covering stdlib type integration and original
-  semantic preservation).
 
 Revision 1.0.2, released 2021-11-13
 -----------------------------------
