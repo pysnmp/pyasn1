@@ -1,5 +1,5 @@
 
-Revision 1.1.4-beta.4, unreleased
+unreleased
 ---------------------------------
 
 - Replaced hand-rolled internal type wrappers with Python standard
