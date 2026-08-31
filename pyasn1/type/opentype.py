@@ -8,7 +8,7 @@
 __all__ = ["OpenType"]
 
 
-class OpenType:
+class OpenType(dict):
     """Create ASN.1 type map indexed by a value
 
     The *OpenType* object models an untyped field of a constructed ASN.1
@@ -73,32 +73,11 @@ class OpenType:
     """
 
     def __init__(self, name, typeMap=None):
-        self.__name = name
-        if typeMap is None:
-            self.__typeMap = {}
-        else:
-            self.__typeMap = typeMap
+        self.name = name
+        super().__init__(typeMap or {})
 
-    @property
-    def name(self):
-        return self.__name
-
-    # Python dict protocol
-
-    def values(self):
-        return self.__typeMap.values()
-
-    def keys(self):
-        return self.__typeMap.keys()
-
-    def items(self):
-        return self.__typeMap.items()
-
-    def __contains__(self, key):
-        return key in self.__typeMap
-
-    def __getitem__(self, key):
-        return self.__typeMap[key]
-
-    def __iter__(self):
-        return iter(self.__typeMap)
+    def __bool__(self):
+        # An OpenType is always considered truthy, even when the typeMap is
+        # empty, so that downstream type-checking code can distinguish "has an
+        # open type" from "no open type" (which would be None / absent).
+        return True

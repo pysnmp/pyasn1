@@ -54,6 +54,128 @@ class NamedValuesCaseBase(BaseTestCase):
         assert repr(self.e)
 
 
+class NamedValuesStdlibIntegrationTestCase(BaseTestCase):
+    """Verify NamedValues behaves as a dict subtype."""
+
+    def testIsDict(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert isinstance(nv, dict)
+
+    def testDictLen(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert len(nv) == 2
+
+    def testDictIter(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert set(iter(nv)) == {"off", "on"}
+
+    def testDictKeys(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert set(nv.keys()) == {"off", "on"}
+
+    def testDictValues(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert set(nv.values()) == {0, 1}
+
+    def testDictItems(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert dict(nv.items()) == {"off": 0, "on": 1}
+
+    def testBidirectionalLookupByName(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv["off"] == 0
+        assert nv["on"] == 1
+
+    def testBidirectionalLookupByNumber(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv[0] == "off"
+        assert nv[1] == "on"
+
+    def testContainsByName(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert "off" in nv
+        assert "missing" not in nv
+
+    def testContainsByNumber(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert 0 in nv
+        assert 99 not in nv
+
+    def testEqWithDict(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv == {"off": 0, "on": 1}
+
+    def testAnonymousNames(self):
+        nv = namedval.NamedValues("a", "b", ("c", 0), d=1)
+        assert nv["a"] == 2
+        assert nv["b"] == 3
+        assert nv["c"] == 0
+        assert nv["d"] == 1
+
+    def testAdd(self):
+        nv1 = namedval.NamedValues(("off", 0))
+        nv2 = namedval.NamedValues(("on", 1))
+        merged = nv1 + nv2
+        assert merged == {"off": 0, "on": 1}
+
+    def testClone(self):
+        nv = namedval.NamedValues(("off", 0))
+        cloned = nv.clone(("on", 1))
+        assert cloned == {"off": 0, "on": 1}
+
+    def testGetNameLegacy(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv.getName(0) == "off"
+        assert nv.getName(1) == "on"
+        assert nv.getName(99) is None
+
+    def testGetValueLegacy(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv.getValue("off") == 0
+        assert nv.getValue("on") == 1
+
+    def testGetValuesLegacy(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert nv.getValues("off", "on") == [0, 1]
+
+    def testGetValuesUnknownRaises(self):
+        from pyasn1.error import PyAsn1Error
+
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        try:
+            nv.getValues("off", "missing")
+            assert False, "unknown name should raise"
+        except PyAsn1Error:
+            pass
+
+    def testDuplicateNameRaises(self):
+        from pyasn1.error import PyAsn1Error
+
+        try:
+            namedval.NamedValues(("off", 0), ("off", 1))
+            assert False, "duplicate name should raise"
+        except PyAsn1Error:
+            pass
+
+    def testDuplicateNumberRaises(self):
+        from pyasn1.error import PyAsn1Error
+
+        try:
+            namedval.NamedValues(("off", 0), ("on", 0))
+            assert False, "duplicate number should raise"
+        except PyAsn1Error:
+            pass
+
+    def testEmptyNamedValues(self):
+        nv = namedval.NamedValues()
+        assert len(nv) == 0
+        assert bool(nv) is False
+
+    def testReprContainsClassName(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        assert "NamedValues" in repr(nv)
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

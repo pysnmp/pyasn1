@@ -11,7 +11,7 @@ from pyasn1 import error
 __all__ = ["NamedValues"]
 
 
-class NamedValues:
+class NamedValues(dict):
     """Create named values object.
 
     The |NamedValues| object represents a collection of string names
@@ -54,8 +54,9 @@ class NamedValues:
     """
 
     def __init__(self, *args, **kwargs):
-        self.__names = {}
-        self.__numbers = {}
+        # The primary dict stores name -> number (the natural dict mapping).
+        # A reverse index stores number -> name for bidirectional lookup.
+        self._numbers = {}
 
         anonymousNames = []
 
@@ -71,36 +72,36 @@ class NamedValues:
                 anonymousNames.append(namedValue)
                 continue
 
-            if name in self.__names:
+            if name in self:
                 raise error.PyAsn1Error("Duplicate name %s" % (name,))
 
-            if number in self.__numbers:
+            if number in self._numbers:
                 raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
 
-            self.__names[name] = number
-            self.__numbers[number] = name
+            self[name] = number
+            self._numbers[number] = name
 
         for name, number in kwargs.items():
-            if name in self.__names:
+            if name in self:
                 raise error.PyAsn1Error("Duplicate name %s" % (name,))
 
-            if number in self.__numbers:
+            if number in self._numbers:
                 raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
 
-            self.__names[name] = number
-            self.__numbers[number] = name
+            self[name] = number
+            self._numbers[number] = name
 
         if anonymousNames:
 
-            number = self.__numbers and max(self.__numbers) + 1 or 0
+            number = self._numbers and max(self._numbers) + 1 or 0
 
             for name in anonymousNames:
 
-                if name in self.__names:
+                if name in self:
                     raise error.PyAsn1Error("Duplicate name %s" % (name,))
 
-                self.__names[name] = number
-                self.__numbers[number] = name
+                self[name] = number
+                self._numbers[number] = name
 
                 number += 1
 
@@ -112,54 +113,29 @@ class NamedValues:
 
         return "<%s object, enums %s>" % (self.__class__.__name__, representation)
 
-    def __eq__(self, other):
-        return dict(self) == other
-
-    def __ne__(self, other):
-        return dict(self) != other
-
-    def __lt__(self, other):
-        return dict(self) < other
-
-    def __le__(self, other):
-        return dict(self) <= other
-
-    def __gt__(self, other):
-        return dict(self) > other
-
-    def __ge__(self, other):
-        return dict(self) >= other
-
-    def __hash__(self):
-        return hash(self.items())
-
-    # Python dict protocol (read-only)
-
+    # Bidirectional lookup: key can be either a name (str) or a number (int).
     def __getitem__(self, key):
         try:
-            return self.__numbers[key]
+            return self._numbers[key]
 
-        except KeyError:
-            return self.__names[key]
-
-    def __len__(self):
-        return len(self.__names)
+        except (KeyError, TypeError):
+            return super().__getitem__(key)
 
     def __contains__(self, key):
-        return key in self.__names or key in self.__numbers
+        return super().__contains__(key) or key in self._numbers
 
     def __iter__(self):
-        return iter(self.__names)
+        return super().__iter__()
 
     def values(self):
-        return iter(self.__numbers)
+        return iter(self._numbers)
 
     def keys(self):
-        return iter(self.__names)
+        return super().__iter__()
 
     def items(self):
-        for name in self.__names:
-            yield name, self.__names[name]
+        for name in super().__iter__():
+            yield name, self[name]
 
     # support merging
 
@@ -175,18 +151,18 @@ class NamedValues:
     # legacy protocol
 
     def getName(self, value):
-        if value in self.__numbers:
-            return self.__numbers[value]
+        if value in self._numbers:
+            return self._numbers[value]
 
     def getValue(self, name):
-        if name in self.__names:
-            return self.__names[name]
+        if name in self:
+            return self[name]
 
     def getValues(self, *names):
         try:
-            return [self.__names[name] for name in names]
+            return [self[name] for name in names]
 
         except KeyError:
             raise error.PyAsn1Error(
-                "Unknown bit identifier(s): %s" % (set(names).difference(self.__names),)
+                "Unknown bit identifier(s): %s" % (set(names).difference(self),)
             )

@@ -119,6 +119,66 @@ class SuperTagSetTestCase(TagSetTestCaseBase):
         ), "isSuperTagSetOf() fails"
 
 
+class TagStdlibIntegrationTestCase(TagTestCaseBase):
+    """Verify Tag behaves as a namedtuple / tuple subtype."""
+
+    def testIsTupleSubtype(self):
+        assert isinstance(self.t1, tuple)
+        # Tag is a namedtuple, which is a tuple subclass with named fields
+        assert self.t1._fields == ("tagClass", "tagFormat", "tagId")
+
+    def testTupleUnpacking(self):
+        tagClass, tagFormat, tagId = self.t1
+        assert tagClass == tag.tagClassUniversal
+        assert tagFormat == tag.tagFormatSimple
+        assert tagId == 3
+
+    def testFieldAccessByName(self):
+        assert self.t1.tagClass == tag.tagClassUniversal
+        assert self.t1.tagFormat == tag.tagFormatSimple
+        assert self.t1.tagId == 3
+
+    def testFieldAccessByIndex(self):
+        assert self.t1[0] == tag.tagClassUniversal
+        assert self.t1[1] == tag.tagFormatSimple
+        assert self.t1[2] == 3
+
+    def testIter(self):
+        assert list(self.t1) == [tag.tagClassUniversal, tag.tagFormatSimple, 3]
+
+    def testLen(self):
+        assert len(self.t1) == 3
+
+    def testEqIgnoresTagFormat(self):
+        """Tag equality intentionally ignores tagFormat (only class+id matter)."""
+        t_simple = tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 3)
+        t_constructed = tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 3)
+        assert t_simple == t_constructed, "tagFormat should not affect equality"
+
+    def testHashIgnoresTagFormat(self):
+        """Tag hashing intentionally ignores tagFormat (only class+id matter)."""
+        t_simple = tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 3)
+        t_constructed = tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 3)
+        assert hash(t_simple) == hash(t_constructed)
+
+    def testNegativeTagIdRejected(self):
+        from pyasn1.error import PyAsn1Error
+
+        try:
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, -1)
+            assert False, "negative tag ID should raise"
+        except PyAsn1Error:
+            pass
+
+    def testAsDictKey(self):
+        """Tag is hashable and can be used as a dict key."""
+        d = {self.t1: "value"}
+        assert d[self.t1] == "value"
+
+    def testReprContainsClassName(self):
+        assert "Tag" in repr(self.t1)
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
