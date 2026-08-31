@@ -3073,7 +3073,6 @@ class Choice(Set):
                 myClone.setComponentByType(tagSet, component.clone())
 
     def getComponentByPosition(self, idx, default=noValue, instantiate=True):
-        __doc__ = Set.__doc__
 
         if self._currentIdx is None or self._currentIdx != idx:
             return Set.getComponentByPosition(

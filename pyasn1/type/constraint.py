@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -159,9 +158,6 @@ class SingleValueConstraint(AbstractConstraint):
 
     def __add__(self, constraint):
         return self.__class__(*(self._set.union(constraint)))
-
-    def __sub__(self, constraint):
-        return self.__class__(*(self._set.difference(constraint)))
 
 
 class ContainedSubtypeConstraint(AbstractConstraint):

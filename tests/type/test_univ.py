@@ -1694,7 +1694,7 @@ class Sequence(BaseTestCase):
 
         assert not s.isValue
 
-    def testSchemaWithOptionalComponents(self):
+    def testSchemaWithDefaultedComponents(self):
         class Sequence(univ.Sequence):
             componentType = namedtype.NamedTypes(
                 namedtype.DefaultedNamedType("name", univ.OctetString(""))
