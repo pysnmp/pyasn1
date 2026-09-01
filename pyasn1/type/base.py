@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -8,13 +7,12 @@
 import sys
 
 from pyasn1 import error
-from pyasn1.compat import calling
 from pyasn1.type import constraint, tag, tagmap
 
 __all__ = ["Asn1Item", "Asn1Type", "SimpleAsn1Type", "ConstructedAsn1Type"]
 
 
-class Asn1Item(object):
+class Asn1Item:
     @classmethod
     def getTypeId(cls, increment=1):
         try:
@@ -128,7 +126,10 @@ class Asn1Type(Asn1Item):
         return (
             not matchTags
             or (self.tagSet.isSuperTagSetOf(other.tagSet))
-            and (not matchConstraints or self.subtypeSpec.isSuperTypeOf(other.subtypeSpec))
+            and (
+                not matchConstraints
+                or self.subtypeSpec.isSuperTypeOf(other.subtypeSpec)
+            )
         )
 
     @staticmethod
@@ -164,7 +165,7 @@ class Asn1Type(Asn1Item):
 Asn1ItemBase = Asn1Type
 
 
-class NoValue(object):
+class NoValue:
     """Create a singleton instance of NoValue class.
 
     The *NoValue* sentinel object represents an instance of ASN.1 schema
@@ -228,7 +229,7 @@ class NoValue(object):
                     name not in cls.skipMethods
                     and name.startswith("__")
                     and name.endswith("__")
-                    and calling.callable(getattr(typ, name))
+                    and callable(getattr(typ, name))
                 )
             ]
 
@@ -243,7 +244,9 @@ class NoValue(object):
         if attr in self.skipMethods:
             raise AttributeError("Attribute %s not present" % attr)
 
-        raise error.PyAsn1Error('Attempted "%s" operation on ASN.1 schema object' % attr)
+        raise error.PyAsn1Error(
+            'Attempted "%s" operation on ASN.1 schema object' % attr
+        )
 
     def __repr__(self):
         return "<%s object>" % self.__class__.__name__
@@ -552,7 +555,9 @@ class ConstructedAsn1Type(Asn1Type):
                 representation += ", %s=%r" % (attr, value)
 
         if self.isValue and self.components:
-            representation += ", payload [%s]" % ", ".join([repr(x) for x in self.components])
+            representation += ", payload [%s]" % ", ".join(
+                [repr(x) for x in self.components]
+            )
 
         return "<%s>" % representation
 

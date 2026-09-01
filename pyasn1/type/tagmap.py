@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -10,7 +9,7 @@ from pyasn1 import error
 __all__ = ["TagMap"]
 
 
-class TagMap(object):
+class TagMap:
     """Map *TagSet* objects to ASN.1 types
 
     Create an object mapping *TagSet* object to ASN.1 type.

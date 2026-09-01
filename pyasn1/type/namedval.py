@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -12,7 +11,7 @@ from pyasn1 import error
 __all__ = ["NamedValues"]
 
 
-class NamedValues(object):
+class NamedValues:
     """Create named values object.
 
     The |NamedValues| object represents a collection of string names

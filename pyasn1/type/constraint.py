@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -24,7 +23,7 @@ __all__ = [
 ]
 
 
-class AbstractConstraint(object):
+class AbstractConstraint:
     def __init__(self, *values):
         self._valueMap = set()
         self._setValues(values)
@@ -159,9 +158,6 @@ class SingleValueConstraint(AbstractConstraint):
 
     def __add__(self, constraint):
         return self.__class__(*(self._set.union(constraint)))
-
-    def __sub__(self, constraint):
-        return self.__class__(*(self._set.difference(constraint)))
 
 
 class ContainedSubtypeConstraint(AbstractConstraint):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -9,6 +8,7 @@ import sys
 import unittest
 
 from pyasn1.codec.der import encoder
+from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
 

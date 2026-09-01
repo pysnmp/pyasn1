@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -8,7 +7,10 @@
 import sys
 import unittest
 
-from pyasn1.compat.octets import str2octs
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
+
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
@@ -30,7 +32,7 @@ class UntaggedAnyTestCase(BaseTestCase):
 
         self.s.clear()
 
-        self.s["blob"] = univ.Any(str2octs("xxx"))
+        self.s["blob"] = univ.Any(_str2octs("xxx"))
 
         # this should succeed because Any is untagged and unconstrained
         self.s["blob"] = univ.Integer(123)
@@ -79,7 +81,9 @@ class TaggedAnyOpenTypeTestCase(BaseTestCase):
         class Sequence(univ.Sequence):
             componentType = namedtype.NamedTypes(
                 namedtype.NamedType("id", univ.Integer()),
-                namedtype.NamedType("blob", self.taggedAny, openType=opentype.OpenType(name="id")),
+                namedtype.NamedType(
+                    "blob", self.taggedAny, openType=opentype.OpenType(name="id")
+                ),
             )
 
         self.s = Sequence()
@@ -88,7 +92,7 @@ class TaggedAnyOpenTypeTestCase(BaseTestCase):
 
         self.s.clear()
 
-        self.s["blob"] = univ.Any(str2octs("xxx"))
+        self.s["blob"] = univ.Any(_str2octs("xxx"))
         self.s["blob"] = univ.Integer(123)
 
 

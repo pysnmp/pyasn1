@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -8,8 +7,11 @@
 import sys
 import unittest
 
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
+
 from pyasn1.codec.native import encoder
-from pyasn1.compat.octets import str2octs
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, univ
 from tests.base import BaseTestCase
@@ -58,7 +60,7 @@ class OctetStringEncoderTestCase(BaseTestCase):
         self.o = univ.OctetString("Quick brown fox")
 
     def testValue(self):
-        assert encoder.encode(self.o) == str2octs("Quick brown fox")
+        assert encoder.encode(self.o) == _str2octs("Quick brown fox")
 
 
 class NullEncoderTestCase(BaseTestCase):
@@ -68,7 +70,10 @@ class NullEncoderTestCase(BaseTestCase):
 
 class ObjectIdentifierEncoderTestCase(BaseTestCase):
     def testOne(self):
-        assert encoder.encode(univ.ObjectIdentifier((1, 3, 6, 0, 12345))) == "1.3.6.0.12345"
+        assert (
+            encoder.encode(univ.ObjectIdentifier((1, 3, 6, 0, 12345)))
+            == "1.3.6.0.12345"
+        )
 
 
 class RealEncoderTestCase(BaseTestCase):
@@ -101,7 +106,7 @@ class SequenceEncoderTestCase(BaseTestCase):
         s[2] = 123
         assert encoder.encode(s) == {
             "place-holder": None,
-            "first-name": str2octs("abc"),
+            "first-name": _str2octs("abc"),
             "age": 123,
         }
 
@@ -137,7 +142,7 @@ class AnyEncoderTestCase(BaseTestCase):
         self.s = univ.Any(encoder.encode(univ.OctetString("fox")))
 
     def testSimple(self):
-        assert encoder.encode(self.s) == str2octs("fox")
+        assert encoder.encode(self.s) == _str2octs("fox")
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

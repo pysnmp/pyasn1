@@ -21,14 +21,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Install tox
-        run: python -m pip install tox tox-gh-actions
-      - name: Run tox lint environment
-        run: tox -e lint
+      - uses: pre-commit/action@v3.0.1
+
+  review_secrets:
+    name: security-detect-secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: "0"
 
   semgrep:
     runs-on: ubuntu-latest
@@ -41,6 +47,23 @@ jobs:
         with:
           publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
 
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+      - name: Install dependencies
+        run: uv pip install -e ".[dev]" --system
+      - name: Run Ruff
+        run: ruff check .
+      - name: Run Pylint
+        run: pylint pyasn1
+
   build:
     name: build
     runs-on: ubuntu-latest
@@ -50,61 +73,52 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Install build dependencies
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+      - name: Build
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install tox tox-gh-actions build
-      - name: Build package
-        run: |
-          python -m build
+          uv pip install -e ".[dev]" --system
+          uv build
       - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
-      - uses: actions/upload-artifact@v4
-        with:
-          name: output
-          path: output
 
   run-unit-tests:
     name: test-unit
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     needs:
       - build
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: Install tox
-        run: python -m pip install tox tox-gh-actions
-      - name: Run tox
-        run: tox
-      - name: Generate coverage report
-        if: matrix.python == '3.12' && matrix.os == 'ubuntu-latest'
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+      - name: Run tests
         run: |
-          tox -e coverage
-          mkdir -p test-results
-          cp coverage.xml test-results/
+          uv pip install -e ".[dev]" --system
+          uv run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
       - uses: actions/upload-artifact@v4
         with:
           name: unit tests test-results
           path: test-results
-      - uses: codecov/codecov-action@v5.4.3
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.os }}, ${{ matrix.python }}
-  release:
-    name: Create Release
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+  publish:
+    name: Build Release
     needs:
-      - pre-commit
+      - review_secrets
       - semgrep
       - build
       - run-unit-tests
@@ -113,18 +127,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: false
-          # Very important: semantic-release won't trigger a tagged
-          # build if this is not set false
           persist-credentials: false
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Install build dependencies
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+      - name: Build
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install build twine poetry
-      - name: Run Semantic Release
+          uv pip install -e ".[dev]" --system
+          uv build
+      - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 24
@@ -143,4 +157,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: haya14busa/action-update-semver@v1.3.0
+      - uses: haya14busa/action-update-semver@v1

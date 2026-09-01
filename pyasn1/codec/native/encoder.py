@@ -1,16 +1,9 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-try:
-    from collections import OrderedDict
-
-except ImportError:
-    OrderedDict = dict
-
 from pyasn1 import debug, error
 from pyasn1.type import base, char, tag, univ, useful
 
@@ -19,7 +12,7 @@ __all__ = ["encode"]
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
 
 
-class AbstractItemEncoder(object):
+class AbstractItemEncoder:
     def encode(self, value, encodeFun, **options):
         raise error.PyAsn1Error("Not implemented")
 
@@ -83,7 +76,7 @@ class SetEncoder(AbstractItemEncoder):
 
 
 class SequenceEncoder(SetEncoder):
-    protoDict = OrderedDict
+    protoDict = dict
 
 
 class SequenceOfEncoder(AbstractItemEncoder):
@@ -171,7 +164,7 @@ typeMap = {
 }
 
 
-class Encoder(object):
+class Encoder:
 
     # noinspection PyDefaultArgument
     def __init__(self, tagMap, typeMap={}):
@@ -180,11 +173,16 @@ class Encoder(object):
 
     def __call__(self, value, **options):
         if not isinstance(value, base.Asn1Item):
-            raise error.PyAsn1Error("value is not valid (should be an instance of an ASN.1 Item)")
+            raise error.PyAsn1Error(
+                "value is not valid (should be an instance of an ASN.1 Item)"
+            )
 
         if LOG:
             debug.scope.push(type(value).__name__)
-            LOG("encoder called for type %s <%s>" % (type(value).__name__, value.prettyPrint()))
+            LOG(
+                "encoder called for type %s <%s>"
+                % (type(value).__name__, value.prettyPrint())
+            )
 
         tagSet = value.tagSet
 
@@ -202,12 +200,18 @@ class Encoder(object):
                 raise error.PyAsn1Error("No encoder for %s" % (value,))
 
         if LOG:
-            LOG("using value codec %s chosen by %s" % (concreteEncoder.__class__.__name__, tagSet))
+            LOG(
+                "using value codec %s chosen by %s"
+                % (concreteEncoder.__class__.__name__, tagSet)
+            )
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
         if LOG:
-            LOG("encoder %s produced: %s" % (type(concreteEncoder).__name__, repr(pyObject)))
+            LOG(
+                "encoder %s produced: %s"
+                % (type(concreteEncoder).__name__, repr(pyObject))
+            )
             debug.scope.pop()
 
         return pyObject
@@ -219,9 +223,8 @@ class Encoder(object):
 #: walks all its components recursively and produces a Python built-in type or a tree
 #: of those.
 #:
-#: One exception is that instead of :py:class:`dict`, the :py:class:`OrderedDict`
-#: can be produced (whenever available) to preserve ordering of the components
-#: in ASN.1 SEQUENCE.
+#: One exception is that :py:class:`dict` preserves ordering of the components
+#: in ASN.1 SEQUENCE (since Python 3.7+).
 #:
 #: Parameters
 #: ----------

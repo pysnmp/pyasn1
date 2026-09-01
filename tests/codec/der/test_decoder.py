@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -8,8 +7,9 @@
 import sys
 import unittest
 
+_null = b""
+
 from pyasn1.codec.der import decoder
-from pyasn1.compat.octets import null
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
@@ -19,7 +19,7 @@ class BitStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
         assert decoder.decode(bytes((3, 127, 6) + (170,) * 125 + (128,))) == (
             ((1, 0) * 501),
-            null,
+            _null,
         )
 
     def testIndefMode(self):
@@ -41,9 +41,9 @@ class BitStringDecoderTestCase(BaseTestCase):
 
 class OctetStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
-        assert decoder.decode("\004\017Quick brown fox".encode()) == (
-            "Quick brown fox".encode(),
-            "".encode(),
+        assert decoder.decode(b"\004\017Quick brown fox") == (
+            b"Quick brown fox",
+            b"",
         )
 
     def testIndefMode(self):
@@ -224,7 +224,9 @@ class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
+        assert s[1] == bytes(
+            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
+        )
 
 
 class SequenceDecoderWithImplicitlyTaggedOpenTypesTestCase(BaseTestCase):
@@ -416,7 +418,9 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1][0] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
+        assert s[1][0] == bytes(
+            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
+        )
 
 
 class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
@@ -429,7 +433,9 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            implicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,
@@ -468,7 +474,9 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            explicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,

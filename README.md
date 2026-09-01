@@ -162,7 +162,7 @@ Python built-ins codecs. The extremely compact PER encoding is expected
 to be introduced in the upcoming pyasn1 release.
 
 More information on pyasn1 APIs can be found in the
-[documentation](http://snmplabs.com/pysnmp/pyasn1/docs),
+[documentation](),
 compiled ASN.1 modules for different protocols and file formats
 could be found in the pyasn1-modules
 [repo](https://github.com/pysnmp/pyasn1-modules).

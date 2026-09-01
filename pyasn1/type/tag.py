@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -44,7 +43,7 @@ tagCategoryExplicit = 0x02
 tagCategoryUntagged = 0x04
 
 
-class Tag(object):
+class Tag:
     """Create ASN.1 tag
 
     Represents ASN.1 tag that can be attached to a ASN.1 type to make
@@ -166,7 +165,7 @@ class Tag(object):
         return self.__tagId
 
 
-class TagSet(object):
+class TagSet:
     """Create a collection of ASN.1 tags
 
     Represents a combination of :class:`~pyasn1.type.tag.Tag` objects

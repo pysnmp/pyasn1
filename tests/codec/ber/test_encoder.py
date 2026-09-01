@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -1103,7 +1102,7 @@ class SetOfEncoderWithSchemaTestCase(BaseTestCase):
         self.v = ["quick brown"]
 
     def testEmpty(self):
-        s = univ.SetOf()
+        univ.SetOf()
         assert encoder.encode([], asn1Spec=self.s) == bytes((49, 0))
 
     def testDefMode(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of pyasn1 software.
 #
@@ -8,8 +7,12 @@
 import sys
 import unittest
 
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
+_null = b""
+
 from pyasn1.codec.ber import decoder, eoo
-from pyasn1.compat.octets import null, str2octs
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
@@ -19,14 +22,16 @@ class LargeTagDecoderTestCase(BaseTestCase):
     def testLargeTag(self):
         assert decoder.decode(bytes((127, 141, 245, 182, 253, 47, 3, 2, 1, 1))) == (
             1,
-            null,
+            _null,
         )
 
     def testLongTag(self):
         assert decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
 
     def testTagsEquivalence(self):
-        integer = univ.Integer(2).subtype(implicitTag=tag.Tag(tag.tagClassContext, 0, 0))
+        integer = univ.Integer(2).subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, 0, 0)
+        )
         assert decoder.decode(
             bytes((0x9F, 0x80, 0x00, 0x02, 0x01, 0x02)), asn1Spec=integer
         ) == decoder.decode(bytes((0x9F, 0x00, 0x02, 0x01, 0x02)), asn1Spec=integer)
@@ -34,47 +39,48 @@ class LargeTagDecoderTestCase(BaseTestCase):
 
 class DecoderCacheTestCase(BaseTestCase):
     def testCache(self):
-        assert decoder.decode(bytes((0x1F, 2, 1, 0))) == decoder.decode(bytes((0x1F, 2, 1, 0)))
+        assert decoder.decode(bytes((0x1F, 2, 1, 0))) == decoder.decode(
+            bytes((0x1F, 2, 1, 0))
+        )
 
 
 class IntegerDecoderTestCase(BaseTestCase):
     def testPosInt(self):
-        assert decoder.decode(bytes((2, 1, 12))) == (12, null)
+        assert decoder.decode(bytes((2, 1, 12))) == (12, _null)
 
     def testNegInt(self):
-        assert decoder.decode(bytes((2, 1, 244))) == (-12, null)
+        assert decoder.decode(bytes((2, 1, 244))) == (-12, _null)
 
     def testZero(self):
-        assert decoder.decode(bytes((2, 0))) == (0, null)
+        assert decoder.decode(bytes((2, 0))) == (0, _null)
 
     def testZeroLong(self):
-        assert decoder.decode(bytes((2, 1, 0))) == (0, null)
+        assert decoder.decode(bytes((2, 1, 0))) == (0, _null)
 
     def testMinusOne(self):
-        assert decoder.decode(bytes((2, 1, 255))) == (-1, null)
+        assert decoder.decode(bytes((2, 1, 255))) == (-1, _null)
 
     def testPosLong(self):
-        assert decoder.decode(bytes((2, 9, 0, 255, 255, 255, 255, 255, 255, 255, 255))) == (
-            0xFFFFFFFFFFFFFFFF,
-            null,
-        )
+        assert decoder.decode(
+            bytes((2, 9, 0, 255, 255, 255, 255, 255, 255, 255, 255))
+        ) == (0xFFFFFFFFFFFFFFFF, _null)
 
     def testNegLong(self):
         assert decoder.decode(bytes((2, 9, 255, 0, 0, 0, 0, 0, 0, 0, 1))) == (
             -0xFFFFFFFFFFFFFFFF,
-            null,
+            _null,
         )
 
     def testSpec(self):
         try:
-            decoder.decode(bytes((2, 1, 12)), asn1Spec=univ.Null()) == (12, null)
+            decoder.decode(bytes((2, 1, 12)), asn1Spec=univ.Null()) == (12, _null)
         except PyAsn1Error:
             pass
         else:
             assert 0, "wrong asn1Spec worked out"
         assert decoder.decode(bytes((2, 1, 12)), asn1Spec=univ.Integer()) == (
             12,
-            null,
+            _null,
         )
 
     def testTagFormat(self):
@@ -88,10 +94,10 @@ class IntegerDecoderTestCase(BaseTestCase):
 
 class BooleanDecoderTestCase(BaseTestCase):
     def testTrue(self):
-        assert decoder.decode(bytes((1, 1, 1))) == (1, null)
+        assert decoder.decode(bytes((1, 1, 1))) == (1, _null)
 
     def testTrueNeg(self):
-        assert decoder.decode(bytes((1, 1, 255))) == (1, null)
+        assert decoder.decode(bytes((1, 1, 255))) == (1, _null)
 
     def testExtraTrue(self):
         assert decoder.decode(bytes((1, 1, 1, 0, 120, 50, 50))) == (
@@ -100,7 +106,7 @@ class BooleanDecoderTestCase(BaseTestCase):
         )
 
     def testFalse(self):
-        assert decoder.decode(bytes((1, 1, 0))) == (0, null)
+        assert decoder.decode(bytes((1, 1, 0))) == (0, _null)
 
     def testTagFormat(self):
         try:
@@ -115,38 +121,38 @@ class BitStringDecoderTestCase(BaseTestCase):
     def testDefMode(self):
         assert decoder.decode(bytes((3, 3, 1, 169, 138))) == (
             (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
-            null,
+            _null,
         )
 
     def testIndefMode(self):
         assert decoder.decode(bytes((3, 3, 1, 169, 138))) == (
             (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
-            null,
+            _null,
         )
 
     def testDefModeChunked(self):
         assert decoder.decode(bytes((35, 8, 3, 2, 0, 169, 3, 2, 1, 138))) == (
             (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
-            null,
+            _null,
         )
 
     def testIndefModeChunked(self):
         assert decoder.decode(bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))) == (
             (1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1),
-            null,
+            _null,
         )
 
     def testDefModeChunkedSubst(self):
         assert decoder.decode(
             bytes((35, 8, 3, 2, 0, 169, 3, 2, 1, 138)),
             substrateFun=lambda a, b, c: (b, b[c:]),
-        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138)), str2octs(""))
+        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138)), _str2octs(""))
 
     def testIndefModeChunkedSubst(self):
         assert decoder.decode(
             bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0)),
-            substrateFun=lambda a, b, c: (b, str2octs("")),
-        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138, 0, 0)), str2octs(""))
+            substrateFun=lambda a, b, c: (b, _str2octs("")),
+        ) == (bytes((3, 2, 0, 169, 3, 2, 1, 138, 0, 0)), _str2octs(""))
 
     def testTypeChecking(self):
         try:
@@ -181,7 +187,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     120,
                 )
             )
-        ) == (str2octs("Quick brown fox"), null)
+        ) == (_str2octs("Quick brown fox"), _null)
 
     def testIndefMode(self):
         assert decoder.decode(
@@ -210,7 +216,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (str2octs("Quick brown fox"), null)
+        ) == (_str2octs("Quick brown fox"), _null)
 
     def testDefModeChunked(self):
         assert decoder.decode(
@@ -243,7 +249,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     120,
                 )
             )
-        ) == (str2octs("Quick brown fox"), null)
+        ) == (_str2octs("Quick brown fox"), _null)
 
     def testIndefModeChunked(self):
         assert decoder.decode(
@@ -278,7 +284,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (str2octs("Quick brown fox"), null)
+        ) == (_str2octs("Quick brown fox"), _null)
 
     def testDefModeChunkedSubst(self):
         assert decoder.decode(
@@ -340,7 +346,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     120,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testIndefModeChunkedSubst(self):
@@ -376,7 +382,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            substrateFun=lambda a, b, c: (b, str2octs("")),
+            substrateFun=lambda a, b, c: (b, _str2octs("")),
         ) == (
             bytes(
                 (
@@ -407,7 +413,7 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
 
@@ -619,7 +625,7 @@ class ExpTaggedOctetStringDecoderTestCase(BaseTestCase):
                     120,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testIndefModeSubst(self):
@@ -653,7 +659,7 @@ class ExpTaggedOctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            substrateFun=lambda a, b, c: (b, str2octs("")),
+            substrateFun=lambda a, b, c: (b, _str2octs("")),
         ) == (
             bytes(
                 (
@@ -682,13 +688,13 @@ class ExpTaggedOctetStringDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
 
 class NullDecoderTestCase(BaseTestCase):
     def testNull(self):
-        assert decoder.decode(bytes((5, 0))) == (null, null)
+        assert decoder.decode(bytes((5, 0))) == (_null, _null)
 
     def testTagFormat(self):
         try:
@@ -705,49 +711,49 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
     def testOne(self):
         assert decoder.decode(bytes((6, 6, 43, 6, 0, 191, 255, 126))) == (
             (1, 3, 6, 0, 0xFFFFE),
-            null,
+            _null,
         )
 
     def testEdge1(self):
-        assert decoder.decode(bytes((6, 1, 39))) == ((0, 39), null)
+        assert decoder.decode(bytes((6, 1, 39))) == ((0, 39), _null)
 
     def testEdge2(self):
-        assert decoder.decode(bytes((6, 1, 79))) == ((1, 39), null)
+        assert decoder.decode(bytes((6, 1, 79))) == ((1, 39), _null)
 
     def testEdge3(self):
-        assert decoder.decode(bytes((6, 1, 120))) == ((2, 40), null)
+        assert decoder.decode(bytes((6, 1, 120))) == ((2, 40), _null)
 
     def testEdge4(self):
         assert decoder.decode(bytes((6, 5, 0x90, 0x80, 0x80, 0x80, 0x4F))) == (
             (2, 0xFFFFFFFF),
-            null,
+            _null,
         )
 
     def testEdge5(self):
-        assert decoder.decode(bytes((6, 1, 0x7F))) == ((2, 47), null)
+        assert decoder.decode(bytes((6, 1, 0x7F))) == ((2, 47), _null)
 
     def testEdge6(self):
-        assert decoder.decode(bytes((6, 2, 0x81, 0x00))) == ((2, 48), null)
+        assert decoder.decode(bytes((6, 2, 0x81, 0x00))) == ((2, 48), _null)
 
     def testEdge7(self):
         assert decoder.decode(bytes((6, 3, 0x81, 0x34, 0x03))) == (
             (2, 100, 3),
-            null,
+            _null,
         )
 
     def testEdge8(self):
-        assert decoder.decode(bytes((6, 2, 133, 0))) == ((2, 560), null)
+        assert decoder.decode(bytes((6, 2, 133, 0))) == ((2, 560), _null)
 
     def testEdge9(self):
         assert decoder.decode(bytes((6, 4, 0x88, 0x84, 0x87, 0x02))) == (
             (2, 16843570),
-            null,
+            _null,
         )
 
     def testNonLeading0x80(self):
         assert decoder.decode(
             bytes((6, 5, 85, 4, 129, 128, 0)),
-        ) == ((2, 5, 4, 16384), null)
+        ) == ((2, 5, 4, 16384), _null)
 
     def testLeading0x80Case1(self):
         try:
@@ -838,7 +844,7 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
                     0x17,
                 )
             )
-        ) == ((2, 18446744073709551535184467440737095), null)
+        ) == ((2, 18446744073709551535184467440737095), _null)
 
     def testLarge2(self):
         assert decoder.decode(
@@ -867,63 +873,61 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
                     0x47,
                 )
             )
-        ) == ((2, 999, 18446744073709551535184467440737095), null)
+        ) == ((2, 999, 18446744073709551535184467440737095), _null)
 
 
 class RealDecoderTestCase(BaseTestCase):
     def testChar(self):
         assert decoder.decode(bytes((9, 7, 3, 49, 50, 51, 69, 49, 49))) == (
             univ.Real((123, 10, 11)),
-            null,
+            _null,
         )
 
     def testBin1(self):  # check base = 2
-        assert decoder.decode(bytes((9, 3, 128, 255, 1))) == (  # (0.5, 2, 0) encoded with base = 2
-            univ.Real((1, 2, -1)),
-            null,
-        )
+        assert decoder.decode(  # (0.5, 2, 0) encoded with base = 2
+            bytes((9, 3, 128, 255, 1))
+        ) == (univ.Real((1, 2, -1)), _null)
 
     def testBin2(self):  # check base = 2 and scale factor
         assert decoder.decode(  # (3.25, 2, 0) encoded with base = 8
             bytes((9, 3, 148, 255, 13))
-        ) == (univ.Real((26, 2, -3)), null)
+        ) == (univ.Real((26, 2, -3)), _null)
 
     def testBin3(self):  # check base = 16
         assert decoder.decode(  # (0.00390625, 2, 0) encoded with base = 16
             bytes((9, 3, 160, 254, 1))
-        ) == (univ.Real((1, 2, -8)), null)
+        ) == (univ.Real((1, 2, -8)), _null)
 
     def testBin4(self):  # check exponent = 0
-        assert decoder.decode(bytes((9, 3, 128, 0, 1))) == (  # (1, 2, 0) encoded with base = 2
-            univ.Real((1, 2, 0)),
-            null,
-        )
+        assert decoder.decode(  # (1, 2, 0) encoded with base = 2
+            bytes((9, 3, 128, 0, 1))
+        ) == (univ.Real((1, 2, 0)), _null)
 
     def testBin5(self):  # case of 2 octs for exponent and negative exponent
         assert decoder.decode(  # (3, 2, -1020) encoded with base = 16
             bytes((9, 4, 161, 255, 1, 3))
-        ) == (univ.Real((3, 2, -1020)), null)
+        ) == (univ.Real((3, 2, -1020)), _null)
 
     # TODO: this requires Real type comparison fix
 
     #    def testBin6(self):
     #        assert decoder.decode(
     #            bytes((9, 5, 162, 0, 255, 255, 1))
-    #        ) == (univ.Real((1, 2, 262140)), null)
+    #        ) == (univ.Real((1, 2, 262140)), _null)
 
     #    def testBin7(self):
     #        assert decoder.decode(
     #            bytes((9, 7, 227, 4, 1, 35, 69, 103, 1))
-    #        ) == (univ.Real((-1, 2, 76354972)), null)
+    #        ) == (univ.Real((-1, 2, 76354972)), _null)
 
     def testPlusInf(self):
-        assert decoder.decode(bytes((9, 1, 64))) == (univ.Real("inf"), null)
+        assert decoder.decode(bytes((9, 1, 64))) == (univ.Real("inf"), _null)
 
     def testMinusInf(self):
-        assert decoder.decode(bytes((9, 1, 65))) == (univ.Real("-inf"), null)
+        assert decoder.decode(bytes((9, 1, 65))) == (univ.Real("-inf"), _null)
 
     def testEmpty(self):
-        assert decoder.decode(bytes((9, 0))) == (univ.Real(0.0), null)
+        assert decoder.decode(bytes((9, 0))) == (univ.Real(0.0), _null)
 
     def testTagFormat(self):
         try:
@@ -944,17 +948,16 @@ class RealDecoderTestCase(BaseTestCase):
 
 class UniversalStringDecoderTestCase(BaseTestCase):
     def testDecoder(self):
-        assert decoder.decode(bytes((28, 12, 0, 0, 0, 97, 0, 0, 0, 98, 0, 0, 0, 99))) == (
-            char.UniversalString("abc"),
-            null,
-        )
+        assert decoder.decode(
+            bytes((28, 12, 0, 0, 0, 97, 0, 0, 0, 98, 0, 0, 0, 99))
+        ) == (char.UniversalString("abc"), _null)
 
 
 class BMPStringDecoderTestCase(BaseTestCase):
     def testDecoder(self):
         assert decoder.decode(bytes((30, 6, 0, 97, 0, 98, 0, 99))) == (
             char.BMPString("abc"),
-            null,
+            _null,
         )
 
 
@@ -962,7 +965,7 @@ class UTF8StringDecoderTestCase(BaseTestCase):
     def testDecoder(self):
         assert decoder.decode(bytes((12, 3, 97, 98, 99))) == (
             char.UTF8String("abc"),
-            null,
+            _null,
         )
 
 
@@ -976,7 +979,7 @@ class SequenceOfDecoderTestCase(BaseTestCase):
     def testDefMode(self):
         assert decoder.decode(
             bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefMode(self):
         assert decoder.decode(
@@ -1001,7 +1004,7 @@ class SequenceOfDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testDefModeChunked(self):
         assert decoder.decode(
@@ -1030,7 +1033,7 @@ class SequenceOfDecoderTestCase(BaseTestCase):
                     110,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefModeChunked(self):
         assert decoder.decode(
@@ -1063,13 +1066,13 @@ class SequenceOfDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testSchemalessDecoder(self):
         assert decoder.decode(
             bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
             asn1Spec=univ.SequenceOf(),
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class ExpTaggedSequenceOfDecoderTestCase(BaseTestCase):
@@ -1102,7 +1105,7 @@ class ExpTaggedSequenceOfDecoderTestCase(BaseTestCase):
             asn1Spec=s,
         )
         assert not r
-        assert s2 == [str2octs("quick brown")]
+        assert s2 == [_str2octs("quick brown")]
         assert s.tagSet == s2.tagSet
 
     def testWithoutSchema(self):
@@ -1133,7 +1136,7 @@ class ExpTaggedSequenceOfDecoderTestCase(BaseTestCase):
             )
         )
         assert not r
-        assert s2 == [str2octs("quick brown")]
+        assert s2 == [_str2octs("quick brown")]
         assert s.tagSet == s2.tagSet
 
 
@@ -1147,7 +1150,7 @@ class SequenceOfDecoderWithSchemaTestCase(BaseTestCase):
         assert decoder.decode(
             bytes((48, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefMode(self):
         assert decoder.decode(
@@ -1173,7 +1176,7 @@ class SequenceOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testDefModeChunked(self):
         assert decoder.decode(
@@ -1203,7 +1206,7 @@ class SequenceOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefModeChunked(self):
         assert decoder.decode(
@@ -1237,7 +1240,7 @@ class SequenceOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class SetOfDecoderTestCase(BaseTestCase):
@@ -1249,7 +1252,7 @@ class SetOfDecoderTestCase(BaseTestCase):
     def testDefMode(self):
         assert decoder.decode(
             bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefMode(self):
         assert decoder.decode(
@@ -1274,7 +1277,7 @@ class SetOfDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testDefModeChunked(self):
         assert decoder.decode(
@@ -1303,7 +1306,7 @@ class SetOfDecoderTestCase(BaseTestCase):
                     110,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefModeChunked(self):
         assert decoder.decode(
@@ -1336,13 +1339,13 @@ class SetOfDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testSchemalessDecoder(self):
         assert decoder.decode(
             bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
             asn1Spec=univ.SetOf(),
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class SetOfDecoderWithSchemaTestCase(BaseTestCase):
@@ -1355,7 +1358,7 @@ class SetOfDecoderWithSchemaTestCase(BaseTestCase):
         assert decoder.decode(
             bytes((49, 13, 4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefMode(self):
         assert decoder.decode(
@@ -1381,7 +1384,7 @@ class SetOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testDefModeChunked(self):
         assert decoder.decode(
@@ -1411,7 +1414,7 @@ class SetOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testIndefModeChunked(self):
         assert decoder.decode(
@@ -1445,7 +1448,7 @@ class SetOfDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class SequenceDecoderTestCase(BaseTestCase):
@@ -1453,12 +1456,12 @@ class SequenceDecoderTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Sequence(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
-                namedtype.NamedType("first-name", univ.OctetString(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
+                namedtype.NamedType("first-name", univ.OctetString(_null)),
                 namedtype.NamedType("age", univ.Integer(33)),
             )
         )
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
@@ -1488,7 +1491,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     1,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         assert decoder.decode(
@@ -1522,7 +1525,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         assert decoder.decode(
@@ -1556,7 +1559,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     1,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         assert decoder.decode(
@@ -1594,7 +1597,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeSubst(self):
         assert decoder.decode(
@@ -1646,7 +1649,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     1,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testWithOptionalAndDefaultedIndefModeSubst(self):
@@ -1681,7 +1684,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            substrateFun=lambda a, b, c: (b, str2octs("")),
+            substrateFun=lambda a, b, c: (b, _str2octs("")),
         ) == (
             bytes(
                 (
@@ -1711,7 +1714,7 @@ class SequenceDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testTagFormat(self):
@@ -1753,7 +1756,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Sequence(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
                 namedtype.OptionalNamedType("first-name", univ.OctetString()),
                 namedtype.DefaultedNamedType("age", univ.Integer(33)),
             )
@@ -1761,21 +1764,21 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
 
     def __init(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
 
     def __initWithOptional(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
 
     def __initWithDefaulted(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
     def __initWithOptionalAndDefaulted(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
@@ -1783,28 +1786,28 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
         self.__init()
         assert decoder.decode(bytes((48, 2, 5, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testIndefMode(self):
         self.__init()
         assert decoder.decode(bytes((48, 128, 5, 0, 0, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testDefModeChunked(self):
         self.__init()
         assert decoder.decode(bytes((48, 2, 5, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testIndefModeChunked(self):
         self.__init()
         assert decoder.decode(bytes((48, 128, 5, 0, 0, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithOptionalDefMode(self):
@@ -1832,7 +1835,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionaIndefMode(self):
         self.__initWithOptional()
@@ -1865,7 +1868,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalDefModeChunked(self):
         self.__initWithOptional()
@@ -1898,7 +1901,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalIndefModeChunked(self):
         self.__initWithOptional()
@@ -1935,35 +1938,33 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithDefaultedDefMode(self):
         self.__initWithDefaulted()
         assert decoder.decode(bytes((48, 5, 5, 0, 2, 1, 1)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithDefaultedIndefMode(self):
         self.__initWithDefaulted()
-        assert decoder.decode(bytes((48, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s) == (
-            self.s,
-            null,
-        )
+        assert decoder.decode(
+            bytes((48, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s
+        ) == (self.s, _null)
 
     def testWithDefaultedDefModeChunked(self):
         self.__initWithDefaulted()
         assert decoder.decode(bytes((48, 5, 5, 0, 2, 1, 1)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithDefaultedIndefModeChunked(self):
         self.__initWithDefaulted()
-        assert decoder.decode(bytes((48, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s) == (
-            self.s,
-            null,
-        )
+        assert decoder.decode(
+            bytes((48, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefMode(self):
         self.__initWithOptionalAndDefaulted()
@@ -1993,7 +1994,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         self.__initWithOptionalAndDefaulted()
@@ -2029,7 +2030,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
@@ -2065,7 +2066,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
@@ -2105,7 +2106,7 @@ class SequenceDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
@@ -2213,7 +2214,9 @@ class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
+        assert s[1] == bytes(
+            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
+        )
 
 
 class SequenceDecoderWithImplicitlyTaggedOpenTypesTestCase(BaseTestCase):
@@ -2405,7 +2408,9 @@ class SequenceDecoderWithUnaggedSetOfOpenTypesTestCase(BaseTestCase):
         )
         assert not r
         assert s[0] == 2
-        assert s[1][0] == bytes((4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110))
+        assert s[1][0] == bytes(
+            (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
+        )
 
 
 class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
@@ -2418,7 +2423,9 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            implicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,
@@ -2457,7 +2464,9 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            explicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,
@@ -2491,12 +2500,12 @@ class SetDecoderTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Set(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
-                namedtype.NamedType("first-name", univ.OctetString(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
+                namedtype.NamedType("first-name", univ.OctetString(_null)),
                 namedtype.NamedType("age", univ.Integer(33)),
             )
         )
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
@@ -2526,7 +2535,7 @@ class SetDecoderTestCase(BaseTestCase):
                     1,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         assert decoder.decode(
@@ -2560,7 +2569,7 @@ class SetDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         assert decoder.decode(
@@ -2594,7 +2603,7 @@ class SetDecoderTestCase(BaseTestCase):
                     1,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         assert decoder.decode(
@@ -2632,7 +2641,7 @@ class SetDecoderTestCase(BaseTestCase):
                     0,
                 )
             )
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeSubst(self):
         assert decoder.decode(
@@ -2684,7 +2693,7 @@ class SetDecoderTestCase(BaseTestCase):
                     1,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testWithOptionalAndDefaultedIndefModeSubst(self):
@@ -2719,7 +2728,7 @@ class SetDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            substrateFun=lambda a, b, c: (b, str2octs("")),
+            substrateFun=lambda a, b, c: (b, _str2octs("")),
         ) == (
             bytes(
                 (
@@ -2749,7 +2758,7 @@ class SetDecoderTestCase(BaseTestCase):
                     0,
                 )
             ),
-            str2octs(""),
+            _str2octs(""),
         )
 
     def testTagFormat(self):
@@ -2791,7 +2800,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Set(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
                 namedtype.OptionalNamedType("first-name", univ.OctetString()),
                 namedtype.DefaultedNamedType("age", univ.Integer(33)),
             )
@@ -2799,21 +2808,21 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
 
     def __init(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
 
     def __initWithOptional(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
 
     def __initWithDefaulted(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
     def __initWithOptionalAndDefaulted(self):
         self.s.clear()
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
@@ -2821,28 +2830,28 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
         self.__init()
         assert decoder.decode(bytes((49, 128, 5, 0, 0, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testIndefMode(self):
         self.__init()
         assert decoder.decode(bytes((49, 128, 5, 0, 0, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testDefModeChunked(self):
         self.__init()
         assert decoder.decode(bytes((49, 2, 5, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testIndefModeChunked(self):
         self.__init()
         assert decoder.decode(bytes((49, 128, 5, 0, 0, 0)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithOptionalDefMode(self):
@@ -2870,7 +2879,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalIndefMode(self):
         self.__initWithOptional()
@@ -2903,7 +2912,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalDefModeChunked(self):
         self.__initWithOptional()
@@ -2936,7 +2945,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalIndefModeChunked(self):
         self.__initWithOptional()
@@ -2973,35 +2982,33 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithDefaultedDefMode(self):
         self.__initWithDefaulted()
         assert decoder.decode(bytes((49, 5, 5, 0, 2, 1, 1)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithDefaultedIndefMode(self):
         self.__initWithDefaulted()
-        assert decoder.decode(bytes((49, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s) == (
-            self.s,
-            null,
-        )
+        assert decoder.decode(
+            bytes((49, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s
+        ) == (self.s, _null)
 
     def testWithDefaultedDefModeChunked(self):
         self.__initWithDefaulted()
         assert decoder.decode(bytes((49, 5, 5, 0, 2, 1, 1)), asn1Spec=self.s) == (
             self.s,
-            null,
+            _null,
         )
 
     def testWithDefaultedIndefModeChunked(self):
         self.__initWithDefaulted()
-        assert decoder.decode(bytes((49, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s) == (
-            self.s,
-            null,
-        )
+        assert decoder.decode(
+            bytes((49, 128, 5, 0, 2, 1, 1, 0, 0)), asn1Spec=self.s
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefMode(self):
         self.__initWithOptionalAndDefaulted()
@@ -3031,7 +3038,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeReordered(self):
         self.__initWithOptionalAndDefaulted()
@@ -3061,7 +3068,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefMode(self):
         self.__initWithOptionalAndDefaulted()
@@ -3097,7 +3104,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefModeReordered(self):
         self.__initWithOptionalAndDefaulted()
@@ -3133,7 +3140,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedDefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
@@ -3169,7 +3176,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testWithOptionalAndDefaultedIndefModeChunked(self):
         self.__initWithOptionalAndDefaulted()
@@ -3209,7 +3216,7 @@ class SetDecoderWithSchemaTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
 
 class SequenceOfWithExpTaggedOctetStringDecoder(BaseTestCase):
@@ -3230,7 +3237,9 @@ class SequenceOfWithExpTaggedOctetStringDecoder(BaseTestCase):
         assert s.tagSet == self.s.tagSet
 
     def testIndefModeSchema(self):
-        s, r = decoder.decode(bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s)
+        s, r = decoder.decode(
+            bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s
+        )
         assert not r
         assert s == self.s
         assert s.tagSet == self.s.tagSet
@@ -3242,7 +3251,9 @@ class SequenceOfWithExpTaggedOctetStringDecoder(BaseTestCase):
         assert s.tagSet == self.s.tagSet
 
     def testIndefModeNoComponent(self):
-        s, r = decoder.decode(bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s2)
+        s, r = decoder.decode(
+            bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s2
+        )
         assert not r
         assert s == self.s
         assert s.tagSet == self.s.tagSet
@@ -3283,7 +3294,9 @@ class SequenceWithExpTaggedOctetStringDecoder(BaseTestCase):
         assert s.tagSet == self.s.tagSet
 
     def testIndefModeSchema(self):
-        s, r = decoder.decode(bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s)
+        s, r = decoder.decode(
+            bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s
+        )
         assert not r
         assert s == self.s
         assert s.tagSet == self.s.tagSet
@@ -3295,7 +3308,9 @@ class SequenceWithExpTaggedOctetStringDecoder(BaseTestCase):
         assert s.tagSet == self.s.tagSet
 
     def testIndefModeNoComponent(self):
-        s, r = decoder.decode(bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s2)
+        s, r = decoder.decode(
+            bytes((48, 128, 163, 128, 4, 1, 113, 0, 0, 0, 0)), asn1Spec=self.s2
+        )
         assert not r
         assert s == self.s
         assert s.tagSet == self.s.tagSet
@@ -3318,20 +3333,20 @@ class ChoiceDecoderTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Choice(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
                 namedtype.NamedType("number", univ.Integer(0)),
                 namedtype.NamedType("string", univ.OctetString()),
             )
         )
 
     def testBySpec(self):
-        self.s.setComponentByPosition(0, univ.Null(null))
-        assert decoder.decode(bytes((5, 0)), asn1Spec=self.s) == (self.s, null)
+        self.s.setComponentByPosition(0, univ.Null(_null))
+        assert decoder.decode(bytes((5, 0)), asn1Spec=self.s) == (self.s, _null)
 
     def testWithoutSpec(self):
-        self.s.setComponentByPosition(0, univ.Null(null))
-        assert decoder.decode(bytes((5, 0))) == (self.s, null)
-        assert decoder.decode(bytes((5, 0))) == (univ.Null(null), null)
+        self.s.setComponentByPosition(0, univ.Null(_null))
+        assert decoder.decode(bytes((5, 0))) == (self.s, _null)
+        assert decoder.decode(bytes((5, 0))) == (univ.Null(_null), _null)
 
     def testUndefLength(self):
         self.s.setComponentByPosition(2, univ.OctetString("abcdefgh"))
@@ -3359,19 +3374,23 @@ class ChoiceDecoderTestCase(BaseTestCase):
                 )
             ),
             asn1Spec=self.s,
-        ) == (self.s, null)
+        ) == (self.s, _null)
 
     def testExplicitTag(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4))
-        s.setComponentByPosition(0, univ.Null(null))
-        assert decoder.decode(bytes((164, 2, 5, 0)), asn1Spec=s) == (s, null)
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4)
+        )
+        s.setComponentByPosition(0, univ.Null(_null))
+        assert decoder.decode(bytes((164, 2, 5, 0)), asn1Spec=s) == (s, _null)
 
     def testExplicitTagUndefLength(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4))
-        s.setComponentByPosition(0, univ.Null(null))
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4)
+        )
+        s.setComponentByPosition(0, univ.Null(_null))
         assert decoder.decode(bytes((164, 128, 5, 0, 0, 0)), asn1Spec=s) == (
             s,
-            null,
+            _null,
         )
 
 
@@ -3383,7 +3402,7 @@ class AnyDecoderTestCase(BaseTestCase):
     def testByUntagged(self):
         assert decoder.decode(bytes((4, 3, 102, 111, 120)), asn1Spec=self.s) == (
             univ.Any("\004\003fox"),
-            null,
+            _null,
         )
 
     def testTaggedEx(self):
@@ -3392,7 +3411,7 @@ class AnyDecoderTestCase(BaseTestCase):
         )
         assert decoder.decode(bytes((164, 5, 4, 3, 102, 111, 120)), asn1Spec=s) == (
             s,
-            null,
+            _null,
         )
 
     def testTaggedIm(self):
@@ -3401,40 +3420,44 @@ class AnyDecoderTestCase(BaseTestCase):
         )
         assert decoder.decode(bytes((132, 5, 4, 3, 102, 111, 120)), asn1Spec=s) == (
             s,
-            null,
+            _null,
         )
 
     def testByUntaggedIndefMode(self):
         assert decoder.decode(bytes((4, 3, 102, 111, 120)), asn1Spec=self.s) == (
             univ.Any("\004\003fox"),
-            null,
+            _null,
         )
 
     def testTaggedExIndefMode(self):
         s = univ.Any("\004\003fox").subtype(
             explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
         )
-        assert decoder.decode(bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s) == (s, null)
+        assert decoder.decode(
+            bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s
+        ) == (s, _null)
 
     def testTaggedImIndefMode(self):
         s = univ.Any("\004\003fox").subtype(
             implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
         )
-        assert decoder.decode(bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s) == (s, null)
+        assert decoder.decode(
+            bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s
+        ) == (s, _null)
 
     def testByUntaggedSubst(self):
         assert decoder.decode(
             bytes((4, 3, 102, 111, 120)),
             asn1Spec=self.s,
             substrateFun=lambda a, b, c: (b, b[c:]),
-        ) == (bytes((4, 3, 102, 111, 120)), str2octs(""))
+        ) == (bytes((4, 3, 102, 111, 120)), _str2octs(""))
 
     def testTaggedExSubst(self):
         assert decoder.decode(
             bytes((164, 5, 4, 3, 102, 111, 120)),
             asn1Spec=self.s,
             substrateFun=lambda a, b, c: (b, b[c:]),
-        ) == (bytes((164, 5, 4, 3, 102, 111, 120)), str2octs(""))
+        ) == (bytes((164, 5, 4, 3, 102, 111, 120)), _str2octs(""))
 
 
 class EndOfOctetsTestCase(BaseTestCase):
@@ -3453,7 +3476,7 @@ class EndOfOctetsTestCase(BaseTestCase):
             and result == eoo.endOfOctets
             and result is eoo.endOfOctets
         )
-        assert remainder == null
+        assert remainder == _null
 
     def testDefiniteNoEoo(self):
         try:
@@ -3466,7 +3489,7 @@ class EndOfOctetsTestCase(BaseTestCase):
     def testIndefiniteEoo(self):
         result, remainder = decoder.decode(bytes((0x23, 0x80, 0x00, 0x00)))
         assert (
-            result == () and remainder == null
+            result == () and remainder == _null
         ), "incorrect decoding of indefinite length end-of-octets"
 
     def testNoLongFormEoo(self):
@@ -3483,7 +3506,9 @@ class EndOfOctetsTestCase(BaseTestCase):
         except PyAsn1Error:
             pass
         else:
-            assert 0, "end-of-contents octets accepted with invalid constructed encoding"
+            assert (
+                0
+            ), "end-of-contents octets accepted with invalid constructed encoding"
 
     def testNoEooData(self):
         try:
@@ -3499,12 +3524,12 @@ class NonStringDecoderTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.s = univ.Sequence(
             componentType=namedtype.NamedTypes(
-                namedtype.NamedType("place-holder", univ.Null(null)),
-                namedtype.NamedType("first-name", univ.OctetString(null)),
+                namedtype.NamedType("place-holder", univ.Null(_null)),
+                namedtype.NamedType("first-name", univ.OctetString(_null)),
                 namedtype.NamedType("age", univ.Integer(33)),
             )
         )
-        self.s.setComponentByPosition(0, univ.Null(null))
+        self.s.setComponentByPosition(0, univ.Null(_null))
         self.s.setComponentByPosition(1, univ.OctetString("quick brown"))
         self.s.setComponentByPosition(2, univ.Integer(1))
 
@@ -3547,11 +3572,13 @@ class ErrorOnDecodingTestCase(BaseTestCase):
         decode = decoder.Decoder(decoder.tagMap, decoder.typeMap)
 
         try:
-            asn1Object, rest = decode(str2octs("abc"))
+            asn1Object, rest = decode(_str2octs("abc"))
 
         except PyAsn1Error:
             exc = sys.exc_info()[1]
-            assert isinstance(exc, PyAsn1Error), "Unexpected exception raised %r" % (exc,)
+            assert isinstance(exc, PyAsn1Error), "Unexpected exception raised %r" % (
+                exc,
+            )
 
         else:
             assert False, "Unexpected decoder result %r" % (asn1Object,)
@@ -3563,7 +3590,9 @@ class ErrorOnDecodingTestCase(BaseTestCase):
 
         asn1Object, rest = decode(bytes((31, 8, 2, 1, 1, 131, 3, 2, 1, 12)))
 
-        assert isinstance(asn1Object, univ.Any), "Unexpected raw dump type %r" % (asn1Object,)
+        assert isinstance(asn1Object, univ.Any), "Unexpected raw dump type %r" % (
+            asn1Object,
+        )
         assert asn1Object.asNumbers() == (
             31,
             8,
