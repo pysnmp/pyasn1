@@ -5,7 +5,9 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import math
+import typing
 import warnings
+from collections.abc import Iterator
 from typing import Final
 
 from pyasn1 import error
@@ -13,7 +15,7 @@ from pyasn1.codec.ber import eoo
 from pyasn1.type import base, constraint, namedtype, namedval, tag, tagmap
 
 
-def _int_to_bytes(value, signed=False, length=0):
+def _int_to_bytes(value: int, signed: bool = False, length: int = 0) -> bytes:
     """Convert an integer to bytes with the same logic as the former compat.integer.to_bytes."""
     length = max(value.bit_length(), length)
     if signed and length % 8 == 0:
@@ -116,124 +118,124 @@ class Integer(base.SimpleAsn1Type):
     # Optimization for faster codec lookup
     typeId = base.SimpleAsn1Type.getTypeId()
 
-    def __init__(self, value=noValue, **kwargs):
+    def __init__(self, value: typing.Any = noValue, **kwargs: typing.Any) -> None:
         if "namedValues" not in kwargs:
             kwargs["namedValues"] = self.namedValues
 
         base.SimpleAsn1Type.__init__(self, value, **kwargs)
 
-    def __and__(self, value):
+    def __and__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value & value)
 
-    def __rand__(self, value):
+    def __rand__(self, value: typing.Any) -> typing.Any:
         return self.clone(value & self._value)
 
-    def __or__(self, value):
+    def __or__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value | value)
 
-    def __ror__(self, value):
+    def __ror__(self, value: typing.Any) -> typing.Any:
         return self.clone(value | self._value)
 
-    def __xor__(self, value):
+    def __xor__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value ^ value)
 
-    def __rxor__(self, value):
+    def __rxor__(self, value: typing.Any) -> typing.Any:
         return self.clone(value ^ self._value)
 
-    def __lshift__(self, value):
+    def __lshift__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value << value)
 
-    def __rshift__(self, value):
+    def __rshift__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value >> value)
 
-    def __add__(self, value):
+    def __add__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value + value)
 
-    def __radd__(self, value):
+    def __radd__(self, value: typing.Any) -> typing.Any:
         return self.clone(value + self._value)
 
-    def __sub__(self, value):
+    def __sub__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value - value)
 
-    def __rsub__(self, value):
+    def __rsub__(self, value: typing.Any) -> typing.Any:
         return self.clone(value - self._value)
 
-    def __mul__(self, value):
+    def __mul__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value * value)
 
-    def __rmul__(self, value):
+    def __rmul__(self, value: typing.Any) -> typing.Any:
         return self.clone(value * self._value)
 
-    def __mod__(self, value):
+    def __mod__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value % value)
 
-    def __rmod__(self, value):
+    def __rmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(value % self._value)
 
-    def __pow__(self, value, modulo=None):
+    def __pow__(self, value: typing.Any, modulo: typing.Any = None) -> typing.Any:
         return self.clone(pow(self._value, value, modulo))
 
-    def __rpow__(self, value):
+    def __rpow__(self, value: typing.Any) -> typing.Any:
         return self.clone(pow(value, self._value))
 
-    def __floordiv__(self, value):
+    def __floordiv__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value // value)
 
-    def __rfloordiv__(self, value):
+    def __rfloordiv__(self, value: typing.Any) -> typing.Any:
         return self.clone(value // self._value)
 
-    def __truediv__(self, value):
+    def __truediv__(self, value: typing.Any) -> typing.Any:
         return Real(self._value / value)
 
-    def __rtruediv__(self, value):
+    def __rtruediv__(self, value: typing.Any) -> typing.Any:
         return Real(value / self._value)
 
-    def __divmod__(self, value):
+    def __divmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(divmod(self._value, value))
 
-    def __rdivmod__(self, value):
+    def __rdivmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(divmod(value, self._value))
 
     __hash__ = base.SimpleAsn1Type.__hash__
 
-    def __int__(self):
+    def __int__(self) -> int:
         return int(self._value)
 
-    def __float__(self):
+    def __float__(self) -> float:
         return float(self._value)
 
-    def __abs__(self):
+    def __abs__(self) -> typing.Any:
         return self.clone(abs(self._value))
 
-    def __index__(self):
+    def __index__(self) -> int:
         return int(self._value)
 
-    def __pos__(self):
+    def __pos__(self) -> typing.Any:
         return self.clone(+self._value)
 
-    def __neg__(self):
+    def __neg__(self) -> typing.Any:
         return self.clone(-self._value)
 
-    def __invert__(self):
+    def __invert__(self) -> typing.Any:
         return self.clone(~self._value)
 
-    def __round__(self, n=0):
+    def __round__(self, n: int = 0) -> typing.Any:
         r = round(self._value, n)
         if n:
             return self.clone(r)
         else:
             return r
 
-    def __floor__(self):
+    def __floor__(self) -> int:
         return math.floor(self._value)
 
-    def __ceil__(self):
+    def __ceil__(self) -> int:
         return math.ceil(self._value)
 
-    def __trunc__(self):
+    def __trunc__(self) -> int:
         return self.clone(math.trunc(self._value))
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         try:
             return int(value)
 
@@ -246,7 +248,7 @@ class Integer(base.SimpleAsn1Type):
                     "Can't coerce %r into integer: %s" % (value, exc)
                 ) from exc
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: typing.Any) -> typing.Any:
         try:
             return str(self.namedValues[value])
 
@@ -325,16 +327,16 @@ SizedIntegerBase = int
 class SizedInteger(SizedIntegerBase):
     bitLength = leadingZeroBits = None
 
-    def setBitLength(self, bitLength):
+    def setBitLength(self, bitLength: int) -> typing.Any:
         self.bitLength = bitLength
         self.leadingZeroBits = max(bitLength - self.bit_length(), 0)
         return self
 
-    def __len__(self):
+    def __len__(self) -> int:
         if self.bitLength is None:
             self.setBitLength(self.bit_length())
 
-        return self.bitLength
+        return typing.cast(int, self.bitLength)
 
 
 class BitString(base.SimpleAsn1Type):
@@ -421,7 +423,7 @@ class BitString(base.SimpleAsn1Type):
 
     defaultBinValue = defaultHexValue = noValue
 
-    def __init__(self, value=noValue, **kwargs):
+    def __init__(self, value: typing.Any = noValue, **kwargs: typing.Any) -> None:
         if value is noValue:
             if kwargs:
                 try:
@@ -452,51 +454,51 @@ class BitString(base.SimpleAsn1Type):
 
         base.SimpleAsn1Type.__init__(self, value, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.asBinary()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if self is other:
             return True
 
         value = self._cmpValue("__eq__")
-        other = self.prettyIn(other)
-        return value == other and len(value) == len(other)
+        otherValue = self.prettyIn(other)
+        return value == otherValue and len(value) == len(otherValue)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         if self is other:
             return False
 
         value = self._cmpValue("__ne__")
-        other = self.prettyIn(other)
-        return value != other or len(value) != len(other)
+        otherValue = self.prettyIn(other)
+        return value != otherValue or len(value) != len(otherValue)
 
-    def __lt__(self, other):
+    def __lt__(self, other: typing.Any) -> bool:
         value = self._cmpValue("__lt__")
         other = self.prettyIn(other)
         return len(value) < len(other) or len(value) == len(other) and value < other
 
-    def __le__(self, other):
+    def __le__(self, other: typing.Any) -> bool:
         value = self._cmpValue("__le__")
         other = self.prettyIn(other)
         return len(value) <= len(other) or len(value) == len(other) and value <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: typing.Any) -> bool:
         value = self._cmpValue("__gt__")
         other = self.prettyIn(other)
         return len(value) > len(other) or len(value) == len(other) and value > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: typing.Any) -> bool:
         value = self._cmpValue("__ge__")
         other = self.prettyIn(other)
         return len(value) >= len(other) or len(value) == len(other) and value >= other
 
     # Immutable sequence object protocol
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._value)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: typing.Any) -> typing.Any:
         if i.__class__ is slice:
             return self.clone([self[x] for x in range(*i.indices(len(self)))])
         else:
@@ -505,18 +507,18 @@ class BitString(base.SimpleAsn1Type):
                 raise IndexError("bit index out of range")
             return (self._value >> (length - i)) & 1
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         length = len(self._value)
         while length:
             length -= 1
             yield (self._value >> length) & 1
 
-    def __reversed__(self):
+    def __reversed__(self) -> Iterator[typing.Any]:
         return reversed(tuple(self))
 
     # arithmetic operators
 
-    def __add__(self, value):
+    def __add__(self, value: typing.Any) -> typing.Any:
         value = self.prettyIn(value)
         return self.clone(
             SizedInteger(self._value << len(value) | value).setBitLength(
@@ -524,7 +526,7 @@ class BitString(base.SimpleAsn1Type):
             )
         )
 
-    def __radd__(self, value):
+    def __radd__(self, value: typing.Any) -> typing.Any:
         value = self.prettyIn(value)
         return self.clone(
             SizedInteger(value << len(self._value) | self._value).setBitLength(
@@ -532,7 +534,7 @@ class BitString(base.SimpleAsn1Type):
             )
         )
 
-    def __mul__(self, value):
+    def __mul__(self, value: typing.Any) -> typing.Any:
         bitString = self._value
         while value > 1:
             bitString <<= len(self._value)
@@ -540,28 +542,28 @@ class BitString(base.SimpleAsn1Type):
             value -= 1
         return self.clone(bitString)
 
-    def __rmul__(self, value):
+    def __rmul__(self, value: typing.Any) -> typing.Any:
         return self * value
 
-    def __lshift__(self, count):
+    def __lshift__(self, count: typing.Any) -> typing.Any:
         return self.clone(
             SizedInteger(self._value << count).setBitLength(len(self._value) + count)
         )
 
-    def __rshift__(self, count):
+    def __rshift__(self, count: typing.Any) -> typing.Any:
         return self.clone(
             SizedInteger(self._value >> count).setBitLength(
                 max(0, len(self._value) - count)
             )
         )
 
-    def __int__(self):
+    def __int__(self) -> int:
         return int(self._cmpValue("__int__"))
 
-    def __float__(self):
+    def __float__(self) -> float:
         return float(self._cmpValue("__float__"))
 
-    def asNumbers(self):
+    def asNumbers(self) -> tuple[int, ...]:
         """Get |ASN.1| value as a sequence of 8-bit integers.
 
         If |ASN.1| object length is not a multiple of 8, result
@@ -569,7 +571,7 @@ class BitString(base.SimpleAsn1Type):
         """
         return tuple(self.asOctets())
 
-    def asOctets(self):
+    def asOctets(self) -> bytes:
         """Get |ASN.1| value as a sequence of octets.
 
         If |ASN.1| object length is not a multiple of 8, result
@@ -577,17 +579,19 @@ class BitString(base.SimpleAsn1Type):
         """
         return _int_to_bytes(self._value, length=len(self))
 
-    def asInteger(self):
+    def asInteger(self) -> int:
         """Get |ASN.1| value as a single integer value."""
         return self._value
 
-    def asBinary(self):
+    def asBinary(self) -> str:
         """Get |ASN.1| value as a text string of bits."""
         binString = bin(self._value)[2:]
         return "0" * (len(self._value) - len(binString)) + binString
 
     @classmethod
-    def fromHexString(cls, value, internalFormat=False, prepend=None):
+    def fromHexString(
+        cls, value: typing.Any, internalFormat: bool = False, prepend: typing.Any = None
+    ) -> typing.Any:
         """Create a |ASN.1| object initialized from the hex string.
 
         Parameters
@@ -614,7 +618,9 @@ class BitString(base.SimpleAsn1Type):
         return value
 
     @classmethod
-    def fromBinaryString(cls, value, internalFormat=False, prepend=None):
+    def fromBinaryString(
+        cls, value: typing.Any, internalFormat: bool = False, prepend: typing.Any = None
+    ) -> typing.Any:
         """Create a |ASN.1| object initialized from a string of '0' and '1'.
 
         Parameters
@@ -641,7 +647,13 @@ class BitString(base.SimpleAsn1Type):
         return value
 
     @classmethod
-    def fromOctetString(cls, value, internalFormat=False, prepend=None, padding=0):
+    def fromOctetString(
+        cls,
+        value: bytes,
+        internalFormat: bool = False,
+        prepend: typing.Any = None,
+        padding: int = 0,
+    ) -> typing.Any:
         """Create a |ASN.1| object initialized from a string.
 
         Parameters
@@ -649,21 +661,21 @@ class BitString(base.SimpleAsn1Type):
         value: :class:`str` (Py2) or :class:`bytes` (Py3)
             Text string like '\\\\x01\\\\xff' (Py2) or b'\\\\x01\\\\xff' (Py3)
         """
-        value = SizedInteger(int.from_bytes(value, "big") >> padding).setBitLength(
+        bits = SizedInteger(int.from_bytes(value, "big") >> padding).setBitLength(
             len(value) * 8 - padding
         )
 
         if prepend is not None:
-            value = SizedInteger(
-                (SizedInteger(prepend) << len(value)) | value
-            ).setBitLength(len(prepend) + len(value))
+            bits = SizedInteger(
+                (SizedInteger(prepend) << len(bits)) | bits
+            ).setBitLength(len(prepend) + len(bits))
 
         if not internalFormat:
-            value = cls(value)
+            return cls(bits)
 
-        return value
+        return bits
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         if isinstance(value, SizedInteger):
             return value
         elif isinstance(value, str):
@@ -789,7 +801,7 @@ class OctetString(base.SimpleAsn1Type):
     defaultBinValue = defaultHexValue = noValue
     encoding = "iso-8859-1"
 
-    def __init__(self, value=noValue, **kwargs):
+    def __init__(self, value: typing.Any = noValue, **kwargs: typing.Any) -> None:
         if kwargs:
             if value is noValue:
                 try:
@@ -816,7 +828,7 @@ class OctetString(base.SimpleAsn1Type):
 
         base.SimpleAsn1Type.__init__(self, value, **kwargs)
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         if isinstance(value, bytes):
             return value
 
@@ -845,7 +857,7 @@ class OctetString(base.SimpleAsn1Type):
         else:
             return bytes(value)
 
-    def _asText(self):
+    def _asText(self) -> str:
         try:
             return self._value.decode(self.encoding)
 
@@ -856,7 +868,7 @@ class OctetString(base.SimpleAsn1Type):
                 exc,
             ) from exc
 
-    def __str__(self):
+    def __str__(self) -> str:
         warnings.warn(
             "str() on %s decodes the payload as text using the '%s' codec. "
             "A future release will return the hexadecimal representation "
@@ -868,13 +880,13 @@ class OctetString(base.SimpleAsn1Type):
         )
         return self._asText()
 
-    def __bytes__(self):
+    def __bytes__(self) -> bytes:
         return bytes(self._value)
 
-    def asOctets(self):
+    def asOctets(self) -> bytes:
         return bytes(self._value)
 
-    def asNumbers(self):
+    def asNumbers(self) -> tuple[int, ...]:
         return tuple(self._value)
 
     #
@@ -896,10 +908,10 @@ class OctetString(base.SimpleAsn1Type):
     # Note: ASN.1 OCTET STRING is never mean to contain text!
     #
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: typing.Any) -> typing.Any:
         return value
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         # first see if subclass has its own .prettyOut()
         value = self.prettyOut(self._value)
 
@@ -916,7 +928,7 @@ class OctetString(base.SimpleAsn1Type):
         return OctetString._asText(self)
 
     @staticmethod
-    def fromBinaryString(value):
+    def fromBinaryString(value: typing.Any) -> typing.Any:
         """Create a |ASN.1| object initialized from a string of '0' and '1'.
 
         Parameters
@@ -945,7 +957,7 @@ class OctetString(base.SimpleAsn1Type):
         return bytes(r)
 
     @staticmethod
-    def fromHexString(value):
+    def fromHexString(value: typing.Any) -> typing.Any:
         """Create a |ASN.1| object initialized from the hex string.
 
         Parameters
@@ -954,11 +966,11 @@ class OctetString(base.SimpleAsn1Type):
             Text string like 'DEADBEEF'
         """
         r = []
-        p = []
+        p = ""
         for v in value:
             if p:
                 r.append(int(p + v, 16))
-                p = None
+                p = ""
             else:
                 p = v
         if p:
@@ -968,40 +980,40 @@ class OctetString(base.SimpleAsn1Type):
 
     # Immutable sequence object protocol
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._value)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: typing.Any) -> typing.Any:
         if i.__class__ is slice:
             return self.clone(self._value[i])
         else:
             return self._value[i]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         return iter(self._value)
 
-    def __contains__(self, value):
+    def __contains__(self, value: object) -> bool:
         return value in self._value
 
-    def __add__(self, value):
+    def __add__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value + self.prettyIn(value))
 
-    def __radd__(self, value):
+    def __radd__(self, value: typing.Any) -> typing.Any:
         return self.clone(self.prettyIn(value) + self._value)
 
-    def __mul__(self, value):
+    def __mul__(self, value: typing.Any) -> typing.Any:
         return self.clone(self._value * value)
 
-    def __rmul__(self, value):
+    def __rmul__(self, value: typing.Any) -> typing.Any:
         return self * value
 
-    def __int__(self):
+    def __int__(self) -> int:
         return int(self._value)
 
-    def __float__(self):
+    def __float__(self) -> float:
         return float(self._value)
 
-    def __reversed__(self):
+    def __reversed__(self) -> Iterator[typing.Any]:
         return reversed(self._value)
 
 
@@ -1050,7 +1062,7 @@ class Null(OctetString):
     # Optimization for faster codec lookup
     typeId = OctetString.getTypeId()
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         if value:
             return value
 
@@ -1118,36 +1130,36 @@ class ObjectIdentifier(base.SimpleAsn1Type):
     # Optimization for faster codec lookup
     typeId = base.SimpleAsn1Type.getTypeId()
 
-    def __add__(self, other):
+    def __add__(self, other: typing.Any) -> typing.Any:
         return self.clone(self._value + other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: typing.Any) -> typing.Any:
         return self.clone(other + self._value)
 
-    def asTuple(self):
+    def asTuple(self) -> tuple[int, ...]:
         return self._value
 
     # Sequence object protocol
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._value)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: typing.Any) -> typing.Any:
         if i.__class__ is slice:
             return self.clone(self._value[i])
         else:
             return self._value[i]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         return iter(self._value)
 
-    def __contains__(self, value):
+    def __contains__(self, value: object) -> bool:
         return value in self._value
 
-    def index(self, suboid):
+    def index(self, suboid: typing.Any) -> int:
         return self._value.index(suboid)
 
-    def isPrefixOf(self, other):
+    def isPrefixOf(self, other: typing.Any) -> bool:
         """Indicate if this |ASN.1| object is a prefix of other |ASN.1| object.
 
         Parameters
@@ -1167,7 +1179,7 @@ class ObjectIdentifier(base.SimpleAsn1Type):
                 return True
         return False
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         if isinstance(value, ObjectIdentifier):
             return tuple(value)
         elif isinstance(value, str):
@@ -1199,7 +1211,7 @@ class ObjectIdentifier(base.SimpleAsn1Type):
             "Malformed Object ID %s at %s" % (value, self.__class__.__name__)
         )
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: typing.Any) -> typing.Any:
         return ".".join([str(x) for x in value])
 
 
@@ -1267,14 +1279,14 @@ class Real(base.SimpleAsn1Type):
     typeId = base.SimpleAsn1Type.getTypeId()
 
     @staticmethod
-    def __normalizeBase10(value):
+    def __normalizeBase10(value: typing.Any) -> typing.Any:
         m, b, e = value
         while m and m % 10 == 0:
             m /= 10
             e += 1
         return m, b, e
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: typing.Any) -> typing.Any:
         if isinstance(value, tuple) and len(value) == 3:
             if (
                 not isinstance(value[0], numericTypes)
@@ -1310,10 +1322,10 @@ class Real(base.SimpleAsn1Type):
                     e -= 1
                 return self.__normalizeBase10((int(value), 10, e))
         elif isinstance(value, Real):
-            return tuple(value)
+            return tuple(typing.cast(typing.Iterable[typing.Any], value))
         raise error.PyAsn1Error("Bad real value syntax: %s" % (value,))
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         try:
             return self.prettyOut(float(self))
 
@@ -1321,7 +1333,7 @@ class Real(base.SimpleAsn1Type):
             return "<overflow>"
 
     @property
-    def isPlusInf(self):
+    def isPlusInf(self) -> bool:
         """Indicate PLUS-INFINITY object value
 
         Returns
@@ -1334,7 +1346,7 @@ class Real(base.SimpleAsn1Type):
         return self._value == self._plusInf
 
     @property
-    def isMinusInf(self):
+    def isMinusInf(self) -> bool:
         """Indicate MINUS-INFINITY object value
 
         Returns
@@ -1346,110 +1358,110 @@ class Real(base.SimpleAsn1Type):
         return self._value == self._minusInf
 
     @property
-    def isInf(self):
+    def isInf(self) -> bool:
         return self._value in self._inf
 
-    def __add__(self, value):
+    def __add__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) + value)
 
-    def __radd__(self, value):
+    def __radd__(self, value: typing.Any) -> typing.Any:
         return self + value
 
-    def __mul__(self, value):
+    def __mul__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) * value)
 
-    def __rmul__(self, value):
+    def __rmul__(self, value: typing.Any) -> typing.Any:
         return self * value
 
-    def __sub__(self, value):
+    def __sub__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) - value)
 
-    def __rsub__(self, value):
+    def __rsub__(self, value: typing.Any) -> typing.Any:
         return self.clone(value - float(self))
 
-    def __mod__(self, value):
+    def __mod__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) % value)
 
-    def __rmod__(self, value):
+    def __rmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(value % float(self))
 
-    def __pow__(self, value, modulo=None):
+    def __pow__(self, value: typing.Any, modulo: typing.Any = None) -> typing.Any:
         return self.clone(pow(float(self), value, modulo))
 
-    def __rpow__(self, value):
+    def __rpow__(self, value: typing.Any) -> typing.Any:
         return self.clone(pow(value, float(self)))
 
-    def __truediv__(self, value):
+    def __truediv__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) / value)
 
-    def __rtruediv__(self, value):
+    def __rtruediv__(self, value: typing.Any) -> typing.Any:
         return self.clone(value / float(self))
 
-    def __divmod__(self, value):
+    def __divmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) // value)
 
-    def __rdivmod__(self, value):
+    def __rdivmod__(self, value: typing.Any) -> typing.Any:
         return self.clone(value // float(self))
 
-    def __int__(self):
+    def __int__(self) -> int:
         return int(float(self))
 
-    def __float__(self):
+    def __float__(self) -> float:
         value = self._cmpValue("__float__")
         if value in self._inf:
             return value
         else:
             return float(value[0] * pow(value[1], value[2]))
 
-    def __abs__(self):
+    def __abs__(self) -> typing.Any:
         return self.clone(abs(float(self)))
 
-    def __pos__(self):
+    def __pos__(self) -> typing.Any:
         return self.clone(+float(self))
 
-    def __neg__(self):
+    def __neg__(self) -> typing.Any:
         return self.clone(-float(self))
 
-    def __round__(self, n=0):
+    def __round__(self, n: int = 0) -> typing.Any:
         r = round(float(self), n)
         if n:
             return self.clone(r)
         else:
             return r
 
-    def __floor__(self):
+    def __floor__(self) -> int:
         return self.clone(math.floor(float(self)))
 
-    def __ceil__(self):
+    def __ceil__(self) -> int:
         return self.clone(math.ceil(float(self)))
 
-    def __trunc__(self):
+    def __trunc__(self) -> int:
         return self.clone(math.trunc(float(self)))
 
-    def __lt__(self, value):
+    def __lt__(self, value: typing.Any) -> bool:
         return float(self) < value
 
-    def __le__(self, value):
+    def __le__(self, value: typing.Any) -> bool:
         return float(self) <= value
 
-    def __eq__(self, value):
+    def __eq__(self, value: object) -> bool:
         return self is value or float(self) == value
 
-    def __ne__(self, value):
+    def __ne__(self, value: object) -> bool:
         return self is not value and float(self) != value
 
-    def __gt__(self, value):
+    def __gt__(self, value: typing.Any) -> bool:
         return float(self) > value
 
-    def __ge__(self, value):
+    def __ge__(self, value: typing.Any) -> bool:
         return float(self) >= value
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(float(self))
 
     __hash__ = base.SimpleAsn1Type.__hash__
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: typing.Any) -> typing.Any:
         if self._value in self._inf:
             raise error.PyAsn1Error("Invalid infinite value operation")
         else:
@@ -1563,28 +1575,28 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         lotteryDraw.extend([123, 456, 789])
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: typing.Any) -> None:
         self._componentValues = noValue
 
         base.ConstructedAsn1Type.__init__(self, **kwargs)
 
     # Python list protocol
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: typing.Any) -> typing.Any:
         try:
             return self.getComponentByPosition(idx)
 
         except error.PyAsn1Error as exc:
             raise IndexError(exc) from exc
 
-    def __setitem__(self, idx, value):
+    def __setitem__(self, idx: typing.Any, value: typing.Any) -> None:
         try:
             self.setComponentByPosition(idx, value)
 
         except error.PyAsn1Error as exc:
             raise IndexError(exc) from exc
 
-    def append(self, value):
+    def append(self, value: typing.Any) -> None:
         if self._componentValues is noValue:
             pos = 0
 
@@ -1593,24 +1605,23 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
         self[pos] = value
 
-    def count(self, value):
+    def count(self, value: typing.Any) -> int:
         return list(self._componentValues.values()).count(value)
 
-    def extend(self, values):
+    def extend(self, values: typing.Any) -> None:
         for value in values:
             self.append(value)
 
         if self._componentValues is noValue:
             self._componentValues = {}
 
-    def index(self, value, start=0, stop=None):
+    def index(self, value: typing.Any, start: int = 0, stop: typing.Any = None) -> int:
         if stop is None:
             stop = len(self)
 
-        indices, values = zip(*self._componentValues.items())
+        indices, componentValues = zip(*self._componentValues.items())
 
-        # TODO: remove when Py2.5 support is gone
-        values = list(values)
+        values = list(componentValues)
 
         try:
             return indices[values.index(value, start, stop)]
@@ -1618,25 +1629,27 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         except error.PyAsn1Error as exc:
             raise ValueError(exc) from exc
 
-    def reverse(self):
+    def reverse(self) -> None:
         self._componentValues.reverse()
 
-    def sort(self, key=None, reverse=False):
+    def sort(self, key: typing.Any = None, reverse: bool = False) -> None:
         self._componentValues = dict(
             enumerate(sorted(self._componentValues.values(), key=key, reverse=reverse))
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         if self._componentValues is noValue or not self._componentValues:
             return 0
 
         return max(self._componentValues) + 1
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         for idx in range(0, len(self)):
             yield self.getComponentByPosition(idx)
 
-    def _cloneComponentValues(self, myClone, cloneValueFlag):
+    def _cloneComponentValues(
+        self, myClone: typing.Any, cloneValueFlag: typing.Any
+    ) -> None:
         for idx, componentValue in self._componentValues.items():
             if componentValue is not noValue:
                 if isinstance(componentValue, base.ConstructedAsn1Type):
@@ -1646,7 +1659,9 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
                 else:
                     myClone.setComponentByPosition(idx, componentValue.clone())
 
-    def getComponentByPosition(self, idx, default=noValue, instantiate=True):
+    def getComponentByPosition(
+        self, idx: int, default: typing.Any = noValue, instantiate: bool = True
+    ) -> typing.Any:
         """Return |ASN.1| type component value by position.
 
         Equivalent to Python sequence subscription operation (e.g. `[]`).
@@ -1742,12 +1757,12 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
     def setComponentByPosition(
         self,
-        idx,
-        value=noValue,
-        verifyConstraints=True,
-        matchTags=True,
-        matchConstraints=True,
-    ):
+        idx: int,
+        value: typing.Any = noValue,
+        verifyConstraints: bool = True,
+        matchTags: bool = True,
+        matchConstraints: bool = True,
+    ) -> typing.Any:
         """Assign |ASN.1| type component by position.
 
         Equivalent to Python sequence item assignment operation (e.g. `[]`)
@@ -1867,15 +1882,15 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return self
 
     @property
-    def componentTagMap(self):
+    def componentTagMap(self) -> typing.Any:
         if self.componentType is not None:
             return self.componentType.tagMap
 
     @property
-    def components(self):
+    def components(self) -> typing.Any:
         return [self._componentValues[idx] for idx in sorted(self._componentValues)]
 
-    def clear(self):
+    def clear(self) -> typing.Any:
         """Remove all components and become an empty |ASN.1| value object.
 
         Has the same effect on |ASN.1| object as it does on :class:`list`
@@ -1884,7 +1899,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         self._componentValues = {}
         return self
 
-    def reset(self):
+    def reset(self) -> typing.Any:
         """Remove all components and become a |ASN.1| schema object.
 
         See :meth:`isValue` property for more information on the
@@ -1893,7 +1908,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         self._componentValues = noValue
         return self
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         scope += 1
         representation = self.__class__.__name__ + ":\n"
 
@@ -1909,7 +1924,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
         return representation
 
-    def prettyPrintType(self, scope=0):
+    def prettyPrintType(self, scope: int = 0) -> str:
         scope += 1
         representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
         if self.componentType is not None:
@@ -1918,7 +1933,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return representation + "\n" + " " * (scope - 1) + "}"
 
     @property
-    def isValue(self):
+    def isValue(self) -> bool:
         """Indicate that |ASN.1| object represents ASN.1 value.
 
         If *isValue* is :obj:`False` then this object represents just ASN.1 schema.
@@ -1957,7 +1972,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return True
 
     @property
-    def isInconsistent(self):
+    def isInconsistent(self) -> typing.Any:
         """Run necessary checks to ensure |ASN.1| object consistency.
 
         Default action is to verify |ASN.1| object against constraints imposed
@@ -2085,59 +2100,59 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
     #: Default :py:class:`~pyasn1.type.namedtype.NamedTypes`
     #: object representing named ASN.1 types allowed within |ASN.1| type
-    componentType = namedtype.NamedTypes()
+    componentType: typing.Any = namedtype.NamedTypes()
 
     class DynamicNames:
         """Fields names/positions mapping for component-less objects"""
 
-        def __init__(self):
-            self._keyToIdxMap = {}
-            self._idxToKeyMap = {}
+        def __init__(self) -> None:
+            self._keyToIdxMap: dict[typing.Any, int] = {}
+            self._idxToKeyMap: dict[int, typing.Any] = {}
 
-        def __len__(self):
+        def __len__(self) -> int:
             return len(self._keyToIdxMap)
 
-        def __contains__(self, item):
+        def __contains__(self, item: object) -> bool:
             return item in self._keyToIdxMap or item in self._idxToKeyMap
 
-        def __iter__(self):
+        def __iter__(self) -> Iterator[typing.Any]:
             return (self._idxToKeyMap[idx] for idx in range(len(self._idxToKeyMap)))
 
-        def __getitem__(self, item):
+        def __getitem__(self, item: typing.Any) -> typing.Any:
             try:
                 return self._keyToIdxMap[item]
 
             except KeyError:
                 return self._idxToKeyMap[item]
 
-        def getNameByPosition(self, idx):
+        def getNameByPosition(self, idx: int) -> typing.Any:
             try:
                 return self._idxToKeyMap[idx]
 
             except KeyError as exc:
                 raise error.PyAsn1Error("Type position out of range") from exc
 
-        def getPositionByName(self, name):
+        def getPositionByName(self, name: str) -> int:
             try:
                 return self._keyToIdxMap[name]
 
             except KeyError as exc:
                 raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
-        def addField(self, idx):
+        def addField(self, idx: int) -> None:
             self._keyToIdxMap["field-%d" % idx] = idx
             self._idxToKeyMap[idx] = "field-%d" % idx
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: typing.Any) -> None:
         base.ConstructedAsn1Type.__init__(self, **kwargs)
-        self._componentTypeLen = len(self.componentType)
+        self._componentTypeLen: int = len(self.componentType)
         if self._componentTypeLen:
             self._componentValues = []
         else:
             self._componentValues = noValue
-        self._dynamicNames = self._componentTypeLen or self.DynamicNames()
+        self._dynamicNames: typing.Any = self._componentTypeLen or self.DynamicNames()
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: typing.Any) -> typing.Any:
         if isinstance(idx, str):
             try:
                 return self.getComponentByName(idx)
@@ -2154,7 +2169,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 # duck-typing list
                 raise IndexError(exc) from exc
 
-    def __setitem__(self, idx, value):
+    def __setitem__(self, idx: typing.Any, value: typing.Any) -> None:
         if isinstance(idx, str):
             try:
                 self.setComponentByName(idx, value)
@@ -2171,41 +2186,41 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 # duck-typing list
                 raise IndexError(exc) from exc
 
-    def __contains__(self, key):
+    def __contains__(self, key: object) -> bool:
         if self._componentTypeLen:
             return key in self.componentType
         else:
             return key in self._dynamicNames
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._componentValues)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         return iter(self.componentType or self._dynamicNames)
 
     # Python dict protocol
 
-    def values(self):
+    def values(self) -> typing.Any:
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             yield self[idx]
 
-    def keys(self):
+    def keys(self) -> typing.Any:
         return iter(self)
 
-    def items(self):
+    def items(self) -> typing.Any:
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             if self._componentTypeLen:
                 yield self.componentType[idx].name, self[idx]
             else:
                 yield self._dynamicNames[idx], self[idx]
 
-    def update(self, *iterValue, **mappingValue):
+    def update(self, *iterValue: typing.Any, **mappingValue: typing.Any) -> None:
         for k, v in iterValue:
             self[k] = v
         for k, v in mappingValue.items():
             self[k] = v
 
-    def clear(self):
+    def clear(self) -> typing.Any:
         """Remove all components and become an empty |ASN.1| value object.
 
         Has the same effect on |ASN.1| object as it does on :class:`dict`
@@ -2215,7 +2230,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         self._dynamicNames = self.DynamicNames()
         return self
 
-    def reset(self):
+    def reset(self) -> typing.Any:
         """Remove all components and become a |ASN.1| schema object.
 
         See :meth:`isValue` property for more information on the
@@ -2226,10 +2241,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         return self
 
     @property
-    def components(self):
+    def components(self) -> typing.Any:
         return self._componentValues
 
-    def _cloneComponentValues(self, myClone, cloneValueFlag):
+    def _cloneComponentValues(
+        self, myClone: typing.Any, cloneValueFlag: typing.Any
+    ) -> None:
         if self._componentValues is noValue:
             return
 
@@ -2242,7 +2259,9 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 else:
                     myClone.setComponentByPosition(idx, componentValue.clone())
 
-    def getComponentByName(self, name, default=noValue, instantiate=True):
+    def getComponentByName(
+        self, name: str, default: typing.Any = noValue, instantiate: bool = True
+    ) -> typing.Any:
         """Returns |ASN.1| type component by name.
 
         Equivalent to Python :class:`dict` subscription operation (e.g. `[]`).
@@ -2285,12 +2304,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
     def setComponentByName(
         self,
-        name,
-        value=noValue,
-        verifyConstraints=True,
-        matchTags=True,
-        matchConstraints=True,
-    ):
+        name: str,
+        value: typing.Any = noValue,
+        verifyConstraints: bool = True,
+        matchTags: bool = True,
+        matchConstraints: bool = True,
+    ) -> typing.Any:
         """Assign |ASN.1| type component by name.
 
         Equivalent to Python :class:`dict` item assignment operation (e.g. `[]`).
@@ -2333,7 +2352,9 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             idx, value, verifyConstraints, matchTags, matchConstraints
         )
 
-    def getComponentByPosition(self, idx, default=noValue, instantiate=True):
+    def getComponentByPosition(
+        self, idx: int, default: typing.Any = noValue, instantiate: bool = True
+    ) -> typing.Any:
         """Returns |ASN.1| type component by index.
 
         Equivalent to Python sequence subscription operation (e.g. `[]`).
@@ -2429,12 +2450,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
     def setComponentByPosition(
         self,
-        idx,
-        value=noValue,
-        verifyConstraints=True,
-        matchTags=True,
-        matchConstraints=True,
-    ):
+        idx: int,
+        value: typing.Any = noValue,
+        verifyConstraints: bool = True,
+        matchTags: bool = True,
+        matchConstraints: bool = True,
+    ) -> typing.Any:
         """Assign |ASN.1| type component by position.
 
         Equivalent to Python sequence item assignment operation (e.g. `[]`).
@@ -2553,7 +2574,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         return self
 
     @property
-    def isValue(self):
+    def isValue(self) -> bool:
         """Indicate that |ASN.1| object represents ASN.1 value.
 
         If *isValue* is :obj:`False` then this object represents just ASN.1 schema.
@@ -2611,7 +2632,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         return True
 
     @property
-    def isInconsistent(self):
+    def isInconsistent(self) -> typing.Any:
         """Run necessary checks to ensure |ASN.1| object consistency.
 
         Default action is to verify |ASN.1| object against constraints imposed
@@ -2647,7 +2668,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
         return False
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         """Return an object representation string.
 
         Returns
@@ -2670,7 +2691,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 )
         return representation
 
-    def prettyPrintType(self, scope=0):
+    def prettyPrintType(self, scope: int = 0) -> str:
         scope += 1
         representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
         for idx, componentType in enumerate(
@@ -2687,7 +2708,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             )
         return representation + "\n" + " " * (scope - 1) + "}"
 
-    def getNameByPosition(self, idx):
+    def getNameByPosition(self, idx: int) -> typing.Any:
         if self._componentTypeLen:
             return self.componentType[idx].name
 
@@ -2709,7 +2730,7 @@ class Sequence(SequenceAndSetBase):
 
     #: Default collection of ASN.1 types of component (e.g. :py:class:`~pyasn1.type.namedtype.NamedType`)
     #: object imposing size constraint on |ASN.1| objects
-    componentType = namedtype.NamedTypes()
+    componentType: typing.Any = namedtype.NamedTypes()
 
     # Disambiguation ASN.1 types identification
     typeId = SequenceAndSetBase.getTypeId()
@@ -2727,7 +2748,7 @@ class Set(SequenceAndSetBase):
 
     #: Default collection of ASN.1 types of component (e.g. :py:class:`~pyasn1.type.namedtype.NamedType`)
     #: object representing ASN.1 type allowed within |ASN.1| type
-    componentType = namedtype.NamedTypes()
+    componentType: typing.Any = namedtype.NamedTypes()
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
@@ -2737,12 +2758,16 @@ class Set(SequenceAndSetBase):
     # Disambiguation ASN.1 types identification
     typeId = SequenceAndSetBase.getTypeId()
 
-    def getComponent(self, innerFlag=False):
+    def getComponent(self, innerFlag: bool = False) -> typing.Any:
         return self
 
     def getComponentByType(
-        self, tagSet, default=noValue, instantiate=True, innerFlag=False
-    ):
+        self,
+        tagSet: tag.TagSet,
+        default: typing.Any = noValue,
+        instantiate: bool = True,
+        innerFlag: bool = False,
+    ) -> typing.Any:
         """Returns |ASN.1| type component by ASN.1 tag.
 
         Parameters
@@ -2782,13 +2807,13 @@ class Set(SequenceAndSetBase):
 
     def setComponentByType(
         self,
-        tagSet,
-        value=noValue,
-        verifyConstraints=True,
-        matchTags=True,
-        matchConstraints=True,
-        innerFlag=False,
-    ):
+        tagSet: tag.TagSet,
+        value: typing.Any = noValue,
+        verifyConstraints: bool = True,
+        matchTags: bool = True,
+        matchConstraints: bool = True,
+        innerFlag: bool = False,
+    ) -> typing.Any:
         """Assign |ASN.1| type component by ASN.1 tag.
 
         Parameters
@@ -2845,7 +2870,7 @@ class Set(SequenceAndSetBase):
             )
 
     @property
-    def componentTagMap(self):
+    def componentTagMap(self) -> typing.Any:
         if self.componentType:
             return self.componentType.tagMapUnique
 
@@ -2903,7 +2928,7 @@ class Choice(Set):
 
     #: Default collection of ASN.1 types of component (e.g. :py:class:`~pyasn1.type.namedtype.NamedType`)
     #: object representing ASN.1 type allowed within |ASN.1| type
-    componentType = namedtype.NamedTypes()
+    componentType: typing.Any = namedtype.NamedTypes()
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
@@ -2917,75 +2942,77 @@ class Choice(Set):
 
     _currentIdx = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if self is other:
             return True
         if self._cmpComponents("__eq__"):
             return self._componentValues[self._currentIdx] == other
         return NotImplemented
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         if self is other:
             return False
         if self._cmpComponents("__ne__"):
             return self._componentValues[self._currentIdx] != other
         return NotImplemented
 
-    def __lt__(self, other):
+    def __lt__(self, other: typing.Any) -> bool:
         if self._cmpComponents("__lt__"):
             return self._componentValues[self._currentIdx] < other
         return NotImplemented
 
-    def __le__(self, other):
+    def __le__(self, other: typing.Any) -> bool:
         if self._cmpComponents("__le__"):
             return self._componentValues[self._currentIdx] <= other
         return NotImplemented
 
-    def __gt__(self, other):
+    def __gt__(self, other: typing.Any) -> bool:
         if self._cmpComponents("__gt__"):
             return self._componentValues[self._currentIdx] > other
         return NotImplemented
 
-    def __ge__(self, other):
+    def __ge__(self, other: typing.Any) -> bool:
         if self._cmpComponents("__ge__"):
             return self._componentValues[self._currentIdx] >= other
         return NotImplemented
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self._componentValues)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return int(self._currentIdx is not None)
 
-    def __contains__(self, key):
+    def __contains__(self, key: object) -> bool:
         if self._currentIdx is None:
             return False
         return key == self.componentType[self._currentIdx].name
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[typing.Any]:
         if self._currentIdx is None:
             return
         yield self.componentType[self._currentIdx].name
 
     # Python dict protocol
 
-    def values(self):
+    def values(self) -> typing.Any:
         if self._currentIdx is not None:
             yield self._componentValues[self._currentIdx]
 
-    def keys(self):
+    def keys(self) -> typing.Any:
         if self._currentIdx is not None:
             yield self.componentType[self._currentIdx].name
 
-    def items(self):
+    def items(self) -> typing.Any:
         if self._currentIdx is not None:
             yield self.componentType[self._currentIdx].name, self[self._currentIdx]
 
-    def checkConsistency(self):
+    def checkConsistency(self) -> None:
         if self._currentIdx is None:
             raise error.PyAsn1Error("Component not chosen")
 
-    def _cloneComponentValues(self, myClone, cloneValueFlag):
+    def _cloneComponentValues(
+        self, myClone: typing.Any, cloneValueFlag: typing.Any
+    ) -> None:
         try:
             component = self.getComponent()
         except error.PyAsn1Error:
@@ -3002,7 +3029,9 @@ class Choice(Set):
             else:
                 myClone.setComponentByType(tagSet, component.clone())
 
-    def getComponentByPosition(self, idx, default=noValue, instantiate=True):
+    def getComponentByPosition(
+        self, idx: int, default: typing.Any = noValue, instantiate: bool = True
+    ) -> typing.Any:
         if self._currentIdx is None or self._currentIdx != idx:
             return Set.getComponentByPosition(
                 self, idx, default=default, instantiate=instantiate
@@ -3012,12 +3041,12 @@ class Choice(Set):
 
     def setComponentByPosition(
         self,
-        idx,
-        value=noValue,
-        verifyConstraints=True,
-        matchTags=True,
-        matchConstraints=True,
-    ):
+        idx: int,
+        value: typing.Any = noValue,
+        verifyConstraints: bool = True,
+        matchTags: bool = True,
+        matchConstraints: bool = True,
+    ) -> typing.Any:
         """Assign |ASN.1| type component by position.
 
         Equivalent to Python sequence item assignment operation (e.g. `[]`).
@@ -3061,7 +3090,7 @@ class Choice(Set):
         return self
 
     @property
-    def effectiveTagSet(self):
+    def effectiveTagSet(self) -> typing.Any:
         """Return a :class:`~pyasn1.type.tag.TagSet` object of the currently initialized component or self (if |ASN.1| is tagged)."""
         if self.tagSet:
             return self.tagSet
@@ -3070,16 +3099,16 @@ class Choice(Set):
             return component.effectiveTagSet
 
     @property
-    def tagMap(self):
+    def tagMap(self) -> typing.Any:
         """ "Return a :class:`~pyasn1.type.tagmap.TagMap` object mapping
         ASN.1 tags to ASN.1 objects contained within callee.
         """
         if self.tagSet:
-            return Set.tagMap.fget(self)
+            return Set.tagMap.fget(self)  # type: ignore[attr-defined]
         else:
             return self.componentType.tagMapUnique
 
-    def getComponent(self, innerFlag=False):
+    def getComponent(self, innerFlag: bool = False) -> typing.Any:
         """Return currently assigned component of the |ASN.1| object.
 
         Returns
@@ -3096,7 +3125,7 @@ class Choice(Set):
             else:
                 return c
 
-    def getName(self, innerFlag=False):
+    def getName(self, innerFlag: bool = False) -> typing.Any:
         """Return the name of currently assigned component of the |ASN.1| object.
 
         Returns
@@ -3114,7 +3143,7 @@ class Choice(Set):
             return self.componentType.getNameByPosition(self._currentIdx)
 
     @property
-    def isValue(self):
+    def isValue(self) -> bool:
         """Indicate that |ASN.1| object represents ASN.1 value.
 
         If *isValue* is :obj:`False` then this object represents just ASN.1 schema.
@@ -3148,7 +3177,7 @@ class Choice(Set):
 
         return componentValue is not noValue and componentValue.isValue
 
-    def clear(self):
+    def clear(self) -> typing.Any:
         self._currentIdx = None
         return Set.clear(self)
 
@@ -3225,6 +3254,8 @@ class Any(OctetString):
     #: associated with |ASN.1| type.
     tagSet = tag.TagSet()  # untagged
 
+    _tagMap: tagmap.TagMap
+
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
     #: imposing constraints on |ASN.1| type initialization values.
@@ -3234,7 +3265,7 @@ class Any(OctetString):
     typeId = OctetString.getTypeId()
 
     @property
-    def tagMap(self):
+    def tagMap(self) -> typing.Any:
         """ "Return a :class:`~pyasn1.type.tagmap.TagMap` object mapping
         ASN.1 tags to ASN.1 objects contained within callee.
         """

@@ -112,6 +112,7 @@ module = [
     "pyasn1.type.opentype",
     "pyasn1.type.tag",
     "pyasn1.type.tagmap",
+    "pyasn1.type.univ",
     "pyasn1.type.useful",
 ]
 disallow_untyped_defs = true

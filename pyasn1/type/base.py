@@ -4,7 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 from pyasn1 import error
 from pyasn1.type import constraint, tag, tagmap
@@ -549,8 +549,13 @@ class ConstructedAsn1Type(Asn1Type):
 
     componentType: Any = None
 
-    isValue: bool
     _componentValues: Any
+
+    if TYPE_CHECKING:
+        # Declared read-only so subclasses may implement it as a property.
+        # Type-check time only; the attribute itself comes from subclasses.
+        @property
+        def isValue(self) -> bool: ...
 
     def __init__(self, **kwargs: Any) -> None:
         readOnly = {"componentType": self.componentType}
