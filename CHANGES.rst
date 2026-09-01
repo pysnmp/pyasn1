@@ -1,5 +1,15 @@
 
+unreleased
+---------------------------------
+
+- Replaced hand-rolled internal type wrappers with Python standard
+  library base types to reduce boilerplate code
+- Removed legacy type accessors, aliases, deprecated BIT STRING notation,
+  positional constructed-type initialization, and ``sizeSpec`` support.
+
+
 Revision 1.0.2, released 2021-11-13
+-----------------------------------
 
 - Release based on 0.4.8 from new repo and ci
 

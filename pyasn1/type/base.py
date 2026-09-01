@@ -142,28 +142,6 @@ class Asn1Type(Asn1Item):
     def prettyPrint(self, scope=0):
         raise NotImplementedError()
 
-    # backward compatibility
-
-    def getTagSet(self):
-        return self.tagSet
-
-    def getEffectiveTagSet(self):
-        return self.effectiveTagSet
-
-    def getTagMap(self):
-        return self.tagMap
-
-    def getSubtypeSpec(self):
-        return self.subtypeSpec
-
-    # backward compatibility
-    def hasValue(self):
-        return self.isValue
-
-
-# Backward compatibility
-Asn1ItemBase = Asn1Type
-
 
 class NoValue:
     """Create a singleton instance of NoValue class.
@@ -468,10 +446,6 @@ class SimpleAsn1Type(Asn1Type):
         return "%s -> %s" % (self.tagSet, self.__class__.__name__)
 
 
-# Backward compatibility
-AbstractSimpleAsn1Item = SimpleAsn1Type
-
-#
 # Constructed types:
 # * There are five of them: Sequence, SequenceOf/SetOf, Set and Choice
 # * ASN1 types and values are represened by Python class instances
@@ -512,37 +486,12 @@ class ConstructedAsn1Type(Asn1Type):
 
     componentType = None
 
-    # backward compatibility, unused
-    sizeSpec = constraint.ConstraintsIntersection()
-
     def __init__(self, **kwargs):
-        readOnly = {
-            "componentType": self.componentType,
-            # backward compatibility, unused
-            "sizeSpec": self.sizeSpec,
-        }
-
-        # backward compatibility: preserve legacy sizeSpec support
-        kwargs = self._moveSizeSpec(**kwargs)
+        readOnly = {"componentType": self.componentType}
 
         readOnly.update(kwargs)
 
         Asn1Type.__init__(self, **readOnly)
-
-    def _moveSizeSpec(self, **kwargs):
-        # backward compatibility, unused
-        sizeSpec = kwargs.pop("sizeSpec", self.sizeSpec)
-        if sizeSpec:
-            subtypeSpec = kwargs.pop("subtypeSpec", self.subtypeSpec)
-            if subtypeSpec:
-                subtypeSpec = sizeSpec
-
-            else:
-                subtypeSpec += sizeSpec
-
-            kwargs["subtypeSpec"] = subtypeSpec
-
-        return kwargs
 
     def __repr__(self):
         representation = "%s %s object" % (
@@ -700,20 +649,3 @@ class ConstructedAsn1Type(Asn1Type):
         for k in kwargs:
             self[k] = kwargs[k]
         return self
-
-    # backward compatibility
-
-    def setDefaultComponents(self):
-        pass
-
-    def getComponentType(self):
-        return self.componentType
-
-    # backward compatibility, unused
-    def verifySizeSpec(self):
-        self.subtypeSpec(self)
-
-        # Backward compatibility
-
-
-AbstractConstructedAsn1Item = ConstructedAsn1Type

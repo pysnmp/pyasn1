@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from collections import namedtuple
+
 from pyasn1 import error
 
 __all__ = [
@@ -43,7 +45,10 @@ tagCategoryExplicit = 0x02
 tagCategoryUntagged = 0x04
 
 
-class Tag:
+_TagBase = namedtuple("Tag", ["tagClass", "tagFormat", "tagId"])
+
+
+class Tag(_TagBase):
     """Create ASN.1 tag
 
     Represents ASN.1 tag that can be attached to a ASN.1 type to make
@@ -64,105 +69,44 @@ class Tag:
         Tag ID value
     """
 
-    def __init__(self, tagClass, tagFormat, tagId):
+    __slots__ = ()
+
+    def __new__(cls, tagClass, tagFormat, tagId):
         if tagId < 0:
             raise error.PyAsn1Error("Negative tag ID (%s) not allowed" % tagId)
-        self.__tagClass = tagClass
-        self.__tagFormat = tagFormat
-        self.__tagId = tagId
-        self.__tagClassId = tagClass, tagId
-        self.__hash = hash(self.__tagClassId)
+        return super().__new__(cls, tagClass, tagFormat, tagId)
 
     def __repr__(self):
-        representation = "[%s:%s:%s]" % (
-            self.__tagClass,
-            self.__tagFormat,
-            self.__tagId,
+        return "<%s object, tag [%s:%s:%s]>" % (
+            self.__class__.__name__,
+            self.tagClass,
+            self.tagFormat,
+            self.tagId,
         )
-        return "<%s object, tag %s>" % (self.__class__.__name__, representation)
 
+    # Equality and hashing intentionally consider only (tagClass, tagId),
+    # matching the original implementation.  tagFormat is excluded so that
+    # a simple and a constructed tag with the same class/id compare equal.
     def __eq__(self, other):
-        return self.__tagClassId == other
+        return (self.tagClass, self.tagId) == other
 
     def __ne__(self, other):
-        return self.__tagClassId != other
+        return (self.tagClass, self.tagId) != other
 
     def __lt__(self, other):
-        return self.__tagClassId < other
+        return (self.tagClass, self.tagId) < other
 
     def __le__(self, other):
-        return self.__tagClassId <= other
+        return (self.tagClass, self.tagId) <= other
 
     def __gt__(self, other):
-        return self.__tagClassId > other
+        return (self.tagClass, self.tagId) > other
 
     def __ge__(self, other):
-        return self.__tagClassId >= other
+        return (self.tagClass, self.tagId) >= other
 
     def __hash__(self):
-        return self.__hash
-
-    def __getitem__(self, idx):
-        if idx == 0:
-            return self.__tagClass
-        elif idx == 1:
-            return self.__tagFormat
-        elif idx == 2:
-            return self.__tagId
-        else:
-            raise IndexError()
-
-    def __iter__(self):
-        yield self.__tagClass
-        yield self.__tagFormat
-        yield self.__tagId
-
-    def __and__(self, otherTag):
-        return self.__class__(
-            self.__tagClass & otherTag.tagClass,
-            self.__tagFormat & otherTag.tagFormat,
-            self.__tagId & otherTag.tagId,
-        )
-
-    def __or__(self, otherTag):
-        return self.__class__(
-            self.__tagClass | otherTag.tagClass,
-            self.__tagFormat | otherTag.tagFormat,
-            self.__tagId | otherTag.tagId,
-        )
-
-    @property
-    def tagClass(self):
-        """ASN.1 tag class
-
-        Returns
-        -------
-        : :py:class:`int`
-            Tag class
-        """
-        return self.__tagClass
-
-    @property
-    def tagFormat(self):
-        """ASN.1 tag format
-
-        Returns
-        -------
-        : :py:class:`int`
-            Tag format
-        """
-        return self.__tagFormat
-
-    @property
-    def tagId(self):
-        """ASN.1 tag ID
-
-        Returns
-        -------
-        : :py:class:`int`
-            Tag ID
-        """
-        return self.__tagId
+        return hash((self.tagClass, self.tagId))
 
 
 class TagSet:
@@ -320,7 +264,9 @@ class TagSet:
             New *TagSet* object
         """
         if self.__superTags:
-            superTag = Tag(superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId)
+            superTag = Tag(
+                superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId
+            )
         return self[:-1] + superTag
 
     def isSuperTagSetOf(self, tagSet):
@@ -343,11 +289,6 @@ class TagSet:
         if len(tagSet) < self.__lenOfSuperTags:
             return False
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
-
-    # Backward compatibility
-
-    def getBaseTag(self):
-        return self.__baseTag
 
 
 def initTagSet(tag):

@@ -25,6 +25,86 @@ class NamedTypeCaseBase(BaseTestCase):
         assert "age" in repr(self.e)
 
 
+class NamedTypeStdlibIntegrationTestCase(BaseTestCase):
+    """Verify NamedType behaves as a namedtuple / tuple subtype."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.nt = namedtype.NamedType("age", univ.Integer(0))
+
+    def testIsTupleSubtype(self):
+        assert isinstance(self.nt, tuple)
+        assert self.nt._fields == ("name", "asn1Object", "openType")
+
+    def testTupleUnpacking(self):
+        n, t = self.nt
+        assert n == "age"
+        assert t == univ.Integer(0)
+
+    def testFieldAccessByName(self):
+        assert self.nt.name == "age"
+        assert self.nt.asn1Object == univ.Integer(0)
+
+    def testFieldAccessByIndex(self):
+        assert self.nt[0] == "age"
+        assert self.nt[1] == univ.Integer(0)
+
+    def testIterYieldsTwo(self):
+        result = list(self.nt)
+        assert len(result) == 2, "iter should yield (name, asn1Object) only"
+
+    def testEqIgnoresOpenType(self):
+        """Equality should not consider openType (only name + asn1Object)."""
+        # Use value objects (not schema) so == works on the asn1Object side
+        nt1 = namedtype.NamedType("x", univ.Integer(0), openType=None)
+        nt2 = namedtype.NamedType("x", univ.Integer(0), openType={"k": "v"})
+        assert nt1 == nt2, "openType should not affect equality"
+
+    def testHashIgnoresOpenType(self):
+        nt1 = namedtype.NamedType("x", univ.Integer(0), openType=None)
+        nt2 = namedtype.NamedType("x", univ.Integer(0), openType={"k": "v"})
+        assert hash(nt1) == hash(nt2)
+
+    def testOpenTypeProperty(self):
+        nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
+        assert nt.openType == {"k": "v"}
+
+    def testOpenTypeDefaultsNone(self):
+        assert self.nt.openType is None
+
+    def testOptionalFlag(self):
+        nt = namedtype.OptionalNamedType("x", univ.Integer())
+        assert nt.isOptional is True
+        assert nt.isDefaulted is False
+
+    def testDefaultedFlag(self):
+        nt = namedtype.DefaultedNamedType("x", univ.Integer(0))
+        assert nt.isDefaulted is True
+        assert nt.isOptional is False
+
+    def testAsDictKey(self):
+        d = {self.nt: "value"}
+        assert d[self.nt] == "value"
+
+    def testLenMatchesTwoItemInterface(self):
+        # len() must match the two items exposed by __iter__/__getitem__,
+        # not the three underlying namedtuple fields.
+        assert len(self.nt) == 2
+        assert len(self.nt) == len(list(self.nt))
+
+    def testCopyPreservesOpenType(self):
+        import copy
+
+        nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
+        assert copy.copy(nt).openType == {"k": "v"}
+
+    def testPicklePreservesOpenType(self):
+        import pickle
+
+        nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
+        assert pickle.loads(pickle.dumps(nt)).openType == {"k": "v"}
+
+
 class NamedTypesCaseBase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
@@ -50,7 +130,9 @@ class NamedTypesCaseBase(BaseTestCase):
         assert list(self.e) == ["first-name", "age", "family-name"]
 
     def testGetTypeByPosition(self):
-        assert self.e.getTypeByPosition(0) == univ.OctetString(""), "getTypeByPosition() fails"
+        assert self.e.getTypeByPosition(0) == univ.OctetString(
+            ""
+        ), "getTypeByPosition() fails"
 
     def testGetNameByPosition(self):
         assert self.e.getNameByPosition(0) == "first-name", "getNameByPosition() fails"
@@ -110,7 +192,9 @@ class OrderedNamedTypesCaseBase(BaseTestCase):
         )
 
     def testGetTypeByPosition(self):
-        assert self.e.getTypeByPosition(0) == univ.OctetString(""), "getTypeByPosition() fails"
+        assert self.e.getTypeByPosition(0) == univ.OctetString(
+            ""
+        ), "getTypeByPosition() fails"
 
 
 class DuplicateNamedTypesCaseBase(BaseTestCase):

@@ -62,6 +62,18 @@ Minor, housekeeping things
 * consider simplifying repr(), otherwise it tend to be too hard to grasp
 * Specialize ASN.1 character and useful types
 
+* Use Python standard library types where possible:
+
+    * Tag — now a ``collections.namedtuple`` subclass (was a hand-rolled
+      tuple-like class with ~90 lines of boilerplate)
+    * NamedType — now a ``collections.namedtuple`` subclass (was a hand-rolled
+      tuple-like class; openType stored as third namedtuple field but excluded
+      from equality/hashing/iteration to preserve original semantics)
+    * OpenType — now a ``dict`` subclass (was a hand-rolled dict-like class;
+      ``__bool__`` overridden so empty OpenType is still truthy)
+    * NamedValues — now a ``dict`` subclass with a reverse index (was a
+      hand-rolled bidirectional dict-like class)
+
 * ber.decoder:
 
     * suspend codec on underrun error ?

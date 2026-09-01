@@ -28,7 +28,6 @@ class ObjectDescriptor(char.GraphicString):
 
 
 class TimeMixIn:
-
     _yearsDigits = 4
     _hasSubsecond = False
     _optionalMinutes = False

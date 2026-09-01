@@ -70,7 +70,6 @@ class TimeEncoderMixIn:
             raise error.PyAsn1Error("Comma in fractions disallowed: %r" % value)
 
         if self.DOT_CHAR in numbers:
-
             isModified = False
 
             numbers = list(numbers)
@@ -133,7 +132,6 @@ class SetOfEncoder(encoder.SequenceOfEncoder):
 
 class SequenceOfEncoder(encoder.SequenceOfEncoder):
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
         if options.get("ifNotEmpty", False) and not len(value):
             return _null, True, True
 
@@ -163,7 +161,6 @@ class SetEncoder(encoder.SequenceEncoder):
             return asn1Spec.tagSet
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
         substrate = _null
 
         comps = []
@@ -197,7 +194,6 @@ class SetEncoder(encoder.SequenceEncoder):
         else:
             # bare Python value + ASN.1 schema
             for idx, namedType in enumerate(asn1Spec.componentType.namedTypes):
-
                 try:
                     component = value[namedType.name]
 

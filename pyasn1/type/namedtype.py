@@ -5,13 +5,18 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
+from collections import namedtuple
+
 from pyasn1 import error
 from pyasn1.type import tag, tagmap
 
 __all__ = ["NamedType", "OptionalNamedType", "DefaultedNamedType", "NamedTypes"]
 
 
-class NamedType:
+_NamedTypeBase = namedtuple("_NamedTypeBase", ["name", "asn1Object", "openType"])
+
+
+class NamedType(_NamedTypeBase):
     """Create named field object for a constructed ASN.1 type.
 
     The |NamedType| object represents a single name and ASN.1 type of a constructed ASN.1 type.
@@ -28,14 +33,13 @@ class NamedType:
         ASN.1 type object
     """
 
+    __slots__ = ()
+
     isOptional = False
     isDefaulted = False
 
-    def __init__(self, name, asn1Object, openType=None):
-        self.__name = name
-        self.__type = asn1Object
-        self.__nameAndType = name, asn1Object
-        self.__openType = openType
+    def __new__(cls, name, asn1Object, openType=None):
+        return super().__new__(cls, name, asn1Object, openType)
 
     def __repr__(self):
         representation = "%s=%r" % (self.name, self.asn1Object)
@@ -45,62 +49,67 @@ class NamedType:
 
         return "<%s object, type %s>" % (self.__class__.__name__, representation)
 
-    def __eq__(self, other):
-        return self.__nameAndType == other
-
-    def __ne__(self, other):
-        return self.__nameAndType != other
-
-    def __lt__(self, other):
-        return self.__nameAndType < other
-
-    def __le__(self, other):
-        return self.__nameAndType <= other
-
-    def __gt__(self, other):
-        return self.__nameAndType > other
-
-    def __ge__(self, other):
-        return self.__nameAndType >= other
-
-    def __hash__(self):
-        return hash(self.__nameAndType)
+    # Iteration, indexing and length intentionally expose only
+    # (name, asn1Object), matching the original 2-tuple duck-type behaviour.
+    # The openType field is accessible only via the .openType property.
+    def __iter__(self):
+        yield self.name
+        yield self.asn1Object
 
     def __getitem__(self, idx):
-        return self.__nameAndType[idx]
+        if idx == 0:
+            return self.name
+        elif idx == 1:
+            return self.asn1Object
+        else:
+            raise IndexError("tuple index out of range")
 
-    def __iter__(self):
-        return iter(self.__nameAndType)
+    def __len__(self):
+        return 2
 
-    @property
-    def name(self):
-        return self.__name
+    def __getnewargs__(self):
+        # Preserve all three fields (including openType) when copying and
+        # pickling.  The namedtuple default round-trips tuple(self), which
+        # only yields the two items exposed by __iter__ and would drop the
+        # openType field.
+        return (self.name, self.asn1Object, self.openType)
 
-    @property
-    def asn1Object(self):
-        return self.__type
+    # Equality and hashing intentionally consider only (name, asn1Object),
+    # matching the original implementation where openType was excluded.
+    def __eq__(self, other):
+        return (self.name, self.asn1Object) == other
 
-    @property
-    def openType(self):
-        return self.__openType
+    def __ne__(self, other):
+        return (self.name, self.asn1Object) != other
 
-    # Backward compatibility
+    def __lt__(self, other):
+        return (self.name, self.asn1Object) < other
 
-    def getName(self):
-        return self.name
+    def __le__(self, other):
+        return (self.name, self.asn1Object) <= other
 
-    def getType(self):
-        return self.asn1Object
+    def __gt__(self, other):
+        return (self.name, self.asn1Object) > other
+
+    def __ge__(self, other):
+        return (self.name, self.asn1Object) >= other
+
+    def __hash__(self):
+        return hash((self.name, self.asn1Object))
 
 
 class OptionalNamedType(NamedType):
     __doc__ = NamedType.__doc__
+
+    __slots__ = ()
 
     isOptional = True
 
 
 class DefaultedNamedType(NamedType):
     __doc__ = NamedType.__doc__
+
+    __slots__ = ()
 
     isDefaulted = True
 
@@ -179,7 +188,7 @@ class NamedTypes:
         )
 
     def __repr__(self):
-        representation = ", ".join(["%r" % x for x in self.__namedTypes])
+        representation = ", ".join([repr(x) for x in self.__namedTypes])
         return "<%s object, types %s>" % (self.__class__.__name__, representation)
 
     def __eq__(self, other):

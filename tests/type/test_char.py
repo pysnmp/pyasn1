@@ -14,7 +14,6 @@ from tests.base import BaseTestCase
 
 
 class AbstractStringTestCase:
-
     initializer = ()
     encoding = "us-ascii"
     asn1Type = None
@@ -140,28 +139,24 @@ class AbstractStringTestCase:
 
 
 class VisibleStringTestCase(AbstractStringTestCase, BaseTestCase):
-
     initializer = (97, 102)
     encoding = "us-ascii"
     asn1Type = char.VisibleString
 
 
 class GeneralStringTestCase(AbstractStringTestCase, BaseTestCase):
-
     initializer = (169, 174)
     encoding = "iso-8859-1"
     asn1Type = char.GeneralString
 
 
 class UTF8StringTestCase(AbstractStringTestCase, BaseTestCase):
-
     initializer = (209, 132, 208, 176)
     encoding = "utf-8"
     asn1Type = char.UTF8String
 
 
 class BMPStringTestCase(AbstractStringTestCase, BaseTestCase):
-
     initializer = (4, 48, 4, 68)
     encoding = "utf-16-be"
     asn1Type = char.BMPString

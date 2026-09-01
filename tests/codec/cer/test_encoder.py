@@ -608,7 +608,6 @@ class SetEncoderWithChoiceWithSchemaEncoderTestCase(BaseTestCase):
 
 class SetEncoderWithTaggedChoiceEncoderTestCase(BaseTestCase):
     def testWithUntaggedChoice(self):
-
         c = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("premium", univ.Boolean())
@@ -628,7 +627,6 @@ class SetEncoderWithTaggedChoiceEncoderTestCase(BaseTestCase):
         assert encoder.encode(s) == bytes((49, 128, 1, 1, 255, 4, 1, 65, 0, 0))
 
     def testWithTaggedChoice(self):
-
         c = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("premium", univ.Boolean())

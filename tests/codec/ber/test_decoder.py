@@ -10,6 +10,8 @@ import unittest
 
 def _str2octs(s):
     return s.encode("iso-8859-1")
+
+
 _null = b""
 
 from pyasn1.codec.ber import decoder, eoo
@@ -2217,6 +2219,57 @@ class SequenceDecoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         assert s[1] == bytes(
             (4, 11, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110)
         )
+
+
+class SequenceDecoderOpenTypeLiveMapTestCase(BaseTestCase):
+    """OpenType retains the caller's typeMap by reference, so types registered
+    on the original mapping after the spec is built are honoured at decode
+    time (regression test for by-reference storage)."""
+
+    def setUp(self):
+        # Start with only one governing value mapped.
+        self.typeMap = {1: univ.Integer()}
+        openType = opentype.OpenType("id", self.typeMap)
+        self.s = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.NamedType("blob", univ.Any(), openType=openType),
+            )
+        )
+
+    def testDecodeOpenTypeAddedAfterConstruction(self):
+        # Register the second governing value *after* the spec was built.
+        self.typeMap[2] = univ.OctetString()
+
+        s, r = decoder.decode(
+            bytes(
+                (
+                    48,
+                    16,
+                    2,
+                    1,
+                    2,
+                    4,
+                    11,
+                    113,
+                    117,
+                    105,
+                    99,
+                    107,
+                    32,
+                    98,
+                    114,
+                    111,
+                    119,
+                    110,
+                )
+            ),
+            asn1Spec=self.s,
+            decodeOpenTypes=True,
+        )
+        assert not r
+        assert s[0] == 2
+        assert s[1] == univ.OctetString("quick brown")
 
 
 class SequenceDecoderWithImplicitlyTaggedOpenTypesTestCase(BaseTestCase):

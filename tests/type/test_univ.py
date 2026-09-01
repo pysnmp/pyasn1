@@ -389,42 +389,6 @@ class BitStringTestCase(BaseTestCase):
         assert self.b.clone("Active") == (1,)
         assert self.b.clone("Urgent") == (0, 1)
         assert self.b.clone("Urgent, Active") == (1, 1)
-        assert self.b.clone("'1010100110001010'B") == (
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-        )
-        assert self.b.clone("'A98A'H") == (
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-        )
         assert self.b.clone(binValue="1010100110001010") == (
             1,
             0,
@@ -492,14 +456,6 @@ class BitStringTestCase(BaseTestCase):
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x03)
         )
 
-    def testLen(self):
-        assert len(self.b.clone("'A98A'H")) == 16
-
-    def testGetItem(self):
-        assert self.b.clone("'A98A'H")[0] == 1
-        assert self.b.clone("'A98A'H")[1] == 0
-        assert self.b.clone("'A98A'H")[2] == 1
-
     def testReverse(self):
         assert list(reversed(univ.BitString([0, 0, 1]))) == list(
             univ.BitString([1, 0, 0])
@@ -548,7 +504,6 @@ class BitStringPicklingTestCase(unittest.TestCase):
 
 
 class OctetStringWithUnicodeMixIn:
-
     initializer = ()
     encoding = "us-ascii"
 
@@ -1084,7 +1039,8 @@ class SequenceOf(BaseTestCase):
             s.setComponentByPosition(
                 0,
                 univ.OctetString().subtype(
-                    "abc", subtypeSpec=constraint.SingleValueConstraint(_str2octs("abc"))
+                    "abc",
+                    subtypeSpec=constraint.SingleValueConstraint(_str2octs("abc")),
                 ),
             )
         except PyAsn1Error:
@@ -1268,17 +1224,6 @@ class SequenceOf(BaseTestCase):
         n[0] = univ.OctetString("fox")
 
         assert n.isValue
-
-    def testLegacyInitializer(self):
-        n = univ.SequenceOf(componentType=univ.OctetString())
-        o = univ.SequenceOf(univ.OctetString())  # this is the old way
-
-        assert n.isSameTypeWith(o) and o.isSameTypeWith(n)
-
-        n[0] = "fox"
-        o[0] = "fox"
-
-        assert n == o
 
     def testGetComponentWithDefault(self):
         class SequenceOf(univ.SequenceOf):
@@ -1487,9 +1432,7 @@ class Sequence(BaseTestCase):
             name="a", nick="b", age=1
         ) == self.s1.setComponentByPosition(0, "a").setComponentByPosition(
             1, "b"
-        ).setComponentByPosition(
-            2, 1
-        )
+        ).setComponentByPosition(2, 1)
 
     def testSetToDefault(self):
         s = self.s1.clone()
@@ -1527,7 +1470,6 @@ class Sequence(BaseTestCase):
         s["name"] = "xxx"
 
         try:
-
             s["xxx"] = "xxx"
 
         except KeyError:
@@ -1537,7 +1479,6 @@ class Sequence(BaseTestCase):
             assert False, "KeyError not raised"
 
         try:
-
             s[100] = "xxx"
 
         except IndexError:
@@ -1809,7 +1750,6 @@ class SequenceWithoutSchema(BaseTestCase):
         s["field-0"] = "xxx"
 
         try:
-
             s["field-1"] = "xxx"
 
         except KeyError:
@@ -2197,7 +2137,6 @@ class Choice(BaseTestCase):
         assert c.getName() == "name"
 
     def testGetComponentWithDefault(self):
-
         s = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("name", univ.OctetString()),
@@ -2218,7 +2157,6 @@ class Choice(BaseTestCase):
         assert s.getComponentByPosition(1, default=None, instantiate=False) is None
 
     def testGetComponentNoInstantiation(self):
-
         s = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("name", univ.OctetString()),
