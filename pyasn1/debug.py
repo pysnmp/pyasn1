@@ -6,6 +6,7 @@
 #
 import logging
 import sys
+import threading
 from collections.abc import Callable
 from typing import Any, Final
 
@@ -29,6 +30,14 @@ LOGGEE_MAP: Final[dict[Any, tuple[str, int]]] = {}
 
 
 class Printer:
+    """Emit pyasn1 debug records through :mod:`logging`.
+
+    Only the library's own ``pyasn1`` logger is configured here: it gets a
+    level and a handler. A logger supplied by the caller is left exactly as
+    found -- no level change, and no handler unless the caller passed one --
+    because that logger belongs to the application, not to pyasn1.
+    """
+
     # noinspection PyShadowingNames
     def __init__(
         self,
@@ -38,18 +47,18 @@ class Printer:
     ) -> None:
         if logger is None:
             logger = logging.getLogger("pyasn1")
+            logger.setLevel(logging.DEBUG)
 
-        logger.setLevel(logging.DEBUG)
+            if handler is None:
+                handler = logging.StreamHandler()
 
-        if handler is None:
-            handler = logging.StreamHandler()
+        if handler is not None:
+            if formatter is None:
+                formatter = logging.Formatter("%(asctime)s %(name)s: %(message)s")
 
-        if formatter is None:
-            formatter = logging.Formatter("%(asctime)s %(name)s: %(message)s")
-
-        handler.setFormatter(formatter)
-        handler.setLevel(logging.DEBUG)
-        logger.addHandler(handler)
+            handler.setFormatter(formatter)
+            handler.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
 
         self.__logger = logger
 
@@ -62,9 +71,14 @@ class Printer:
 
 NullHandler: Final = logging.NullHandler
 
+_defaultPrinterLock: Final = threading.Lock()
+
 
 class Debug:
-    defaultPrinter = Printer()
+    #: Printer shared by all :class:`Debug` instances that were not given one.
+    #: Built on first use, never at import time, so that merely importing
+    #: pyasn1 never attaches a handler to anybody's logger.
+    defaultPrinter: "Printer | None" = None
 
     _printer: Callable[[str], None]
 
@@ -72,16 +86,22 @@ class Debug:
         self._flags = DEBUG_NONE
 
         if "loggerName" in options:
-            # route our logs to parent logger
-            self._printer = Printer(
-                logger=logging.getLogger(options["loggerName"]), handler=NullHandler()
-            )
+            # Route our records to the caller's logger and let them propagate.
+            # No handler is attached: the logger is the application's, and
+            # every construction would otherwise add another one to it.
+            self._printer = Printer(logger=logging.getLogger(options["loggerName"]))
 
         elif "printer" in options:
             self._printer = options["printer"]
 
         else:
-            self._printer = self.defaultPrinter
+            # Building a Printer attaches a handler, so two threads racing
+            # through first use would attach two and double every record.
+            with _defaultPrinterLock:
+                if Debug.defaultPrinter is None:
+                    Debug.defaultPrinter = Printer()
+
+            self._printer = Debug.defaultPrinter
 
         self._printer(
             "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))
