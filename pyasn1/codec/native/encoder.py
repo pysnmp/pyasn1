@@ -4,6 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import logging
 from collections.abc import Callable
 from typing import Any, Final
 
@@ -12,7 +13,7 @@ from pyasn1.type import base, char, tag, univ, useful
 
 __all__ = ["encode"]
 
-LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
+LOG = logging.getLogger(__name__)
 
 
 class AbstractItemEncoder:
@@ -182,11 +183,12 @@ class Encoder:
                 "value is not valid (should be an instance of an ASN.1 Item)"
             )
 
-        if LOG:
+        if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(value).__name__)
-            LOG(
-                "encoder called for type %s <%s>"
-                % (type(value).__name__, value.prettyPrint())
+            LOG.debug(
+                "encoder called for type %s <%s>",
+                type(value).__name__,
+                value.prettyPrint(),
             )
 
         tagSet = value.tagSet
@@ -204,18 +206,20 @@ class Encoder:
             except KeyError as exc:
                 raise error.PyAsn1Error("No encoder for %s" % (value,)) from exc
 
-        if LOG:
-            LOG(
-                "using value codec %s chosen by %s"
-                % (concreteEncoder.__class__.__name__, tagSet)
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "using value codec %s chosen by %s",
+                concreteEncoder.__class__.__name__,
+                tagSet,
             )
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
-        if LOG:
-            LOG(
-                "encoder %s produced: %s"
-                % (type(concreteEncoder).__name__, repr(pyObject))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "encoder %s produced: %s",
+                type(concreteEncoder).__name__,
+                repr(pyObject),
             )
             debug.scope.pop()
 
