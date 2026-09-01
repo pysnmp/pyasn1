@@ -29,6 +29,13 @@ LOGGEE_MAP: Final[dict[Any, tuple[str, int]]] = {}
 
 
 class Printer:
+    """Emit pyasn1 debug records through :mod:`logging`.
+
+    Only the library's own ``pyasn1`` logger is configured here. A logger
+    supplied by the caller keeps its level and propagation untouched, because
+    that logger belongs to the application, not to pyasn1.
+    """
+
     # noinspection PyShadowingNames
     def __init__(
         self,
@@ -38,18 +45,18 @@ class Printer:
     ) -> None:
         if logger is None:
             logger = logging.getLogger("pyasn1")
+            logger.setLevel(logging.DEBUG)
 
-        logger.setLevel(logging.DEBUG)
+            if handler is None:
+                handler = logging.StreamHandler()
 
-        if handler is None:
-            handler = logging.StreamHandler()
+        if handler is not None:
+            if formatter is None:
+                formatter = logging.Formatter("%(asctime)s %(name)s: %(message)s")
 
-        if formatter is None:
-            formatter = logging.Formatter("%(asctime)s %(name)s: %(message)s")
-
-        handler.setFormatter(formatter)
-        handler.setLevel(logging.DEBUG)
-        logger.addHandler(handler)
+            handler.setFormatter(formatter)
+            handler.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
 
         self.__logger = logger
 
@@ -64,7 +71,10 @@ NullHandler: Final = logging.NullHandler
 
 
 class Debug:
-    defaultPrinter = Printer()
+    #: Printer shared by all :class:`Debug` instances that were not given one.
+    #: Built on first use, never at import time, so that merely importing
+    #: pyasn1 never attaches a handler to anybody's logger.
+    defaultPrinter: "Printer | None" = None
 
     _printer: Callable[[str], None]
 
@@ -81,7 +91,10 @@ class Debug:
             self._printer = options["printer"]
 
         else:
-            self._printer = self.defaultPrinter
+            if Debug.defaultPrinter is None:
+                Debug.defaultPrinter = Printer()
+
+            self._printer = Debug.defaultPrinter
 
         self._printer(
             "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))

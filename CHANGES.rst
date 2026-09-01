@@ -2,6 +2,21 @@
 unreleased
 ---------------------------------
 
+- Importing pyasn1 no longer configures logging for the importing application.
+  Previously ``pyasn1.debug`` built its default ``Printer`` at class-definition
+  time, so merely importing any codec attached a ``StreamHandler`` writing to
+  stderr on the ``pyasn1`` logger and forced that logger to ``DEBUG``. The
+  handler is now built on first use of ``debug.Debug()``, and the package
+  installs only a ``logging.NullHandler``, per the standard library's guidance
+  for libraries.
+- ``debug.Debug(..., loggerName=...)`` no longer overrides the level of the
+  application logger it is pointed at. pyasn1 configures only the ``pyasn1``
+  logger it owns; a logger supplied by the caller keeps its level and handlers.
+- Added a regression test asserting that every failure escaping the BER, CER
+  and DER decoders derives from ``PyAsn1Error``, so ``except PyAsn1Error`` is
+  sufficient to contain decoding of hostile input.
+- Documented the debugging procedure under :ref:`pyasn1-debugging`.
+
 - Replaced hand-rolled internal type wrappers with Python standard
   library base types to reduce boilerplate code
 - Removed legacy type accessors, aliases, deprecated BIT STRING notation,
