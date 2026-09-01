@@ -82,12 +82,6 @@ class NamedTypeStdlibIntegrationTestCase(BaseTestCase):
         assert nt.isDefaulted is True
         assert nt.isOptional is False
 
-    def testGetNameLegacy(self):
-        assert self.nt.getName() == "age"
-
-    def testGetTypeLegacy(self):
-        assert self.nt.getType() == univ.Integer(0)
-
     def testAsDictKey(self):
         d = {self.nt: "value"}
         assert d[self.nt] == "value"

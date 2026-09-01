@@ -87,14 +87,3 @@ class TagMap:
     def defaultType(self):
         """Return default ASN.1 type being returned for any missing *TagSet*"""
         return self.__defaultType
-
-    # Backward compatibility
-
-    def getPosMap(self):
-        return self.presentTypes
-
-    def getNegMap(self):
-        return self.skipTypes
-
-    def getDef(self):
-        return self.defaultType

@@ -147,22 +147,3 @@ class NamedValues(dict):
     def clone(self, *args, **kwargs):
         new = self.__class__(*args, **kwargs)
         return self + new
-
-    # legacy protocol
-
-    def getName(self, value):
-        if value in self._numbers:
-            return self._numbers[value]
-
-    def getValue(self, name):
-        if name in self:
-            return self[name]
-
-    def getValues(self, *names):
-        try:
-            return [self[name] for name in names]
-
-        except KeyError:
-            raise error.PyAsn1Error(
-                "Unknown bit identifier(s): %s" % (set(names).difference(self),)
-            )

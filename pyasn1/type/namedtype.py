@@ -87,15 +87,6 @@ class NamedType(_NamedTypeBase):
     def __hash__(self):
         return hash((self.name, self.asn1Object))
 
-    # Backward compatibility
-
-    def getName(self):
-        return self.name
-
-    def getType(self):
-        return self.asn1Object
-
-
 class OptionalNamedType(NamedType):
     __doc__ = NamedType.__doc__
 

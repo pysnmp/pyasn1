@@ -269,12 +269,6 @@ class Integer(base.SimpleAsn1Type):
         except KeyError:
             return str(value)
 
-    # backward compatibility
-
-    def getNamedValues(self):
-        return self.namedValues
-
-
 class Boolean(Integer):
     """Create |ASN.1| schema or value object.
 
@@ -694,18 +688,6 @@ class BitString(base.SimpleAsn1Type):
         elif isinstance(value, str):
             if not value:
                 return SizedInteger(0).setBitLength(0)
-
-            elif (
-                value[0] == "'"
-            ):  # "'1011'B" -- ASN.1 schema representation (deprecated)
-                if value[-2:] == "'B":
-                    return self.fromBinaryString(value[1:-2], internalFormat=True)
-                elif value[-2:] == "'H":
-                    return self.fromHexString(value[1:-2], internalFormat=True)
-                else:
-                    raise error.PyAsn1Error(
-                        "Bad BIT STRING value notation %s" % (value,)
-                    )
 
             elif (
                 self.namedValues and not value.isdigit()
@@ -1486,18 +1468,6 @@ class Real(base.SimpleAsn1Type):
         else:
             return self._value[idx]
 
-    # compatibility stubs
-
-    def isPlusInfinity(self):
-        return self.isPlusInf
-
-    def isMinusInfinity(self):
-        return self.isMinusInf
-
-    def isInfinity(self):
-        return self.isInf
-
-
 class Enumerated(Integer):
     """Create |ASN.1| schema or value object.
 
@@ -1605,16 +1575,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         lotteryDraw.extend([123, 456, 789])
     """
 
-    def __init__(self, *args, **kwargs):
-        # support positional params for backward compatibility
-        if args:
-            for key, value in zip(("componentType", "tagSet", "subtypeSpec"), args):
-                if key in kwargs:
-                    raise error.PyAsn1Error(
-                        "Conflicting positional and keyword params!"
-                    )
-                kwargs["componentType"] = value
-
+    def __init__(self, **kwargs):
         self._componentValues = noValue
 
         base.ConstructedAsn1Type.__init__(self, **kwargs)
@@ -2740,15 +2701,6 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             )
         return representation + "\n" + " " * (scope - 1) + "}"
 
-    # backward compatibility
-
-    def setDefaultComponents(self):
-        return self
-
-    def getComponentType(self):
-        if self._componentTypeLen:
-            return self.componentType
-
     def getNameByPosition(self, idx):
         if self._componentTypeLen:
             return self.componentType[idx].name
@@ -2775,19 +2727,6 @@ class Sequence(SequenceAndSetBase):
 
     # Disambiguation ASN.1 types identification
     typeId = SequenceAndSetBase.getTypeId()
-
-    # backward compatibility
-
-    def getComponentTagMapNearPosition(self, idx):
-        if self.componentType:
-            return self.componentType.getTagMapNearPosition(idx)
-
-    def getComponentPositionNearType(self, tagSet, idx):
-        if self.componentType:
-            return self.componentType.getPositionNearType(tagSet, idx)
-        else:
-            return idx
-
 
 class Set(SequenceAndSetBase):
     __doc__ = SequenceAndSetBase.__doc__
@@ -3030,12 +2969,12 @@ class Choice(Set):
     def __contains__(self, key):
         if self._currentIdx is None:
             return False
-        return key == self.componentType[self._currentIdx].getName()
+        return key == self.componentType[self._currentIdx].name
 
     def __iter__(self):
         if self._currentIdx is None:
             raise StopIteration
-        yield self.componentType[self._currentIdx].getName()
+        yield self.componentType[self._currentIdx].name
 
     # Python dict protocol
 
@@ -3045,11 +2984,11 @@ class Choice(Set):
 
     def keys(self):
         if self._currentIdx is not None:
-            yield self.componentType[self._currentIdx].getName()
+            yield self.componentType[self._currentIdx].name
 
     def items(self):
         if self._currentIdx is not None:
-            yield self.componentType[self._currentIdx].getName(), self[self._currentIdx]
+            yield self.componentType[self._currentIdx].name, self[self._currentIdx]
 
     def checkConsistency(self):
         if self._currentIdx is None:
@@ -3222,12 +3161,6 @@ class Choice(Set):
     def clear(self):
         self._currentIdx = None
         return Set.clear(self)
-
-    # compatibility stubs
-
-    def getMinTagSet(self):
-        return self.minTagSet
-
 
 class Any(OctetString):
     """Create |ASN.1| schema or value object.

@@ -389,42 +389,6 @@ class BitStringTestCase(BaseTestCase):
         assert self.b.clone("Active") == (1,)
         assert self.b.clone("Urgent") == (0, 1)
         assert self.b.clone("Urgent, Active") == (1, 1)
-        assert self.b.clone("'1010100110001010'B") == (
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-        )
-        assert self.b.clone("'A98A'H") == (
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-        )
         assert self.b.clone(binValue="1010100110001010") == (
             1,
             0,
@@ -491,14 +455,6 @@ class BitStringTestCase(BaseTestCase):
         assert univ.BitString().tagSet == tag.TagSet(
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x03)
         )
-
-    def testLen(self):
-        assert len(self.b.clone("'A98A'H")) == 16
-
-    def testGetItem(self):
-        assert self.b.clone("'A98A'H")[0] == 1
-        assert self.b.clone("'A98A'H")[1] == 0
-        assert self.b.clone("'A98A'H")[2] == 1
 
     def testReverse(self):
         assert list(reversed(univ.BitString([0, 0, 1]))) == list(
@@ -1268,17 +1224,6 @@ class SequenceOf(BaseTestCase):
         n[0] = univ.OctetString("fox")
 
         assert n.isValue
-
-    def testLegacyInitializer(self):
-        n = univ.SequenceOf(componentType=univ.OctetString())
-        o = univ.SequenceOf(univ.OctetString())  # this is the old way
-
-        assert n.isSameTypeWith(o) and o.isSameTypeWith(n)
-
-        n[0] = "fox"
-        o[0] = "fox"
-
-        assert n == o
 
     def testGetComponentWithDefault(self):
         class SequenceOf(univ.SequenceOf):

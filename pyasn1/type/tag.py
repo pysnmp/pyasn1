@@ -288,11 +288,5 @@ class TagSet:
             return False
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
 
-    # Backward compatibility
-
-    def getBaseTag(self):
-        return self.__baseTag
-
-
 def initTagSet(tag):
     return TagSet(tag, tag)

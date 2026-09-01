@@ -123,31 +123,6 @@ class NamedValuesStdlibIntegrationTestCase(BaseTestCase):
         cloned = nv.clone(("on", 1))
         assert cloned == {"off": 0, "on": 1}
 
-    def testGetNameLegacy(self):
-        nv = namedval.NamedValues(("off", 0), ("on", 1))
-        assert nv.getName(0) == "off"
-        assert nv.getName(1) == "on"
-        assert nv.getName(99) is None
-
-    def testGetValueLegacy(self):
-        nv = namedval.NamedValues(("off", 0), ("on", 1))
-        assert nv.getValue("off") == 0
-        assert nv.getValue("on") == 1
-
-    def testGetValuesLegacy(self):
-        nv = namedval.NamedValues(("off", 0), ("on", 1))
-        assert nv.getValues("off", "on") == [0, 1]
-
-    def testGetValuesUnknownRaises(self):
-        from pyasn1.error import PyAsn1Error
-
-        nv = namedval.NamedValues(("off", 0), ("on", 1))
-        try:
-            nv.getValues("off", "missing")
-            assert False, "unknown name should raise"
-        except PyAsn1Error:
-            pass
-
     def testDuplicateNameRaises(self):
         from pyasn1.error import PyAsn1Error
 
