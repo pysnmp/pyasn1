@@ -105,6 +105,10 @@ module = [
     "pyasn1.error",
     "pyasn1.codec.*",
     "pyasn1.type.char",
+    "pyasn1.type.constraint",
+    "pyasn1.type.namedval",
+    "pyasn1.type.opentype",
+    "pyasn1.type.tag",
     "pyasn1.type.tagmap",
     "pyasn1.type.useful",
 ]
