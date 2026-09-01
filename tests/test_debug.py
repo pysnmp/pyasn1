@@ -114,24 +114,49 @@ class StdlibLoggingCaseBase(unittest.TestCase):
             % (self.collector.records,)
         )
 
-    def testRecordsKeepTheirFormatArguments(self):
-        """The point of lazy arguments: ``msg`` stays a template.
+    def testMessagesAreInvariant(self):
+        """``msg`` identifies the call site and nothing else.
 
-        A record whose message was pre-rendered cannot be grouped by call
-        site downstream, which is what structured handlers key on.
+        A message carrying interpolated values cannot be grouped by call site
+        downstream, which is what structured handlers key on. Every varying
+        value belongs in ``extra`` instead, so no record should arrive with
+        positional arguments or a placeholder left in its message.
         """
         self.logger.setLevel(logging.DEBUG)
         roundTrip()
 
-        parameterised = [r for r in self.collector.records if r.args]
+        assert self.collector.records, "nothing emitted"
 
-        assert parameterised, "no record carried deferred arguments"
-
-        for record in parameterised:
-            assert "%" in record.msg, "record has args but no placeholders: %r" % (
+        for record in self.collector.records:
+            assert not record.args, "record carries positional args: %r" % (record.msg,)
+            assert "%" not in record.msg, "record message interpolates: %r" % (
                 record.msg,
             )
-            record.getMessage()
+
+    def testRecordsCarryTheirContextAsFields(self):
+        """The values dropped from the messages have to be on the records."""
+        self.logger.setLevel(logging.DEBUG)
+        roundTrip()
+
+        fields = {
+            key
+            for record in self.collector.records
+            for key in vars(record)
+            if key not in debug._RECORD_ATTRS
+        }
+
+        assert "tagSet" in fields, sorted(fields)
+        assert "substrate" in fields, sorted(fields)
+
+    def testContextIsRenderedIntoTextOutput(self):
+        """Plain-text output must not lose what left the messages."""
+        self.logger.setLevel(logging.DEBUG)
+        roundTrip()
+
+        formatter = debug.ContextFormatter("%(message)s")
+        rendered = [formatter.format(r) for r in self.collector.records]
+
+        assert any("tagSet=" in text for text in rendered), rendered[:5]
 
 
 class LegacyDebugCaseBase(unittest.TestCase):
