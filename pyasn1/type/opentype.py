@@ -11,7 +11,7 @@ from typing import Any
 __all__ = ["OpenType"]
 
 
-class OpenType(dict):
+class OpenType(dict[Any, Any]):
     """Create ASN.1 type map indexed by a value
 
     The *OpenType* object models an untyped field of a constructed ASN.1

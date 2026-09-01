@@ -168,8 +168,8 @@ class ContainedSubtypeConstraint(AbstractConstraint):
     """Create a ContainedSubtypeConstraint object.
 
     The ContainedSubtypeConstraint satisfies any value that
-    is present in the set of permitted values and also
-    satisfies included constraints.
+    either equals one of the permitted values or satisfies
+    one of the included constraints.
 
     The ContainedSubtypeConstraint object can be applied to
     any ASN.1 type.
@@ -202,16 +202,22 @@ class ContainedSubtypeConstraint(AbstractConstraint):
     """
 
     def _testValue(self, value: Any, idx: Any) -> None:
+        # ASN.1 INCLUDES combines its operands as a union, so the value only
+        # has to match one of them.
         for constraint in self._values:
             if isinstance(constraint, AbstractConstraint):
-                constraint(value, idx)
-            # FIXME: _set is defined by SingleValueConstraint, not by this
-            # class, so this branch raises AttributeError instead of
-            # validating. Reaching it requires a non-constraint value in
-            # *values. Behaviour preserved pending a decision on the
-            # intended any-of vs all-of semantics.
-            elif value not in self._set:  # type: ignore[attr-defined]
-                raise error.ValueConstraintError(value)
+                try:
+                    constraint(value, idx)
+
+                except error.ValueConstraintError:
+                    continue
+
+                return
+
+            elif value == constraint:
+                return
+
+        raise error.ValueConstraintError(value)
 
 
 class ValueRangeConstraint(AbstractConstraint):

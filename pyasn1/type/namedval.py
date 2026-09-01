@@ -14,7 +14,7 @@ from pyasn1 import error
 __all__ = ["NamedValues"]
 
 
-class NamedValues(dict):
+class NamedValues(dict[Any, Any]):
     """Create named values object.
 
     The |NamedValues| object represents a collection of string names

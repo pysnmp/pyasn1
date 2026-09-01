@@ -6,6 +6,8 @@
 #
 from pyasn1.error import PyAsn1Error
 
+__all__ = ["PyAsn1Error", "ValueConstraintError"]
+
 
 class ValueConstraintError(PyAsn1Error):
     pass
