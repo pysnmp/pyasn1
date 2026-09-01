@@ -5,7 +5,6 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import math
-import sys
 
 from pyasn1 import error
 from pyasn1.codec.ber import eoo
@@ -17,7 +16,7 @@ def _int_to_bytes(value, signed=False, length=0):
     length = max(value.bit_length(), length)
     if signed and length % 8 == 0:
         length += 1
-    return value.to_bytes(length // 8 + (length % 8 and 1 or 0), "big", signed=signed)
+    return value.to_bytes((length + 7) // 8, "big", signed=signed)
 
 
 NoValue = base.NoValue
@@ -258,10 +257,10 @@ class Integer(base.SimpleAsn1Type):
             try:
                 return self.namedValues[value]
 
-            except KeyError:
+            except KeyError as exc:
                 raise error.PyAsn1Error(
-                    "Can't coerce %r into integer: %s" % (value, sys.exc_info()[1])
-                )
+                    "Can't coerce %r into integer: %s" % (value, exc)
+                ) from exc
 
     def prettyOut(self, value):
         try:
@@ -619,10 +618,10 @@ class BitString(base.SimpleAsn1Type):
         try:
             value = SizedInteger(value, 16).setBitLength(len(value) * 4)
 
-        except ValueError:
+        except ValueError as exc:
             raise error.PyAsn1Error(
-                "%s.fromHexString() error: %s" % (cls.__name__, sys.exc_info()[1])
-            )
+                "%s.fromHexString() error: %s" % (cls.__name__, exc)
+            ) from exc
 
         if prepend is not None:
             value = SizedInteger(
@@ -646,10 +645,10 @@ class BitString(base.SimpleAsn1Type):
         try:
             value = SizedInteger(value or "0", 2).setBitLength(len(value))
 
-        except ValueError:
+        except ValueError as exc:
             raise error.PyAsn1Error(
-                "%s.fromBinaryString() error: %s" % (cls.__name__, sys.exc_info()[1])
-            )
+                "%s.fromBinaryString() error: %s" % (cls.__name__, exc)
+            ) from exc
 
         if prepend is not None:
             value = SizedInteger(
@@ -699,8 +698,10 @@ class BitString(base.SimpleAsn1Type):
                 try:
                     bitPositions = [self.namedValues[name] for name in names]
 
-                except KeyError:
-                    raise error.PyAsn1Error("unknown bit name(s) in %r" % (names,))
+                except KeyError as exc:
+                    raise error.PyAsn1Error(
+                        "unknown bit name(s) in %r" % (names,)
+                    ) from exc
 
                 rightmostPosition = max(bitPositions)
 
@@ -721,7 +722,7 @@ class BitString(base.SimpleAsn1Type):
 
         elif isinstance(value, tuple | list):
             return self.fromBinaryString(
-                "".join([b and "1" or "0" for b in value]), internalFormat=True
+                "".join(["1" if b else "0" for b in value]), internalFormat=True
             )
 
         elif isinstance(value, BitString):
@@ -843,12 +844,11 @@ class OctetString(base.SimpleAsn1Type):
             try:
                 return value.encode(self.encoding)
 
-            except UnicodeEncodeError:
-                exc = sys.exc_info()[1]
+            except UnicodeEncodeError as exc:
                 raise error.PyAsn1UnicodeEncodeError(
                     "Can't encode string '%s' with '%s' codec" % (value, self.encoding),
                     exc,
-                )
+                ) from exc
         elif isinstance(
             value, OctetString
         ):  # a shortcut, bytes() would work the same way
@@ -869,13 +869,12 @@ class OctetString(base.SimpleAsn1Type):
         try:
             return self._value.decode(self.encoding)
 
-        except UnicodeDecodeError:
-            exc = sys.exc_info()[1]
+        except UnicodeDecodeError as exc:
             raise error.PyAsn1UnicodeDecodeError(
                 "Can't decode string '%s' with '%s' codec at "
                 "'%s'" % (self._value, self.encoding, self.__class__.__name__),
                 exc,
-            )
+            ) from exc
 
     def __bytes__(self):
         return bytes(self._value)
@@ -1181,25 +1180,24 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         elif isinstance(value, str):
             if "-" in value:
                 raise error.PyAsn1Error(
-                    "Malformed Object ID %s at %s: %s"
-                    % (value, self.__class__.__name__, sys.exc_info()[1])
+                    "Malformed Object ID %s at %s" % (value, self.__class__.__name__)
                 )
             try:
                 return tuple([int(subOid) for subOid in value.split(".") if subOid])
-            except ValueError:
+            except ValueError as exc:
                 raise error.PyAsn1Error(
                     "Malformed Object ID %s at %s: %s"
-                    % (value, self.__class__.__name__, sys.exc_info()[1])
-                )
+                    % (value, self.__class__.__name__, exc)
+                ) from exc
 
         try:
             tupleOfInts = tuple([int(subOid) for subOid in value if subOid >= 0])
 
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as exc:
             raise error.PyAsn1Error(
                 "Malformed Object ID %s at %s: %s"
-                % (value, self.__class__.__name__, sys.exc_info()[1])
-            )
+                % (value, self.__class__.__name__, exc)
+            ) from exc
 
         if len(tupleOfInts) == len(value):
             return tupleOfInts
@@ -1312,8 +1310,10 @@ class Real(base.SimpleAsn1Type):
             if isinstance(value, str):
                 try:
                     value = float(value)
-                except ValueError:
-                    raise error.PyAsn1Error("Bad real value syntax: %s" % (value,))
+                except ValueError as exc:
+                    raise error.PyAsn1Error(
+                        "Bad real value syntax: %s" % (value,)
+                    ) from exc
             if self._inf and value in self._inf:
                 return value
             else:
@@ -1586,15 +1586,15 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         try:
             return self.getComponentByPosition(idx)
 
-        except error.PyAsn1Error:
-            raise IndexError(sys.exc_info()[1])
+        except error.PyAsn1Error as exc:
+            raise IndexError(exc) from exc
 
     def __setitem__(self, idx, value):
         try:
             self.setComponentByPosition(idx, value)
 
-        except error.PyAsn1Error:
-            raise IndexError(sys.exc_info()[1])
+        except error.PyAsn1Error as exc:
+            raise IndexError(exc) from exc
 
     def append(self, value):
         if self._componentValues is noValue:
@@ -1627,8 +1627,8 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         try:
             return indices[values.index(value, start, stop)]
 
-        except error.PyAsn1Error:
-            raise ValueError(sys.exc_info()[1])
+        except error.PyAsn1Error as exc:
+            raise ValueError(exc) from exc
 
     def reverse(self):
         self._componentValues.reverse()
@@ -1802,7 +1802,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         """
         if isinstance(idx, slice):
             indices = tuple(range(len(self)))
-            startIdx = indices and indices[idx][0] or 0
+            startIdx = indices[idx][0] if indices else 0
             for subIdx, subValue in enumerate(value):
                 self.setComponentByPosition(
                     startIdx + subIdx,
@@ -1998,8 +1998,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             # Represent SequenceOf/SetOf as a bare dict to constraints chain
             self.subtypeSpec(mapping)
 
-        except error.PyAsn1Error:
-            exc = sys.exc_info()[1]
+        except error.PyAsn1Error as exc:
             return exc
 
         return False
@@ -2127,15 +2126,15 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             try:
                 return self._idxToKeyMap[idx]
 
-            except KeyError:
-                raise error.PyAsn1Error("Type position out of range")
+            except KeyError as exc:
+                raise error.PyAsn1Error("Type position out of range") from exc
 
         def getPositionByName(self, name):
             try:
                 return self._keyToIdxMap[name]
 
-            except KeyError:
-                raise error.PyAsn1Error("Name %s not found" % (name,))
+            except KeyError as exc:
+                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
         def addField(self, idx):
             self._keyToIdxMap["field-%d" % idx] = idx
@@ -2155,34 +2154,34 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             try:
                 return self.getComponentByName(idx)
 
-            except error.PyAsn1Error:
+            except error.PyAsn1Error as exc:
                 # duck-typing dict
-                raise KeyError(sys.exc_info()[1])
+                raise KeyError(exc) from exc
 
         else:
             try:
                 return self.getComponentByPosition(idx)
 
-            except error.PyAsn1Error:
+            except error.PyAsn1Error as exc:
                 # duck-typing list
-                raise IndexError(sys.exc_info()[1])
+                raise IndexError(exc) from exc
 
     def __setitem__(self, idx, value):
         if isinstance(idx, str):
             try:
                 self.setComponentByName(idx, value)
 
-            except error.PyAsn1Error:
+            except error.PyAsn1Error as exc:
                 # duck-typing dict
-                raise KeyError(sys.exc_info()[1])
+                raise KeyError(exc) from exc
 
         else:
             try:
                 self.setComponentByPosition(idx, value)
 
-            except error.PyAsn1Error:
+            except error.PyAsn1Error as exc:
                 # duck-typing list
-                raise IndexError(sys.exc_info()[1])
+                raise IndexError(exc) from exc
 
     def __contains__(self, key):
         if self._componentTypeLen:
@@ -2289,8 +2288,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             try:
                 idx = self._dynamicNames.getPositionByName(name)
 
-            except KeyError:
-                raise error.PyAsn1Error("Name %s not found" % (name,))
+            except KeyError as exc:
+                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
         return self.getComponentByPosition(
             idx, default=default, instantiate=instantiate
@@ -2339,8 +2338,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             try:
                 idx = self._dynamicNames.getPositionByName(name)
 
-            except KeyError:
-                raise error.PyAsn1Error("Name %s not found" % (name,))
+            except KeyError as exc:
+                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
         return self.setComponentByPosition(
             idx, value, verifyConstraints, matchTags, matchConstraints
@@ -2492,11 +2491,11 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         try:
             currentValue = componentValues[idx]
 
-        except IndexError:
+        except IndexError as exc:
             currentValue = noValue
             if componentTypeLen:
                 if componentTypeLen < idx:
-                    raise error.PyAsn1Error("component index out of range")
+                    raise error.PyAsn1Error("component index out of range") from exc
 
                 componentValues = [noValue] * componentTypeLen
 
@@ -2655,8 +2654,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             # Represent Sequence/Set as a bare dict to constraints chain
             self.subtypeSpec(mapping)
 
-        except error.PyAsn1Error:
-            exc = sys.exc_info()[1]
+        except error.PyAsn1Error as exc:
             return exc
 
         return False
@@ -2962,10 +2960,10 @@ class Choice(Set):
         return NotImplemented
 
     def __bool__(self):
-        return self._componentValues and True or False
+        return bool(self._componentValues)
 
     def __len__(self):
-        return self._currentIdx is not None and 1 or 0
+        return int(self._currentIdx is not None)
 
     def __contains__(self, key):
         if self._currentIdx is None:

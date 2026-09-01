@@ -158,8 +158,10 @@ class Decoder:
 
             try:
                 valueDecoder = self.__tagMap[baseTagSet]
-            except KeyError:
-                raise error.PyAsn1Error("Unknown ASN.1 tag %s" % asn1Spec.tagSet)
+            except KeyError as exc:
+                raise error.PyAsn1Error(
+                    "Unknown ASN.1 tag %s" % asn1Spec.tagSet
+                ) from exc
 
         if LOG:
             LOG(

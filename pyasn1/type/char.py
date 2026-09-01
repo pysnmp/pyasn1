@@ -4,8 +4,6 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
-
 from pyasn1 import error
 from pyasn1.type import tag, univ
 
@@ -70,12 +68,11 @@ class AbstractCharacterString(univ.OctetString):
     def __bytes__(self):
         try:
             return self._value.encode(self.encoding)
-        except UnicodeEncodeError:
-            exc = sys.exc_info()[1]
+        except UnicodeEncodeError as exc:
             raise error.PyAsn1UnicodeEncodeError(
                 "Can't encode string '%s' with codec %s" % (self._value, self.encoding),
                 exc,
-            )
+            ) from exc
 
     def prettyIn(self, value):
         try:
@@ -90,12 +87,11 @@ class AbstractCharacterString(univ.OctetString):
             else:
                 return str(value)
 
-        except (UnicodeDecodeError, LookupError):
-            exc = sys.exc_info()[1]
+        except (UnicodeDecodeError, LookupError) as exc:
             raise error.PyAsn1UnicodeDecodeError(
                 "Can't decode string '%s' with codec %s" % (value, self.encoding),
                 exc,
-            )
+            ) from exc
 
     def asOctets(self, padding=True):
         return bytes(self)

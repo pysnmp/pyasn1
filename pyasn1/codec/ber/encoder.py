@@ -4,8 +4,6 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
-
 from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.type import char, tag, univ, useful
@@ -16,18 +14,7 @@ def _int_to_bytes(value, signed=False, length=0):
     length = max(value.bit_length(), length)
     if signed and length % 8 == 0:
         length += 1
-    return value.to_bytes(length // 8 + (length % 8 and 1 or 0), "big", signed=signed)
-
-
-def _int2oct(x):
-    return bytes((x,))
-
-
-_null = b""
-
-
-def _str2octs(s):
-    return s.encode("iso-8859-1")
+    return value.to_bytes((length + 7) // 8, "big", signed=signed)
 
 
 __all__ = ["encode"]
@@ -101,7 +88,7 @@ class AbstractItemEncoder:
 
         defMode = options.get("defMode", True)
 
-        substrate = _null
+        substrate = b""
 
         for idx, singleTag in enumerate(tagSet.superTags):
             defModeOverride = defMode
@@ -113,14 +100,15 @@ class AbstractItemEncoder:
                         value, asn1Spec, encodeFun, **options
                     )
 
-                except error.PyAsn1Error:
-                    exc = sys.exc_info()
-                    raise error.PyAsn1Error("Error encoding %r: %s" % (value, exc[1]))
+                except error.PyAsn1Error as exc:
+                    raise error.PyAsn1Error(
+                        "Error encoding %r: %s" % (value, exc)
+                    ) from exc
 
                 if LOG:
                     LOG(
                         "encoded %svalue %s into %s"
-                        % (isConstructed and "constructed " or "", value, substrate)
+                        % ("constructed " if isConstructed else "", value, substrate)
                     )
 
                 if not substrate and isConstructed and options.get("ifNotEmpty", False):
@@ -140,7 +128,7 @@ class AbstractItemEncoder:
                 LOG(
                     "encoded %stag %s into %s"
                     % (
-                        isConstructed and "constructed " or "",
+                        "constructed " if isConstructed else "",
                         singleTag,
                         debug.hexdump(bytes(header)),
                     )
@@ -174,14 +162,14 @@ class AbstractItemEncoder:
 
 class EndOfOctetsEncoder(AbstractItemEncoder):
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-        return _null, False, True
+        return b"", False, True
 
 
 class BooleanEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-        return value and (1,) or (0,), False, False
+        return (1,) if value else (0,), False, False
 
 
 class IntegerEncoder(AbstractItemEncoder):
@@ -193,7 +181,7 @@ class IntegerEncoder(AbstractItemEncoder):
             if LOG:
                 LOG(
                     "encoding %spayload for zero INTEGER"
-                    % (self.supportCompactZero and "no " or "")
+                    % ("no " if self.supportCompactZero else "")
                 )
 
             # de-facto way to encode zero
@@ -220,7 +208,7 @@ class BitStringEncoder(AbstractItemEncoder):
         maxChunkSize = options.get("maxChunkSize", 0)
         if not maxChunkSize or len(alignedValue) <= maxChunkSize * 8:
             substrate = alignedValue.asOctets()
-            return _int2oct(len(substrate) * 8 - valueLength) + substrate, False, True
+            return bytes((len(substrate) * 8 - valueLength,)) + substrate, False, True
 
         if LOG:
             LOG("encoding into up to %s-octet chunks" % maxChunkSize)
@@ -237,7 +225,7 @@ class BitStringEncoder(AbstractItemEncoder):
         alignedValue = alignedValue.clone(tagSet=tagSet)
 
         stop = 0
-        substrate = _null
+        substrate = b""
         while stop < valueLength:
             start = stop
             stop = min(start + maxChunkSize * 8, valueLength)
@@ -292,7 +280,7 @@ class OctetStringEncoder(AbstractItemEncoder):
             asn1Spec = asn1Spec.clone(tagSet=tagSet)
 
         pos = 0
-        substrate = _null
+        substrate = b""
 
         while True:
             chunk = value[pos : pos + maxChunkSize]
@@ -309,7 +297,7 @@ class NullEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-        return _null, False, True
+        return b"", False, True
 
 
 class ObjectIdentifierEncoder(AbstractItemEncoder):
@@ -326,8 +314,8 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             first = oid[0]
             second = oid[1]
 
-        except IndexError:
-            raise error.PyAsn1Error("Short OID %s" % (value,))
+        except IndexError as exc:
+            raise error.PyAsn1Error("Short OID %s" % (value,)) from exc
 
         if 0 <= second <= 39:
             if first == 1:
@@ -452,13 +440,14 @@ class RealEncoder(AbstractItemEncoder):
         m, b, e = value
 
         if not m:
-            return _null, False, True
+            return b"", False, True
 
         if b == 10:
             if LOG:
                 LOG("encoding REAL into character form")
 
-            return _str2octs("\x03%dE%s%d" % (m, e == 0 and "+" or "", e)), False, True
+            sign = "+" if e == 0 else ""
+            return ("\x03%dE%s%d" % (m, sign, e)).encode("ascii"), False, True
 
         elif b == 2:
             fo = 0x80  # binary encoding
@@ -495,20 +484,20 @@ class RealEncoder(AbstractItemEncoder):
                 raise error.PyAsn1Error("Scale factor overflow")  # bug if raised
 
             fo |= sf << 2
-            eo = _null
+            eo = b""
             if e in (0, -1):
-                eo = _int2oct(e & 0xFF)
+                eo = bytes((e & 0xFF,))
 
             else:
                 while e not in (0, -1):
-                    eo = _int2oct(e & 0xFF) + eo
+                    eo = bytes((e & 0xFF,)) + eo
                     e >>= 8
 
                 if e == 0 and eo and eo[0] & 0x80:
-                    eo = _int2oct(0) + eo
+                    eo = bytes((0,)) + eo
 
                 if e == -1 and eo and not (eo[0] & 0x80):
-                    eo = _int2oct(0xFF) + eo
+                    eo = bytes((0xFF,)) + eo
 
             n = len(eo)
             if n > 0xFF:
@@ -525,15 +514,15 @@ class RealEncoder(AbstractItemEncoder):
 
             else:
                 fo |= 3
-                eo = _int2oct(n & 0xFF) + eo
+                eo = bytes((n & 0xFF,)) + eo
 
-            po = _null
+            po = b""
 
             while m:
-                po = _int2oct(m & 0xFF) + po
+                po = bytes((m & 0xFF,)) + po
                 m >>= 8
 
-            substrate = _int2oct(fo) + eo + po
+            substrate = bytes((fo,)) + eo + po
 
             return substrate, False, True
 
@@ -547,14 +536,14 @@ class SequenceEncoder(AbstractItemEncoder):
     # TODO: handling three flavors of input is too much -- split over codecs
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-        substrate = _null
+        substrate = b""
 
         omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
 
         if LOG:
             LOG(
                 "%sencoding empty OPTIONAL components"
-                % (omitEmptyOptionals and "not " or "")
+                % ("not " if omitEmptyOptionals else "")
             )
 
         if asn1Spec is None:
@@ -614,10 +603,10 @@ class SequenceEncoder(AbstractItemEncoder):
                 try:
                     component = value[namedType.name]
 
-                except KeyError:
+                except KeyError as exc:
                     raise error.PyAsn1Error(
                         'Component name "%s" not found in %r' % (namedType.name, value)
-                    )
+                    ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
                     if LOG:
@@ -695,7 +684,7 @@ class SequenceOfEncoder(AbstractItemEncoder):
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
-        return _null.join(chunks), True, True
+        return b"".join(chunks), True, True
 
 
 class ChoiceEncoder(AbstractItemEncoder):
@@ -711,7 +700,7 @@ class ChoiceEncoder(AbstractItemEncoder):
             if len(names) != 1:
                 raise error.PyAsn1Error(
                     "%s components for Choice at %r"
-                    % (len(names) and "Multiple " or "None ", value)
+                    % ("Multiple " if names else "None ", value)
                 )
 
             name = names[0]
@@ -816,18 +805,18 @@ class Encoder:
             else:
                 typeId = asn1Spec.typeId
 
-        except AttributeError:
+        except AttributeError as exc:
             raise error.PyAsn1Error(
                 "Value %r is not ASN.1 type instance "
                 'and "asn1Spec" not given' % (value,)
-            )
+            ) from exc
 
         if LOG:
             LOG(
                 "encoder called in %sdef mode, chunk size %s for "
                 "type %s, value:\n%s"
                 % (
-                    not options.get("defMode", True) and "in" or "",
+                    "in" if not options.get("defMode", True) else "",
                     options.get("maxChunkSize", 0),
                     asn1Spec is None
                     and value.prettyPrintType()
@@ -863,8 +852,10 @@ class Encoder:
             try:
                 concreteEncoder = self.__tagMap[baseTagSet]
 
-            except KeyError:
-                raise error.PyAsn1Error("No encoder for %r (%s)" % (value, tagSet))
+            except KeyError as exc:
+                raise error.PyAsn1Error(
+                    "No encoder for %r (%s)" % (value, tagSet)
+                ) from exc
 
             if LOG:
                 LOG(

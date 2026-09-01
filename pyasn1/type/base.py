@@ -4,8 +4,6 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
-
 from pyasn1 import error
 from pyasn1.type import constraint, tag, tagmap
 
@@ -258,16 +256,17 @@ class SimpleAsn1Type(Asn1Type):
             try:
                 self.subtypeSpec(value)
 
-            except error.PyAsn1Error:
-                exType, exValue, exTb = sys.exc_info()
-                raise exType("%s at %s" % (exValue, self.__class__.__name__))
+            except error.PyAsn1Error as exc:
+                raise exc.__class__(
+                    "%s at %s" % (exc, self.__class__.__name__)
+                ) from exc
 
         self._value = value
 
     def __repr__(self):
         representation = "%s %s object" % (
             self.__class__.__name__,
-            self.isValue and "value" or "schema",
+            "value" if self.isValue else "schema",
         )
 
         for attr, value in self.readOnly.items():
@@ -283,7 +282,7 @@ class SimpleAsn1Type(Asn1Type):
         return "<%s>" % representation
 
     def __eq__(self, other):
-        return self is other and True or self._value == other
+        return self is other or self._value == other
 
     def __ne__(self, other):
         return self._value != other
@@ -301,7 +300,7 @@ class SimpleAsn1Type(Asn1Type):
         return self._value >= other
 
     def __bool__(self):
-        return self._value and True or False
+        return bool(self._value)
 
     def __hash__(self):
         return hash(self._value)
@@ -494,7 +493,7 @@ class ConstructedAsn1Type(Asn1Type):
     def __repr__(self):
         representation = "%s %s object" % (
             self.__class__.__name__,
-            self.isValue and "value" or "schema",
+            "value" if self.isValue else "schema",
         )
 
         for attr, value in self.readOnly.items():

@@ -6,6 +6,20 @@ unreleased
   library base types to reduce boilerplate code
 - Removed legacy type accessors, aliases, deprecated BIT STRING notation,
   positional constructed-type initialization, and ``sizeSpec`` support.
+- Dropped Python 2 residue throughout: the ``_int2oct``/``_str2octs``/``_null``
+  byte shims in the BER/CER codecs, ``sys.exc_info()`` in favour of bound
+  ``except ... as exc`` handlers, and the ``cond and a or b`` ternary idiom.
+- All exceptions raised while handling another now chain with ``raise ... from``,
+  so the originating error is preserved in tracebacks. The ``B904`` lint rule
+  is enabled to keep it that way.
+- Fixed a bug in ``ObjectIdentifier.prettyIn`` where the "Malformed Object ID"
+  message for a value containing ``-`` interpolated ``sys.exc_info()[1]`` read
+  outside any ``except`` block, rendering a stale exception or ``None``.
+- ``TimeMixIn.FixedOffset`` is deprecated in favour of
+  :py:class:`datetime.timezone`; it now emits a ``DeprecationWarning`` and
+  returns a ``datetime.timezone``. ``TimeMixIn.UTC`` is now
+  ``datetime.timezone.utc``. Note that ``dst()`` on the returned object is
+  ``None`` rather than ``timedelta(0)``, matching the standard library.
 
 
 Revision 1.0.2, released 2021-11-13

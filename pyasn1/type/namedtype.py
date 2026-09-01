@@ -159,7 +159,7 @@ class NamedTypes:
         self.__nameToPosMap = self.__computeNameToPosMap()
         self.__tagToPosMap = self.__computeTagToPosMap()
         self.__ambiguousTypes = (
-            "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
+            self.__computeAmbiguousTypes() if "terminal" not in kwargs else {}
         )
         self.__uniqueTagMap = self.__computeTagMaps(unique=True)
         self.__nonUniqueTagMap = self.__computeTagMaps(unique=False)
@@ -313,8 +313,8 @@ class NamedTypes:
         try:
             return self.__namedTypes[idx].asn1Object
 
-        except IndexError:
-            raise error.PyAsn1Error("Type position out of range")
+        except IndexError as exc:
+            raise error.PyAsn1Error("Type position out of range") from exc
 
     def getPositionByType(self, tagSet):
         """Return field position by its ASN.1 type.
@@ -337,8 +337,8 @@ class NamedTypes:
         try:
             return self.__tagToPosMap[tagSet]
 
-        except KeyError:
-            raise error.PyAsn1Error("Type %s not found" % (tagSet,))
+        except KeyError as exc:
+            raise error.PyAsn1Error("Type %s not found" % (tagSet,)) from exc
 
     def getNameByPosition(self, idx):
         """Return field name by its position in fields set.
@@ -361,8 +361,8 @@ class NamedTypes:
         try:
             return self.__namedTypes[idx].name
 
-        except IndexError:
-            raise error.PyAsn1Error("Type position out of range")
+        except IndexError as exc:
+            raise error.PyAsn1Error("Type position out of range") from exc
 
     def getPositionByName(self, name):
         """Return field position by filed name.
@@ -385,8 +385,8 @@ class NamedTypes:
         try:
             return self.__nameToPosMap[name]
 
-        except KeyError:
-            raise error.PyAsn1Error("Name %s not found" % (name,))
+        except KeyError as exc:
+            raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
     def getTagMapNearPosition(self, idx):
         """Return ASN.1 types that are allowed at or past given field position.
@@ -414,8 +414,8 @@ class NamedTypes:
         try:
             return self.__ambiguousTypes[idx].tagMap
 
-        except KeyError:
-            raise error.PyAsn1Error("Type position out of range")
+        except KeyError as exc:
+            raise error.PyAsn1Error("Type position out of range") from exc
 
     def getPositionNearType(self, tagSet, idx):
         """Return the closest field position where given ASN.1 type is allowed.
@@ -447,8 +447,8 @@ class NamedTypes:
         try:
             return idx + self.__ambiguousTypes[idx].getPositionByType(tagSet)
 
-        except KeyError:
-            raise error.PyAsn1Error("Type position out of range")
+        except KeyError as exc:
+            raise error.PyAsn1Error("Type position out of range") from exc
 
     def __computeMinTagSet(self):
         minTagSet = None

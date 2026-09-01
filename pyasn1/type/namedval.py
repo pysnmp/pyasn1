@@ -65,10 +65,10 @@ class NamedValues(dict):
                 try:
                     name, number = namedValue
 
-                except ValueError:
+                except ValueError as exc:
                     raise error.PyAsn1Error(
                         "Not a proper attribute-value pair %r" % (namedValue,)
-                    )
+                    ) from exc
 
             else:
                 anonymousNames.append(namedValue)
@@ -94,7 +94,7 @@ class NamedValues(dict):
             self._numbers[number] = name
 
         if anonymousNames:
-            number = self._numbers and max(self._numbers) + 1 or 0
+            number = max(self._numbers) + 1 if self._numbers else 0
 
             for name in anonymousNames:
                 if name in self:
