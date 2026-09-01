@@ -9,6 +9,10 @@ import pickle
 import sys
 import unittest
 
+from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
+from pyasn1.type import constraint, error, namedtype, namedval, tag, univ
+from tests.base import BaseTestCase
+
 
 def _str2octs(s):
     return s.encode("iso-8859-1")
@@ -19,10 +23,6 @@ def _octs2str(b):
 
 
 _null = b""
-
-from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
-from pyasn1.type import constraint, error, namedtype, namedval, tag, univ
-from tests.base import BaseTestCase
 
 
 class NoValueTestCase(BaseTestCase):
@@ -1432,7 +1432,9 @@ class Sequence(BaseTestCase):
             name="a", nick="b", age=1
         ) == self.s1.setComponentByPosition(0, "a").setComponentByPosition(
             1, "b"
-        ).setComponentByPosition(2, 1)
+        ).setComponentByPosition(
+            2, 1
+        )
 
     def testSetToDefault(self):
         s = self.s1.clone()

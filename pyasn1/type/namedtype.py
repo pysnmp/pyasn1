@@ -45,9 +45,9 @@ class NamedType(_NamedTypeBase):
         representation = "%s=%r" % (self.name, self.asn1Object)
 
         if self.openType:
-            representation += ", open type %r" % self.openType
+            representation += ", openType %r" % self.openType
 
-        return "<%s object, type %s>" % (self.__class__.__name__, representation)
+        return "<%s object, %s>" % (self.__class__.__name__, representation)
 
     # Iteration, indexing and length intentionally expose only
     # (name, asn1Object), matching the original 2-tuple duck-type behaviour.

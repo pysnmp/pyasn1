@@ -267,22 +267,15 @@ class SimpleAsn1Type(Asn1Type):
         self._value = value
 
     def __repr__(self):
-        representation = "%s %s object" % (
-            self.__class__.__name__,
-            self.isValue and "value" or "schema",
-        )
-
-        for attr, value in self.readOnly.items():
-            if value:
-                representation += ", %s %s" % (attr, value)
-
         if self.isValue:
             value = self.prettyPrint()
             if len(value) > 32:
                 value = value[:16] + "..." + value[-16:]
-            representation += ", payload [%s]" % value
-
-        return "<%s>" % representation
+            return "<%s value object, payload [%s]>" % (
+                self.__class__.__name__,
+                value,
+            )
+        return "<%s schema object>" % self.__class__.__name__
 
     def __eq__(self, other):
         return self is other and True or self._value == other
@@ -494,21 +487,32 @@ class ConstructedAsn1Type(Asn1Type):
         Asn1Type.__init__(self, **readOnly)
 
     def __repr__(self):
-        representation = "%s %s object" % (
-            self.__class__.__name__,
-            self.isValue and "value" or "schema",
-        )
-
-        for attr, value in self.readOnly.items():
-            if value is not noValue:
-                representation += ", %s=%r" % (attr, value)
-
         if self.isValue and self.components:
-            representation += ", payload [%s]" % ", ".join(
-                [repr(x) for x in self.components]
+            parts = []
+            # Try to include field names for named-component types (Sequence/Set)
+            component_type = getattr(self, "componentType", None)
+            has_named_components = (
+                component_type is not None and len(component_type) > 0
             )
 
-        return "<%s>" % representation
+            for idx, component in enumerate(self.components):
+                r = repr(component)
+                # Strip outer angle brackets for cleaner inline display
+                if r.startswith("<") and r.endswith(">"):
+                    r = r[1:-1]
+                if has_named_components:
+                    try:
+                        name = component_type[idx].name
+                        parts.append("%s=%s" % (name, r))
+                    except (IndexError, KeyError):
+                        parts.append(r)
+                else:
+                    parts.append(r)
+            return "<%s value object, payload [%s]>" % (
+                self.__class__.__name__,
+                ", ".join(parts),
+            )
+        return "<%s schema object>" % self.__class__.__name__
 
     def __eq__(self, other):
         return self is other or self.components == other

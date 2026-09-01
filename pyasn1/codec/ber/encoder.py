@@ -420,7 +420,7 @@ class RealEncoder(AbstractItemEncoder):
         e = float("inf")
 
         for i in range(3):
-            (sign, mantissa[i], encBase[i], exponent[i]) = self._dropFloatingPoint(
+            sign, mantissa[i], encBase[i], exponent[i] = self._dropFloatingPoint(
                 mantissa[i], encBase[i], exponent[i]
             )
 

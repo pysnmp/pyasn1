@@ -7,17 +7,17 @@
 import sys
 import unittest
 
+from pyasn1.codec.ber import decoder, eoo
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import char, namedtype, opentype, tag, univ
+from tests.base import BaseTestCase
+
 
 def _str2octs(s):
     return s.encode("iso-8859-1")
 
 
 _null = b""
-
-from pyasn1.codec.ber import decoder, eoo
-from pyasn1.error import PyAsn1Error
-from pyasn1.type import char, namedtype, opentype, tag, univ
-from tests.base import BaseTestCase
 
 
 class LargeTagDecoderTestCase(BaseTestCase):

@@ -7,14 +7,13 @@
 import sys
 import unittest
 
-
-def _str2octs(s):
-    return s.encode("iso-8859-1")
-
-
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
+
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
 
 
 class UntaggedAnyTestCase(BaseTestCase):
