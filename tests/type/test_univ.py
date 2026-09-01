@@ -4,6 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import copy
 import math
 import pickle
 import sys
@@ -155,6 +156,98 @@ class NoValueTestCase(BaseTestCase):
 
         except TypeError:
             raise unittest.SkipTest("sys.getsizeof() raises TypeError")
+
+    def testCopy(self):
+        try:
+            assert copy.copy(univ.noValue) is univ.noValue, (
+                "copy() does not preserve the NoValue singleton"
+            )
+
+        except PyAsn1Error:
+            assert False, "copy() fails for NoValue object"
+
+    def testDeepCopy(self):
+        try:
+            assert copy.deepcopy(univ.noValue) is univ.noValue, (
+                "deepcopy() does not preserve the NoValue singleton"
+            )
+
+        except PyAsn1Error:
+            assert False, "deepcopy() fails for NoValue object"
+
+    def testDir(self):
+        try:
+            dir(univ.noValue)
+
+        except PyAsn1Error:
+            assert False, "dir() fails for NoValue object"
+
+
+class SchemaObjectComparisonTestCase(BaseTestCase):
+    """Comparing schema objects must behave the same for every ASN.1 type."""
+
+    types = (
+        univ.Integer,
+        univ.Boolean,
+        univ.Enumerated,
+        univ.Real,
+        univ.BitString,
+        univ.OctetString,
+        univ.ObjectIdentifier,
+        univ.Null,
+        univ.Any,
+        univ.SequenceOf,
+        univ.SetOf,
+        univ.Sequence,
+        univ.Set,
+        univ.Choice,
+    )
+
+    def testEqualToItself(self):
+        for typ in self.types:
+            schema = typ()
+            itself = schema
+
+            assert schema == itself, "%s schema is not equal to itself" % typ.__name__
+
+    def testNotUnequalToItself(self):
+        for typ in self.types:
+            schema = typ()
+            itself = schema
+
+            assert not (schema != itself), (
+                "%s schema is unequal to itself" % typ.__name__
+            )
+
+    def testComparisonWithOtherSchemaRaises(self):
+        for typ in self.types:
+            try:
+                typ() == typ()
+
+            except PyAsn1Error:
+                pass
+
+            else:
+                assert False, "%s schema comparison does not raise" % typ.__name__
+
+    def testOrderingRaises(self):
+        for typ in self.types:
+            try:
+                typ() < typ()
+
+            except PyAsn1Error:
+                pass
+
+            else:
+                assert False, "%s schema ordering does not raise" % typ.__name__
+
+    def testDeepCopy(self):
+        for typ in self.types:
+            try:
+                copy.deepcopy(typ())
+
+            except PyAsn1Error:
+                assert False, "deepcopy() fails for %s schema" % typ.__name__
 
 
 class IntegerTestCase(BaseTestCase):
