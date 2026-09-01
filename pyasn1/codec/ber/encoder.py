@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.type import char, tag, univ, useful
@@ -360,7 +362,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
 
 
 class RealEncoder(AbstractItemEncoder):
-    supportIndefLenMode = 0
+    supportIndefLenMode = False
     binEncBase = 2  # set to None to choose encoding base automatically
 
     @staticmethod
@@ -721,7 +723,7 @@ class AnyEncoder(OctetStringEncoder):
         return value, not options.get("defMode", True), True
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, AbstractItemEncoder]] = {
     eoo.endOfOctets.tagSet: EndOfOctetsEncoder(),
     univ.Boolean.tagSet: BooleanEncoder(),
     univ.Integer.tagSet: IntegerEncoder(),
@@ -754,7 +756,7 @@ tagMap = {
 }
 
 # Put in ambiguous & non-ambiguous types for faster codec lookup
-typeMap = {
+typeMap: Final[dict[int, AbstractItemEncoder]] = {
     univ.Boolean.typeId: BooleanEncoder(),
     univ.Integer.typeId: IntegerEncoder(),
     univ.BitString.typeId: BitStringEncoder(),
@@ -790,15 +792,18 @@ typeMap = {
 
 
 class Encoder:
-    fixedDefLengthMode = None
-    fixedChunkSize = None
+    fixedDefLengthMode: bool | None = None
+    fixedChunkSize: int | None = None
 
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap={}):
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, AbstractItemEncoder],
+        typeMap: dict[int, AbstractItemEncoder] | None = None,
+    ) -> None:
         self.__tagMap = tagMap
-        self.__typeMap = typeMap
+        self.__typeMap = typeMap if typeMap is not None else {}
 
-    def __call__(self, value, asn1Spec=None, **options):
+    def __call__(self, value: Any, asn1Spec: Any = None, **options: Any) -> bytes:
         try:
             if asn1Spec is None:
                 typeId = value.typeId
@@ -925,4 +930,4 @@ class Encoder:
 #:    >>> encode(seq)
 #:    b'0\t\x02\x01\x01\x02\x01\x02\x02\x01\x03'
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)

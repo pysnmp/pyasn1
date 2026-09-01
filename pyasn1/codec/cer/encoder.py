@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Final
+
 from pyasn1 import error
 from pyasn1.codec.ber import encoder
 from pyasn1.type import univ, useful
@@ -227,7 +229,7 @@ class SequenceEncoder(encoder.SequenceEncoder):
     omitEmptyOptionals = True
 
 
-tagMap = encoder.tagMap.copy()
+tagMap: Final = encoder.tagMap.copy()
 tagMap.update(
     {
         univ.Boolean.tagSet: BooleanEncoder(),
@@ -240,7 +242,7 @@ tagMap.update(
     }
 )
 
-typeMap = encoder.typeMap.copy()
+typeMap: Final = encoder.typeMap.copy()
 typeMap.update(
     {
         univ.Boolean.typeId: BooleanEncoder(),
@@ -306,6 +308,6 @@ class Encoder(encoder.Encoder):
 #:    >>> encode(seq)
 #:    b'0\x80\x02\x01\x01\x02\x01\x02\x02\x01\x03\x00\x00'
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)
 
 # EncoderFactory queries class instance and builds a map of tags -> encoders

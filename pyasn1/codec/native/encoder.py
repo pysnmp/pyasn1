@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import debug, error
 from pyasn1.type import base, char, tag, univ, useful
 
@@ -96,7 +98,7 @@ class AnyEncoder(AbstractItemEncoder):
         return value.asOctets()
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, AbstractItemEncoder]] = {
     univ.Boolean.tagSet: BooleanEncoder(),
     univ.Integer.tagSet: IntegerEncoder(),
     univ.BitString.tagSet: BitStringEncoder(),
@@ -129,7 +131,7 @@ tagMap = {
 
 
 # Put in ambiguous & non-ambiguous types for faster codec lookup
-typeMap = {
+typeMap: Final[dict[int, AbstractItemEncoder]] = {
     univ.Boolean.typeId: BooleanEncoder(),
     univ.Integer.typeId: IntegerEncoder(),
     univ.BitString.typeId: BitStringEncoder(),
@@ -165,12 +167,15 @@ typeMap = {
 
 
 class Encoder:
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap={}):
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, AbstractItemEncoder],
+        typeMap: dict[int, AbstractItemEncoder] | None = None,
+    ) -> None:
         self.__tagMap = tagMap
-        self.__typeMap = typeMap
+        self.__typeMap = typeMap if typeMap is not None else {}
 
-    def __call__(self, value, **options):
+    def __call__(self, value: base.Asn1Type, **options: Any) -> Any:
         if not isinstance(value, base.Asn1Item):
             raise error.PyAsn1Error(
                 "value is not valid (should be an instance of an ASN.1 Item)"
@@ -251,4 +256,4 @@ class Encoder:
 #:    >>> encode(seq)
 #:    [1, 2, 3]
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)

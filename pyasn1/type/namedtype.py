@@ -99,7 +99,7 @@ class NamedType(_NamedTypeBase):
 
 
 class OptionalNamedType(NamedType):
-    __doc__ = NamedType.__doc__
+    __doc__ = NamedType.__doc__  # type: ignore[assignment]
 
     __slots__ = ()
 
@@ -107,7 +107,7 @@ class OptionalNamedType(NamedType):
 
 
 class DefaultedNamedType(NamedType):
-    __doc__ = NamedType.__doc__
+    __doc__ = NamedType.__doc__  # type: ignore[assignment]
 
     __slots__ = ()
 

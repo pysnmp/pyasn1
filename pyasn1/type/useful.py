@@ -6,6 +6,7 @@
 #
 import datetime
 import warnings
+from typing import Final
 
 from pyasn1 import error
 from pyasn1.type import char, tag, univ
@@ -13,7 +14,7 @@ from pyasn1.type import char, tag, univ
 __all__ = ["GeneralizedTime", "ObjectDescriptor", "UTCTime"]
 
 NoValue = univ.NoValue
-noValue = univ.noValue
+noValue: Final = univ.noValue
 
 
 class ObjectDescriptor(char.GraphicString):

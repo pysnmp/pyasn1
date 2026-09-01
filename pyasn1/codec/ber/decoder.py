@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.type import base, char, tag, tagmap, univ, useful
@@ -12,15 +14,15 @@ __all__ = ["decode"]
 
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
 
-noValue = base.noValue
+noValue: Final = base.noValue
 # Maximum recursion depth for nested SEQUENCE/SET structures.
 # Prevents unbounded recursion DoS (same fix as CVE-2026-30922 /
 # GHSA-jr27-m4p2-rc6r in mainline pyasn1, ported here).
-MAX_NESTING_DEPTH = 100
+MAX_NESTING_DEPTH: Final = 100
 
 
 class AbstractDecoder:
-    protoComponent = None
+    protoComponent: Any = None
 
     def valueDecoder(
         self,
@@ -128,7 +130,7 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
             raise error.PyAsn1Error("Missing end-of-octets terminator")
 
 
-explicitTagDecoder = ExplicitTagDecoder()
+explicitTagDecoder: Final = ExplicitTagDecoder()
 
 
 class IntegerDecoder(AbstractSimpleDecoder):
@@ -569,12 +571,12 @@ class RealDecoder(AbstractSimpleDecoder):
 
 
 class AbstractConstructedDecoder(AbstractDecoder):
-    protoComponent = None
+    protoComponent: Any = None
 
 
 class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
-    protoRecordComponent = None
-    protoSequenceComponent = None
+    protoRecordComponent: Any = None
+    protoSequenceComponent: Any = None
 
     def _getComponentTagMap(self, asn1Object, idx):
         raise NotImplementedError()
@@ -1425,7 +1427,7 @@ class UTCTimeDecoder(OctetStringDecoder):
     protoComponent = useful.UTCTime()
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, AbstractDecoder]] = {
     univ.Integer.tagSet: IntegerDecoder(),
     univ.Boolean.tagSet: BooleanDecoder(),
     univ.BitString.tagSet: BitStringDecoder(),
@@ -1456,7 +1458,7 @@ tagMap = {
 }
 
 # Type-to-codec map for ambiguous ASN.1 types
-typeMap = {
+typeMap: Final[dict[int, AbstractDecoder]] = {
     univ.Set.typeId: SetDecoder(),
     univ.SetOf.typeId: SetOfDecoder(),
     univ.Sequence.typeId: SequenceDecoder(),
@@ -1493,26 +1495,29 @@ class Decoder:
     defaultRawDecoder = AnyDecoder()
     supportIndefLength = True
 
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap={}):
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, AbstractDecoder],
+        typeMap: dict[int, AbstractDecoder] | None = None,
+    ) -> None:
         self.__tagMap = tagMap
-        self.__typeMap = typeMap
+        self.__typeMap = typeMap if typeMap is not None else {}
         # Tag & TagSet objects caches
-        self.__tagCache = {}
-        self.__tagSetCache = {}
+        self.__tagCache: dict[int, tag.Tag] = {}
+        self.__tagSetCache: dict[int, tag.TagSet] = {}
         self.__eooSentinel = bytes((0, 0))
 
     def __call__(
         self,
-        substrate,
-        asn1Spec=None,
-        tagSet=None,
-        length=None,
-        state=stDecodeTag,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any = None,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: int = stDecodeTag,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         _nestingLevel = options.get("_nestingLevel", 0)
         if _nestingLevel > MAX_NESTING_DEPTH:
             raise error.PyAsn1Error(
@@ -1543,6 +1548,8 @@ class Decoder:
         tagSetCache = self.__tagSetCache
 
         fullSubstrate = substrate
+
+        concreteDecoder: Any
 
         while state is not stStop:
             if state is stDecodeTag:
@@ -1860,7 +1867,7 @@ class Decoder:
                             concreteDecoder.__class__.__name__,
                             value.__class__.__name__,
                             value.prettyPrint()
-                            if isinstance(value, base.Asn1Item)
+                            if isinstance(value, base.Asn1Type)
                             else value,
                             debug.hexdump(substrate) if substrate else "<none>",
                         )
@@ -1965,7 +1972,7 @@ class Decoder:
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, typeMap)
+decode: Final = Decoder(tagMap, typeMap)
 
 # XXX
 # non-recursive decoding; return position rather than substrate
