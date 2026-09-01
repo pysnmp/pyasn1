@@ -27,8 +27,9 @@ Route pyasn1's debug records into logging you already configure:
 
 ``loggerName`` names the logger records are emitted on, so ordinary
 :mod:`logging` configuration -- levels, handlers, filters, formatters --
-applies to them. pyasn1 does not change the level or propagation of a
-logger you name; that logger is yours.
+applies to them. pyasn1 does not touch a logger you name -- it adds no
+handler and changes no level or propagation setting; that logger is
+yours. Records simply propagate to whatever you have configured.
 
 To get output on stderr without configuring anything, omit
 ``loggerName``. pyasn1 then owns the ``pyasn1`` logger and attaches a

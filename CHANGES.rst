@@ -9,9 +9,11 @@ unreleased
   handler is now built on first use of ``debug.Debug()``, and the package
   installs only a ``logging.NullHandler``, per the standard library's guidance
   for libraries.
-- ``debug.Debug(..., loggerName=...)`` no longer overrides the level of the
-  application logger it is pointed at. pyasn1 configures only the ``pyasn1``
-  logger it owns; a logger supplied by the caller keeps its level and handlers.
+- ``debug.Debug(..., loggerName=...)`` no longer mutates the application logger
+  it is pointed at. It previously forced that logger to ``DEBUG`` and attached
+  a fresh ``NullHandler`` on every construction, so handlers accumulated and
+  ``hasHandlers()`` changed answer. pyasn1 now configures only the ``pyasn1``
+  logger it owns; records on a caller-named logger just propagate.
 - Added a regression test asserting that every failure escaping the BER, CER
   and DER decoders derives from ``PyAsn1Error``, so ``except PyAsn1Error`` is
   sufficient to contain decoding of hostile input.

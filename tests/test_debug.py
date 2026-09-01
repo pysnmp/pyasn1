@@ -45,6 +45,7 @@ class LoggingHygieneCaseBase(unittest.TestCase):
             "from pyasn1.codec.native import decoder as nd, encoder as ne\n"
             "log = logging.getLogger('pyasn1')\n"
             "assert log.level == logging.NOTSET, 'import set level to %s' % log.level\n"
+            "assert log.handlers, 'no NullHandler installed on the pyasn1 logger'\n"
             "assert all(isinstance(h, logging.NullHandler) for h in log.handlers), (\n"
             "    'import attached %r' % (log.handlers,))\n"
             "assert debug.Debug.defaultPrinter is None, 'default printer built at import'\n"
@@ -75,14 +76,21 @@ class LoggingHygieneCaseBase(unittest.TestCase):
             log.handlers.clear()
             log.setLevel(logging.NOTSET)
 
-    def testCallerLoggerLevelPreserved(self):
+    def testCallerLoggerLeftAlone(self):
         log = logging.getLogger("pyasn1-test-app")
         log.setLevel(logging.WARNING)
+        handlersBefore = list(log.handlers)
 
         try:
-            debug.setLogger(debug.Debug("all", loggerName="pyasn1-test-app"))
+            for _ in range(3):
+                debug.setLogger(debug.Debug("all", loggerName="pyasn1-test-app"))
+
             assert log.level == logging.WARNING, (
                 "pyasn1 overrode the application logger level: %s" % log.level
+            )
+            assert log.handlers == handlersBefore, (
+                "pyasn1 attached handlers to the application logger: %r"
+                % (log.handlers,)
             )
 
         finally:
