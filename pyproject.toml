@@ -37,6 +37,7 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
     "mypy>=2.3.1",
+    "ty>=0.0.77",
     "Sphinx>=9.1.0; python_version >= '3.12'",
     "pre-commit>=4.6.2",
 ]
@@ -96,6 +97,29 @@ warn_unused_ignores = true
 warn_unused_configs = true
 no_implicit_optional = true
 strict_equality = true
+disallow_any_generics = true
+no_implicit_reexport = true
+
+# Modules below are fully annotated and must stay that way. Move entries out of
+# this list only to widen coverage, never to relax it.
+[[tool.mypy.overrides]]
+module = [
+    "pyasn1.debug",
+    "pyasn1.error",
+    "pyasn1.codec.*",
+    "pyasn1.type.base",
+    "pyasn1.type.char",
+    "pyasn1.type.constraint",
+    "pyasn1.type.namedtype",
+    "pyasn1.type.namedval",
+    "pyasn1.type.opentype",
+    "pyasn1.type.tag",
+    "pyasn1.type.tagmap",
+    "pyasn1.type.univ",
+    "pyasn1.type.useful",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

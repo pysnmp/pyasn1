@@ -15,17 +15,35 @@ LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
 
 
 class AbstractScalarDecoder:
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         return asn1Spec.clone(pyObject)
 
 
 class BitStringDecoder(AbstractScalarDecoder):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         return asn1Spec.clone(univ.BitString.fromBinaryString(pyObject))
 
 
 class SequenceOrSetDecoder:
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         componentsTypes = asn1Spec.componentType
@@ -40,7 +58,13 @@ class SequenceOrSetDecoder:
 
 
 class SequenceOfOrSetOfDecoder:
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         for pyValue in pyObject:
@@ -50,7 +74,13 @@ class SequenceOfOrSetOfDecoder:
 
 
 class ChoiceDecoder:
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         componentsTypes = asn1Spec.componentType

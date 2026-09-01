@@ -4,6 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from collections.abc import Callable
 from typing import Any, Final
 
 from pyasn1 import debug, error
@@ -15,54 +16,54 @@ LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
 
 
 class AbstractItemEncoder:
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         raise error.PyAsn1Error("Not implemented")
 
 
 class BooleanEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return bool(value)
 
 
 class IntegerEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return int(value)
 
 
 class BitStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class OctetStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return value.asOctets()
 
 
 class TextStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class NullEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return None
 
 
 class ObjectIdentifierEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class RealEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return float(value)
 
 
 class SetEncoder(AbstractItemEncoder):
     protoDict = dict
 
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
             raise inconsistency
@@ -82,7 +83,7 @@ class SequenceEncoder(SetEncoder):
 
 
 class SequenceOfEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
             raise inconsistency
@@ -94,7 +95,7 @@ class ChoiceEncoder(SequenceEncoder):
 
 
 class AnyEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return value.asOctets()
 
 

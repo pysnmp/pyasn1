@@ -4,7 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Final
+from collections.abc import Iterator
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.type import tag, univ
@@ -64,10 +65,10 @@ class AbstractCharacterString(univ.OctetString):
         On constraint violation or bad initializer.
     """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self._value)
 
-    def __bytes__(self):
+    def __bytes__(self) -> bytes:
         try:
             return self._value.encode(self.encoding)
         except UnicodeEncodeError as exc:
@@ -76,7 +77,7 @@ class AbstractCharacterString(univ.OctetString):
                 exc,
             ) from exc
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: Any) -> str:
         try:
             if isinstance(value, str):
                 return value
@@ -95,20 +96,20 @@ class AbstractCharacterString(univ.OctetString):
                 exc,
             ) from exc
 
-    def asOctets(self, padding=True):
+    def asOctets(self, padding: bool = True) -> bytes:
         return bytes(self)
 
-    def asNumbers(self, padding=True):
+    def asNumbers(self, padding: bool = True) -> tuple[int, ...]:
         return tuple(bytes(self))
 
     #
     # See OctetString.prettyPrint() for the explanation
     #
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: Any) -> Any:
         return value
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         # first see if subclass has its own .prettyOut()
         value = self.prettyOut(self._value)
 
@@ -117,7 +118,7 @@ class AbstractCharacterString(univ.OctetString):
 
         return AbstractCharacterString.__str__(self)
 
-    def __reversed__(self):
+    def __reversed__(self) -> Iterator[str]:
         return reversed(self._value)
 
 

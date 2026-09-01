@@ -4,7 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 from pyasn1 import error
 from pyasn1.type import constraint, tag, tagmap
@@ -13,8 +13,10 @@ __all__ = ["Asn1Item", "Asn1Type", "ConstructedAsn1Type", "SimpleAsn1Type"]
 
 
 class Asn1Item:
+    _typeCounter: int
+
     @classmethod
-    def getTypeId(cls, increment=1):
+    def getTypeId(cls, increment: int = 1) -> int:
         try:
             Asn1Item._typeCounter += increment
         except AttributeError:
@@ -45,7 +47,7 @@ class Asn1Type(Asn1Item):
     # Disambiguation ASN.1 types identification
     typeId: Any = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
 
         readOnly.update(kwargs)
@@ -54,30 +56,32 @@ class Asn1Type(Asn1Item):
 
         self._readOnly = readOnly
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         if name[0] != "_" and name in self._readOnly:
             raise error.PyAsn1Error('read-only instance attribute "%s"' % name)
 
         self.__dict__[name] = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.prettyPrint()
 
     @property
-    def readOnly(self):
+    def readOnly(self) -> dict[str, Any]:
         return self._readOnly
 
     @property
-    def effectiveTagSet(self):
+    def effectiveTagSet(self) -> tag.TagSet:
         """For |ASN.1| type is equivalent to *tagSet*"""
         return self.tagSet  # used by untagged types
 
     @property
-    def tagMap(self):
+    def tagMap(self) -> tagmap.TagMap:
         """Return a :class:`~pyasn1.type.tagmap.TagMap` object mapping ASN.1 tags to ASN.1 objects within callee object."""
         return tagmap.TagMap({self.tagSet: self})
 
-    def isSameTypeWith(self, other, matchTags=True, matchConstraints=True):
+    def isSameTypeWith(
+        self, other: Any, matchTags: bool = True, matchConstraints: bool = True
+    ) -> bool:
         """Examine |ASN.1| type for equality with other ASN.1 type.
 
         ASN.1 tags (:py:mod:`~pyasn1.type.tag`) and constraints
@@ -103,7 +107,9 @@ class Asn1Type(Asn1Item):
             and (not matchConstraints or self.subtypeSpec == other.subtypeSpec)
         )
 
-    def isSuperTypeOf(self, other, matchTags=True, matchConstraints=True):
+    def isSuperTypeOf(
+        self, other: Any, matchTags: bool = True, matchConstraints: bool = True
+    ) -> bool:
         """Examine |ASN.1| type for subtype relationship with other ASN.1 type.
 
         ASN.1 tags (:py:mod:`~pyasn1.type.tag`) and constraints
@@ -133,13 +139,13 @@ class Asn1Type(Asn1Item):
         )
 
     @staticmethod
-    def isNoValue(*values):
+    def isNoValue(*values: Any) -> bool:
         for value in values:
             if value is not noValue:
                 return False
         return True
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         raise NotImplementedError()
 
 
@@ -240,13 +246,13 @@ class NoValue:
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> "NoValue":
         if cls._instance is None:
             cls._instance = object.__new__(cls)
 
         return cls._instance
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         # Let protocol probes (`__deepcopy__`, `__getstate__` and friends) fail
         # the way they would on any other object, or copying and pickling of
         # schema objects would blow up instead of falling back.
@@ -257,12 +263,12 @@ class NoValue:
             'Attempted "%s" operation on ASN.1 schema object' % attr
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s object>" % self.__class__.__name__
 
 
-def _plugSchemaOperation(name):
-    def operation(self, *args, **kwargs):
+def _plugSchemaOperation(name: str) -> Any:
+    def operation(self: Any, *args: Any, **kwargs: Any) -> Any:
         raise error.PyAsn1Error(
             'Attempted "%s" operation on ASN.1 schema object' % name
         )
@@ -299,7 +305,7 @@ class SimpleAsn1Type(Asn1Type):
     #: Default payload value
     defaultValue: Any = noValue
 
-    def __init__(self, value=noValue, **kwargs):
+    def __init__(self, value: Any = noValue, **kwargs: Any) -> None:
         Asn1Type.__init__(self, **kwargs)
         if value is noValue:
             value = self.defaultValue
@@ -315,7 +321,7 @@ class SimpleAsn1Type(Asn1Type):
 
         self._value = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         representation = "%s %s object" % (
             self.__class__.__name__,
             "value" if self.isValue else "schema",
@@ -333,7 +339,7 @@ class SimpleAsn1Type(Asn1Type):
 
         return "<%s>" % representation
 
-    def _cmpValue(self, operation):
+    def _cmpValue(self, operation: str) -> Any:
         if self._value is noValue:
             raise error.PyAsn1Error(
                 'Attempted "%s" operation on ASN.1 schema object' % operation
@@ -341,32 +347,32 @@ class SimpleAsn1Type(Asn1Type):
 
         return self._value
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self is other or self._cmpValue("__eq__") == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self is not other and self._cmpValue("__ne__") != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return self._cmpValue("__lt__") < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return self._cmpValue("__le__") <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return self._cmpValue("__gt__") > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return self._cmpValue("__ge__") >= other
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self._value)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self._value)
 
     @property
-    def isValue(self):
+    def isValue(self) -> bool:
         """Indicate that |ASN.1| object represents ASN.1 value.
 
         If *isValue* is :obj:`False` then this object represents just
@@ -395,7 +401,7 @@ class SimpleAsn1Type(Asn1Type):
         """
         return self._value is not noValue
 
-    def clone(self, value=noValue, **kwargs):
+    def clone(self, value: Any = noValue, **kwargs: Any) -> Any:
         """Create a modified version of |ASN.1| schema or value object.
 
         The `clone()` method accepts the same set arguments as |ASN.1|
@@ -422,7 +428,7 @@ class SimpleAsn1Type(Asn1Type):
 
         return self.__class__(value, **initializers)
 
-    def subtype(self, value=noValue, **kwargs):
+    def subtype(self, value: Any = noValue, **kwargs: Any) -> Any:
         """Create a specialization of |ASN.1| schema or value object.
 
         The subtype relationship between ASN.1 types has no correlation with
@@ -490,16 +496,16 @@ class SimpleAsn1Type(Asn1Type):
 
         return self.__class__(value, **initializers)
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: Any) -> Any:
         return value
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: Any) -> Any:
         return str(value)
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         return self.prettyOut(self._value)
 
-    def prettyPrintType(self, scope=0):
+    def prettyPrintType(self, scope: int = 0) -> str:
         return "%s -> %s" % (self.tagSet, self.__class__.__name__)
 
 
@@ -543,14 +549,22 @@ class ConstructedAsn1Type(Asn1Type):
 
     componentType: Any = None
 
-    def __init__(self, **kwargs):
+    _componentValues: Any
+
+    if TYPE_CHECKING:
+        # Declared read-only so subclasses may implement it as a property.
+        # Type-check time only; the attribute itself comes from subclasses.
+        @property
+        def isValue(self) -> bool: ...
+
+    def __init__(self, **kwargs: Any) -> None:
         readOnly = {"componentType": self.componentType}
 
         readOnly.update(kwargs)
 
         Asn1Type.__init__(self, **readOnly)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         representation = "%s %s object" % (
             self.__class__.__name__,
             "value" if self.isValue else "schema",
@@ -567,7 +581,7 @@ class ConstructedAsn1Type(Asn1Type):
 
         return "<%s>" % representation
 
-    def _cmpComponents(self, operation):
+    def _cmpComponents(self, operation: str) -> Any:
         if self._componentValues is noValue:
             raise error.PyAsn1Error(
                 'Attempted "%s" operation on ASN.1 schema object' % operation
@@ -575,35 +589,35 @@ class ConstructedAsn1Type(Asn1Type):
 
         return self.components
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self is other or self._cmpComponents("__eq__") == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self is not other and self._cmpComponents("__ne__") != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return self._cmpComponents("__lt__") < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return self._cmpComponents("__le__") <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return self._cmpComponents("__gt__") > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return self._cmpComponents("__ge__") >= other
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.components)
 
     @property
-    def components(self):
+    def components(self) -> Any:
         raise error.PyAsn1Error("Method not implemented")
 
-    def _cloneComponentValues(self, myClone, cloneValueFlag):
+    def _cloneComponentValues(self, myClone: Any, cloneValueFlag: Any) -> None:
         pass
 
-    def clone(self, **kwargs):
+    def clone(self, **kwargs: Any) -> Any:
         """Create a modified version of |ASN.1| schema object.
 
         The `clone()` method accepts the same set arguments as |ASN.1|
@@ -638,7 +652,7 @@ class ConstructedAsn1Type(Asn1Type):
 
         return clone
 
-    def subtype(self, **kwargs):
+    def subtype(self, **kwargs: Any) -> Any:
         """Create a specialization of |ASN.1| schema object.
 
         The `subtype()` method accepts the same set arguments as |ASN.1|
@@ -702,15 +716,17 @@ class ConstructedAsn1Type(Asn1Type):
 
         return clone
 
-    def getComponentByPosition(self, idx):
+    def getComponentByPosition(self, idx: int) -> Any:
         raise error.PyAsn1Error("Method not implemented")
 
-    def setComponentByPosition(self, idx, value, verifyConstraints=True):
+    def setComponentByPosition(
+        self, idx: int, value: Any, verifyConstraints: bool = True
+    ) -> Any:
         raise error.PyAsn1Error("Method not implemented")
 
-    def setComponents(self, *args, **kwargs):
+    def setComponents(self, *args: Any, **kwargs: Any) -> Any:
         for idx, value in enumerate(args):
-            self[idx] = value
+            self[idx] = value  # type: ignore[index]
         for k, v in kwargs.items():
-            self[k] = v
+            self[k] = v  # type: ignore[index]
         return self

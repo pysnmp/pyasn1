@@ -84,6 +84,55 @@ class ContainedSubtypeConstraintTestCase(BaseTestCase):
             assert 0, "constraint check fails"
 
 
+class ContainedSubtypeConstraintUnionTestCase(BaseTestCase):
+    """INCLUDES combines its operands as a union.
+
+    Mirrors the example from the ContainedSubtypeConstraint docstring:
+
+        Divisors-of-18 ::= INTEGER (INCLUDES Divisors-of-6 | 9 | 18)
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.c1 = constraint.ContainedSubtypeConstraint(
+            constraint.SingleValueConstraint(1, 2, 3, 6), 9, 18
+        )
+
+    def testIncludedConstraint(self):
+        for value in (1, 2, 3, 6):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                assert 0, "rejected %s permitted by the included constraint" % value
+
+    def testLiteralValue(self):
+        for value in (9, 18):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                assert 0, "rejected literal %s" % value
+
+    def testBadVal(self):
+        for value in (0, 7, 10, 19):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                pass
+            else:
+                assert 0, "accepted %s permitted by no operand" % value
+
+    def testLiteralOnly(self):
+        c = constraint.ContainedSubtypeConstraint(9, 18)
+        c(9)
+        c(18)
+        try:
+            c(10)
+        except error.ValueConstraintError:
+            pass
+        else:
+            assert 0, "accepted value permitted by no operand"
+
+
 class ValueRangeConstraintTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)

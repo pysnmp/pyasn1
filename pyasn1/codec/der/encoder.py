@@ -4,7 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Final
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.codec.cer import encoder
@@ -15,7 +15,7 @@ __all__ = ["encode"]
 
 class SetEncoder(encoder.SetEncoder):
     @staticmethod
-    def _componentSortKey(componentAndType):
+    def _componentSortKey(componentAndType: Any) -> Any:
         """Sort SET components by tag
 
         Sort depending on the actual Choice value (dynamic sort)

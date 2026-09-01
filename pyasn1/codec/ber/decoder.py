@@ -26,28 +26,28 @@ class AbstractDecoder:
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         raise error.PyAsn1Error("Decoder not implemented for %s" % (tagSet,))
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         raise error.PyAsn1Error(
             "Indefinite length mode decoder not implemented for %s" % (tagSet,)
         )
@@ -55,10 +55,12 @@ class AbstractDecoder:
 
 class AbstractSimpleDecoder(AbstractDecoder):
     @staticmethod
-    def substrateCollector(asn1Object, substrate, length):
+    def substrateCollector(asn1Object: Any, substrate: bytes, length: int) -> Any:
         return substrate[:length], substrate[length:]
 
-    def _createComponent(self, asn1Spec, tagSet, value, **options):
+    def _createComponent(
+        self, asn1Spec: Any, tagSet: Any, value: Any, **options: Any
+    ) -> Any:
         if options.get("native"):
             return value
         elif asn1Spec is None:
@@ -74,15 +76,15 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if substrateFun:
             return substrateFun(
                 self._createComponent(asn1Spec, tagSet, "", **options),
@@ -104,15 +106,15 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if substrateFun:
             return substrateFun(
                 self._createComponent(asn1Spec, tagSet, "", **options),
@@ -138,15 +140,15 @@ class IntegerDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
 
@@ -163,7 +165,9 @@ class IntegerDecoder(AbstractSimpleDecoder):
 class BooleanDecoder(IntegerDecoder):
     protoComponent = univ.Boolean(0)
 
-    def _createComponent(self, asn1Spec, tagSet, value, **options):
+    def _createComponent(
+        self, asn1Spec: Any, tagSet: Any, value: Any, **options: Any
+    ) -> Any:
         return IntegerDecoder._createComponent(
             self, asn1Spec, tagSet, int(bool(value)), **options
         )
@@ -175,15 +179,15 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         head, tail = substrate[:length], substrate[length:]
 
         if substrateFun:
@@ -240,15 +244,15 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if substrateFun:
             return substrateFun(
                 self._createComponent(asn1Spec, tagSet, noValue, **options),
@@ -295,15 +299,15 @@ class OctetStringDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         head, tail = substrate[:length], substrate[length:]
 
         if substrateFun:
@@ -339,15 +343,15 @@ class OctetStringDecoder(AbstractSimpleDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if substrateFun and substrateFun is not self.substrateCollector:
             asn1Object = self._createComponent(asn1Spec, tagSet, noValue, **options)
             return substrateFun(asn1Object, substrate, length)
@@ -381,15 +385,15 @@ class NullDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
 
@@ -408,15 +412,15 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
 
@@ -424,7 +428,7 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         if not head:
             raise error.PyAsn1Error("Empty substrate")
 
-        oid = ()
+        oid: tuple[int, ...] = ()
         index = 0
         substrateLen = len(head)
         while index < substrateLen:
@@ -470,15 +474,15 @@ class RealDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatSimple:
             raise error.PyAsn1Error("Simple tag format expected")
 
@@ -536,7 +540,7 @@ class RealDecoder(AbstractSimpleDecoder):
 
             sf = fo >> 2 & 0x03  # scale bits
             p *= 2**sf
-            value = (p, 2, e)
+            value: Any = (p, 2, e)
 
         elif fo & 0x40:  # infinite value
             if LOG:
@@ -578,13 +582,21 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
     protoRecordComponent: Any = None
     protoSequenceComponent: Any = None
 
-    def _getComponentTagMap(self, asn1Object, idx):
+    def _getComponentTagMap(self, asn1Object: Any, idx: int) -> Any:
         raise NotImplementedError()
 
-    def _getComponentPositionByType(self, asn1Object, tagSet, idx):
+    def _getComponentPositionByType(
+        self, asn1Object: Any, tagSet: Any, idx: int
+    ) -> Any:
         raise NotImplementedError()
 
-    def _decodeComponents(self, substrate, tagSet=None, decodeFun=None, **options):
+    def _decodeComponents(
+        self,
+        substrate: bytes,
+        tagSet: Any = None,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         components = []
         componentTypes = set()
 
@@ -631,15 +643,15 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatConstructed:
             raise error.PyAsn1Error("Constructed tag format expected")
 
@@ -864,15 +876,15 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if tagSet[0].tagFormat != tag.tagFormatConstructed:
             raise error.PyAsn1Error("Constructed tag format expected")
 
@@ -1135,15 +1147,15 @@ class ChoiceDecoder(AbstractConstructedDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         head, tail = substrate[:length], substrate[length:]
 
         if asn1Spec is None:
@@ -1190,15 +1202,15 @@ class ChoiceDecoder(AbstractConstructedDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if asn1Spec is None:
             asn1Object = self.protoComponent.clone(tagSet=tagSet)
         else:
@@ -1259,20 +1271,20 @@ class AnyDecoder(AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if asn1Spec is None:
             isUntagged = True
 
         elif asn1Spec.__class__ is tagmap.TagMap:
-            isUntagged = tagSet not in asn1Spec.tagMap
+            isUntagged = tagSet not in asn1Spec
 
         else:
             isUntagged = tagSet != asn1Spec.tagSet
@@ -1300,20 +1312,20 @@ class AnyDecoder(AbstractSimpleDecoder):
 
     def indefLenValueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         if asn1Spec is None:
             isTagged = False
 
         elif asn1Spec.__class__ is tagmap.TagMap:
-            isTagged = tagSet in asn1Spec.tagMap
+            isTagged = tagSet in asn1Spec
 
         else:
             isTagged = tagSet == asn1Spec.tagSet
@@ -1512,7 +1524,7 @@ class Decoder:
         substrate: bytes,
         asn1Spec: Any = None,
         tagSet: Any = None,
-        length: int | None = None,
+        length: Any = None,
         state: int = stDecodeTag,
         decodeFun: Any = None,
         substrateFun: Any = None,
@@ -1752,13 +1764,13 @@ class Decoder:
                     if LOG:
                         LOG("candidate ASN.1 spec is a map of:")
 
-                        for firstOctet, v in asn1Spec.presentTypes.items():
-                            LOG("  %s -> %s" % (firstOctet, v.__class__.__name__))
+                        for specTagSet, v in asn1Spec.presentTypes.items():
+                            LOG("  %s -> %s" % (specTagSet, v.__class__.__name__))
 
                         if asn1Spec.skipTypes:
                             LOG("but neither of: ")
-                            for firstOctet, v in asn1Spec.skipTypes.items():
-                                LOG("  %s -> %s" % (firstOctet, v.__class__.__name__))
+                            for specTagSet, v in asn1Spec.skipTypes.items():
+                                LOG("  %s -> %s" % (specTagSet, v.__class__.__name__))
                         LOG(
                             "new candidate ASN.1 spec is %s, chosen by %s"
                             % (
