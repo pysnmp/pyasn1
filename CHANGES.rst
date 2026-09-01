@@ -20,6 +20,28 @@ unreleased
   returns a ``datetime.timezone``. ``TimeMixIn.UTC`` is now
   ``datetime.timezone.utc``. Note that ``dst()`` on the returned object is
   ``None`` rather than ``timedelta(0)``, matching the standard library.
+- Comparing a schema object now behaves the same for every ASN.1 type.
+  Previously ``schema == schema`` returned :obj:`True` for ``OctetString``,
+  ``ObjectIdentifier`` and the constructed types, raised ``PyAsn1Error`` for
+  ``Integer``, ``Boolean`` and ``Real``, and raised ``TypeError`` for
+  ``BitString``; ``schema != schema`` raised for all of them. A schema object
+  is now equal to itself and unequal to nothing, and every other comparison
+  raises ``PyAsn1Error``.
+- Fixed ``BitString`` comparison converting the right-hand operand before
+  testing identity, so its identity shortcut could never be taken.
+- ``copy.deepcopy()`` now works on schema objects. ``NoValue.__getattr__``
+  answered the ``__deepcopy__`` protocol probe with ``PyAsn1Error`` instead of
+  ``AttributeError``, so deep-copying any schema object raised.
+- ``NoValue`` no longer derives the set of operations it rejects by scanning
+  ``dir()`` of :class:`str`, :class:`int`, :class:`list` and :class:`dict` at
+  first instantiation. The set is now the explicit ``NoValue.plugMethods``
+  tuple, which no longer sweeps up class machinery (``__init_subclass__``,
+  ``__subclasshook__``, ``__class_getitem__``, ``__dir__``) and no longer
+  varies with the Python version. The ``NoValue.skipMethods`` attribute is
+  gone; ``dir()`` on a schema object works again.
+- ``BitString.__int__`` returns a plain :class:`int` rather than a
+  ``SizedInteger``, clearing a ``DeprecationWarning`` that Python raises for
+  ``__int__`` implementations returning an :class:`int` subclass.
 
 
 Revision 1.0.2, released 2021-11-13

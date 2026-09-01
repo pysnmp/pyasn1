@@ -231,24 +231,6 @@ class Integer(base.SimpleAsn1Type):
     def __trunc__(self):
         return self.clone(math.trunc(self._value))
 
-    def __lt__(self, value):
-        return self._value < value
-
-    def __le__(self, value):
-        return self._value <= value
-
-    def __eq__(self, value):
-        return self._value == value
-
-    def __ne__(self, value):
-        return self._value != value
-
-    def __gt__(self, value):
-        return self._value > value
-
-    def __ge__(self, value):
-        return self._value >= value
-
     def prettyIn(self, value):
         try:
             return int(value)
@@ -472,44 +454,40 @@ class BitString(base.SimpleAsn1Type):
         return self.asBinary()
 
     def __eq__(self, other):
+        if self is other:
+            return True
+
+        value = self._cmpValue("__eq__")
         other = self.prettyIn(other)
-        return self is other or self._value == other and len(self._value) == len(other)
+        return value == other and len(value) == len(other)
 
     def __ne__(self, other):
+        if self is other:
+            return False
+
+        value = self._cmpValue("__ne__")
         other = self.prettyIn(other)
-        return self._value != other or len(self._value) != len(other)
+        return value != other or len(value) != len(other)
 
     def __lt__(self, other):
+        value = self._cmpValue("__lt__")
         other = self.prettyIn(other)
-        return (
-            len(self._value) < len(other)
-            or len(self._value) == len(other)
-            and self._value < other
-        )
+        return len(value) < len(other) or len(value) == len(other) and value < other
 
     def __le__(self, other):
+        value = self._cmpValue("__le__")
         other = self.prettyIn(other)
-        return (
-            len(self._value) <= len(other)
-            or len(self._value) == len(other)
-            and self._value <= other
-        )
+        return len(value) <= len(other) or len(value) == len(other) and value <= other
 
     def __gt__(self, other):
+        value = self._cmpValue("__gt__")
         other = self.prettyIn(other)
-        return (
-            len(self._value) > len(other)
-            or len(self._value) == len(other)
-            and self._value > other
-        )
+        return len(value) > len(other) or len(value) == len(other) and value > other
 
     def __ge__(self, other):
+        value = self._cmpValue("__ge__")
         other = self.prettyIn(other)
-        return (
-            len(self._value) >= len(other)
-            or len(self._value) == len(other)
-            and self._value >= other
-        )
+        return len(value) >= len(other) or len(value) == len(other) and value >= other
 
     # Immutable sequence object protocol
 
@@ -576,10 +554,10 @@ class BitString(base.SimpleAsn1Type):
         )
 
     def __int__(self):
-        return self._value
+        return int(self._cmpValue("__int__"))
 
     def __float__(self):
-        return float(self._value)
+        return float(self._cmpValue("__float__"))
 
     def asNumbers(self):
         """Get |ASN.1| value as a sequence of 8-bit integers.
@@ -1408,10 +1386,11 @@ class Real(base.SimpleAsn1Type):
         return int(float(self))
 
     def __float__(self):
-        if self._value in self._inf:
-            return self._value
+        value = self._cmpValue("__float__")
+        if value in self._inf:
+            return value
         else:
-            return float(self._value[0] * pow(self._value[1], self._value[2]))
+            return float(value[0] * pow(value[1], value[2]))
 
     def __abs__(self):
         return self.clone(abs(float(self)))
@@ -1445,10 +1424,10 @@ class Real(base.SimpleAsn1Type):
         return float(self) <= value
 
     def __eq__(self, value):
-        return float(self) == value
+        return self is value or float(self) == value
 
     def __ne__(self, value):
-        return float(self) != value
+        return self is not value and float(self) != value
 
     def __gt__(self, value):
         return float(self) > value
@@ -2930,32 +2909,36 @@ class Choice(Set):
     _currentIdx = None
 
     def __eq__(self, other):
-        if self._componentValues:
+        if self is other:
+            return True
+        if self._cmpComponents("__eq__"):
             return self._componentValues[self._currentIdx] == other
         return NotImplemented
 
     def __ne__(self, other):
-        if self._componentValues:
+        if self is other:
+            return False
+        if self._cmpComponents("__ne__"):
             return self._componentValues[self._currentIdx] != other
         return NotImplemented
 
     def __lt__(self, other):
-        if self._componentValues:
+        if self._cmpComponents("__lt__"):
             return self._componentValues[self._currentIdx] < other
         return NotImplemented
 
     def __le__(self, other):
-        if self._componentValues:
+        if self._cmpComponents("__le__"):
             return self._componentValues[self._currentIdx] <= other
         return NotImplemented
 
     def __gt__(self, other):
-        if self._componentValues:
+        if self._cmpComponents("__gt__"):
             return self._componentValues[self._currentIdx] > other
         return NotImplemented
 
     def __ge__(self, other):
-        if self._componentValues:
+        if self._cmpComponents("__ge__"):
             return self._componentValues[self._currentIdx] >= other
         return NotImplemented
 

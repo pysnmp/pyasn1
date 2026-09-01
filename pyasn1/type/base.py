@@ -156,66 +156,99 @@ class NoValue:
     *PyAsn1Error* exception.
     """
 
-    skipMethods = {
-        "__slots__",
-        # attributes
-        "__getattribute__",
-        "__getattr__",
-        "__setattr__",
-        "__delattr__",
-        # class instance
-        "__class__",
-        "__init__",
-        "__del__",
-        "__new__",
-        "__repr__",
-        "__qualname__",
-        "__objclass__",
-        "im_class",
-        "__sizeof__",
-        # pickle protocol
-        "__reduce__",
-        "__reduce_ex__",
-        "__getnewargs__",
-        "__getinitargs__",
-        "__getstate__",
-        "__setstate__",
-    }
+    #: Operations that only make sense on a value object. Python looks special
+    #: methods up on the type rather than on the instance, so `__getattr__`
+    #: below never sees them -- each one has to be planted on the class.
+    plugMethods = (
+        # comparison
+        "__lt__",
+        "__le__",
+        "__eq__",
+        "__ne__",
+        "__gt__",
+        "__ge__",
+        # arithmetic
+        "__add__",
+        "__sub__",
+        "__mul__",
+        "__truediv__",
+        "__floordiv__",
+        "__mod__",
+        "__divmod__",
+        "__pow__",
+        "__lshift__",
+        "__rshift__",
+        "__and__",
+        "__or__",
+        "__xor__",
+        # reflected arithmetic
+        "__radd__",
+        "__rsub__",
+        "__rmul__",
+        "__rtruediv__",
+        "__rfloordiv__",
+        "__rmod__",
+        "__rdivmod__",
+        "__rpow__",
+        "__rlshift__",
+        "__rrshift__",
+        "__rand__",
+        "__ror__",
+        "__rxor__",
+        # in-place arithmetic
+        "__iadd__",
+        "__isub__",
+        "__imul__",
+        "__itruediv__",
+        "__ifloordiv__",
+        "__imod__",
+        "__ipow__",
+        "__ilshift__",
+        "__irshift__",
+        "__iand__",
+        "__ior__",
+        "__ixor__",
+        # unary and rounding
+        "__neg__",
+        "__pos__",
+        "__abs__",
+        "__invert__",
+        "__round__",
+        "__floor__",
+        "__ceil__",
+        "__trunc__",
+        # conversion
+        "__bool__",
+        "__int__",
+        "__float__",
+        "__complex__",
+        "__index__",
+        "__str__",
+        "__format__",
+        "__hash__",
+        # container protocol
+        "__len__",
+        "__getitem__",
+        "__setitem__",
+        "__delitem__",
+        "__iter__",
+        "__reversed__",
+        "__contains__",
+    )
 
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-
-            def getPlug(name):
-                def plug(self, *args, **kw):
-                    raise error.PyAsn1Error(
-                        'Attempted "%s" operation on ASN.1 schema object' % name
-                    )
-
-                return plug
-
-            op_names = [
-                name
-                for typ in (str, int, list, dict)
-                for name in dir(typ)
-                if (
-                    name not in cls.skipMethods
-                    and name.startswith("__")
-                    and name.endswith("__")
-                    and callable(getattr(typ, name))
-                )
-            ]
-
-            for name in set(op_names):
-                setattr(cls, name, getPlug(name))
-
             cls._instance = object.__new__(cls)
 
         return cls._instance
 
     def __getattr__(self, attr):
-        if attr in self.skipMethods:
+        # Let protocol probes (`__deepcopy__`, `__getstate__` and friends) fail
+        # the way they would on any other object, or copying and pickling of
+        # schema objects would blow up instead of falling back.
+        if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError("Attribute %s not present" % attr)
 
         raise error.PyAsn1Error(
@@ -224,6 +257,23 @@ class NoValue:
 
     def __repr__(self):
         return "<%s object>" % self.__class__.__name__
+
+
+def _plugSchemaOperation(name):
+    def operation(self, *args, **kwargs):
+        raise error.PyAsn1Error(
+            'Attempted "%s" operation on ASN.1 schema object' % name
+        )
+
+    operation.__name__ = name
+
+    return operation
+
+
+for _plugName in NoValue.plugMethods:
+    setattr(NoValue, _plugName, _plugSchemaOperation(_plugName))
+
+del _plugName
 
 
 noValue = NoValue()
@@ -281,23 +331,31 @@ class SimpleAsn1Type(Asn1Type):
 
         return "<%s>" % representation
 
+    def _cmpValue(self, operation):
+        if self._value is noValue:
+            raise error.PyAsn1Error(
+                'Attempted "%s" operation on ASN.1 schema object' % operation
+            )
+
+        return self._value
+
     def __eq__(self, other):
-        return self is other or self._value == other
+        return self is other or self._cmpValue("__eq__") == other
 
     def __ne__(self, other):
-        return self._value != other
+        return self is not other and self._cmpValue("__ne__") != other
 
     def __lt__(self, other):
-        return self._value < other
+        return self._cmpValue("__lt__") < other
 
     def __le__(self, other):
-        return self._value <= other
+        return self._cmpValue("__le__") <= other
 
     def __gt__(self, other):
-        return self._value > other
+        return self._cmpValue("__gt__") > other
 
     def __ge__(self, other):
-        return self._value >= other
+        return self._cmpValue("__ge__") >= other
 
     def __bool__(self):
         return bool(self._value)
@@ -507,23 +565,31 @@ class ConstructedAsn1Type(Asn1Type):
 
         return "<%s>" % representation
 
+    def _cmpComponents(self, operation):
+        if self._componentValues is noValue:
+            raise error.PyAsn1Error(
+                'Attempted "%s" operation on ASN.1 schema object' % operation
+            )
+
+        return self.components
+
     def __eq__(self, other):
-        return self is other or self.components == other
+        return self is other or self._cmpComponents("__eq__") == other
 
     def __ne__(self, other):
-        return self.components != other
+        return self is not other and self._cmpComponents("__ne__") != other
 
     def __lt__(self, other):
-        return self.components < other
+        return self._cmpComponents("__lt__") < other
 
     def __le__(self, other):
-        return self.components <= other
+        return self._cmpComponents("__le__") <= other
 
     def __gt__(self, other):
-        return self.components > other
+        return self._cmpComponents("__gt__") > other
 
     def __ge__(self, other):
-        return self.components >= other
+        return self._cmpComponents("__ge__") >= other
 
     def __bool__(self):
         return bool(self.components)
