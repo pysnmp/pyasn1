@@ -87,11 +87,11 @@ class Debug:
                     self._flags &= ~FLAG_MAP[flag]
                 else:
                     self._flags |= FLAG_MAP[flag]
-            except KeyError:
-                raise error.PyAsn1Error("bad debug flag %s" % flag)
+            except KeyError as exc:
+                raise error.PyAsn1Error("bad debug flag %s" % flag) from exc
 
             self._printer(
-                "debug category '%s' %s" % (flag, inverse and "disabled" or "enabled")
+                "debug category '%s' %s" % (flag, "disabled" if inverse else "enabled")
             )
 
     def __str__(self):
@@ -120,7 +120,7 @@ def setLogger(userLogger):
 
     # Update registered logging clients
     for module, (name, flags) in LOGGEE_MAP.items():
-        setattr(module, name, _LOG & flags and _LOG or DEBUG_NONE)
+        setattr(module, name, _LOG if _LOG & flags else DEBUG_NONE)
 
 
 def registerLoggee(module, name="LOG", flags=DEBUG_NONE):
@@ -132,7 +132,7 @@ def registerLoggee(module, name="LOG", flags=DEBUG_NONE):
 def hexdump(octets):
     return " ".join(
         [
-            "%s%.2X" % (n % 16 == 0 and ("\n%.5d: " % n) or "", x)
+            "%s%.2X" % ("\n%.5d: " % n if n % 16 == 0 else "", x)
             for n, x in zip(range(len(octets)), octets)
         ]
     )

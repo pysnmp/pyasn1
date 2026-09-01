@@ -5,6 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import datetime
+import warnings
 
 from pyasn1 import error
 from pyasn1.type import char, tag, univ
@@ -33,25 +34,24 @@ class TimeMixIn:
     _optionalMinutes = False
     _shortTZ = False
 
-    class FixedOffset(datetime.tzinfo):
-        """Fixed offset in minutes east from UTC."""
+    #: Alias for :py:const:`datetime.timezone.utc`.
+    UTC = datetime.timezone.utc
 
-        # defaulted arguments required
-        # https: // docs.python.org / 2.3 / lib / datetime - tzinfo.html
-        def __init__(self, offset=0, name="UTC"):
-            self.__offset = datetime.timedelta(minutes=offset)
-            self.__name = name
+    @staticmethod
+    def FixedOffset(offset=0, name="UTC"):
+        """Fixed offset in minutes east from UTC.
 
-        def utcoffset(self, dt):
-            return self.__offset
-
-        def tzname(self, dt):
-            return self.__name
-
-        def dst(self, dt):
-            return datetime.timedelta(0)
-
-    UTC = FixedOffset()
+        .. deprecated::
+           Use :py:class:`datetime.timezone` with a
+           :py:class:`datetime.timedelta` offset instead.
+        """
+        warnings.warn(
+            "TimeMixIn.FixedOffset() is deprecated, use "
+            "datetime.timezone(datetime.timedelta(minutes=offset), name)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return datetime.timezone(datetime.timedelta(minutes=offset), name)
 
     @property
     def asDateTime(self):
@@ -84,10 +84,10 @@ class TimeMixIn:
                 if plusminus == "-":
                     minutes *= -1
 
-            except ValueError:
-                raise error.PyAsn1Error("unknown time specification %s" % self)
+            except ValueError as exc:
+                raise error.PyAsn1Error("unknown time specification %s" % self) from exc
 
-            tzinfo = TimeMixIn.FixedOffset(minutes, "?")
+            tzinfo = datetime.timezone(datetime.timedelta(minutes=minutes), "?")
 
         else:
             tzinfo = None
@@ -101,8 +101,10 @@ class TimeMixIn:
             try:
                 ms = int(ms) * 1000
 
-            except ValueError:
-                raise error.PyAsn1Error("bad sub-second time specification %s" % self)
+            except ValueError as exc:
+                raise error.PyAsn1Error(
+                    "bad sub-second time specification %s" % self
+                ) from exc
 
         else:
             ms = 0
@@ -114,11 +116,11 @@ class TimeMixIn:
 
         try:
             dt = datetime.datetime.strptime(
-                text, self._yearsDigits == 4 and "%Y%m%d%H%M%S" or "%y%m%d%H%M%S"
+                text, "%Y%m%d%H%M%S" if self._yearsDigits == 4 else "%y%m%d%H%M%S"
             )
 
-        except ValueError:
-            raise error.PyAsn1Error("malformed datetime format %s" % self)
+        except ValueError as exc:
+            raise error.PyAsn1Error("malformed datetime format %s" % self) from exc
 
         return dt.replace(microsecond=ms, tzinfo=tzinfo)
 
@@ -137,7 +139,7 @@ class TimeMixIn:
         :
             new instance of |ASN.1| value
         """
-        text = dt.strftime(cls._yearsDigits == 4 and "%Y%m%d%H%M%S" or "%y%m%d%H%M%S")
+        text = dt.strftime("%Y%m%d%H%M%S" if cls._yearsDigits == 4 else "%y%m%d%H%M%S")
         if cls._hasSubsecond:
             text += ".%d" % (dt.microsecond // 1000)
 

@@ -8,8 +8,6 @@ from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
 from pyasn1.type import base, char, tag, tagmap, univ, useful
 
-_null = b""
-
 __all__ = ["decode"]
 
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
@@ -165,7 +163,7 @@ class BooleanDecoder(IntegerDecoder):
 
     def _createComponent(self, asn1Spec, tagSet, value, **options):
         return IntegerDecoder._createComponent(
-            self, asn1Spec, tagSet, value and 1 or 0, **options
+            self, asn1Spec, tagSet, int(bool(value)), **options
         )
 
 
@@ -218,7 +216,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
         # All inner fragments are of the same type, treat them as octet string
         substrateFun = self.substrateCollector
 
-        bitString = self.protoComponent.fromOctetString(_null, internalFormat=True)
+        bitString = self.protoComponent.fromOctetString(b"", internalFormat=True)
 
         while head:
             component, head = decodeFun(
@@ -259,7 +257,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
         # All inner fragments are of the same type, treat them as octet string
         substrateFun = self.substrateCollector
 
-        bitString = self.protoComponent.fromOctetString(_null, internalFormat=True)
+        bitString = self.protoComponent.fromOctetString(b"", internalFormat=True)
 
         while substrate:
             component, substrate = decodeFun(
@@ -327,7 +325,7 @@ class OctetStringDecoder(AbstractSimpleDecoder):
         # All inner fragments are of the same type, treat them as octet string
         substrateFun = self.substrateCollector
 
-        header = _null
+        header = b""
 
         while head:
             component, head = decodeFun(
@@ -355,7 +353,7 @@ class OctetStringDecoder(AbstractSimpleDecoder):
         # All inner fragments are of the same type, treat them as octet string
         substrateFun = self.substrateCollector
 
-        header = _null
+        header = b""
 
         while substrate:
             component, substrate = decodeFun(
@@ -507,7 +505,7 @@ class RealDecoder(AbstractSimpleDecoder):
             if not eo or not head:
                 raise error.PyAsn1Error("Real exponent screwed")
 
-            e = eo[0] & 0x80 and -1 or 0
+            e = -1 if eo[0] & 0x80 else 0
 
             while eo:  # exponent
                 e <<= 8
@@ -542,7 +540,7 @@ class RealDecoder(AbstractSimpleDecoder):
             if LOG:
                 LOG("decoding infinite REAL")
 
-            value = fo & 0x01 and "-inf" or "inf"
+            value = "-inf" if fo & 0x01 else "inf"
 
         elif fo & 0xC0 == 0:  # character encoding
             if not head:
@@ -561,8 +559,8 @@ class RealDecoder(AbstractSimpleDecoder):
                 else:
                     raise error.SubstrateUnderrunError("Unknown NR (tag %s)" % fo)
 
-            except ValueError:
-                raise error.SubstrateUnderrunError("Bad character Real syntax")
+            except ValueError as exc:
+                raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
 
         else:
             raise error.SubstrateUnderrunError("Unknown encoding (tag %s)" % fo)
@@ -684,8 +682,8 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                 LOG(
                     "decoding %sdeterministic %s type %r chosen by type ID"
                     % (
-                        not isDeterministic and "non-" or "",
-                        isSetType and "SET" or "",
+                        "non-" if not isDeterministic else "",
+                        "SET" if isSetType else "",
                         asn1Spec,
                     )
                 )
@@ -710,10 +708,10 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                         else:
                             componentType = namedTypes[idx].asn1Object
 
-                    except IndexError:
+                    except IndexError as exc:
                         raise error.PyAsn1Error(
                             "Excessive components decoded at %r" % (asn1Spec,)
-                        )
+                        ) from exc
 
                 component, head = decodeFun(head, componentType, **options)
 
@@ -909,8 +907,8 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                 LOG(
                     "decoding %sdeterministic %s type %r chosen by type ID"
                     % (
-                        not isDeterministic and "non-" or "",
-                        isSetType and "SET" or "",
+                        "non-" if not isDeterministic else "",
+                        "SET" if isSetType else "",
                         asn1Spec,
                     )
                 )
@@ -935,10 +933,10 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                         else:
                             asn1Spec = namedTypes[idx].asn1Object
 
-                    except IndexError:
+                    except IndexError as exc:
                         raise error.PyAsn1Error(
                             "Excessive components decoded at %r" % (asn1Object,)
-                        )
+                        ) from exc
 
                 component, substrate = decodeFun(
                     substrate, asn1Spec, allowEoo=True, **options
@@ -1320,7 +1318,7 @@ class AnyDecoder(AbstractSimpleDecoder):
 
         if isTagged:
             # tagged Any type -- consume header substrate
-            header = _null
+            header = b""
 
             if LOG:
                 LOG("decoding as tagged ANY")
@@ -1583,10 +1581,10 @@ class Decoder:
 
                             substrate = substrate[lengthOctetIdx:]
 
-                        except IndexError:
+                        except IndexError as exc:
                             raise error.SubstrateUnderrunError(
                                 "Short octet stream on long tag decoding"
-                            )
+                            ) from exc
 
                     lastTag = tag.Tag(
                         tagClass=tagClass, tagFormat=tagFormat, tagId=tagId
@@ -1671,7 +1669,7 @@ class Decoder:
                         % (
                             length,
                             debug.hexdump(
-                                length == -1 and substrate or substrate[:length]
+                                substrate if length == -1 else substrate[:length]
                             ),
                         )
                     )
@@ -1727,7 +1725,7 @@ class Decoder:
                             concreteDecoder
                             and concreteDecoder.__class__.__name__
                             or "<none>",
-                            state is stDecodeValue and "value" or "as explicit tag",
+                            "value" if state is stDecodeValue else "as explicit tag",
                         )
                     )
                     debug.scope.push(
@@ -1816,11 +1814,11 @@ class Decoder:
                             state is stDecodeValue
                             and concreteDecoder.__class__.__name__
                             or "<none>",
-                            state is stDecodeValue and "value" or "as explicit tag",
+                            "value" if state is stDecodeValue else "as explicit tag",
                         )
                     )
                     debug.scope.push(
-                        chosenSpec is None and "?" or chosenSpec.__class__.__name__
+                        "?" if chosenSpec is None else chosenSpec.__class__.__name__
                     )
 
             if state is stDecodeValue:
@@ -1864,7 +1862,7 @@ class Decoder:
                             isinstance(value, base.Asn1Item)
                             and value.prettyPrint()
                             or value,
-                            substrate and debug.hexdump(substrate) or "<none>",
+                            debug.hexdump(substrate) if substrate else "<none>",
                         )
                     )
 
@@ -1892,7 +1890,7 @@ class Decoder:
                             concreteDecoder
                             and concreteDecoder.__class__.__name__
                             or "<none>",
-                            state is stDecodeValue and "value" or "as failure",
+                            "value" if state is stDecodeValue else "as failure",
                         )
                     )
 

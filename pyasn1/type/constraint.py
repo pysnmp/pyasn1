@@ -6,8 +6,6 @@
 #
 # Original concept and code by Mike C. Fletcher.
 #
-import sys
-
 from pyasn1.type import error
 
 __all__ = [
@@ -36,10 +34,8 @@ class AbstractConstraint:
         try:
             self._testValue(value, idx)
 
-        except error.ValueConstraintError:
-            raise error.ValueConstraintError(
-                "%s failed at: %r" % (self, sys.exc_info()[1])
-            )
+        except error.ValueConstraintError as exc:
+            raise error.ValueConstraintError("%s failed at: %r" % (self, exc)) from exc
 
     def __repr__(self):
         representation = "%s object" % (self.__class__.__name__)
@@ -50,7 +46,7 @@ class AbstractConstraint:
         return "<%s>" % representation
 
     def __eq__(self, other):
-        return self is other and True or self._values == other
+        return self is other or self._values == other
 
     def __ne__(self, other):
         return self._values != other
@@ -68,7 +64,7 @@ class AbstractConstraint:
         return self._values >= other
 
     def __bool__(self):
-        return self._values and True or False
+        return bool(self._values)
 
     def __hash__(self):
         return self.__hash

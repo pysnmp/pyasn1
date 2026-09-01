@@ -38,7 +38,7 @@ class SetEncoder(encoder.SetEncoder):
                 if len(names) != 1:
                     raise error.PyAsn1Error(
                         "%s components for Choice at %r"
-                        % (len(names) and "Multiple " or "None ", component)
+                        % ("Multiple " if names else "None ", component)
                     )
 
                 # TODO: support nested CHOICE ordering
