@@ -73,8 +73,7 @@ class AbstractCharacterString(univ.OctetString):
         except UnicodeEncodeError:
             exc = sys.exc_info()[1]
             raise error.PyAsn1UnicodeEncodeError(
-                "Can't encode string '%s' with codec "
-                "%s" % (self._value, self.encoding),
+                "Can't encode string '%s' with codec %s" % (self._value, self.encoding),
                 exc,
             )
 
@@ -94,7 +93,7 @@ class AbstractCharacterString(univ.OctetString):
         except (UnicodeDecodeError, LookupError):
             exc = sys.exc_info()[1]
             raise error.PyAsn1UnicodeDecodeError(
-                "Can't decode string '%s' with codec " "%s" % (value, self.encoding),
+                "Can't decode string '%s' with codec %s" % (value, self.encoding),
                 exc,
             )
 
