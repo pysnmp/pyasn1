@@ -64,6 +64,19 @@ jobs:
       - name: Check formatting
         run: uv run ruff format --check .
 
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Build docs
+        run: uv run --python 3.13 --group dev sphinx-build -W -b html docs/source docs/build
+
   build:
     name: build
     runs-on: ubuntu-latest

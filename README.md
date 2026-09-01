@@ -4,7 +4,7 @@ ASN.1 library for Python
 [![PyPI](https://img.shields.io/pypi/v/pysnmp-pyasn1.svg?maxAge=2592000)](https://pypi.org/project/pysnmp-pyasn1)
 [![Python Versions](https://img.shields.io/pypi/pyversions/pysnmp-pyasn1.svg)](https://pypi.org/project/pysnmp-pyasn1/)
 [![CI](https://github.com/pysnmp/pyasn1/actions/workflows/build-test-release.yml/badge.svg)](https://github.com/pysnmp/pyasn1/actions/workflows/build-test-release.yml)
-[![GitHub license](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/pysnmp/pyasn1/master/LICENSE.txt)
+[![GitHub license](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/pysnmp/pyasn1/blob/main/LICENSE.rst)
 
 This is a free and open source implementation of ASN.1 types and codecs
 as a Python package. It has been first written to support particular
@@ -21,7 +21,7 @@ Features
 * Standards compliant BER/CER/DER codecs
 * Can operate on streams of serialized data
 * Dumps/loads ASN.1 structures from Python types
-* 100% Python, works with Python 2.7 and 3.5+
+* 100% Python, works with Python 3.10+
 * MT-safe
 * Contributed ASN.1 compiler [Asn1ate](https://github.com/kimgr/asn1ate)
 
@@ -156,11 +156,10 @@ Record:
 With ASN.1 design, serialisation codecs are decoupled from data objects,
 so you could turn every single ASN.1 object into many different
 serialised forms. As of this moment, pyasn1 supports BER, DER, CER and
-Python built-ins codecs. The extremely compact PER encoding is expected
-to be introduced in the upcoming pyasn1 release.
+Python built-ins codecs.
 
 More information on pyasn1 APIs can be found in the
-[documentation](),
+[documentation](https://github.com/pysnmp/pyasn1/tree/main/docs/source);
 compiled ASN.1 modules for different protocols and file formats
 could be found in the pyasn1-modules
 [repo](https://github.com/pysnmp/pyasn1-modules).
@@ -169,17 +168,16 @@ How to get pyasn1
 -----------------
 
 This project is forked from pyasn1. The pyasn1 package is distributed under terms
-and conditions of 2-clause BSD [license](http://snmplabs.com/pyasn1/license.html).
+and conditions of 2-clause BSD [license](https://github.com/pysnmp/pyasn1/blob/main/LICENSE.rst).
 Source code is freely available as a GitHub [repo](https://github.com/pysnmp/pyasn1).
 
 You could `pip install pysnmp-pyasn1` or download it from [PyPI](https://pypi.org/project/pysnmp-pyasn1).
 
 If something does not work as expected,
-[open an issue](https://github.com/pysnmp/pyasn1/issues) at GitHub or
-post your question [on Stack Overflow](https://stackoverflow.com/questions/ask)
-or try browsing pyasn1 .
+[open an issue](https://github.com/pysnmp/pyasn1/issues) at GitHub
+or post your question [on Stack Overflow](https://stackoverflow.com/questions/ask).
 
 Copyright (c) 2005-2020, [Ilya Etingof](mailto:etingof@gmail.com).
 All rights reserved.
-Copyright (c) 2021- [Splunk Inc.]
-Copyright (c) 2025- [Ryan Faircloth]
+Copyright (c) 2021- Splunk Inc.
+Copyright (c) 2025- Ryan Faircloth
