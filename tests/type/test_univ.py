@@ -38,9 +38,9 @@ class NoValueTestCase(BaseTestCase):
 
     def testIsInstance(self):
         try:
-            assert isinstance(
-                univ.noValue, univ.NoValue
-            ), "isinstance() on NoValue() object fails"
+            assert isinstance(univ.noValue, univ.NoValue), (
+                "isinstance() on NoValue() object fails"
+            )
 
         except PyAsn1Error:
             assert False, "isinstance() on NoValue object fails"
@@ -318,9 +318,9 @@ class BooleanTestCase(BaseTestCase):
         assert univ.Boolean(True) and univ.Boolean(1), "Truth initializer fails"
 
     def testFalse(self):
-        assert not univ.Boolean(False) and not univ.Boolean(
-            0
-        ), "False initializer fails"
+        assert not univ.Boolean(False) and not univ.Boolean(0), (
+            "False initializer fails"
+        )
 
     def testStr(self):
         assert str(univ.Boolean(1)) == "True", "str() fails"
@@ -462,9 +462,9 @@ class BitStringTestCase(BaseTestCase):
         )
 
     def testAsOctets(self):
-        assert self.b.clone(hexValue="A98A").asOctets() == bytes(
-            (0xA9, 0x8A)
-        ), "testAsOctets() fails"
+        assert self.b.clone(hexValue="A98A").asOctets() == bytes((0xA9, 0x8A)), (
+            "testAsOctets() fails"
+        )
 
     def testAsInts(self):
         assert self.b.clone(hexValue="A98A").asNumbers() == (
@@ -513,9 +513,9 @@ class OctetStringWithUnicodeMixIn:
         self.numbersString = tuple(self.encodedPythonString)
 
     def testInit(self):
-        assert (
-            univ.OctetString(self.encodedPythonString) == self.encodedPythonString
-        ), "__init__() fails"
+        assert univ.OctetString(self.encodedPythonString) == self.encodedPythonString, (
+            "__init__() fails"
+        )
 
     def testInitFromAsn1(self):
         assert (
@@ -668,9 +668,9 @@ class OctetStringTestCase(BaseTestCase):
         ), "hex init fails"
 
     def testTuple(self):
-        assert univ.OctetString((1, 2, 3, 4, 5)) == bytes(
-            (1, 2, 3, 4, 5)
-        ), "tuple init failed"
+        assert univ.OctetString((1, 2, 3, 4, 5)) == bytes((1, 2, 3, 4, 5)), (
+            "tuple init failed"
+        )
 
     def testRepr(self):
         assert "abc" in repr(univ.OctetString("abc"))
@@ -779,9 +779,9 @@ class NullPicklingTestCase(unittest.TestCase):
 
 class RealTestCase(BaseTestCase):
     def testFloat4BinEnc(self):
-        assert (
-            univ.Real((0.25, 2, 3)) == 2.0
-        ), "float initializer for binary encoding fails"
+        assert univ.Real((0.25, 2, 3)) == 2.0, (
+            "float initializer for binary encoding fails"
+        )
 
     def testStr(self):
         assert str(univ.Real(1.0)) == "1.0", "str() fails"
@@ -1352,9 +1352,9 @@ class Sequence(BaseTestCase):
 
     def testById(self):
         self.s1.setComponentByName("name", univ.OctetString("abc"))
-        assert self.s1.getComponentByName("name") == _str2octs(
-            "abc"
-        ), "set by name fails"
+        assert self.s1.getComponentByName("name") == _str2octs("abc"), (
+            "set by name fails"
+        )
 
     def testByKey(self):
         self.s1["name"] = "abc"

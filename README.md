@@ -68,17 +68,15 @@ Could be expressed in pyasn1 like this:
 ```python
 class Record(Sequence):
     componentType = NamedTypes(
-        NamedType('id', Integer()),
+        NamedType("id", Integer()),
         OptionalNamedType(
-            'room', Integer().subtype(
-                implicitTag=Tag(tagClassContext, tagFormatSimple, 0)
-            )
+            "room",
+            Integer().subtype(implicitTag=Tag(tagClassContext, tagFormatSimple, 0)),
         ),
         DefaultedNamedType(
-            'house', Integer(0).subtype(
-                implicitTag=Tag(tagClassContext, tagFormatSimple, 1)
-            )
-        )
+            "house",
+            Integer(0).subtype(implicitTag=Tag(tagClassContext, tagFormatSimple, 1)),
+        ),
     )
 ```
 

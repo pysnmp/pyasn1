@@ -209,8 +209,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
         if not self.supportConstructedForm:
             raise error.PyAsn1Error(
-                "Constructed encoding form prohibited "
-                "at %s" % self.__class__.__name__
+                "Constructed encoding form prohibited at %s" % self.__class__.__name__
             )
 
         if LOG:

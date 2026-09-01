@@ -846,8 +846,7 @@ class OctetString(base.SimpleAsn1Type):
             except UnicodeEncodeError:
                 exc = sys.exc_info()[1]
                 raise error.PyAsn1UnicodeEncodeError(
-                    "Can't encode string '%s' with '%s' "
-                    "codec" % (value, self.encoding),
+                    "Can't encode string '%s' with '%s' codec" % (value, self.encoding),
                     exc,
                 )
         elif isinstance(

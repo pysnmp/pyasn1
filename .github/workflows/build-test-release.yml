@@ -58,11 +58,11 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v7
       - name: Install dependencies
-        run: uv pip install -e ".[dev]" --system
+        run: uv sync --locked
       - name: Run Ruff
-        run: ruff check .
+        run: uv run ruff check .
       - name: Run Pylint
-        run: pylint pyasn1
+        run: uv run pylint pyasn1
 
   build:
     name: build
@@ -76,9 +76,7 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v7
       - name: Build
-        run: |
-          uv pip install -e ".[dev]" --system
-          uv build
+        run: uv build
       - uses: actions/upload-artifact@v7
         with:
           name: dist
@@ -89,7 +87,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     needs:
@@ -104,7 +102,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Run tests
         run: |
-          uv pip install -e ".[dev]" --system
+          uv sync --locked --python ${{ matrix.python }}
           uv run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
       - uses: actions/upload-artifact@v7
         with:
@@ -135,9 +133,7 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v7
       - name: Build
-        run: |
-          uv pip install -e ".[dev]" --system
-          uv build
+        run: uv build
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v6
         with:
