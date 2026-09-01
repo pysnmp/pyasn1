@@ -139,7 +139,7 @@ jobs:
           uv pip install -e ".[dev]" --system
           uv build
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           semantic_version: 24
           extra_plugins: |
