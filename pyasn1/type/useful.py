@@ -6,7 +6,7 @@
 #
 import datetime
 import warnings
-from typing import Final
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.type import char, tag, univ
@@ -39,7 +39,7 @@ class TimeMixIn:
     UTC = datetime.timezone.utc
 
     @staticmethod
-    def FixedOffset(offset=0, name="UTC"):
+    def FixedOffset(offset: int = 0, name: str = "UTC") -> datetime.timezone:
         """Fixed offset in minutes east from UTC.
 
         .. deprecated::
@@ -55,7 +55,7 @@ class TimeMixIn:
         return datetime.timezone(datetime.timedelta(minutes=offset), name)
 
     @property
-    def asDateTime(self):
+    def asDateTime(self) -> datetime.datetime:
         """Create :py:class:`datetime.datetime` object from a |ASN.1| object.
 
         Returns
@@ -95,12 +95,12 @@ class TimeMixIn:
 
         if "." in text or "," in text:
             if "." in text:
-                text, _, ms = text.partition(".")
+                text, _, subsecond = text.partition(".")
             else:
-                text, _, ms = text.partition(",")
+                text, _, subsecond = text.partition(",")
 
             try:
-                ms = int(ms) * 1000
+                ms = int(subsecond) * 1000
 
             except ValueError as exc:
                 raise error.PyAsn1Error(
@@ -126,7 +126,7 @@ class TimeMixIn:
         return dt.replace(microsecond=ms, tzinfo=tzinfo)
 
     @classmethod
-    def fromDateTime(cls, dt):
+    def fromDateTime(cls, dt: datetime.datetime) -> Any:
         """Create |ASN.1| object from a :py:class:`datetime.datetime` object.
 
         Parameters
@@ -144,8 +144,9 @@ class TimeMixIn:
         if cls._hasSubsecond:
             text += ".%d" % (dt.microsecond // 1000)
 
-        if dt.utcoffset():
-            seconds = dt.utcoffset().seconds
+        utcOffset = dt.utcoffset()
+        if utcOffset:
+            seconds = utcOffset.seconds
             if seconds < 0:
                 text += "-"
             else:
@@ -154,7 +155,7 @@ class TimeMixIn:
         else:
             text += "Z"
 
-        return cls(text)
+        return cls(text)  # type: ignore[call-arg]
 
 
 class GeneralizedTime(char.VisibleString, TimeMixIn):

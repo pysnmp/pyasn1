@@ -11,7 +11,7 @@ from pyasn1.codec.ber import eoo
 from pyasn1.type import char, tag, univ, useful
 
 
-def _int_to_bytes(value, signed=False, length=0):
+def _int_to_bytes(value: int, signed: bool = False, length: int = 0) -> bytes:
     """Convert an integer to bytes with length calculation."""
     length = max(value.bit_length(), length)
     if signed and length % 8 == 0:
@@ -32,7 +32,7 @@ class AbstractItemEncoder:
     eooOctetsSubstrate = bytes(eooIntegerSubstrate)
 
     # noinspection PyMethodMayBeStatic
-    def encodeTag(self, singleTag, isConstructed):
+    def encodeTag(self, singleTag: tag.Tag, isConstructed: bool) -> tuple[int, ...]:
         tagClass, tagFormat, tagId = singleTag
         encodedTag = tagClass | tagFormat
         if isConstructed:
@@ -42,7 +42,7 @@ class AbstractItemEncoder:
             return (encodedTag | tagId,)
 
         else:
-            substrate = (tagId & 0x7F,)
+            substrate: tuple[int, ...] = (tagId & 0x7F,)
 
             tagId >>= 7
 
@@ -52,7 +52,7 @@ class AbstractItemEncoder:
 
             return (encodedTag | 0x1F,) + substrate
 
-    def encodeLength(self, length, defMode):
+    def encodeLength(self, length: int, defMode: bool) -> tuple[int, ...]:
         if not defMode and self.supportIndefLenMode:
             return (0x80,)
 
@@ -60,7 +60,7 @@ class AbstractItemEncoder:
             return (length,)
 
         else:
-            substrate = ()
+            substrate: tuple[int, ...] = ()
             while length:
                 substrate = (length & 0xFF,) + substrate
                 length >>= 8
@@ -72,10 +72,14 @@ class AbstractItemEncoder:
 
             return (0x80 | substrateLen,) + substrate
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         raise error.PyAsn1Error("Not implemented")
 
-    def encode(self, value, asn1Spec=None, encodeFun=None, **options):
+    def encode(
+        self, value: Any, asn1Spec: Any = None, encodeFun: Any = None, **options: Any
+    ) -> bytes:
         if asn1Spec is None:
             tagSet = value.tagSet
         else:
@@ -163,14 +167,18 @@ class AbstractItemEncoder:
 
 
 class EndOfOctetsEncoder(AbstractItemEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         return b"", False, True
 
 
 class BooleanEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         return (1,) if value else (0,), False, False
 
 
@@ -178,7 +186,9 @@ class IntegerEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
     supportCompactZero = False
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if value == 0:
             if LOG:
                 LOG(
@@ -196,7 +206,9 @@ class IntegerEncoder(AbstractItemEncoder):
 
 
 class BitStringEncoder(AbstractItemEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is not None:
             # TODO: try to avoid ASN.1 schema instantiation
             value = asn1Spec.clone(value)
@@ -237,7 +249,9 @@ class BitStringEncoder(AbstractItemEncoder):
 
 
 class OctetStringEncoder(AbstractItemEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is None:
             substrate = value.asOctets()
 
@@ -298,14 +312,18 @@ class OctetStringEncoder(AbstractItemEncoder):
 class NullEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         return b"", False, True
 
 
 class ObjectIdentifierEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is not None:
             value = asn1Spec.clone(value)
 
@@ -335,7 +353,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
         else:
             raise error.PyAsn1Error("Impossible first/second arcs at %s" % (value,))
 
-        octets = ()
+        octets: tuple[int, ...] = ()
 
         # Cycle through subIds
         for subOid in oid:
@@ -345,7 +363,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
 
             elif subOid > 127:
                 # Pack large Sub-Object IDs
-                res = (subOid & 0x7F,)
+                res: tuple[int, ...] = (subOid & 0x7F,)
                 subOid >>= 7
 
                 while subOid:
@@ -366,7 +384,7 @@ class RealEncoder(AbstractItemEncoder):
     binEncBase = 2  # set to None to choose encoding base automatically
 
     @staticmethod
-    def _dropFloatingPoint(m, encbase, e):
+    def _dropFloatingPoint(m: float, encbase: int, e: int) -> tuple[int, int, int, int]:
         ms, es = 1, 1
         if m < 0:
             ms = -1  # mantissa sign
@@ -393,7 +411,7 @@ class RealEncoder(AbstractItemEncoder):
 
         return ms, int(m), encbase, e
 
-    def _chooseEncBase(self, value):
+    def _chooseEncBase(self, value: Any) -> tuple[int, int, int, int]:
         m, b, e = value
         encBase = [2, 8, 16]
         if value.binEncBase in encBase:
@@ -429,7 +447,9 @@ class RealEncoder(AbstractItemEncoder):
 
         return sign, m, encbase, e
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is not None:
             value = asn1Spec.clone(value)
 
@@ -537,7 +557,9 @@ class SequenceEncoder(AbstractItemEncoder):
 
     # TODO: handling three flavors of input is too much -- split over codecs
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         substrate = b""
 
         omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
@@ -656,7 +678,9 @@ class SequenceEncoder(AbstractItemEncoder):
 
 
 class SequenceOfEncoder(AbstractItemEncoder):
-    def _encodeComponents(self, value, asn1Spec, encodeFun, **options):
+    def _encodeComponents(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> list[bytes]:
         if asn1Spec is None:
             inconsistency = value.isInconsistent
             if inconsistency:
@@ -683,14 +707,18 @@ class SequenceOfEncoder(AbstractItemEncoder):
 
         return chunks
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
         return b"".join(chunks), True, True
 
 
 class ChoiceEncoder(AbstractItemEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is None:
             component = value.getComponent()
         else:
@@ -714,7 +742,9 @@ class ChoiceEncoder(AbstractItemEncoder):
 
 
 class AnyEncoder(OctetStringEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if asn1Spec is None:
             value = value.asOctets()
         elif not isinstance(value, bytes):

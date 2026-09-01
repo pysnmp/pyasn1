@@ -4,7 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Final
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.codec.ber import decoder
@@ -18,15 +18,15 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         head, tail = substrate[:length], substrate[length:]
         if not head or length != 1:
             raise error.PyAsn1Error("Not single-octet Boolean payload")

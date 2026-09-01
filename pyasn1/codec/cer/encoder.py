@@ -4,7 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from typing import Final
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.codec.ber import encoder
@@ -14,7 +14,9 @@ __all__ = ["encode"]
 
 
 class BooleanEncoder(encoder.IntegerEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if value == 0:
             substrate = (0,)
         else:
@@ -23,7 +25,7 @@ class BooleanEncoder(encoder.IntegerEncoder):
 
 
 class RealEncoder(encoder.RealEncoder):
-    def _chooseEncBase(self, value):
+    def _chooseEncBase(self, value: Any) -> tuple[int, int, int, int]:
         m, b, e = value
         return self._dropFloatingPoint(m, b, e)
 
@@ -42,7 +44,9 @@ class TimeEncoderMixIn:
     MIN_LENGTH = 12
     MAX_LENGTH = 19
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         # CER encoding constraints:
         # - minutes are mandatory, seconds are optional
         # - sub-seconds must NOT be zero / no meaningless zeros
@@ -95,7 +99,11 @@ class TimeEncoderMixIn:
         options.update(maxChunkSize=1000)
 
         return encoder.OctetStringEncoder.encodeValue(
-            self, value, asn1Spec, encodeFun, **options
+            self,  # type: ignore[arg-type]
+            value,
+            asn1Spec,
+            encodeFun,
+            **options,
         )
 
 
@@ -110,7 +118,9 @@ class UTCTimeEncoder(TimeEncoderMixIn, encoder.OctetStringEncoder):
 
 
 class SetOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
         # sort by serialised and padded components
@@ -126,7 +136,9 @@ class SetOfEncoder(encoder.SequenceOfEncoder):
 
 
 class SequenceOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if options.get("ifNotEmpty", False) and not len(value):
             return b"", True, True
 
@@ -137,7 +149,7 @@ class SequenceOfEncoder(encoder.SequenceOfEncoder):
 
 class SetEncoder(encoder.SequenceEncoder):
     @staticmethod
-    def _componentSortKey(componentAndType):
+    def _componentSortKey(componentAndType: Any) -> Any:
         """Sort SET components by tag
 
         Sort regardless of the Choice value (static sort)
@@ -155,7 +167,9 @@ class SetEncoder(encoder.SequenceEncoder):
         else:
             return asn1Spec.tagSet
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         substrate = b""
 
         comps = []

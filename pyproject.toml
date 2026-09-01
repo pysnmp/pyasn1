@@ -97,6 +97,20 @@ warn_unused_configs = true
 no_implicit_optional = true
 strict_equality = true
 
+# Modules below are fully annotated and must stay that way. Move entries out of
+# this list only to widen coverage, never to relax it.
+[[tool.mypy.overrides]]
+module = [
+    "pyasn1.debug",
+    "pyasn1.error",
+    "pyasn1.codec.*",
+    "pyasn1.type.char",
+    "pyasn1.type.tagmap",
+    "pyasn1.type.useful",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = [
