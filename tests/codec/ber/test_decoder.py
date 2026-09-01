@@ -10,6 +10,8 @@ import unittest
 
 def _str2octs(s):
     return s.encode("iso-8859-1")
+
+
 _null = b""
 
 from pyasn1.codec.ber import decoder, eoo

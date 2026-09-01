@@ -11,6 +11,7 @@ import unittest
 def _str2octs(s):
     return s.encode("iso-8859-1")
 
+
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
@@ -29,7 +30,6 @@ class UntaggedAnyTestCase(BaseTestCase):
         self.s = Sequence()
 
     def testTypeCheckOnAssignment(self):
-
         self.s.clear()
 
         self.s["blob"] = univ.Any(_str2octs("xxx"))
@@ -55,7 +55,6 @@ class TaggedAnyTestCase(BaseTestCase):
         self.s = Sequence()
 
     def testTypeCheckOnAssignment(self):
-
         self.s.clear()
 
         self.s["blob"] = self.taggedAny.clone("xxx")
@@ -89,7 +88,6 @@ class TaggedAnyOpenTypeTestCase(BaseTestCase):
         self.s = Sequence()
 
     def testTypeCheckOnAssignment(self):
-
         self.s.clear()
 
         self.s["blob"] = univ.Any(_str2octs("xxx"))

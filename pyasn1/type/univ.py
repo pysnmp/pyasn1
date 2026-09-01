@@ -19,6 +19,7 @@ def _int_to_bytes(value, signed=False, length=0):
         length += 1
     return value.to_bytes(length // 8 + (length % 8 and 1 or 0), "big", signed=signed)
 
+
 NoValue = base.NoValue
 noValue = NoValue()
 
@@ -268,6 +269,7 @@ class Integer(base.SimpleAsn1Type):
 
         except KeyError:
             return str(value)
+
 
 class Boolean(Integer):
     """Create |ASN.1| schema or value object.
@@ -695,7 +697,6 @@ class BitString(base.SimpleAsn1Type):
                 names = [x.strip() for x in value.split(",")]
 
                 try:
-
                     bitPositions = [self.namedValues[name] for name in names]
 
                 except KeyError:
@@ -1467,6 +1468,7 @@ class Real(base.SimpleAsn1Type):
             raise error.PyAsn1Error("Invalid infinite value operation")
         else:
             return self._value[idx]
+
 
 class Enumerated(Integer):
     """Create |ASN.1| schema or value object.
@@ -2728,6 +2730,7 @@ class Sequence(SequenceAndSetBase):
     # Disambiguation ASN.1 types identification
     typeId = SequenceAndSetBase.getTypeId()
 
+
 class Set(SequenceAndSetBase):
     __doc__ = SequenceAndSetBase.__doc__
 
@@ -3012,7 +3015,6 @@ class Choice(Set):
                 myClone.setComponentByType(tagSet, component.clone())
 
     def getComponentByPosition(self, idx, default=noValue, instantiate=True):
-
         if self._currentIdx is None or self._currentIdx != idx:
             return Set.getComponentByPosition(
                 self, idx, default=default, instantiate=instantiate
@@ -3161,6 +3163,7 @@ class Choice(Set):
     def clear(self):
         self._currentIdx = None
         return Set.clear(self)
+
 
 class Any(OctetString):
     """Create |ASN.1| schema or value object.

@@ -264,7 +264,9 @@ class TagSet:
             New *TagSet* object
         """
         if self.__superTags:
-            superTag = Tag(superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId)
+            superTag = Tag(
+                superTag.tagClass, self.__superTags[-1].tagFormat, superTag.tagId
+            )
         return self[:-1] + superTag
 
     def isSuperTagSetOf(self, tagSet):
@@ -287,6 +289,7 @@ class TagSet:
         if len(tagSet) < self.__lenOfSuperTags:
             return False
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
+
 
 def initTagSet(tag):
     return TagSet(tag, tag)

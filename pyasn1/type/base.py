@@ -142,6 +142,7 @@ class Asn1Type(Asn1Item):
     def prettyPrint(self, scope=0):
         raise NotImplementedError()
 
+
 class NoValue:
     """Create a singleton instance of NoValue class.
 

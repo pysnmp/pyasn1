@@ -66,7 +66,9 @@ class NamedValues(dict):
                     name, number = namedValue
 
                 except ValueError:
-                    raise error.PyAsn1Error("Not a proper attribute-value pair %r" % (namedValue,))
+                    raise error.PyAsn1Error(
+                        "Not a proper attribute-value pair %r" % (namedValue,)
+                    )
 
             else:
                 anonymousNames.append(namedValue)
@@ -92,11 +94,9 @@ class NamedValues(dict):
             self._numbers[number] = name
 
         if anonymousNames:
-
             number = self._numbers and max(self._numbers) + 1 or 0
 
             for name in anonymousNames:
-
                 if name in self:
                     raise error.PyAsn1Error("Duplicate name %s" % (name,))
 

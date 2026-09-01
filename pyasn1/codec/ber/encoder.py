@@ -29,6 +29,7 @@ _null = b""
 def _str2octs(s):
     return s.encode("iso-8859-1")
 
+
 __all__ = ["encode"]
 
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
@@ -86,7 +87,6 @@ class AbstractItemEncoder:
         raise error.PyAsn1Error("Not implemented")
 
     def encode(self, value, asn1Spec=None, encodeFun=None, **options):
-
         if asn1Spec is None:
             tagSet = value.tagSet
         else:
@@ -104,7 +104,6 @@ class AbstractItemEncoder:
         substrate = _null
 
         for idx, singleTag in enumerate(tagSet.superTags):
-
             defModeOverride = defMode
 
             # base tag?
@@ -249,7 +248,6 @@ class BitStringEncoder(AbstractItemEncoder):
 
 class OctetStringEncoder(AbstractItemEncoder):
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
         if asn1Spec is None:
             substrate = value.asOctets()
 
@@ -549,7 +547,6 @@ class SequenceEncoder(AbstractItemEncoder):
     # TODO: handling three flavors of input is too much -- split over codecs
 
     def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
         substrate = _null
 
         omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
@@ -587,15 +584,13 @@ class SequenceEncoder(AbstractItemEncoder):
 
                 # wrap open type blob if needed
                 if namedTypes and namedType.openType:
-
                     wrapType = namedType.asn1Object
 
                     if wrapType.typeId in (univ.SetOf.typeId, univ.SequenceOf.typeId):
-
                         substrate += encodeFun(
                             component,
                             asn1Spec,
-                            **dict(options, wrapType=wrapType.componentType)
+                            **dict(options, wrapType=wrapType.componentType),
                         )
 
                     else:
@@ -616,7 +611,6 @@ class SequenceEncoder(AbstractItemEncoder):
         else:
             # bare Python value + ASN.1 schema
             for idx, namedType in enumerate(asn1Spec.componentType.namedTypes):
-
                 try:
                     component = value[namedType.name]
 
@@ -642,16 +636,14 @@ class SequenceEncoder(AbstractItemEncoder):
 
                 # wrap open type blob if needed
                 if namedType.openType:
-
                     if componentSpec.typeId in (
                         univ.SetOf.typeId,
                         univ.SequenceOf.typeId,
                     ):
-
                         substrate += encodeFun(
                             component,
                             componentSpec,
-                            **dict(options, wrapType=componentSpec.componentType)
+                            **dict(options, wrapType=componentSpec.componentType),
                         )
 
                     else:
@@ -674,7 +666,6 @@ class SequenceEncoder(AbstractItemEncoder):
 
 class SequenceOfEncoder(AbstractItemEncoder):
     def _encodeComponents(self, value, asn1Spec, encodeFun, **options):
-
         if asn1Spec is None:
             inconsistency = value.isInconsistent
             if inconsistency:

@@ -130,14 +130,12 @@ typeMap = {
 
 
 class Decoder:
-
     # noinspection PyDefaultArgument
     def __init__(self, tagMap, typeMap):
         self.__tagMap = tagMap
         self.__typeMap = typeMap
 
     def __call__(self, pyObject, asn1Spec, **options):
-
         if LOG:
             debug.scope.push(type(pyObject).__name__)
             LOG(

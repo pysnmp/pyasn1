@@ -48,9 +48,9 @@ class BitStringDecoderTestCase(BaseTestCase):
 
 class OctetStringDecoderTestCase(BaseTestCase):
     def testSimple(self):
-        assert decoder.decode("Quick brown fox", asn1Spec=univ.OctetString()) == univ.OctetString(
-            "Quick brown fox"
-        )
+        assert decoder.decode(
+            "Quick brown fox", asn1Spec=univ.OctetString()
+        ) == univ.OctetString("Quick brown fox")
 
 
 class NullDecoderTestCase(BaseTestCase):
@@ -88,7 +88,9 @@ class SequenceDecoderTestCase(BaseTestCase):
         s[1] = univ.OctetString("xx")
         s[2] = univ.Integer(33)
         assert (
-            decoder.decode({"place-holder": None, "first-name": "xx", "age": 33}, asn1Spec=self.s)
+            decoder.decode(
+                {"place-holder": None, "first-name": "xx", "age": 33}, asn1Spec=self.s
+            )
             == s
         )
 

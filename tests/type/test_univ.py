@@ -504,7 +504,6 @@ class BitStringPicklingTestCase(unittest.TestCase):
 
 
 class OctetStringWithUnicodeMixIn:
-
     initializer = ()
     encoding = "us-ascii"
 
@@ -1040,7 +1039,8 @@ class SequenceOf(BaseTestCase):
             s.setComponentByPosition(
                 0,
                 univ.OctetString().subtype(
-                    "abc", subtypeSpec=constraint.SingleValueConstraint(_str2octs("abc"))
+                    "abc",
+                    subtypeSpec=constraint.SingleValueConstraint(_str2octs("abc")),
                 ),
             )
         except PyAsn1Error:
@@ -1432,9 +1432,7 @@ class Sequence(BaseTestCase):
             name="a", nick="b", age=1
         ) == self.s1.setComponentByPosition(0, "a").setComponentByPosition(
             1, "b"
-        ).setComponentByPosition(
-            2, 1
-        )
+        ).setComponentByPosition(2, 1)
 
     def testSetToDefault(self):
         s = self.s1.clone()
@@ -1472,7 +1470,6 @@ class Sequence(BaseTestCase):
         s["name"] = "xxx"
 
         try:
-
             s["xxx"] = "xxx"
 
         except KeyError:
@@ -1482,7 +1479,6 @@ class Sequence(BaseTestCase):
             assert False, "KeyError not raised"
 
         try:
-
             s[100] = "xxx"
 
         except IndexError:
@@ -1754,7 +1750,6 @@ class SequenceWithoutSchema(BaseTestCase):
         s["field-0"] = "xxx"
 
         try:
-
             s["field-1"] = "xxx"
 
         except KeyError:
@@ -2142,7 +2137,6 @@ class Choice(BaseTestCase):
         assert c.getName() == "name"
 
     def testGetComponentWithDefault(self):
-
         s = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("name", univ.OctetString()),
@@ -2163,7 +2157,6 @@ class Choice(BaseTestCase):
         assert s.getComponentByPosition(1, default=None, instantiate=False) is None
 
     def testGetComponentNoInstantiation(self):
-
         s = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("name", univ.OctetString()),

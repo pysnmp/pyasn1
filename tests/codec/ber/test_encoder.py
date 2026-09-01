@@ -19,11 +19,15 @@ class LargeTagEncoderTestCase(BaseTestCase):
 
         self.o = univ.Integer().subtype(
             value=1,
-            explicitTag=tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 0xDEADBEAF),
+            explicitTag=tag.Tag(
+                tag.tagClassApplication, tag.tagFormatSimple, 0xDEADBEAF
+            ),
         )
 
     def testEncoder(self):
-        assert encoder.encode(self.o) == bytes((127, 141, 245, 182, 253, 47, 3, 2, 1, 1))
+        assert encoder.encode(self.o) == bytes(
+            (127, 141, 245, 182, 253, 47, 3, 2, 1, 1)
+        )
 
 
 class IntegerEncoderTestCase(BaseTestCase):
@@ -100,7 +104,9 @@ class BitStringEncoderTestCase(BaseTestCase):
         assert encoder.encode(self.b, defMode=False) == bytes((3, 3, 1, 169, 138))
 
     def testDefModeChunked(self):
-        assert encoder.encode(self.b, maxChunkSize=1) == bytes((35, 8, 3, 2, 0, 169, 3, 2, 1, 138))
+        assert encoder.encode(self.b, maxChunkSize=1) == bytes(
+            (35, 8, 3, 2, 0, 169, 3, 2, 1, 138)
+        )
 
     def testIndefModeChunked(self):
         assert encoder.encode(self.b, defMode=False, maxChunkSize=1) == bytes(
@@ -121,7 +127,9 @@ class BitStringEncoderWithSchemaTestCase(BaseTestCase):
         assert encoder.encode(self.b, asn1Spec=self.s) == bytes((3, 3, 1, 169, 138))
 
     def testIndefMode(self):
-        assert encoder.encode(self.b, asn1Spec=self.s, defMode=False) == bytes((3, 3, 1, 169, 138))
+        assert encoder.encode(self.b, asn1Spec=self.s, defMode=False) == bytes(
+            (3, 3, 1, 169, 138)
+        )
 
     def testDefModeChunked(self):
         assert encoder.encode(self.b, asn1Spec=self.s, maxChunkSize=1) == bytes(
@@ -129,9 +137,9 @@ class BitStringEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.b, asn1Spec=self.s, defMode=False, maxChunkSize=1) == bytes(
-            (35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0)
-        )
+        assert encoder.encode(
+            self.b, asn1Spec=self.s, defMode=False, maxChunkSize=1
+        ) == bytes((35, 128, 3, 2, 0, 169, 3, 2, 1, 138, 0, 0))
 
     def testEmptyValue(self):
         assert encoder.encode([], asn1Spec=self.s) == bytes((3, 1, 0))
@@ -337,7 +345,9 @@ class OctetStringEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.o, asn1Spec=self.s, defMode=False, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.o, asn1Spec=self.s, defMode=False, maxChunkSize=4
+        ) == bytes(
             (
                 36,
                 128,
@@ -539,11 +549,15 @@ class ObjectIdentifierEncoderTestCase(BaseTestCase):
 
     def testEdge6(self):
         # 10000001|00000000
-        assert encoder.encode(univ.ObjectIdentifier((2, 48))) == bytes((6, 2, 0x81, 0x00))
+        assert encoder.encode(univ.ObjectIdentifier((2, 48))) == bytes(
+            (6, 2, 0x81, 0x00)
+        )
 
     def testEdge7(self):
         # 10000001|00110100|00000003
-        assert encoder.encode(univ.ObjectIdentifier((2, 100, 3))) == bytes((6, 3, 0x81, 0x34, 0x03))
+        assert encoder.encode(univ.ObjectIdentifier((2, 100, 3))) == bytes(
+            (6, 3, 0x81, 0x34, 0x03)
+        )
 
     def testEdge8(self):
         # 10000101|00000000
@@ -649,14 +663,16 @@ class ObjectIdentifierEncoderTestCase(BaseTestCase):
 
 class ObjectIdentifierWithSchemaEncoderTestCase(BaseTestCase):
     def testOne(self):
-        assert encoder.encode((1, 3, 6, 0, 0xFFFFE), asn1Spec=univ.ObjectIdentifier()) == bytes(
-            (6, 6, 43, 6, 0, 191, 255, 126)
-        )
+        assert encoder.encode(
+            (1, 3, 6, 0, 0xFFFFE), asn1Spec=univ.ObjectIdentifier()
+        ) == bytes((6, 6, 43, 6, 0, 191, 255, 126))
 
 
 class RealEncoderTestCase(BaseTestCase):
     def testChar(self):
-        assert encoder.encode(univ.Real((123, 10, 11))) == bytes((9, 7, 3, 49, 50, 51, 69, 49, 49))
+        assert encoder.encode(univ.Real((123, 10, 11))) == bytes(
+            (9, 7, 3, 49, 50, 51, 69, 49, 49)
+        )
 
     def testBin1(self):
         assert encoder.encode(  # default binEncBase = 2
@@ -674,7 +690,9 @@ class RealEncoderTestCase(BaseTestCase):
             encoder.typeMap[univ.Real.typeId].binEncBase,
             16,
         )
-        assert encoder.encode(univ.Real((0.00390625, 2, 0))) == bytes(  # check encbase = 16
+        assert encoder.encode(
+            univ.Real((0.00390625, 2, 0))
+        ) == bytes(  # check encbase = 16
             (9, 3, 160, 254, 1)
         )
         encoder.typeMap[univ.Real.typeId].binEncBase = binEncBase
@@ -872,7 +890,9 @@ class SequenceOfEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testDefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4
+        ) == bytes(
             (
                 48,
                 19,
@@ -899,7 +919,9 @@ class SequenceOfEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4
+        ) == bytes(
             (
                 48,
                 128,
@@ -1116,7 +1138,9 @@ class SetOfEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testDefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4
+        ) == bytes(
             (
                 49,
                 19,
@@ -1143,7 +1167,9 @@ class SetOfEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4
+        ) == bytes(
             (
                 49,
                 128,
@@ -1464,7 +1490,9 @@ class SequenceEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testDefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4
+        ) == bytes(
             (
                 48,
                 24,
@@ -1496,7 +1524,9 @@ class SequenceEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4
+        ) == bytes(
             (
                 48,
                 128,
@@ -1550,7 +1580,9 @@ class SequenceEncoderWithUntaggedOpenTypesTestCase(BaseTestCase):
         self.s[0] = 1
         self.s[1] = univ.Integer(12)
 
-        assert encoder.encode(self.s, asn1Spec=self.s) == bytes((48, 5, 2, 1, 1, 49, 50))
+        assert encoder.encode(self.s, asn1Spec=self.s) == bytes(
+            (48, 5, 2, 1, 1, 49, 50)
+        )
 
     def testEncodeOpenTypeChoiceTwo(self):
         self.s.clear()
@@ -1665,7 +1697,9 @@ class SequenceEncoderWithUntaggedSetOfOpenTypesTestCase(BaseTestCase):
         self.s[0] = 1
         self.s[1].append(univ.Integer(12))
 
-        assert encoder.encode(self.s, asn1Spec=self.s) == bytes((48, 7, 2, 1, 1, 49, 2, 49, 50))
+        assert encoder.encode(self.s, asn1Spec=self.s) == bytes(
+            (48, 7, 2, 1, 1, 49, 2, 49, 50)
+        )
 
     def testEncodeOpenTypeChoiceTwo(self):
         self.s.clear()
@@ -1733,7 +1767,9 @@ class SequenceEncoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            implicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,
@@ -1764,7 +1800,9 @@ class SequenceEncoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
                     "blob",
                     univ.SetOf(
                         componentType=univ.Any().subtype(
-                            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                            explicitTag=tag.Tag(
+                                tag.tagClassContext, tag.tagFormatSimple, 3
+                            )
                         )
                     ),
                     openType=openType,
@@ -1824,11 +1862,15 @@ class SequenceEncoderWithComponentsSchemaTestCase(BaseTestCase):
 
     def testDefModeChunked(self):
         self.__init()
-        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes((48, 2, 5, 0))
+        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes(
+            (48, 2, 5, 0)
+        )
 
     def testIndefModeChunked(self):
         self.__init()
-        assert encoder.encode(self.s, defMode=False, maxChunkSize=4) == bytes((48, 128, 5, 0, 0, 0))
+        assert encoder.encode(self.s, defMode=False, maxChunkSize=4) == bytes(
+            (48, 128, 5, 0, 0, 0)
+        )
 
     def testWithOptionalDefMode(self):
         self.__initWithOptional()
@@ -1932,11 +1974,15 @@ class SequenceEncoderWithComponentsSchemaTestCase(BaseTestCase):
 
     def testWithDefaultedIndefMode(self):
         self.__initWithDefaulted()
-        assert encoder.encode(self.s, defMode=False) == bytes((48, 128, 5, 0, 2, 1, 1, 0, 0))
+        assert encoder.encode(self.s, defMode=False) == bytes(
+            (48, 128, 5, 0, 2, 1, 1, 0, 0)
+        )
 
     def testWithDefaultedDefModeChunked(self):
         self.__initWithDefaulted()
-        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes((48, 5, 5, 0, 2, 1, 1))
+        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes(
+            (48, 5, 5, 0, 2, 1, 1)
+        )
 
     def testWithDefaultedIndefModeChunked(self):
         self.__initWithDefaulted()
@@ -2080,7 +2126,9 @@ class ExpTaggedSequenceEncoderTestCase(BaseTestCase):
             )
         )
 
-        s = s.subtype(explicitTag=tag.Tag(tag.tagClassApplication, tag.tagFormatConstructed, 5))
+        s = s.subtype(
+            explicitTag=tag.Tag(tag.tagClassApplication, tag.tagFormatConstructed, 5)
+        )
 
         s[0] = 12
 
@@ -2328,7 +2376,9 @@ class SetEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testDefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=True, maxChunkSize=4
+        ) == bytes(
             (
                 49,
                 24,
@@ -2360,7 +2410,9 @@ class SetEncoderWithSchemaTestCase(BaseTestCase):
         )
 
     def testIndefModeChunked(self):
-        assert encoder.encode(self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4) == bytes(
+        assert encoder.encode(
+            self.v, asn1Spec=self.s, defMode=False, maxChunkSize=4
+        ) == bytes(
             (
                 49,
                 128,
@@ -2437,11 +2489,15 @@ class SetEncoderWithComponentsSchemaTestCase(BaseTestCase):
 
     def testDefModeChunked(self):
         self.__init()
-        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes((49, 2, 5, 0))
+        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes(
+            (49, 2, 5, 0)
+        )
 
     def testIndefModeChunked(self):
         self.__init()
-        assert encoder.encode(self.s, defMode=False, maxChunkSize=4) == bytes((49, 128, 5, 0, 0, 0))
+        assert encoder.encode(self.s, defMode=False, maxChunkSize=4) == bytes(
+            (49, 128, 5, 0, 0, 0)
+        )
 
     def testWithOptionalDefMode(self):
         self.__initWithOptional()
@@ -2545,11 +2601,15 @@ class SetEncoderWithComponentsSchemaTestCase(BaseTestCase):
 
     def testWithDefaultedIndefMode(self):
         self.__initWithDefaulted()
-        assert encoder.encode(self.s, defMode=False) == bytes((49, 128, 5, 0, 2, 1, 1, 0, 0))
+        assert encoder.encode(self.s, defMode=False) == bytes(
+            (49, 128, 5, 0, 2, 1, 1, 0, 0)
+        )
 
     def testWithDefaultedDefModeChunked(self):
         self.__initWithDefaulted()
-        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes((49, 5, 5, 0, 2, 1, 1))
+        assert encoder.encode(self.s, defMode=True, maxChunkSize=4) == bytes(
+            (49, 5, 5, 0, 2, 1, 1)
+        )
 
     def testWithDefaultedIndefModeChunked(self):
         self.__initWithDefaulted()
@@ -2810,7 +2870,9 @@ class ChoiceEncoderWithComponentsSchemaTestCase(BaseTestCase):
         assert encoder.encode(self.s) == bytes((5, 0))
 
     def testTagged(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4))
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4)
+        )
         s.setComponentByPosition(0, univ.Null(""))
         assert encoder.encode(s) == bytes((164, 2, 5, 0))
 
@@ -2821,7 +2883,9 @@ class ChoiceEncoderWithComponentsSchemaTestCase(BaseTestCase):
         )
 
     def testTaggedUndefLength(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4))
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 4)
+        )
         s.setComponentByPosition(2, univ.OctetString("abcdefgh"))
         assert encoder.encode(s, defMode=False, maxChunkSize=3) == bytes(
             (
@@ -2860,11 +2924,15 @@ class AnyEncoderTestCase(BaseTestCase):
         assert encoder.encode(self.s) == bytes((4, 3, 102, 111, 120))
 
     def testTaggedEx(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
         assert encoder.encode(s) == bytes((164, 5, 4, 3, 102, 111, 120))
 
     def testTaggedIm(self):
-        s = self.s.subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))
+        s = self.s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
         assert encoder.encode(s) == bytes((132, 5, 4, 3, 102, 111, 120))
 
 
@@ -2878,12 +2946,20 @@ class AnyEncoderWithSchemaTestCase(BaseTestCase):
         assert encoder.encode(self.v, asn1Spec=self.s) == bytes((4, 3, 102, 111, 120))
 
     def testTaggedEx(self):
-        s = self.s.subtype(explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))
-        assert encoder.encode(self.v, asn1Spec=s) == bytes((164, 5, 4, 3, 102, 111, 120))
+        s = self.s.subtype(
+            explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
+        assert encoder.encode(self.v, asn1Spec=s) == bytes(
+            (164, 5, 4, 3, 102, 111, 120)
+        )
 
     def testTaggedIm(self):
-        s = self.s.subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))
-        assert encoder.encode(self.v, asn1Spec=s) == bytes((132, 5, 4, 3, 102, 111, 120))
+        s = self.s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
+        assert encoder.encode(self.v, asn1Spec=s) == bytes(
+            (132, 5, 4, 3, 102, 111, 120)
+        )
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

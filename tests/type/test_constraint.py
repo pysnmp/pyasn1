@@ -65,7 +65,9 @@ class SingleValueConstraintTestCase(BaseTestCase):
 class ContainedSubtypeConstraintTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
-        self.c1 = constraint.ContainedSubtypeConstraint(constraint.SingleValueConstraint(12))
+        self.c1 = constraint.ContainedSubtypeConstraint(
+            constraint.SingleValueConstraint(12)
+        )
 
     def testGoodVal(self):
         try:
@@ -182,7 +184,9 @@ class WithComponentsConstraintTestCase(BaseTestCase):
             assert 0, "constraint check fails"
 
     def testBadVal(self):
-        c = constraint.WithComponentsConstraint(("A", constraint.ComponentPresentConstraint()))
+        c = constraint.WithComponentsConstraint(
+            ("A", constraint.ComponentPresentConstraint())
+        )
 
         try:
             c({"B": 2})
@@ -194,7 +198,9 @@ class WithComponentsConstraintTestCase(BaseTestCase):
             assert 0, "constraint check fails"
 
     def testBadValExtraFields(self):
-        c = constraint.WithComponentsConstraint(("A", constraint.ComponentPresentConstraint()))
+        c = constraint.WithComponentsConstraint(
+            ("A", constraint.ComponentPresentConstraint())
+        )
 
         try:
             c({"B": 2, "C": 3})
@@ -362,7 +368,9 @@ class DirectDerivationTestCase(BaseTestCase):
 
         self.c1 = constraint.SingleValueConstraint(5)
 
-        self.c2 = constraint.ConstraintsUnion(self.c1, constraint.ValueRangeConstraint(1, 3))
+        self.c2 = constraint.ConstraintsUnion(
+            self.c1, constraint.ValueRangeConstraint(1, 3)
+        )
 
     def testGoodVal(self):
         assert self.c1.isSuperTypeOf(self.c2), "isSuperTypeOf failed"
@@ -377,7 +385,9 @@ class IndirectDerivationTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
 
-        self.c1 = constraint.ConstraintsIntersection(constraint.ValueRangeConstraint(1, 30))
+        self.c1 = constraint.ConstraintsIntersection(
+            constraint.ValueRangeConstraint(1, 30)
+        )
 
         self.c2 = constraint.ConstraintsIntersection(
             self.c1, constraint.ValueRangeConstraint(1, 20)

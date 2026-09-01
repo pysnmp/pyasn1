@@ -165,7 +165,6 @@ typeMap = {
 
 
 class Encoder:
-
     # noinspection PyDefaultArgument
     def __init__(self, tagMap, typeMap={}):
         self.__tagMap = tagMap

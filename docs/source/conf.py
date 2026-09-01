@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # PyASN1 documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun 27 23:15:54 2015.
