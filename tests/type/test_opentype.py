@@ -206,6 +206,33 @@ class OpenTypeStdlibIntegrationTestCase(BaseTestCase):
         typeMap[2] = univ.OctetString()
         assert 2 in ot2
 
+    def testEqualityReflectsLiveTypeMap(self):
+        typeMap = {1: "integer"}
+        ot = opentype.OpenType("id", typeMap)
+
+        typeMap[2] = "octet string"
+
+        assert ot == typeMap
+        assert ot == opentype.OpenType("different-id", typeMap)
+
+    def testReprReflectsLiveTypeMap(self):
+        typeMap = {1: "integer"}
+        ot = opentype.OpenType("id", typeMap)
+
+        typeMap[2] = "octet string"
+
+        assert repr(ot) == repr(typeMap)
+
+    def testDictCopyReflectsLiveTypeMap(self):
+        typeMap = {1: "integer"}
+        ot = opentype.OpenType("id", typeMap)
+
+        typeMap[2] = "octet string"
+        copiedTypeMap = ot.copy()
+
+        assert copiedTypeMap == typeMap
+        assert copiedTypeMap is not typeMap
+
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 

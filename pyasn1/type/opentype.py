@@ -133,6 +133,20 @@ class OpenType(dict):
     def setdefault(self, *args, **kwargs):
         return self._typeMap.setdefault(*args, **kwargs)
 
+    def __eq__(self, other):
+        if isinstance(other, OpenType):
+            other = other._typeMap
+        return self._typeMap == other
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __repr__(self):
+        return repr(self._typeMap)
+
+    def copy(self):
+        return self._typeMap.copy()
+
     def __reduce__(self):
         # Reconstruct via __init__ so the live typeMap reference (and the
         # name) are restored.  The default dict pickle path would instead
