@@ -42,6 +42,19 @@ unreleased
 - ``BitString.__int__`` returns a plain :class:`int` rather than a
   ``SizedInteger``, clearing a ``DeprecationWarning`` that Python raises for
   ``__int__`` implementations returning an :class:`int` subclass.
+- ``str()`` on an ``OctetString`` (and on ``Any``) now emits a
+  ``DeprecationWarning``. It still decodes the payload as text using the
+  ``encoding`` codec, but a future major release will return the hexadecimal
+  representation instead -- an ASN.1 OCTET STRING is not text. Use
+  ``.asOctets()`` for the octet stream, or ``.asOctets().decode(encoding)``
+  for text. The character string types in ``pyasn1.type.char`` and the time
+  types in ``pyasn1.type.useful`` model text and are unaffected.
+  ``prettyPrint()``, ``repr()`` and ``asOctets()`` do not warn.
+- Fixed two residual ``cond and a or b`` expressions in the BER codec debug
+  logging that PR #38 missed. Both could take the wrong branch when the
+  left-hand result was falsy: ``Decoder`` fell back to the raw value whenever
+  ``prettyPrint()`` returned an empty string, and ``Encoder`` would call
+  ``prettyPrintType()`` on ``None`` whenever it returned an empty string.
 
 
 Revision 1.0.2, released 2021-11-13

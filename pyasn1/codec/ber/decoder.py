@@ -1859,9 +1859,9 @@ class Decoder:
                         % (
                             concreteDecoder.__class__.__name__,
                             value.__class__.__name__,
-                            isinstance(value, base.Asn1Item)
-                            and value.prettyPrint()
-                            or value,
+                            value.prettyPrint()
+                            if isinstance(value, base.Asn1Item)
+                            else value,
                             debug.hexdump(substrate) if substrate else "<none>",
                         )
                     )

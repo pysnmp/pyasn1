@@ -91,6 +91,12 @@ ignore = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    # The suite deliberately exercises OctetString.__str__(), whose text
+    # decoding is deprecated. The warning is asserted directly by
+    # OctetStringStrDeprecationTestCase.
+    'ignore:str\(\) on .*decodes the payload as text:DeprecationWarning',
+]
 
 [tool.coverage.run]
 source = ["pyasn1"]

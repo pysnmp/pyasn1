@@ -9,6 +9,7 @@ import math
 import pickle
 import sys
 import unittest
+import warnings
 
 
 def _str2octs(s):
@@ -22,7 +23,7 @@ def _octs2str(b):
 _null = b""
 
 from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
-from pyasn1.type import constraint, error, namedtype, namedval, tag, univ
+from pyasn1.type import char, constraint, error, namedtype, namedval, tag, univ, useful
 from tests.base import BaseTestCase
 
 
@@ -805,6 +806,53 @@ class OctetStringPicklingTestCase(unittest.TestCase):
         assert serialised
         new_asn1 = pickle.loads(serialised)
         assert new_asn1 == (1, 0, 1, 0)
+
+
+class OctetStringStrDeprecationTestCase(BaseTestCase):
+    """`str()` on an OCTET STRING decodes text; that is being deprecated."""
+
+    @staticmethod
+    def _warningsFrom(func):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            func()
+        return [w for w in caught if issubclass(w.category, DeprecationWarning)]
+
+    def testStrWarns(self):
+        caught = self._warningsFrom(lambda: str(univ.OctetString(b"abc")))
+        assert len(caught) == 1, "str() did not emit a DeprecationWarning"
+        assert "asOctets()" in str(caught[0].message)
+
+    def testStrStillDecodesText(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            assert str(univ.OctetString(b"abc")) == "abc", "str() behaviour changed"
+
+    def testAnyWarns(self):
+        caught = self._warningsFrom(lambda: str(univ.Any(b"abc")))
+        assert len(caught) == 1, "Any.__str__() did not emit a DeprecationWarning"
+
+    def testCharacterStringDoesNotWarn(self):
+        caught = self._warningsFrom(lambda: str(char.UTF8String("abc")))
+        assert not caught, "character string str() must not warn"
+
+    def testUsefulTypeDoesNotWarn(self):
+        caught = self._warningsFrom(
+            lambda: str(useful.GeneralizedTime("20170801120112.099Z"))
+        )
+        assert not caught, "useful type str() must not warn"
+
+    def testPrettyPrintDoesNotWarn(self):
+        caught = self._warningsFrom(univ.OctetString(b"abc").prettyPrint)
+        assert not caught, "prettyPrint() must not warn"
+
+    def testReprDoesNotWarn(self):
+        caught = self._warningsFrom(lambda: repr(univ.OctetString(b"abc")))
+        assert not caught, "repr() must not warn"
+
+    def testAsOctetsDoesNotWarn(self):
+        caught = self._warningsFrom(univ.OctetString(b"abc").asOctets)
+        assert not caught, "asOctets() must not warn"
 
 
 class Null(BaseTestCase):

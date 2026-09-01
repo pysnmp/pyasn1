@@ -818,9 +818,9 @@ class Encoder:
                 % (
                     "in" if not options.get("defMode", True) else "",
                     options.get("maxChunkSize", 0),
-                    asn1Spec is None
-                    and value.prettyPrintType()
-                    or asn1Spec.prettyPrintType(),
+                    value.prettyPrintType()
+                    if asn1Spec is None
+                    else asn1Spec.prettyPrintType(),
                     value,
                 )
             )
