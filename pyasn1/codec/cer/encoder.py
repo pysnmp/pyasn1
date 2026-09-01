@@ -252,7 +252,12 @@ tagMap.update(
         useful.UTCTime.tagSet: UTCTimeEncoder(),
         # Sequence & Set have same tags as SequenceOf & SetOf
         univ.SetOf.tagSet: SetOfEncoder(),
-        univ.Sequence.typeId: SequenceEncoder(),
+        # FIXME: every other entry here is keyed by tagSet; this one is keyed
+        # by typeId, so it can never match a tag lookup. Inherited verbatim
+        # from upstream pyasn1. Left as-is because univ.Sequence.tagSet equals
+        # univ.SequenceOf.tagSet, so correcting the key would displace the
+        # inherited SequenceOfEncoder and change CER output.
+        univ.Sequence.typeId: SequenceEncoder(),  # type: ignore[dict-item]
     }
 )
 

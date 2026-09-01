@@ -104,6 +104,7 @@ module = [
     "pyasn1.debug",
     "pyasn1.error",
     "pyasn1.codec.*",
+    "pyasn1.type.base",
     "pyasn1.type.char",
     "pyasn1.type.constraint",
     "pyasn1.type.namedval",
