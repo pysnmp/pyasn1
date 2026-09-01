@@ -150,6 +150,48 @@ class NamedValuesStdlibIntegrationTestCase(BaseTestCase):
         nv = namedval.NamedValues(("off", 0), ("on", 1))
         assert "NamedValues" in repr(nv)
 
+    def testImmutableBlocksMutation(self):
+        from pyasn1.error import PyAsn1Error
+
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+        for op in (
+            lambda: nv.__setitem__("new", 2),
+            lambda: nv.__delitem__("off"),
+            lambda: nv.update({"new": 2}),
+            lambda: nv.pop("off"),
+            lambda: nv.popitem(),
+            lambda: nv.clear(),
+            lambda: nv.setdefault("new", 2),
+        ):
+            try:
+                op()
+                assert False, "mutation should be blocked on immutable NamedValues"
+            except PyAsn1Error:
+                pass
+
+        # Mutation attempts must not have left the reverse index stale.
+        assert nv[0] == "off"
+        assert nv[1] == "on"
+        assert len(nv) == 2
+
+    def testKeysValuesItemsReturnDictViews(self):
+        nv = namedval.NamedValues(("off", 0), ("on", 1))
+
+        keys = nv.keys()
+        assert hasattr(keys, "__len__")
+        assert len(keys) == 2
+        # key-view set operations work
+        assert keys & {"off"} == {"off"}
+
+        values = nv.values()
+        assert hasattr(values, "__len__")
+        assert len(values) == 2
+
+        items = nv.items()
+        assert hasattr(items, "__len__")
+        assert len(items) == 2
+        assert dict(items) == {"off": 0, "on": 1}
+
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 

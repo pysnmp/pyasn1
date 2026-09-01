@@ -49,9 +49,9 @@ class NamedType(_NamedTypeBase):
 
         return "<%s object, type %s>" % (self.__class__.__name__, representation)
 
-    # Iteration and indexing intentionally expose only (name, asn1Object),
-    # matching the original 2-tuple duck-type behaviour.  The openType field
-    # is accessible only via the .openType property.
+    # Iteration, indexing and length intentionally expose only
+    # (name, asn1Object), matching the original 2-tuple duck-type behaviour.
+    # The openType field is accessible only via the .openType property.
     def __iter__(self):
         yield self.name
         yield self.asn1Object
@@ -63,6 +63,16 @@ class NamedType(_NamedTypeBase):
             return self.asn1Object
         else:
             raise IndexError("tuple index out of range")
+
+    def __len__(self):
+        return 2
+
+    def __getnewargs__(self):
+        # Preserve all three fields (including openType) when copying and
+        # pickling.  The namedtuple default round-trips tuple(self), which
+        # only yields the two items exposed by __iter__ and would drop the
+        # openType field.
+        return (self.name, self.asn1Object, self.openType)
 
     # Equality and hashing intentionally consider only (name, asn1Object),
     # matching the original implementation where openType was excluded.

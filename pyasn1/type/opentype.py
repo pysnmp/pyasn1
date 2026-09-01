@@ -74,10 +74,68 @@ class OpenType(dict):
 
     def __init__(self, name, typeMap=None):
         self.name = name
-        super().__init__(typeMap or {})
+        # Store the caller's mapping by reference (do not copy) so that
+        # additions made to it after construction remain visible through this
+        # OpenType, e.g. via namedType.openType[governingValue] during BER
+        # decoding.  All dict operations below delegate to the live mapping.
+        self._typeMap = typeMap if typeMap is not None else {}
 
     def __bool__(self):
         # An OpenType is always considered truthy, even when the typeMap is
         # empty, so that downstream type-checking code can distinguish "has an
         # open type" from "no open type" (which would be None / absent).
         return True
+
+    # Python dict protocol, delegating to the live typeMap so that the
+    # OpenType and the caller's mapping stay in sync in both directions.
+    def __len__(self):
+        return len(self._typeMap)
+
+    def __iter__(self):
+        return iter(self._typeMap)
+
+    def __contains__(self, key):
+        return key in self._typeMap
+
+    def __getitem__(self, key):
+        return self._typeMap[key]
+
+    def __setitem__(self, key, value):
+        self._typeMap[key] = value
+
+    def __delitem__(self, key):
+        del self._typeMap[key]
+
+    def keys(self):
+        return self._typeMap.keys()
+
+    def values(self):
+        return self._typeMap.values()
+
+    def items(self):
+        return self._typeMap.items()
+
+    def get(self, key, default=None):
+        return self._typeMap.get(key, default)
+
+    def update(self, *args, **kwargs):
+        self._typeMap.update(*args, **kwargs)
+
+    def pop(self, *args, **kwargs):
+        return self._typeMap.pop(*args, **kwargs)
+
+    def popitem(self):
+        return self._typeMap.popitem()
+
+    def clear(self):
+        self._typeMap.clear()
+
+    def setdefault(self, *args, **kwargs):
+        return self._typeMap.setdefault(*args, **kwargs)
+
+    def __reduce__(self):
+        # Reconstruct via __init__ so the live typeMap reference (and the
+        # name) are restored.  The default dict pickle path would instead
+        # call __setitem__ on a fresh instance whose _typeMap does not yet
+        # exist.
+        return (self.__class__, (self.name, self._typeMap))

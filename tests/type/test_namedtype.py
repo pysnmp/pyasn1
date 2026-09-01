@@ -86,6 +86,24 @@ class NamedTypeStdlibIntegrationTestCase(BaseTestCase):
         d = {self.nt: "value"}
         assert d[self.nt] == "value"
 
+    def testLenMatchesTwoItemInterface(self):
+        # len() must match the two items exposed by __iter__/__getitem__,
+        # not the three underlying namedtuple fields.
+        assert len(self.nt) == 2
+        assert len(self.nt) == len(list(self.nt))
+
+    def testCopyPreservesOpenType(self):
+        import copy
+
+        nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
+        assert copy.copy(nt).openType == {"k": "v"}
+
+    def testPicklePreservesOpenType(self):
+        import pickle
+
+        nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
+        assert pickle.loads(pickle.dumps(nt)).openType == {"k": "v"}
+
 
 class NamedTypesCaseBase(BaseTestCase):
     def setUp(self):

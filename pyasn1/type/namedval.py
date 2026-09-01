@@ -80,7 +80,7 @@ class NamedValues(dict):
             if number in self._numbers:
                 raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
 
-            self[name] = number
+            dict.__setitem__(self, name, number)
             self._numbers[number] = name
 
         for name, number in kwargs.items():
@@ -90,7 +90,7 @@ class NamedValues(dict):
             if number in self._numbers:
                 raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
 
-            self[name] = number
+            dict.__setitem__(self, name, number)
             self._numbers[number] = name
 
         if anonymousNames:
@@ -100,10 +100,48 @@ class NamedValues(dict):
                 if name in self:
                     raise error.PyAsn1Error("Duplicate name %s" % (name,))
 
-                self[name] = number
+                dict.__setitem__(self, name, number)
                 self._numbers[number] = name
 
                 number += 1
+
+    # NamedValues is immutable (see class docstring).  Block every dict
+    # mutation path so the primary name->number mapping and the _numbers
+    # reverse index can never fall out of sync.  Construction populates the
+    # storage via dict.__setitem__ to bypass these guards.
+    def _immutable(self, op):
+        raise error.PyAsn1Error("NamedValues is immutable, attempted %s" % (op,))
+
+    def __setitem__(self, key, value):
+        self._immutable("item assignment")
+
+    def __delitem__(self, key):
+        self._immutable("item deletion")
+
+    def update(self, *args, **kwargs):
+        self._immutable("update")
+
+    def pop(self, *args, **kwargs):
+        self._immutable("pop")
+
+    def popitem(self, *args, **kwargs):
+        self._immutable("popitem")
+
+    def clear(self):
+        self._immutable("clear")
+
+    def setdefault(self, *args, **kwargs):
+        self._immutable("setdefault")
+
+    def __ior__(self, other):
+        self._immutable("in-place merge")
+
+    def __reduce__(self):
+        # Reconstruct via __init__ (which populates storage with
+        # dict.__setitem__, bypassing the immutability guards) rather than
+        # the default dict pickle path that restores items through
+        # __setitem__/update.  __init__ rebuilds the _numbers reverse index.
+        return (self.__class__, tuple(self.items()))
 
     def __repr__(self):
         representation = ", ".join(["%s=%d" % x for x in self.items()])
@@ -127,15 +165,16 @@ class NamedValues(dict):
     def __iter__(self):
         return super().__iter__()
 
+    # Return standard dictionary view objects so that length checks and
+    # key-view set operations behave as they do for a regular dict.
     def values(self):
-        return iter(self._numbers)
+        return super().values()
 
     def keys(self):
-        return super().__iter__()
+        return super().keys()
 
     def items(self):
-        for name in super().__iter__():
-            yield name, self[name]
+        return super().items()
 
     # support merging
 

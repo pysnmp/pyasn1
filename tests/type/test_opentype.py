@@ -160,6 +160,52 @@ class OpenTypeStdlibIntegrationTestCase(BaseTestCase):
         assert ot.get(1) is not None
         assert ot.get(99) is None
 
+    def testLiveTypeMapMutationAfterConstruction(self):
+        """The caller's typeMap is retained by reference, so additions made
+        to it after the OpenType is constructed remain visible through the
+        OpenType (regression test for by-reference storage)."""
+        typeMap = {1: univ.Integer()}
+        ot = opentype.OpenType("id", typeMap)
+
+        # Post-construction mutation of the *original* mapping.
+        typeMap[2] = univ.OctetString()
+
+        assert 2 in ot
+        assert len(ot) == 2
+        assert ot[2] is typeMap[2]
+        assert set(ot.keys()) == {1, 2}
+
+    def testMutateThroughOpenTypeAffectsLiveMap(self):
+        """Mutating the OpenType directly writes back to the live typeMap."""
+        typeMap = {1: univ.Integer()}
+        ot = opentype.OpenType("id", typeMap)
+
+        ot[2] = univ.OctetString()
+
+        assert 2 in typeMap
+        assert typeMap[2] is ot[2]
+
+    def testPickleRoundtrip(self):
+        import pickle
+
+        ot = opentype.OpenType("id", {1: univ.Integer(), 2: univ.OctetString()})
+        ot2 = pickle.loads(pickle.dumps(ot))
+        assert isinstance(ot2, opentype.OpenType)
+        assert ot2.name == "id"
+        assert len(ot2) == 2
+        assert set(ot2.keys()) == {1, 2}
+
+    def testCopySharesLiveMap(self):
+        import copy
+
+        typeMap = {1: univ.Integer()}
+        ot = opentype.OpenType("id", typeMap)
+        ot2 = copy.copy(ot)
+        # A shallow copy shares the live typeMap by reference.
+        assert ot2._typeMap is typeMap
+        typeMap[2] = univ.OctetString()
+        assert 2 in ot2
+
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
