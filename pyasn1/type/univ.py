@@ -24,23 +24,23 @@ NoValue = base.NoValue
 noValue = NoValue()
 
 __all__ = [
-    "Integer",
-    "Boolean",
+    "Any",
     "BitString",
-    "OctetString",
+    "Boolean",
+    "Choice",
+    "Enumerated",
+    "Integer",
+    "NoValue",
     "Null",
     "ObjectIdentifier",
+    "OctetString",
     "Real",
-    "Enumerated",
-    "SequenceOfAndSetOfBase",
-    "SequenceOf",
-    "SetOf",
-    "SequenceAndSetBase",
     "Sequence",
+    "SequenceAndSetBase",
+    "SequenceOf",
+    "SequenceOfAndSetOfBase",
     "Set",
-    "Choice",
-    "Any",
-    "NoValue",
+    "SetOf",
     "noValue",
 ]
 
@@ -920,9 +920,8 @@ class OctetString(base.SimpleAsn1Type):
             # hexify if needed
             if x < 32 or x > 126:
                 return "0x" + "".join("%.2x" % x for x in numbers)
-        else:
-            # this prevents infinite recursion
-            return OctetString.__str__(self)
+        # this prevents infinite recursion
+        return OctetString.__str__(self)
 
     @staticmethod
     def fromBinaryString(value):
@@ -2216,8 +2215,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     def update(self, *iterValue, **mappingValue):
         for k, v in iterValue:
             self[k] = v
-        for k in mappingValue:
-            self[k] = mappingValue[k]
+        for k, v in mappingValue.items():
+            self[k] = v
 
     def clear(self):
         """Remove all components and become an empty |ASN.1| value object.
@@ -2975,7 +2974,7 @@ class Choice(Set):
 
     def __iter__(self):
         if self._currentIdx is None:
-            raise StopIteration
+            return
         yield self.componentType[self._currentIdx].name
 
     # Python dict protocol

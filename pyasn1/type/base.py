@@ -9,7 +9,7 @@ import sys
 from pyasn1 import error
 from pyasn1.type import constraint, tag, tagmap
 
-__all__ = ["Asn1Item", "Asn1Type", "SimpleAsn1Type", "ConstructedAsn1Type"]
+__all__ = ["Asn1Item", "Asn1Type", "ConstructedAsn1Type", "SimpleAsn1Type"]
 
 
 class Asn1Item:
@@ -158,33 +158,31 @@ class NoValue:
     *PyAsn1Error* exception.
     """
 
-    skipMethods = set(
-        (
-            "__slots__",
-            # attributes
-            "__getattribute__",
-            "__getattr__",
-            "__setattr__",
-            "__delattr__",
-            # class instance
-            "__class__",
-            "__init__",
-            "__del__",
-            "__new__",
-            "__repr__",
-            "__qualname__",
-            "__objclass__",
-            "im_class",
-            "__sizeof__",
-            # pickle protocol
-            "__reduce__",
-            "__reduce_ex__",
-            "__getnewargs__",
-            "__getinitargs__",
-            "__getstate__",
-            "__setstate__",
-        )
-    )
+    skipMethods = {
+        "__slots__",
+        # attributes
+        "__getattribute__",
+        "__getattr__",
+        "__setattr__",
+        "__delattr__",
+        # class instance
+        "__class__",
+        "__init__",
+        "__del__",
+        "__new__",
+        "__repr__",
+        "__qualname__",
+        "__objclass__",
+        "im_class",
+        "__sizeof__",
+        # pickle protocol
+        "__reduce__",
+        "__reduce_ex__",
+        "__getnewargs__",
+        "__getinitargs__",
+        "__getstate__",
+        "__setstate__",
+    }
 
     _instance = None
 
@@ -646,6 +644,6 @@ class ConstructedAsn1Type(Asn1Type):
     def setComponents(self, *args, **kwargs):
         for idx, value in enumerate(args):
             self[idx] = value
-        for k in kwargs:
-            self[k] = kwargs[k]
+        for k, v in kwargs.items():
+            self[k] = v
         return self

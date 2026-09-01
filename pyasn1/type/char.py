@@ -10,19 +10,19 @@ from pyasn1 import error
 from pyasn1.type import tag, univ
 
 __all__ = [
+    "BMPString",
+    "GeneralString",
+    "GraphicString",
+    "IA5String",
+    "ISO646String",
     "NumericString",
     "PrintableString",
-    "TeletexString",
     "T61String",
-    "VideotexString",
-    "IA5String",
-    "GraphicString",
-    "VisibleString",
-    "ISO646String",
-    "GeneralString",
-    "UniversalString",
-    "BMPString",
+    "TeletexString",
     "UTF8String",
+    "UniversalString",
+    "VideotexString",
+    "VisibleString",
 ]
 
 NoValue = univ.NoValue

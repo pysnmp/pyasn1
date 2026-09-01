@@ -36,7 +36,6 @@ dev = [
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
-    "pylint>=4.0.8",
     "mypy>=2.3.1",
     "Sphinx>=9.1.0; python_version >= '3.12'",
     "pre-commit>=4.6.2",
@@ -50,7 +49,7 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF"]
 ignore = [
     "E501",    # line-too-long — existing codebase has long lines
     "E721",    # type-comparison — existing pattern
@@ -69,25 +68,31 @@ ignore = [
     "SIM101",  # duplicate-isinstance-call — existing pattern
     "SIM110",  # reimplemented-builtin — existing pattern
     "UP031",   # printf-string-formatting — existing codebase style
+    # Migrated from the former [tool.pylint] config: R0913 was disabled there,
+    # and ASN.1 codecs are inherently branchy, so the complexity family stays off.
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments — was disabled for pylint
+    "PLR0915",  # too-many-statements
+    "PLR0917",  # too-many-positional-arguments
+    "PLR2004",  # magic-value-comparison — ASN.1 tag and length constants
+    "PLC0415",  # import-outside-top-level — deliberate, breaks import cycles
+    "PLW2901",  # redefined-loop-name — existing pattern
+    "RUF005",   # collection-literal-concatenation — style preference
+    "RUF012",   # mutable-class-default — existing pattern
+    "RUF021",   # parenthesize-chained-operators — existing pattern
+    "RUF059",   # unused-unpacked-variable — matches B007 above
+    "PLW0603",  # global-statement — setLogger() intentionally rebinds the module logger
+    "PLW1641",  # eq-without-hash — constructed types are mutable, so deliberately
+                # unhashable; SimpleAsn1Type re-adds __hash__ where it is wanted
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["B", "SIM"]  # relax rules for tests
-
-[tool.pylint.messages_control]
-disable = [
-    "C0114",  # missing-module-docstring
-    "C0115",  # missing-class-docstring
-    "C0116",  # missing-function-docstring
-    "R0903",  # too-few-public-methods
-    "R0913",  # too-many-arguments
-]
-
-[tool.pylint.format]
-max-line-length = 88
-
-[tool.pylint.basic]
-good-names = ["e", "f", "i", "j", "k", "n", "o", "s", "x", "id", "dt"]
+"tests/**" = ["B", "SIM", "PL", "RUF"]  # relax rules for tests
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["pyasn1"]
+relative_files = true
