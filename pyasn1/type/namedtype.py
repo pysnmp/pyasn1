@@ -10,7 +10,7 @@ from collections import namedtuple
 from pyasn1 import error
 from pyasn1.type import tag, tagmap
 
-__all__ = ["NamedType", "OptionalNamedType", "DefaultedNamedType", "NamedTypes"]
+__all__ = ["DefaultedNamedType", "NamedType", "NamedTypes", "OptionalNamedType"]
 
 
 _NamedTypeBase = namedtuple("_NamedTypeBase", ["name", "asn1Object", "openType"])
@@ -164,14 +164,12 @@ class NamedTypes:
         self.__uniqueTagMap = self.__computeTagMaps(unique=True)
         self.__nonUniqueTagMap = self.__computeTagMaps(unique=False)
         self.__hasOptionalOrDefault = any(
-            [
-                True
-                for namedType in self.__namedTypes
-                if namedType.isDefaulted or namedType.isOptional
-            ]
+            True
+            for namedType in self.__namedTypes
+            if namedType.isDefaulted or namedType.isOptional
         )
         self.__hasOpenTypes = any(
-            [True for namedType in self.__namedTypes if namedType.openType]
+            True for namedType in self.__namedTypes if namedType.openType
         )
 
         self.__requiredComponents = frozenset(
@@ -291,9 +289,7 @@ class NamedTypes:
             if len(partialAmbiguousTypes) == len(self.__namedTypes):
                 ambiguousTypes[idx] = self
             else:
-                ambiguousTypes[idx] = NamedTypes(
-                    *partialAmbiguousTypes, **dict(terminal=True)
-                )
+                ambiguousTypes[idx] = NamedTypes(*partialAmbiguousTypes, terminal=True)
         return ambiguousTypes
 
     def getTypeByPosition(self, idx):

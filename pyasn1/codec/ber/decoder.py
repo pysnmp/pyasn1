@@ -424,8 +424,6 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         if not head:
             raise error.PyAsn1Error("Empty substrate")
 
-        head = head
-
         oid = ()
         index = 0
         substrateLen = len(head)
@@ -818,7 +816,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                             ):
                                 for pos, containerElement in enumerate(containerValue):
                                     component, rest = decodeFun(
-                                        containerValue[pos].asOctets(),
+                                        containerElement.asOctets(),
                                         asn1Spec=openType,
                                         **options,
                                     )
@@ -1049,7 +1047,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                             ):
                                 for pos, containerElement in enumerate(containerValue):
                                     component, rest = decodeFun(
-                                        containerValue[pos].asOctets(),
+                                        containerElement.asOctets(),
                                         asn1Spec=openType,
                                         **dict(options, allowEoo=True),
                                     )
@@ -1660,11 +1658,10 @@ class Decoder:
                             "Indefinite length encoding not supported by this codec"
                         )
 
-                else:
-                    if len(substrate) < length:
-                        raise error.SubstrateUnderrunError(
-                            "%d-octet short" % (length - len(substrate))
-                        )
+                elif len(substrate) < length:
+                    raise error.SubstrateUnderrunError(
+                        "%d-octet short" % (length - len(substrate))
+                    )
 
                 state = stGetValueDecoder
 

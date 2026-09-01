@@ -9,7 +9,7 @@ import sys
 
 from pyasn1 import __version__, error
 
-__all__ = ["Debug", "setLogger", "hexdump"]
+__all__ = ["Debug", "hexdump", "setLogger"]
 
 DEBUG_NONE = 0x0000
 DEBUG_ENCODER = 0x0001

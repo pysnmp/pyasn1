@@ -61,8 +61,8 @@ jobs:
         run: uv sync --locked
       - name: Run Ruff
         run: uv run ruff check .
-      - name: Run Pylint
-        run: uv run pylint pyasn1
+      - name: Check formatting
+        run: uv run ruff format --check .
 
   build:
     name: build
@@ -103,7 +103,7 @@ jobs:
       - name: Run tests
         run: |
           uv sync --locked --python ${{ matrix.python }}
-          uv run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
+          uv run pytest --junitxml=test-results/results.xml --cov=pyasn1 --cov-report=xml tests
       - uses: actions/upload-artifact@v7
         with:
           name: unit tests test-results

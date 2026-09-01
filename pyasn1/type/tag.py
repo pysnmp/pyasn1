@@ -9,17 +9,17 @@ from collections import namedtuple
 from pyasn1 import error
 
 __all__ = [
-    "tagClassUniversal",
+    "Tag",
+    "TagSet",
+    "tagCategoryExplicit",
+    "tagCategoryImplicit",
+    "tagCategoryUntagged",
     "tagClassApplication",
     "tagClassContext",
     "tagClassPrivate",
-    "tagFormatSimple",
+    "tagClassUniversal",
     "tagFormatConstructed",
-    "tagCategoryImplicit",
-    "tagCategoryExplicit",
-    "tagCategoryUntagged",
-    "Tag",
-    "TagSet",
+    "tagFormatSimple",
 ]
 
 #: Identifier for ASN.1 class UNIVERSAL

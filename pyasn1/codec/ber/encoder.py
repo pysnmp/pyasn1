@@ -496,7 +496,7 @@ class RealEncoder(AbstractItemEncoder):
 
             fo |= sf << 2
             eo = _null
-            if e == 0 or e == -1:
+            if e in (0, -1):
                 eo = _int2oct(e & 0xFF)
 
             else:

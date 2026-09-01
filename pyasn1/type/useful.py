@@ -9,7 +9,7 @@ import datetime
 from pyasn1 import error
 from pyasn1.type import char, tag, univ
 
-__all__ = ["ObjectDescriptor", "GeneralizedTime", "UTCTime"]
+__all__ = ["GeneralizedTime", "ObjectDescriptor", "UTCTime"]
 
 NoValue = univ.NoValue
 noValue = univ.noValue
