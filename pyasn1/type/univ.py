@@ -719,7 +719,7 @@ class BitString(base.SimpleAsn1Type):
             else:  # assume plain binary string like '1011'
                 return self.fromBinaryString(value, internalFormat=True)
 
-        elif isinstance(value, (tuple, list)):
+        elif isinstance(value, tuple | list):
             return self.fromBinaryString(
                 "".join([b and "1" or "0" for b in value]), internalFormat=True
             )
@@ -860,7 +860,7 @@ class OctetString(base.SimpleAsn1Type):
         ):  # this mostly targets Integer objects
             return self.prettyIn(str(value))
 
-        elif isinstance(value, (tuple, list)):
+        elif isinstance(value, tuple | list):
             return self.prettyIn(bytes(value))
 
         else:

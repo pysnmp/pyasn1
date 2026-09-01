@@ -61,7 +61,7 @@ class NamedValues(dict):
         anonymousNames = []
 
         for namedValue in args:
-            if isinstance(namedValue, (tuple, list)):
+            if isinstance(namedValue, tuple | list):
                 try:
                     name, number = namedValue
 

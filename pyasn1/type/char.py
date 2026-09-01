@@ -84,7 +84,7 @@ class AbstractCharacterString(univ.OctetString):
                 return value
             elif isinstance(value, bytes):
                 return value.decode(self.encoding)
-            elif isinstance(value, (tuple, list)):
+            elif isinstance(value, tuple | list):
                 return self.prettyIn(bytes(value))
             elif isinstance(value, univ.OctetString):
                 return value.asOctets().decode(self.encoding)
