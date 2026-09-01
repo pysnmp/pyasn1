@@ -179,5 +179,5 @@ or post your question [on Stack Overflow](https://stackoverflow.com/questions/as
 
 Copyright (c) 2005-2020, [Ilya Etingof](mailto:etingof@gmail.com).
 All rights reserved.
-Copyright (c) 2021- Splunk Inc.
-Copyright (c) 2025- Ryan Faircloth
+Copyright (c) 2021- [Ryan Faircloth](mailto:actual@rfaircloth.com).
+Copyright (c) 2023, Splunk Inc.

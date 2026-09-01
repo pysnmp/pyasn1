@@ -10,7 +10,7 @@ readme = "README.md"
 license = "BSD-2-Clause"
 requires-python = ">=3.10"
 authors = [
-    {name = "rfaircloth-splunk", email = "rfaircloth@splunk.com"},
+    {name = "Ryan Faircloth", email = "actual@rfaircloth.com"},
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

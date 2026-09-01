@@ -49,8 +49,8 @@ master_doc = "contents"
 
 # General information about the project.
 project = "ASN.1 types and codecs"
-copyright = "2005-2019, Ilya Etingof; 2021- Splunk Inc.; 2025- Ryan Faircloth"
-author = "Ilya Etingof, Splunk Inc., Ryan Faircloth"
+copyright = "2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc."
+author = "Ilya Etingof, Ryan Faircloth"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -123,7 +123,7 @@ html_theme_options = {
     "logo": "logo.svg",
     "description": "<p align=left><i><b>Brewing free software for the greater good</i></b></p>",
     "show_powered_by": False,
-    "github_user": "etingof",
+    "github_user": "pysnmp",
     "github_repo": "pyasn1",
     "fixed_sidebar": True,
 }
