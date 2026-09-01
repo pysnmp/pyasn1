@@ -1,6 +1,16 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
+  # Python dependency updates require a Python version that Dependabot
+  # supports. Re-enable them when the modern project metadata reaches main.
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    target-branch: "main"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
