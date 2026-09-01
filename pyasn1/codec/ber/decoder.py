@@ -15,7 +15,10 @@ __all__ = ["decode"]
 LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
 
 noValue = base.noValue
-
+# Maximum recursion depth for nested SEQUENCE/SET structures.
+# Prevents unbounded recursion DoS (same fix as CVE-2026-30922 /
+# GHSA-jr27-m4p2-rc6r in mainline pyasn1, ported here).
+MAX_NESTING_DEPTH = 100
 
 class AbstractDecoder:
     protoComponent = None
@@ -1530,7 +1533,13 @@ class Decoder:
         substrateFun=None,
         **options
     ):
-
+        _nestingLevel = options.get('_nestingLevel', 0)
+        if _nestingLevel > MAX_NESTING_DEPTH:
+            raise error.PyAsn1Error(
+              'ASN.1 structure nesting depth exceeds limit (%d)' % MAX_NESTING_DEPTH
+            )
+           options['_nestingLevel'] = _nestingLevel + 1
+            
         if LOG:
             LOG(
                 "decoder called at scope %s with state %d, working with up to %d octets of substrate: %s"
