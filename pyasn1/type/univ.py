@@ -5,6 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import math
+import warnings
 
 from pyasn1 import error
 from pyasn1.codec.ber import eoo
@@ -843,7 +844,7 @@ class OctetString(base.SimpleAsn1Type):
         else:
             return bytes(value)
 
-    def __str__(self):
+    def _asText(self):
         try:
             return self._value.decode(self.encoding)
 
@@ -853,6 +854,18 @@ class OctetString(base.SimpleAsn1Type):
                 "'%s'" % (self._value, self.encoding, self.__class__.__name__),
                 exc,
             ) from exc
+
+    def __str__(self):
+        warnings.warn(
+            "str() on %s decodes the payload as text using the '%s' codec. "
+            "A future release will return the hexadecimal representation "
+            "instead -- an ASN.1 OCTET STRING is not text. Use .asOctets() "
+            "for the octet stream, or .asOctets().decode(encoding) for text."
+            % (self.__class__.__name__, self.encoding),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._asText()
 
     def __bytes__(self):
         return bytes(self._value)
@@ -873,10 +886,11 @@ class OctetString(base.SimpleAsn1Type):
     # Therefore `OctetString.__str__()` -> `.prettyPrint()` call chain is
     # reversed to preserve the original behaviour.
     #
-    # Eventually we should deprecate `.prettyPrint()` / `.prettyOut()` harness
-    # and end up with just `__str__()` producing hexified representation while
-    # both text and octet-stream representation should only be requested via
-    # the `.asOctets()` method.
+    # `__str__()` now emits a DeprecationWarning: a future major release will
+    # have it produce the hexified representation, leaving text and
+    # octet-stream representations to be requested explicitly via
+    # `.asOctets()`. Internal callers go through `._asText()` so that they do
+    # not trip the warning.
     #
     # Note: ASN.1 OCTET STRING is never mean to contain text!
     #
@@ -898,7 +912,7 @@ class OctetString(base.SimpleAsn1Type):
             if x < 32 or x > 126:
                 return "0x" + "".join("%.2x" % x for x in numbers)
         # this prevents infinite recursion
-        return OctetString.__str__(self)
+        return OctetString._asText(self)
 
     @staticmethod
     def fromBinaryString(value):
