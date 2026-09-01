@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
@@ -8,19 +8,19 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
         args: ["--maxkb=100"]
+        exclude: ^uv\.lock$
       - id: check-docstring-first
-      - id: fix-encoding-pragma
       - id: mixed-line-ending
         args: ["--fix=lf"]
       - id: pretty-format-json
         args: ["--autofix"]
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
+    rev: v2.4.0
     hooks:
       - id: autoflake
         args: ["--remove-all-unused-imports", "--in-place", "--ignore-init-module-imports"]
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         additional_dependencies: [
@@ -29,17 +29,17 @@ repos:
         args: ['--config=.flake8']
   # isort must run before black
   - repo: https://github.com/PyCQA/isort
-    rev: 6.0.1
+    rev: 9.0.1
     hooks:
       - id: isort
   # Black must be the last formatter to run
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 26.5.1
     hooks:
       - id: black
         args: ["--line-length=100"]
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.2.0
+    rev: v4.4.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]

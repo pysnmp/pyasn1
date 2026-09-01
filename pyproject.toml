@@ -1,10 +1,13 @@
-[tool.poetry]
+[project]
 name = "pysnmp-pyasn1"
 version = "1.1.4-beta.4"
 description = "ASN.1 types and codecs"
-authors = ["rfaircloth-splunk <rfaircloth@splunk.com>"]
+authors = [{ name = "rfaircloth-splunk", email = "rfaircloth@splunk.com" }]
 license = "BSD-2-Clause"
-repository = "https://github.com/pysnmp/pyasn1"
+license-files = ["LICENSE.rst"]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -14,46 +17,44 @@ classifiers = [
     "Intended Audience :: Telecommunications Industry",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    # Make sure these classifiers are in your setup.py
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
 ]
-readme = "README.md"
-packages = [
-    { include = "pyasn1" },
+
+[project.urls]
+Repository = "https://github.com/pysnmp/pyasn1"
+
+[dependency-groups]
+dev = [
+    "Sphinx>=9.1.0; python_version >= '3.12'",
+    "isort>=9.0.1",
+    "black>=26.5.1",
+    "pyflakes>=3.4.0",
+    "autoflake>=2.4.0",
+    "flake8>=7.3.0",
+    "pre-commit>=4.6.2",
+    "mypy>=2.3.1",
 ]
-include = ["docs", "tests"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-
-[tool.poetry.group.dev.dependencies]
-Sphinx = "^4.3.0"
-isort = "^6.0.1"
-black = "^25.1.0"
-pyflakes = "^3.3.2"
-autoflake = "^2.3.1"
-flake8 = "^7.2.0"
-pre-commit = "^4.2.0"
-mypy = "^1.15.0"
 
 [build-system]
-requires = ["setuptools>=42", "wheel", "build"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = "test_*.py"
+[tool.hatch.build.targets.wheel]
+packages = ["pyasn1"]
+
+[tool.hatch.build.targets.sdist]
+include = ["pyasn1", "docs", "tests", "README.md", "LICENSE.rst"]
 
 # Configure Black formatting
 [tool.black]
 line-length = 100
-target-version = ["py39", "py310", "py311", "py312", "py313"]
+target-version = ["py310"]
 include = '\.pyi?$'
 exclude = '''
 /(
