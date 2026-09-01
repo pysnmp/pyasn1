@@ -211,7 +211,7 @@ class _PrinterHandler(logging.Handler):
 
         try:
             self._printer(record.getMessage())
-        except Exception:
+        except Exception:  # noqa: BLE001 - logging.Handler contract: a broken printer must never escape into the code that logged
             self.handleError(record)
         finally:
             self._busy.active = False

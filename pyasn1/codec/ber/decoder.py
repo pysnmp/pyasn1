@@ -585,12 +585,12 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
     protoSequenceComponent: Any = None
 
     def _getComponentTagMap(self, asn1Object: Any, idx: int) -> Any:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _getComponentPositionByType(
         self, asn1Object: Any, tagSet: Any, idx: int
     ) -> Any:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _decodeComponents(
         self,

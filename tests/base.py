@@ -26,7 +26,7 @@ class RenderingHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             record.getMessage()
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - any render failure is the bug this handler exists to catch
             self.failures.append(
                 "%s: %r %% %r -- %s" % (record.name, record.msg, record.args, exc)
             )

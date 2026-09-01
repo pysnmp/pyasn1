@@ -50,7 +50,7 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF", "G", "LOG", "TRY", "BLE", "RSE"]
 ignore = [
     "E501",    # line-too-long — existing codebase has long lines
     "E721",    # type-comparison — existing pattern
@@ -82,6 +82,9 @@ ignore = [
     "RUF021",   # parenthesize-chained-operators — existing pattern
     "RUF059",   # unused-unpacked-variable — matches B007 above
     "PLW0603",  # global-statement — setLogger() intentionally rebinds the module logger
+    "TRY003",   # raise-vanilla-args — message text is part of pyasn1's public
+                # error contract; moving it into exception classes would churn
+                # every raise site and change what callers see
     "PLW1641",  # eq-without-hash — constructed types are mutable, so deliberately
                 # unhashable; SimpleAsn1Type re-adds __hash__ where it is wanted
 ]
