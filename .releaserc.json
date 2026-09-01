@@ -63,7 +63,8 @@
         "assets": [
           "NOTICE",
           "pyproject.toml",
-          "pyasn1/__init__.py"
+          "pyasn1/__init__.py",
+          "uv.lock"
         ],
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
       }
