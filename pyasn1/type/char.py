@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Final
+
 from pyasn1 import error
 from pyasn1.type import tag, univ
 
@@ -24,7 +26,7 @@ __all__ = [
 ]
 
 NoValue = univ.NoValue
-noValue = univ.noValue
+noValue: Final = univ.noValue
 
 
 class AbstractCharacterString(univ.OctetString):

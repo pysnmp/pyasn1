@@ -6,6 +6,7 @@
 #
 import math
 import warnings
+from typing import Final
 
 from pyasn1 import error
 from pyasn1.codec.ber import eoo
@@ -21,7 +22,7 @@ def _int_to_bytes(value, signed=False, length=0):
 
 
 NoValue = base.NoValue
-noValue = NoValue()
+noValue: Final = NoValue()
 
 __all__ = [
     "Any",
@@ -1056,9 +1057,9 @@ class Null(OctetString):
         return "".encode("iso-8859-1")
 
 
-intTypes = (int,)
+intTypes: Final = (int,)
 
-numericTypes = intTypes + (float,)
+numericTypes: Final = intTypes + (float,)
 
 
 class ObjectIdentifier(base.SimpleAsn1Type):
@@ -1248,15 +1249,9 @@ class Real(base.SimpleAsn1Type):
 
     binEncBase = None  # binEncBase = 16 is recommended for large numbers
 
-    try:
-        _plusInf = float("inf")
-        _minusInf = float("-inf")
-        _inf = _plusInf, _minusInf
-
-    except ValueError:
-        # Infinity support is platform and Python dependent
-        _plusInf = _minusInf = None
-        _inf = ()
+    _plusInf = float("inf")
+    _minusInf = float("-inf")
+    _inf = _plusInf, _minusInf
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)

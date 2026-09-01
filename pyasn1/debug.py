@@ -6,29 +6,36 @@
 #
 import logging
 import sys
+from collections.abc import Callable
+from typing import Any, Final
 
 from pyasn1 import __version__, error
 
 __all__ = ["Debug", "hexdump", "setLogger"]
 
-DEBUG_NONE = 0x0000
-DEBUG_ENCODER = 0x0001
-DEBUG_DECODER = 0x0002
-DEBUG_ALL = 0xFFFF
+DEBUG_NONE: Final = 0x0000
+DEBUG_ENCODER: Final = 0x0001
+DEBUG_DECODER: Final = 0x0002
+DEBUG_ALL: Final = 0xFFFF
 
-FLAG_MAP = {
+FLAG_MAP: Final[dict[str, int]] = {
     "none": DEBUG_NONE,
     "encoder": DEBUG_ENCODER,
     "decoder": DEBUG_DECODER,
     "all": DEBUG_ALL,
 }
 
-LOGGEE_MAP = {}
+LOGGEE_MAP: Final[dict[Any, tuple[str, int]]] = {}
 
 
 class Printer:
     # noinspection PyShadowingNames
-    def __init__(self, logger=None, handler=None, formatter=None):
+    def __init__(
+        self,
+        logger: logging.Logger | None = None,
+        handler: logging.Handler | None = None,
+        formatter: logging.Formatter | None = None,
+    ) -> None:
         if logger is None:
             logger = logging.getLogger("pyasn1")
 
@@ -46,20 +53,22 @@ class Printer:
 
         self.__logger = logger
 
-    def __call__(self, msg):
+    def __call__(self, msg: str) -> None:
         self.__logger.debug(msg)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "<python logging>"
 
 
-NullHandler = logging.NullHandler
+NullHandler: Final = logging.NullHandler
 
 
 class Debug:
     defaultPrinter = Printer()
 
-    def __init__(self, *flags, **options):
+    _printer: Callable[[str], None]
+
+    def __init__(self, *flags: str, **options: Any) -> None:
         self._flags = DEBUG_NONE
 
         if "loggerName" in options:
@@ -69,7 +78,7 @@ class Debug:
             )
 
         elif "printer" in options:
-            self._printer = options.get("printer")
+            self._printer = options["printer"]
 
         else:
             self._printer = self.defaultPrinter
@@ -94,23 +103,23 @@ class Debug:
                 "debug category '%s' %s" % (flag, "disabled" if inverse else "enabled")
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "logger %s, flags %x" % (self._printer, self._flags)
 
-    def __call__(self, msg):
+    def __call__(self, msg: str) -> None:
         self._printer(msg)
 
-    def __and__(self, flag):
+    def __and__(self, flag: int) -> int:
         return self._flags & flag
 
-    def __rand__(self, flag):
+    def __rand__(self, flag: int) -> int:
         return flag & self._flags
 
 
-_LOG = DEBUG_NONE
+_LOG: "Debug | int" = DEBUG_NONE
 
 
-def setLogger(userLogger):
+def setLogger(userLogger: "Debug | int | None") -> None:
     global _LOG
 
     if userLogger:
@@ -123,13 +132,13 @@ def setLogger(userLogger):
         setattr(module, name, _LOG if _LOG & flags else DEBUG_NONE)
 
 
-def registerLoggee(module, name="LOG", flags=DEBUG_NONE):
+def registerLoggee(module: str, name: str = "LOG", flags: int = DEBUG_NONE) -> Any:
     LOGGEE_MAP[sys.modules[module]] = name, flags
     setLogger(_LOG)
     return _LOG
 
 
-def hexdump(octets):
+def hexdump(octets: bytes) -> str:
     return " ".join(
         [
             "%s%.2X" % ("\n%.5d: " % n if n % 16 == 0 else "", x)
@@ -139,17 +148,17 @@ def hexdump(octets):
 
 
 class Scope:
-    def __init__(self):
-        self._list = []
+    def __init__(self) -> None:
+        self._list: list[str] = []
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ".".join(self._list)
 
-    def push(self, token):
+    def push(self, token: str) -> None:
         self._list.append(token)
 
-    def pop(self):
+    def pop(self) -> str:
         return self._list.pop()
 
 
-scope = Scope()
+scope: Final = Scope()

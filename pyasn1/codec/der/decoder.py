@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Final
+
 from pyasn1.codec.cer import decoder
 from pyasn1.type import univ
 
@@ -21,7 +23,7 @@ class OctetStringDecoder(decoder.OctetStringDecoder):
 # TODO: prohibit non-canonical encoding
 RealDecoder = decoder.RealDecoder
 
-tagMap = decoder.tagMap.copy()
+tagMap: Final = decoder.tagMap.copy()
 tagMap.update(
     {
         univ.BitString.tagSet: BitStringDecoder(),
@@ -30,7 +32,7 @@ tagMap.update(
     }
 )
 
-typeMap = decoder.typeMap.copy()
+typeMap: Final = decoder.typeMap.copy()
 
 # Put in non-ambiguous types for faster codec lookup
 for typeDecoder in tagMap.values():
@@ -94,4 +96,4 @@ class Decoder(decoder.Decoder):
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, typeMap)
+decode: Final = Decoder(tagMap, typeMap)

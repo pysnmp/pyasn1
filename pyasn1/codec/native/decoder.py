@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import debug, error
 from pyasn1.type import base, char, tag, univ, useful
 
@@ -63,7 +65,7 @@ class ChoiceDecoder:
         return asn1Value
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, Any]] = {
     univ.Integer.tagSet: AbstractScalarDecoder(),
     univ.Boolean.tagSet: AbstractScalarDecoder(),
     univ.BitString.tagSet: BitStringDecoder(),
@@ -94,7 +96,7 @@ tagMap = {
 }
 
 # Put in ambiguous & non-ambiguous types for faster codec lookup
-typeMap = {
+typeMap: Final[dict[int, Any]] = {
     univ.Integer.typeId: AbstractScalarDecoder(),
     univ.Boolean.typeId: AbstractScalarDecoder(),
     univ.BitString.typeId: BitStringDecoder(),
@@ -130,12 +132,17 @@ typeMap = {
 
 
 class Decoder:
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap):
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, Any],
+        typeMap: dict[int, Any],
+    ) -> None:
         self.__tagMap = tagMap
         self.__typeMap = typeMap
 
-    def __call__(self, pyObject, asn1Spec, **options):
+    def __call__(
+        self, pyObject: Any, asn1Spec: base.Asn1Type, **options: Any
+    ) -> base.Asn1Item:
         if LOG:
             debug.scope.push(type(pyObject).__name__)
             LOG(
@@ -221,4 +228,4 @@ class Decoder:
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, typeMap)
+decode: Final = Decoder(tagMap, typeMap)

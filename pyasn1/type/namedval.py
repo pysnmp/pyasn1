@@ -6,6 +6,8 @@
 #
 # ASN.1 named integers
 #
+from typing import NoReturn
+
 from pyasn1 import error
 
 __all__ = ["NamedValues"]
@@ -109,7 +111,7 @@ class NamedValues(dict):
     # mutation path so the primary name->number mapping and the _numbers
     # reverse index can never fall out of sync.  Construction populates the
     # storage via dict.__setitem__ to bypass these guards.
-    def _immutable(self, op):
+    def _immutable(self, op) -> NoReturn:
         raise error.PyAsn1Error("NamedValues is immutable, attempted %s" % (op,))
 
     def __setitem__(self, key, value):
@@ -133,7 +135,7 @@ class NamedValues(dict):
     def setdefault(self, *args, **kwargs):
         self._immutable("setdefault")
 
-    def __ior__(self, other):
+    def __ior__(self, other) -> NoReturn:  # type: ignore[misc]
         self._immutable("in-place merge")
 
     def __reduce__(self):

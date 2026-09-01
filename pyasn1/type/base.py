@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import error
 from pyasn1.type import constraint, tag, tagmap
 
@@ -41,7 +43,7 @@ class Asn1Type(Asn1Item):
     subtypeSpec = constraint.ConstraintsIntersection()
 
     # Disambiguation ASN.1 types identification
-    typeId = None
+    typeId: Any = None
 
     def __init__(self, **kwargs):
         readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
@@ -276,7 +278,7 @@ for _plugName in NoValue.plugMethods:
 del _plugName
 
 
-noValue = NoValue()
+noValue: Final = NoValue()
 
 
 class SimpleAsn1Type(Asn1Type):
@@ -295,7 +297,7 @@ class SimpleAsn1Type(Asn1Type):
     """
 
     #: Default payload value
-    defaultValue = noValue
+    defaultValue: Any = noValue
 
     def __init__(self, value=noValue, **kwargs):
         Asn1Type.__init__(self, **kwargs)
@@ -539,7 +541,7 @@ class ConstructedAsn1Type(Asn1Type):
     #: otherwise subtype relation is only enforced
     strictConstraints = False
 
-    componentType = None
+    componentType: Any = None
 
     def __init__(self, **kwargs):
         readOnly = {"componentType": self.componentType}

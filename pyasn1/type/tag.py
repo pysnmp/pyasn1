@@ -5,6 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 from collections import namedtuple
+from typing import Final
 
 from pyasn1 import error
 
@@ -23,29 +24,29 @@ __all__ = [
 ]
 
 #: Identifier for ASN.1 class UNIVERSAL
-tagClassUniversal = 0x00
+tagClassUniversal: Final = 0x00
 
 #: Identifier for ASN.1 class APPLICATION
-tagClassApplication = 0x40
+tagClassApplication: Final = 0x40
 
 #: Identifier for ASN.1 class context-specific
-tagClassContext = 0x80
+tagClassContext: Final = 0x80
 
 #: Identifier for ASN.1 class private
-tagClassPrivate = 0xC0
+tagClassPrivate: Final = 0xC0
 
 #: Identifier for "simple" ASN.1 structure (e.g. scalar)
-tagFormatSimple = 0x00
+tagFormatSimple: Final = 0x00
 
 #: Identifier for "constructed" ASN.1 structure (e.g. may have inner components)
-tagFormatConstructed = 0x20
+tagFormatConstructed: Final = 0x20
 
-tagCategoryImplicit = 0x01
-tagCategoryExplicit = 0x02
-tagCategoryUntagged = 0x04
+tagCategoryImplicit: Final = 0x01
+tagCategoryExplicit: Final = 0x02
+tagCategoryUntagged: Final = 0x04
 
 
-_TagBase = namedtuple("Tag", ["tagClass", "tagFormat", "tagId"])
+_TagBase = namedtuple("_TagBase", ["tagClass", "tagFormat", "tagId"])
 
 
 class Tag(_TagBase):
