@@ -4,6 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import logging
 from typing import Any, Final
 
 from pyasn1 import debug, error
@@ -11,7 +12,7 @@ from pyasn1.type import base, char, tag, univ, useful
 
 __all__ = ["decode"]
 
-LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
+LOG = logging.getLogger(__name__)
 
 
 class AbstractScalarDecoder:
@@ -173,11 +174,12 @@ class Decoder:
     def __call__(
         self, pyObject: Any, asn1Spec: base.Asn1Type, **options: Any
     ) -> base.Asn1Item:
-        if LOG:
+        if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(pyObject).__name__)
-            LOG(
-                "decoder called at scope %s, working with type %s"
-                % (debug.scope, type(pyObject).__name__)
+            LOG.debug(
+                "decoder called at scope %s, working with type %s",
+                debug.scope,
+                type(pyObject).__name__,
             )
 
         if asn1Spec is None or not isinstance(asn1Spec, base.Asn1Item):
@@ -200,18 +202,22 @@ class Decoder:
                     "Unknown ASN.1 tag %s" % asn1Spec.tagSet
                 ) from exc
 
-        if LOG:
-            LOG(
-                "calling decoder %s on Python type %s <%s>"
-                % (type(valueDecoder).__name__, type(pyObject).__name__, repr(pyObject))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "calling decoder %s on Python type %s <%s>",
+                type(valueDecoder).__name__,
+                type(pyObject).__name__,
+                repr(pyObject),
             )
 
         value = valueDecoder(pyObject, asn1Spec, self, **options)
 
-        if LOG:
-            LOG(
-                "decoder %s produced ASN.1 type %s <%s>"
-                % (type(valueDecoder).__name__, type(value).__name__, repr(value))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "decoder %s produced ASN.1 type %s <%s>",
+                type(valueDecoder).__name__,
+                type(value).__name__,
+                repr(value),
             )
             debug.scope.pop()
 

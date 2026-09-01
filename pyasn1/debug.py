@@ -4,9 +4,31 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Debug logging for pyasn1.
+
+pyasn1 logs through :mod:`logging` under the ``pyasn1`` namespace, one logger
+per codec module::
+
+    pyasn1.codec.ber.decoder
+    pyasn1.codec.ber.encoder
+    pyasn1.codec.native.decoder
+    pyasn1.codec.native.encoder
+
+Applications turn debugging on the ordinary way, and no pyasn1 API is
+involved::
+
+    logging.getLogger("pyasn1.codec.ber.decoder").setLevel(logging.DEBUG)
+
+The :class:`Debug` / :func:`setLogger` / :func:`registerLoggee` trio predates
+that and is deprecated. It is kept working for downstream code, but it drives
+logger levels behind your back and cannot express anything the standard
+configuration cannot.
+"""
+
 import logging
 import sys
 import threading
+import warnings
 from collections.abc import Callable
 from typing import Any, Final
 
@@ -24,6 +46,16 @@ FLAG_MAP: Final[dict[str, int]] = {
     "encoder": DEBUG_ENCODER,
     "decoder": DEBUG_DECODER,
     "all": DEBUG_ALL,
+}
+
+#: Root of the library's logger namespace.
+LOGGER_NAME: Final = "pyasn1"
+
+#: Which loggers each legacy debug flag stands for. The flags exist only
+#: because the modules could not be addressed by name before; they can now.
+FLAG_LOGGER_MAP: Final[dict[int, tuple[str, ...]]] = {
+    DEBUG_ENCODER: ("pyasn1.codec.ber.encoder", "pyasn1.codec.native.encoder"),
+    DEBUG_DECODER: ("pyasn1.codec.ber.decoder", "pyasn1.codec.native.decoder"),
 }
 
 LOGGEE_MAP: Final[dict[Any, tuple[str, int]]] = {}
@@ -46,7 +78,7 @@ class Printer:
         formatter: logging.Formatter | None = None,
     ) -> None:
         if logger is None:
-            logger = logging.getLogger("pyasn1")
+            logger = logging.getLogger(LOGGER_NAME)
             logger.setLevel(logging.DEBUG)
 
             if handler is None:
@@ -62,6 +94,11 @@ class Printer:
 
         self.__logger = logger
 
+    @property
+    def logger(self) -> logging.Logger:
+        """The logger this printer writes to."""
+        return self.__logger
+
     def __call__(self, msg: str) -> None:
         self.__logger.debug(msg)
 
@@ -75,6 +112,11 @@ _defaultPrinterLock: Final = threading.Lock()
 
 
 class Debug:
+    """Deprecated switch for pyasn1 debug output.
+
+    Configure :mod:`logging` instead; see the module docstring.
+    """
+
     #: Printer shared by all :class:`Debug` instances that were not given one.
     #: Built on first use, never at import time, so that merely importing
     #: pyasn1 never attaches a handler to anybody's logger.
@@ -83,6 +125,13 @@ class Debug:
     _printer: Callable[[str], None]
 
     def __init__(self, *flags: str, **options: Any) -> None:
+        warnings.warn(
+            "pyasn1.debug.Debug is deprecated; enable debugging with "
+            "logging.getLogger('pyasn1').setLevel(logging.DEBUG) instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         self._flags = DEBUG_NONE
 
         if "loggerName" in options:
@@ -123,6 +172,11 @@ class Debug:
                 "debug category '%s' %s" % (flag, "disabled" if inverse else "enabled")
             )
 
+    @property
+    def printer(self) -> Callable[[str], None]:
+        """Where this instance sends rendered debug messages."""
+        return self._printer
+
     def __str__(self) -> str:
         return "logger %s, flags %x" % (self._printer, self._flags)
 
@@ -136,25 +190,145 @@ class Debug:
         return flag & self._flags
 
 
+class _PrinterHandler(logging.Handler):
+    """Feed records from the ``pyasn1`` loggers to a legacy printer.
+
+    Re-entry is blocked per thread: a :class:`Printer` writes by calling
+    ``logger.debug()``, so without the guard a printer aimed back at a logger
+    that reaches this handler would recurse until the stack ran out.
+    """
+
+    def __init__(self, printer: Callable[[str], None]) -> None:
+        super().__init__(logging.DEBUG)
+        self._printer = printer
+        self._busy = threading.local()
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if getattr(self._busy, "active", False):
+            return
+
+        self._busy.active = True
+
+        try:
+            self._printer(record.getMessage())
+        except Exception:
+            self.handleError(record)
+        finally:
+            self._busy.active = False
+
+
+def _reaches_pyasn1_logger(printer: Callable[[str], None]) -> bool:
+    """Would records written by ``printer`` come back to the pyasn1 loggers?
+
+    True when the printer targets ``pyasn1`` itself or one of its ancestors,
+    in which case pyasn1's own records already arrive there by propagation and
+    bridging would only duplicate them.
+    """
+    if not isinstance(printer, Printer):
+        return False
+
+    name = printer.logger.name
+
+    return (
+        name == LOGGER_NAME
+        or name in ("root", logging.root.name)
+        or printer.logger is logging.root
+        or LOGGER_NAME.startswith(name + ".")
+    )
+
+
 _LOG: "Debug | int" = DEBUG_NONE
+
+_setLoggerLock: Final = threading.Lock()
+
+#: Levels replaced by the last :func:`setLogger` call, so they can be restored.
+_savedLevels: dict[str, int] = {}
+
+_bridgeHandler: "_PrinterHandler | None" = None
+
+
+def _restoreLoggers() -> None:
+    """Undo whatever the previous :func:`setLogger` call changed."""
+    global _bridgeHandler
+
+    if _bridgeHandler is not None:
+        logging.getLogger(LOGGER_NAME).removeHandler(_bridgeHandler)
+        _bridgeHandler = None
+
+    while _savedLevels:
+        name, level = _savedLevels.popitem()
+        logging.getLogger(name).setLevel(level)
 
 
 def setLogger(userLogger: "Debug | int | None") -> None:
-    global _LOG
+    """Deprecated. Turn pyasn1 debugging on or off.
 
-    if userLogger:
-        _LOG = userLogger
-    else:
-        _LOG = DEBUG_NONE
+    Passing a :class:`Debug` instance raises the level of the loggers its
+    flags name and, when needed, routes their records to the instance's
+    printer. Passing a false value puts every level back as it was.
 
-    # Update registered logging clients
-    for module, (name, flags) in LOGGEE_MAP.items():
-        setattr(module, name, _LOG if _LOG & flags else DEBUG_NONE)
+    This overrides application-set levels on the ``pyasn1.codec.*`` loggers
+    for as long as it is in effect. Configure :mod:`logging` directly to
+    avoid that.
+    """
+    warnings.warn(
+        "pyasn1.debug.setLogger is deprecated; enable debugging with "
+        "logging.getLogger('pyasn1').setLevel(logging.DEBUG) instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    _setLogger(userLogger)
+
+
+def _setLogger(userLogger: "Debug | int | None") -> None:
+    """:func:`setLogger` without the deprecation warning, for internal use."""
+    global _LOG, _bridgeHandler
+
+    with _setLoggerLock:
+        _restoreLoggers()
+
+        _LOG = userLogger if userLogger else DEBUG_NONE
+
+        if isinstance(_LOG, Debug):
+            for flag, names in FLAG_LOGGER_MAP.items():
+                # Disabled categories are pinned above DEBUG rather than left
+                # alone: they would otherwise inherit an enabling level from
+                # an ancestor and leak the very output the flags exclude.
+                level = logging.DEBUG if _LOG & flag else logging.INFO
+
+                for name in names:
+                    logger = logging.getLogger(name)
+                    _savedLevels[name] = logger.level
+                    logger.setLevel(level)
+
+            if not _reaches_pyasn1_logger(_LOG.printer):
+                _bridgeHandler = _PrinterHandler(_LOG.printer)
+                pyasn1Logger = logging.getLogger(LOGGER_NAME)
+                _savedLevels[LOGGER_NAME] = pyasn1Logger.level
+                pyasn1Logger.setLevel(logging.DEBUG)
+                pyasn1Logger.addHandler(_bridgeHandler)
+
+        # Update legacy logging clients registered by out-of-tree modules.
+        for module, (name, flags) in LOGGEE_MAP.items():
+            setattr(module, name, _LOG if _LOG & flags else DEBUG_NONE)
 
 
 def registerLoggee(module: str, name: str = "LOG", flags: int = DEBUG_NONE) -> Any:
+    """Deprecated. Bind a module-global debug switch updated by :func:`setLogger`.
+
+    pyasn1's own modules no longer use this; they hold ordinary
+    :class:`logging.Logger` objects. It remains for out-of-tree code.
+    """
+    warnings.warn(
+        "pyasn1.debug.registerLoggee is deprecated; use "
+        "logging.getLogger(__name__) and guard with Logger.isEnabledFor()",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     LOGGEE_MAP[sys.modules[module]] = name, flags
-    setLogger(_LOG)
+    _setLogger(_LOG)
     return _LOG
 
 

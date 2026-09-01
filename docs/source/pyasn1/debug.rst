@@ -1,4 +1,3 @@
-
 .. _pyasn1-debugging:
 
 Debugging and logging
@@ -14,78 +13,109 @@ ask for it.
 Turning debugging on
 --------------------
 
-Route pyasn1's debug records into logging you already configure:
+pyasn1 logs through :mod:`logging` under the ``pyasn1`` namespace. There
+is no pyasn1 API to call: raise the level the way you would for any
+other library.
 
 .. code-block:: python
 
    import logging
-   from pyasn1 import debug
 
-   logging.basicConfig(level=logging.DEBUG)
+   logging.basicConfig(level=logging.INFO)
+   logging.getLogger('pyasn1').setLevel(logging.DEBUG)
 
-   debug.setLogger(debug.Debug('all', loggerName='myapp.asn1'))
+Everything pyasn1 traces is emitted at ``DEBUG``. Records propagate to
+your handlers, so levels, filters and formatters you already configure
+apply to them unchanged.
 
-``loggerName`` names the logger records are emitted on, so ordinary
-:mod:`logging` configuration -- levels, handlers, filters, formatters --
-applies to them. pyasn1 does not touch a logger you name -- it adds no
-handler and changes no level or propagation setting; that logger is
-yours. Records simply propagate to whatever you have configured.
-
-To get output on stderr without configuring anything, omit
-``loggerName``. pyasn1 then owns the ``pyasn1`` logger and attaches a
-:class:`logging.StreamHandler` to it:
+Turn it back off by putting the level back:
 
 .. code-block:: python
 
-   debug.setLogger(debug.Debug('all'))
-
-Turn it back off with:
-
-.. code-block:: python
-
-   debug.setLogger(None)
+   logging.getLogger('pyasn1').setLevel(logging.NOTSET)
 
 Selecting what is traced
 ------------------------
 
-:class:`~pyasn1.debug.Debug` accepts one or more category flags:
+Each codec module owns a logger named after it, so tracing is selected
+by logger name:
 
-============  ==================================================
-Flag          Traces
-============  ==================================================
-``encoder``   serialisation
-``decoder``   de-serialisation
-``all``       everything
-``none``      nothing
-============  ==================================================
+=================================  ==================================
+Logger                             Traces
+=================================  ==================================
+``pyasn1.codec.ber.decoder``       BER/CER/DER de-serialisation
+``pyasn1.codec.ber.encoder``       BER/CER/DER serialisation
+``pyasn1.codec.native.decoder``    conversion from native objects
+``pyasn1.codec.native.encoder``    conversion to native objects
+``pyasn1``                         all of the above
+=================================  ==================================
 
-Prefixing a flag with ``!`` or ``~`` subtracts it, so tracing everything
-except the encoder is:
+To trace only BER decoding, and nothing else:
 
 .. code-block:: python
 
-   debug.setLogger(debug.Debug('all', '!encoder'))
+   logging.getLogger('pyasn1.codec.ber.decoder').setLevel(logging.DEBUG)
 
-An unrecognised flag raises :class:`~pyasn1.error.PyAsn1Error`.
+To trace everything except the encoders, enable the namespace and pin
+the encoders above ``DEBUG``:
+
+.. code-block:: python
+
+   logging.getLogger('pyasn1').setLevel(logging.DEBUG)
+   logging.getLogger('pyasn1.codec.ber.encoder').setLevel(logging.INFO)
+   logging.getLogger('pyasn1.codec.native.encoder').setLevel(logging.INFO)
+
+Records carry their format arguments
+------------------------------------
+
+Trace points pass arguments to :mod:`logging` rather than pre-rendering
+them, so ``record.msg`` stays the format string and ``record.args``
+holds the values:
+
+.. code-block:: python
+
+   LOG.debug('tag decoded into %s, decoding length', tagSet)
+
+A structured handler can therefore group records by call site, and emit
+the arguments as fields, without parsing the rendered message.
 
 Cost when disabled
 ------------------
 
-Debug tracing is off by default and every trace point is guarded, so
-disabled tracing costs one truthiness test per call site and never
-formats a message. Leaving the guards in place in production is fine;
-enabling ``all`` on a hot decoding path is not, as the records embed
-hexdumps of the substrate.
+Every trace point is guarded with
+:meth:`~logging.Logger.isEnabledFor`, so disabled tracing costs one
+level check per call site and neither formats a message nor builds its
+arguments. Leaving the guards in place in production is fine; enabling
+``DEBUG`` on a hot decoding path is not, as the records embed hexdumps
+of the substrate.
 
-Custom sinks
-------------
+.. _pyasn1-debug-deprecated:
 
-To send records somewhere other than :mod:`logging`, pass any callable
-taking a single string:
+Deprecated: the Debug switch
+----------------------------
+
+:class:`~pyasn1.debug.Debug`, :func:`~pyasn1.debug.setLogger` and
+``registerLoggee`` predate the move to per-module loggers and are
+deprecated. They still work, and using them raises a
+:exc:`DeprecationWarning`.
 
 .. code-block:: python
 
-   debug.setLogger(debug.Debug('all', printer=my_sink))
+   from pyasn1 import debug
+
+   debug.setLogger(debug.Debug('all'))   # deprecated
+   debug.setLogger(None)
+
+The ``encoder``, ``decoder``, ``all`` and ``none`` flags map onto the
+loggers in the table above, and ``!``/``~`` still subtracts a category.
+While a :class:`~pyasn1.debug.Debug` instance is installed,
+:func:`~pyasn1.debug.setLogger` drives the levels of the
+``pyasn1.codec.*`` loggers itself, overriding any level your
+application set on them; ``setLogger(None)`` puts them back.
+
+Prefer plain :mod:`logging` configuration: it needs no pyasn1 import,
+survives this deprecation, and addresses individual codec modules, which
+the flags cannot.
 
 Errors
 ------

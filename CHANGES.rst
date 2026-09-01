@@ -2,6 +2,26 @@
 unreleased
 ---------------------------------
 
+- The codecs now log through ordinary :mod:`logging` loggers named after their
+  modules (``pyasn1.codec.ber.decoder`` and siblings), guarded with
+  ``Logger.isEnabledFor(logging.DEBUG)``. Debugging is enabled the standard
+  way, ``logging.getLogger('pyasn1').setLevel(logging.DEBUG)``, with no pyasn1
+  API involved. Previously the only way in was ``debug.setLogger()``: raising
+  the level on the ``pyasn1`` logger did nothing at all, because each module
+  held a private switch that only ``setLogger`` could flip.
+- Debug records keep their format arguments instead of being rendered at the
+  call site, so ``record.msg`` stays a template and ``record.args`` holds the
+  values. Structured handlers can group by call site and emit the arguments as
+  fields without parsing the message.
+- Per-module logger names replace the ``encoder``/``decoder`` flags, which
+  could not distinguish the BER codecs from the native ones. Enabling
+  ``pyasn1.codec.ber.decoder`` alone is now possible.
+- ``debug.Debug``, ``debug.setLogger`` and ``debug.registerLoggee`` are
+  deprecated and raise ``DeprecationWarning``. They continue to work: the
+  flags map onto the new loggers, ``registerLoggee`` still serves out-of-tree
+  modules, and the emitted message stream is unchanged. Note that while a
+  ``Debug`` instance is installed, ``setLogger`` drives the ``pyasn1.codec.*``
+  logger levels itself and restores them on ``setLogger(None)``.
 - Importing pyasn1 no longer configures logging for the importing application.
   Previously ``pyasn1.debug`` built its default ``Printer`` at class-definition
   time, so merely importing any codec attached a ``StreamHandler`` writing to
