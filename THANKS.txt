@@ -8,3 +8,9 @@ Alex Gaynor
 Geoffrey Thomas
 Daniel Bratell
 Kim Gräsman
+
+Fork maintenance (2021- ):
+
+Sean Mancini
+Olga Mrozowicz (Splunk Inc.)
+mgm-77
