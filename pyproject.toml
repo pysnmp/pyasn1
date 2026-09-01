@@ -107,6 +107,7 @@ module = [
     "pyasn1.type.base",
     "pyasn1.type.char",
     "pyasn1.type.constraint",
+    "pyasn1.type.namedtype",
     "pyasn1.type.namedval",
     "pyasn1.type.opentype",
     "pyasn1.type.tag",
