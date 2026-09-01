@@ -37,6 +37,7 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
     "mypy>=2.3.1",
+    "ty>=0.0.77",
     "Sphinx>=9.1.0; python_version >= '3.12'",
     "pre-commit>=4.6.2",
 ]

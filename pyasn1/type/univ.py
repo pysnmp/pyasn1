@@ -1438,23 +1438,23 @@ class Real(base.SimpleAsn1Type):
     def __trunc__(self) -> int:
         return self.clone(math.trunc(float(self)))
 
-    def __lt__(self, value: typing.Any) -> bool:
-        return float(self) < value
+    def __lt__(self, other: typing.Any) -> bool:
+        return float(self) < other
 
-    def __le__(self, value: typing.Any) -> bool:
-        return float(self) <= value
+    def __le__(self, other: typing.Any) -> bool:
+        return float(self) <= other
 
-    def __eq__(self, value: object) -> bool:
-        return self is value or float(self) == value
+    def __eq__(self, other: object) -> bool:
+        return self is other or float(self) == other
 
-    def __ne__(self, value: object) -> bool:
-        return self is not value and float(self) != value
+    def __ne__(self, other: object) -> bool:
+        return self is not other and float(self) != other
 
-    def __gt__(self, value: typing.Any) -> bool:
-        return float(self) > value
+    def __gt__(self, other: typing.Any) -> bool:
+        return float(self) > other
 
-    def __ge__(self, value: typing.Any) -> bool:
-        return float(self) >= value
+    def __ge__(self, other: typing.Any) -> bool:
+        return float(self) >= other
 
     def __bool__(self) -> bool:
         return bool(float(self))
