@@ -146,7 +146,7 @@ class Asn1Type(Asn1Item):
         return True
 
     def prettyPrint(self, scope: int = 0) -> str:
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class NoValue:
