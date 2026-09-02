@@ -7,9 +7,10 @@
 import sys
 import unittest
 
-from pyasn1.codec.ber import decoder, eoo
+from pyasn1.codec.ber import decoder, encoder, eoo
 from pyasn1.error import PyAsn1Error
-from pyasn1.type import char, namedtype, opentype, tag, univ
+from pyasn1.type import char, constraint, namedtype, opentype, tag, univ
+from pyasn1.type.error import ValueConstraintError
 from tests.base import BaseTestCase
 
 
@@ -946,6 +947,39 @@ class RealDecoderTestCase(BaseTestCase):
             pass
         else:
             assert 0, "accepted too-short real"
+
+
+class RealRoundTripTestCase(BaseTestCase):
+    @staticmethod
+    def _roundTrip(value):
+        decoded, rest = decoder.decode(encoder.encode(value), asn1Spec=univ.Real())
+        assert rest == _null
+        return decoded
+
+    def testSupportedBinaryBases(self):
+        cases = (
+            (univ.Real((0.5, 2, 0)), (1, 2, -1), 2),
+            (univ.Real((3.25, 2, 0)), (26, 2, -3), 8),
+            (univ.Real((0.00390625, 2, 0)), (1, 2, -8), 16),
+        )
+
+        for value, expected, encbase in cases:
+            value.binEncBase = encbase
+            assert tuple(self._roundTrip(value)) == expected
+
+    def testSubnormalAndLargeExponentValues(self):
+        cases = (
+            ((1, 2, -1074), (1, 2, -1074)),
+            ((1, 2, 262140), (1, 2, 262140)),
+            ((-1, 2, 76354972), (-1, 2, 76354972)),
+        )
+
+        for value, expected in cases:
+            assert tuple(self._roundTrip(univ.Real(value))) == expected
+
+    def testInfinityValues(self):
+        assert self._roundTrip(univ.Real("inf")).isPlusInf
+        assert self._roundTrip(univ.Real("-inf")).isMinusInf
 
 
 class UniversalStringDecoderTestCase(BaseTestCase):
@@ -3618,6 +3652,78 @@ class NonStringDecoderTestCase(BaseTestCase):
     def testAny(self):
         s, _ = decoder.decode(univ.Any(self.substrate), asn1Spec=self.s)
         assert self.s == s
+
+
+class BoundedInteger(univ.Integer):
+    subtypeSpec = constraint.ConstraintsIntersection(
+        constraint.ValueRangeConstraint(1, 9)
+    )
+
+
+class ConstructedValueConstraintDecoderTestCase(BaseTestCase):
+    class RequiredIdSequence(univ.Sequence):
+        componentType = namedtype.NamedTypes(
+            namedtype.OptionalNamedType("id", univ.Integer()),
+            namedtype.OptionalNamedType("name", univ.OctetString()),
+        )
+        subtypeSpec = constraint.ConstraintsIntersection(
+            constraint.WithComponentsConstraint(
+                ("id", constraint.ComponentPresentConstraint()),
+                ("name", constraint.ComponentAbsentConstraint()),
+            )
+        )
+
+    class NoIdSet(univ.Set):
+        componentType = namedtype.NamedTypes(
+            namedtype.OptionalNamedType("id", univ.Integer())
+        )
+        subtypeSpec = constraint.ConstraintsIntersection(
+            constraint.WithComponentsConstraint(
+                ("id", constraint.ComponentAbsentConstraint()),
+            )
+        )
+
+    class SubtypedSequence(univ.Sequence):
+        componentType = namedtype.NamedTypes(
+            namedtype.NamedType("number", BoundedInteger())
+        )
+
+    class DefaultedSequence(univ.Sequence):
+        componentType = namedtype.NamedTypes(
+            namedtype.DefaultedNamedType("count", univ.Integer(5))
+        )
+
+    def testDefiniteLengthRequiredComponentIsValidated(self):
+        with self.assertRaises(ValueConstraintError):
+            decoder.decode(b"0\x00", asn1Spec=self.RequiredIdSequence())
+
+    def testIndefiniteLengthRequiredComponentIsValidated(self):
+        with self.assertRaises(ValueConstraintError):
+            decoder.decode(b"0\x80\x00\x00", asn1Spec=self.RequiredIdSequence())
+
+    def testAbsentComponentConstraintIsValidated(self):
+        with self.assertRaises(ValueConstraintError):
+            decoder.decode(b"1\x03\x02\x01\x01", asn1Spec=self.NoIdSet())
+
+    def testPresentSubtypeIsMaterializedAsAValue(self):
+        value, rest = decoder.decode(
+            b"0\x03\x02\x01\x01", asn1Spec=self.SubtypedSequence()
+        )
+
+        component = value["number"]
+        assert rest == _null
+        assert isinstance(component, BoundedInteger)
+        assert component.isValue
+        assert component == 1
+
+    def testOmittedDefaultRemainsAbsentUntilAccessed(self):
+        value, rest = decoder.decode(b"0\x00", asn1Spec=self.DefaultedSequence())
+
+        assert rest == _null
+        assert (
+            value.getComponentByName("count", default=None, instantiate=False) is None
+        )
+        assert value["count"] == 5
 
 
 class ErrorOnDecodingTestCase(BaseTestCase):

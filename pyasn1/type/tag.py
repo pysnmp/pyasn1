@@ -47,7 +47,6 @@ tagCategoryImplicit: Final = 0x01
 tagCategoryExplicit: Final = 0x02
 tagCategoryUntagged: Final = 0x04
 
-
 #: Human-readable names for the ASN.1 tag classes, used by ``repr()``.
 _TAG_CLASS_NAMES: Final = {
     tagClassUniversal: "UNIVERSAL",

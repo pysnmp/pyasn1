@@ -30,6 +30,53 @@ class LargeTagEncoderTestCase(BaseTestCase):
         )
 
 
+class LengthEncoderTestCase(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.encoder = encoder.AbstractItemEncoder()
+
+    def testShortForm(self):
+        assert self.encoder.encodeLength(127, defMode=True) == (127,)
+
+    def testMaximumLongForm(self):
+        length = 1 << (8 * 125)
+        encoded = self.encoder.encodeLength(length, defMode=True)
+        assert encoded[0] == 0xFE
+        assert len(encoded) == 127
+        assert encoded[1] == 1
+        assert not any(encoded[2:])
+
+    def testLongFormOverflow(self):
+        with self.assertRaises(PyAsn1Error):
+            self.encoder.encodeLength(1 << (8 * 126), defMode=True)
+
+
+class TaggedEncoderDispatchTestCase(BaseTestCase):
+    class TaggedIntegerEncoder(encoder.AbstractItemEncoder):
+        def encodeValue(self, value, asn1Spec, encodeFun, **options):
+            return b"\xff", False, True
+
+    def testCompleteTagSetSelectsCustomEncoder(self):
+        value = univ.Integer(1).subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 7)
+        )
+        tagMap = encoder.tagMap.copy()
+        tagMap[value.tagSet] = self.TaggedIntegerEncoder()
+        encode = encoder.Encoder(tagMap, encoder.typeMap)
+
+        assert encode(value) == bytes((0x87, 1, 0xFF))
+
+    def testAmbiguousBuiltInTagUsesTypeEncoder(self):
+        value = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("value", univ.Integer())
+            )
+        )
+        value["value"] = 1
+
+        assert encoder.encode(value) == bytes((0x30, 3, 2, 1, 1))
+
+
 class IntegerEncoderTestCase(BaseTestCase):
     def testPosInt(self):
         assert encoder.encode(univ.Integer(12)) == bytes((2, 1, 12))
