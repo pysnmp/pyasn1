@@ -54,7 +54,7 @@ class DecoderErrorContractTestCase(BaseTestCase):
                         (name, type(exc).__name__), (substrate.hex(), str(exc))
                     )
 
-        assert not leaks, "non-PyAsn1Error escaped a decoder: %r" % (leaks,)
+        assert not leaks, f"non-PyAsn1Error escaped a decoder: {leaks!r}"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

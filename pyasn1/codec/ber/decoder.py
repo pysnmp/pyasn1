@@ -37,7 +37,7 @@ class AbstractDecoder:
         substrateFun: Any = None,
         **options: Any,
     ) -> tuple[Any, bytes]:
-        raise error.PyAsn1Error("Decoder not implemented for %s" % (tagSet,))
+        raise error.PyAsn1Error(f"Decoder not implemented for {tagSet}")
 
     def indefLenValueDecoder(
         self,
@@ -51,7 +51,7 @@ class AbstractDecoder:
         **options: Any,
     ) -> tuple[Any, bytes]:
         raise error.PyAsn1Error(
-            "Indefinite length mode decoder not implemented for %s" % (tagSet,)
+            f"Indefinite length mode decoder not implemented for {tagSet}"
         )
 
 
@@ -205,7 +205,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
         if tagSet[0].tagFormat == tag.tagFormatSimple:  # XXX what tag to check?
             trailingBits = head[0]
             if trailingBits > 7:
-                raise error.PyAsn1Error("Trailing bits overflow %s" % trailingBits)
+                raise error.PyAsn1Error(f"Trailing bits overflow {trailingBits}")
 
             value = self.protoComponent.fromOctetString(
                 head[1:], internalFormat=True, padding=trailingBits
@@ -215,7 +215,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
         if not self.supportConstructedForm:
             raise error.PyAsn1Error(
-                "Constructed encoding form prohibited at %s" % self.__class__.__name__
+                f"Constructed encoding form prohibited at {self.__class__.__name__}"
             )
 
         if LOG.isEnabledFor(logging.DEBUG):
@@ -233,7 +233,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
             trailingBits = component[0]
             if trailingBits > 7:
-                raise error.PyAsn1Error("Trailing bits overflow %s" % trailingBits)
+                raise error.PyAsn1Error(f"Trailing bits overflow {trailingBits}")
 
             bitString = self.protoComponent.fromOctetString(
                 component[1:],
@@ -280,7 +280,7 @@ class BitStringDecoder(AbstractSimpleDecoder):
 
             trailingBits = component[0]
             if trailingBits > 7:
-                raise error.PyAsn1Error("Trailing bits overflow %s" % trailingBits)
+                raise error.PyAsn1Error(f"Trailing bits overflow {trailingBits}")
 
             bitString = self.protoComponent.fromOctetString(
                 component[1:],
@@ -324,7 +324,7 @@ class OctetStringDecoder(AbstractSimpleDecoder):
 
         if not self.supportConstructedForm:
             raise error.PyAsn1Error(
-                "Constructed encoding form prohibited at %s" % self.__class__.__name__
+                f"Constructed encoding form prohibited at {self.__class__.__name__}"
             )
 
         if LOG.isEnabledFor(logging.DEBUG):
@@ -404,7 +404,7 @@ class NullDecoder(AbstractSimpleDecoder):
         component = self._createComponent(asn1Spec, tagSet, "", **options)
 
         if head:
-            raise error.PyAsn1Error("Unexpected %d-octet substrate for Null" % length)
+            raise error.PyAsn1Error(f"Unexpected {length}-octet substrate for Null")
 
         return component, tail
 
@@ -446,7 +446,7 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
                     subId = (subId << 7) + (nextSubId & 0x7F)
                     if index >= substrateLen:
                         raise error.SubstrateUnderrunError(
-                            "Short substrate for sub-OID past %s" % (oid,)
+                            f"Short substrate for sub-OID past {oid}"
                         )
                     nextSubId = head[index]
                     index += 1
@@ -466,7 +466,7 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         elif oid[0] >= 80:
             oid = (2, oid[0] - 80) + oid[1:]
         else:
-            raise error.PyAsn1Error("Malformed first OID octet: %s" % head[0])
+            raise error.PyAsn1Error(f"Malformed first OID octet: {head[0]}")
 
         return self._createComponent(asn1Spec, tagSet, oid, **options), tail
 
@@ -565,13 +565,13 @@ class RealDecoder(AbstractSimpleDecoder):
                     value = float(head)
 
                 else:
-                    raise error.SubstrateUnderrunError("Unknown NR (tag %s)" % fo)
+                    raise error.SubstrateUnderrunError(f"Unknown NR (tag {fo})")
 
             except ValueError as exc:
                 raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
 
         else:
-            raise error.SubstrateUnderrunError("Unknown encoding (tag %s)" % fo)
+            raise error.SubstrateUnderrunError(f"Unknown encoding (tag {fo})")
 
         return self._createComponent(asn1Spec, tagSet, value, **options), tail
 
@@ -726,7 +726,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
                     except IndexError as exc:
                         raise error.PyAsn1Error(
-                            "Excessive components decoded at %r" % (asn1Spec,)
+                            f"Excessive components decoded at {asn1Spec!r}"
                         ) from exc
 
                 component, head = decodeFun(head, componentType, **options)
@@ -757,8 +757,8 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
             if namedTypes:
                 if not namedTypes.requiredComponents.issubset(seenIndices):
                     raise error.PyAsn1Error(
-                        "ASN.1 object %s has uninitialized "
-                        "components" % asn1Object.__class__.__name__
+                        f"ASN.1 object {asn1Object.__class__.__name__} has uninitialized "
+                        "components"
                     )
 
                 if namedTypes.hasOpenTypes:
@@ -954,7 +954,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
                     except IndexError as exc:
                         raise error.PyAsn1Error(
-                            "Excessive components decoded at %r" % (asn1Object,)
+                            f"Excessive components decoded at {asn1Object!r}"
                         ) from exc
 
                 component, substrate = decodeFun(
@@ -991,8 +991,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
             if namedTypes:
                 if not namedTypes.requiredComponents.issubset(seenIndices):
                     raise error.PyAsn1Error(
-                        "ASN.1 object %s has uninitialized components"
-                        % asn1Object.__class__.__name__
+                        f"ASN.1 object {asn1Object.__class__.__name__} has uninitialized components"
                     )
 
                 if namedTypes.hasOpenTypes:
@@ -1541,7 +1540,7 @@ class Decoder:
         _nestingLevel = options.get("_nestingLevel", 0)
         if _nestingLevel > MAX_NESTING_DEPTH:
             raise error.PyAsn1Error(
-                "ASN.1 structure nesting depth exceeds limit (%d)" % MAX_NESTING_DEPTH
+                f"ASN.1 structure nesting depth exceeds limit ({MAX_NESTING_DEPTH})"
             )
         options["_nestingLevel"] = _nestingLevel + 1
 
@@ -1666,7 +1665,7 @@ class Decoder:
                     # problem, we can handle more than is possible
                     if len(encodedLength) != size:
                         raise error.SubstrateUnderrunError(
-                            "%s<%s at %s" % (size, len(encodedLength), tagSet)
+                            f"{size}<{len(encodedLength)} at {tagSet}"
                         )
 
                     length = 0
@@ -1689,7 +1688,7 @@ class Decoder:
 
                 elif len(substrate) < length:
                     raise error.SubstrateUnderrunError(
-                        "%d-octet short" % (length - len(substrate))
+                        f"{length - len(substrate)}-octet short"
                     )
 
                 state = stGetValueDecoder
@@ -1945,7 +1944,7 @@ class Decoder:
                 state = stDecodeValue
 
             if state is stErrorCondition:
-                raise error.PyAsn1Error("%s not in asn1Spec: %r" % (tagSet, asn1Spec))
+                raise error.PyAsn1Error(f"{tagSet} not in asn1Spec: {asn1Spec!r}")
 
         if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.pop()

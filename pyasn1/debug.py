@@ -110,10 +110,12 @@ class ContextFormatter(logging.Formatter):
         if not context:
             return text
 
-        return "%s %s" % (
+        return "{} {}".format(
             text,
             " ".join(
-                "%s=%s" % (key, value.hex(" ") if isinstance(value, bytes) else value)
+                "{}={}".format(
+                    key, value.hex(" ") if isinstance(value, bytes) else value
+                )
                 for key, value in sorted(context.items())
             ),
         )
@@ -218,7 +220,7 @@ class Debug:
             self._printer = Debug.defaultPrinter
 
         self._printer(
-            "running pyasn1 %s, debug flags %s" % (__version__, ", ".join(flags))
+            "running pyasn1 {}, debug flags {}".format(__version__, ", ".join(flags))
         )
 
         for flag in flags:
@@ -231,10 +233,12 @@ class Debug:
                 else:
                     self._flags |= FLAG_MAP[flag]
             except KeyError as exc:
-                raise error.PyAsn1Error("bad debug flag %s" % flag) from exc
+                raise error.PyAsn1Error(f"bad debug flag {flag}") from exc
 
             self._printer(
-                "debug category '%s' %s" % (flag, "disabled" if inverse else "enabled")
+                "debug category '{}' {}".format(
+                    flag, "disabled" if inverse else "enabled"
+                )
             )
 
     @property
@@ -243,7 +247,7 @@ class Debug:
         return self._printer
 
     def __str__(self) -> str:
-        return "logger %s, flags %x" % (self._printer, self._flags)
+        return f"logger {self._printer}, flags {self._flags:x}"
 
     def __call__(self, msg: str) -> None:
         """Forward `msg` to this instance's printer.
@@ -425,8 +429,8 @@ def hexdump(octets: bytes) -> str:
     """
     return " ".join(
         [
-            "%s%.2X" % ("\n%.5d: " % n if n % 16 == 0 else "", x)
-            for n, x in zip(range(len(octets)), octets)
+            (f"\n{n:05d}: " if n % 16 == 0 else "") + f"{x:02X}"
+            for n, x in enumerate(octets)
         ]
     )
 

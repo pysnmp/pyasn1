@@ -41,7 +41,7 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
         elif byte == 0x00:
             value = 0
         else:
-            raise error.PyAsn1Error("Unexpected Boolean payload: %s" % byte)
+            raise error.PyAsn1Error(f"Unexpected Boolean payload: {byte}")
         return self._createComponent(asn1Spec, tagSet, value, **options), tail
 
 

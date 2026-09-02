@@ -266,7 +266,7 @@ class Integer(base.SimpleAsn1Type):
 
             except KeyError as exc:
                 raise error.PyAsn1Error(
-                    "Can't coerce %r into integer: %s" % (value, exc)
+                    f"Can't coerce {value!r} into integer: {exc}"
                 ) from exc
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
@@ -637,7 +637,7 @@ class BitString(base.SimpleAsn1Type):
 
         except ValueError as exc:
             raise error.PyAsn1Error(
-                "%s.fromHexString() error: %s" % (cls.__name__, exc)
+                f"{cls.__name__}.fromHexString() error: {exc}"
             ) from exc
 
         if prepend is not None:
@@ -666,7 +666,7 @@ class BitString(base.SimpleAsn1Type):
 
         except ValueError as exc:
             raise error.PyAsn1Error(
-                "%s.fromBinaryString() error: %s" % (cls.__name__, exc)
+                f"{cls.__name__}.fromBinaryString() error: {exc}"
             ) from exc
 
         if prepend is not None:
@@ -746,7 +746,7 @@ class BitString(base.SimpleAsn1Type):
 
                 except KeyError as exc:
                     raise error.PyAsn1Error(
-                        "unknown bit name(s) in %r" % (names,)
+                        f"unknown bit name(s) in {names!r}"
                     ) from exc
 
                 rightmostPosition = max(bitPositions)
@@ -778,7 +778,7 @@ class BitString(base.SimpleAsn1Type):
             return SizedInteger(value)
 
         else:
-            raise error.PyAsn1Error("Bad BitString initializer type '%s'" % (value,))
+            raise error.PyAsn1Error(f"Bad BitString initializer type '{value}'")
 
 
 class OctetString(base.SimpleAsn1Type):
@@ -911,7 +911,7 @@ class OctetString(base.SimpleAsn1Type):
 
             except UnicodeEncodeError as exc:
                 raise error.PyAsn1UnicodeEncodeError(
-                    "Can't encode string '%s' with '%s' codec" % (value, self.encoding),
+                    f"Can't encode string '{value}' with '{self.encoding}' codec",
                     exc,
                 ) from exc
         elif isinstance(
@@ -936,18 +936,17 @@ class OctetString(base.SimpleAsn1Type):
 
         except UnicodeDecodeError as exc:
             raise error.PyAsn1UnicodeDecodeError(
-                "Can't decode string '%s' with '%s' codec at "
-                "'%s'" % (self._value, self.encoding, self.__class__.__name__),
+                f"Can't decode string '{self._value}' with '{self.encoding}' codec at "
+                f"'{self.__class__.__name__}'",
                 exc,
             ) from exc
 
     def __str__(self) -> str:
         warnings.warn(
-            "str() on %s decodes the payload as text using the '%s' codec. "
+            f"str() on {self.__class__.__name__} decodes the payload as text using the '{self.encoding}' codec. "
             "A future release will return the hexadecimal representation "
             "instead -- an ASN.1 OCTET STRING is not text. Use .asOctets() "
-            "for the octet stream, or .asOctets().decode(encoding) for text."
-            % (self.__class__.__name__, self.encoding),
+            "for the octet stream, or .asOctets().decode(encoding) for text.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -1018,7 +1017,7 @@ class OctetString(base.SimpleAsn1Type):
         for x in numbers:
             # hexify if needed
             if x < 32 or x > 126:
-                return "0x" + "".join("%.2x" % x for x in numbers)
+                return "0x" + "".join(f"{x:02x}" for x in numbers)
         # this prevents infinite recursion
         return OctetString._asText(self)
 
@@ -1044,7 +1043,7 @@ class OctetString(base.SimpleAsn1Type):
             if v in ("0", "1"):
                 v = int(v)
             else:
-                raise error.PyAsn1Error("Non-binary OCTET STRING initializer %s" % (v,))
+                raise error.PyAsn1Error(f"Non-binary OCTET STRING initializer {v}")
             byte |= v << bitNo
 
         r.append(byte)
@@ -1331,14 +1330,13 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         elif isinstance(value, str):
             if "-" in value:
                 raise error.PyAsn1Error(
-                    "Malformed Object ID %s at %s" % (value, self.__class__.__name__)
+                    f"Malformed Object ID {value} at {self.__class__.__name__}"
                 )
             try:
                 return tuple([int(subOid) for subOid in value.split(".") if subOid])
             except ValueError as exc:
                 raise error.PyAsn1Error(
-                    "Malformed Object ID %s at %s: %s"
-                    % (value, self.__class__.__name__, exc)
+                    f"Malformed Object ID {value} at {self.__class__.__name__}: {exc}"
                 ) from exc
 
         try:
@@ -1346,15 +1344,14 @@ class ObjectIdentifier(base.SimpleAsn1Type):
 
         except (ValueError, TypeError) as exc:
             raise error.PyAsn1Error(
-                "Malformed Object ID %s at %s: %s"
-                % (value, self.__class__.__name__, exc)
+                f"Malformed Object ID {value} at {self.__class__.__name__}: {exc}"
             ) from exc
 
         if len(tupleOfInts) == len(value):
             return tupleOfInts
 
         raise error.PyAsn1Error(
-            "Malformed Object ID %s at %s" % (value, self.__class__.__name__)
+            f"Malformed Object ID {value} at {self.__class__.__name__}"
         )
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
@@ -1474,13 +1471,11 @@ class Real(base.SimpleAsn1Type):
                 or not isinstance(value[1], intTypes)
                 or not isinstance(value[2], intTypes)
             ):
-                raise error.PyAsn1Error("Lame Real value syntax: %s" % (value,))
+                raise error.PyAsn1Error(f"Lame Real value syntax: {value}")
             if isinstance(value[0], float) and self._inf and value[0] in self._inf:
                 return value[0]
             if value[1] not in (2, 10):
-                raise error.PyAsn1Error(
-                    "Prohibited base for Real value: %s" % (value[1],)
-                )
+                raise error.PyAsn1Error(f"Prohibited base for Real value: {value[1]}")
             if value[1] == 10:
                 value = self.__normalizeBase10(value)
             return value
@@ -1491,9 +1486,7 @@ class Real(base.SimpleAsn1Type):
                 try:
                     value = float(value)
                 except ValueError as exc:
-                    raise error.PyAsn1Error(
-                        "Bad real value syntax: %s" % (value,)
-                    ) from exc
+                    raise error.PyAsn1Error(f"Bad real value syntax: {value}") from exc
             if self._inf and value in self._inf:
                 return value
             else:
@@ -1504,7 +1497,7 @@ class Real(base.SimpleAsn1Type):
                 return self.__normalizeBase10((int(value), 10, e))
         elif isinstance(value, Real):
             return tuple(typing.cast(typing.Iterable[typing.Any], value))
-        raise error.PyAsn1Error("Bad real value syntax: %s" % (value,))
+        raise error.PyAsn1Error(f"Bad real value syntax: {value}")
 
     def prettyPrint(self, scope: int = 0) -> str:
         """Return a human-friendly text representation of the value.
@@ -2079,8 +2072,8 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
             else:
                 raise error.PyAsn1Error(
-                    "Non-ASN.1 value %r and undefined component"
-                    " type at %r" % (value, self)
+                    f"Non-ASN.1 value {value!r} and undefined component"
+                    f" type at {self!r}"
                 )
 
         elif componentType is not None and (matchTags or matchConstraints):
@@ -2099,8 +2092,8 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
                 # additional properties associated with componentType
                 if componentType.typeId != Any.typeId:
                     raise error.PyAsn1Error(
-                        "Component value is tag-incompatible: %r vs "
-                        "%r" % (value, componentType)
+                        f"Component value is tag-incompatible: {value!r} vs "
+                        f"{componentType!r}"
                     )
 
         componentValues[idx] = value
@@ -2170,7 +2163,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             Human-friendly object type representation.
         """
         scope += 1
-        representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
+        representation = f"{self.tagSet} -> {self.__class__.__name__} {{\n"
         if self.componentType is not None:
             representation += " " * scope
             representation += self.componentType.prettyPrintType(scope)
@@ -2395,12 +2388,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 return self._keyToIdxMap[name]
 
             except KeyError as exc:
-                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
+                raise error.PyAsn1Error(f"Name {name} not found") from exc
 
         def addField(self, idx: int) -> None:
             """Register a synthetic 'field-<idx>' name for position `idx`."""
-            self._keyToIdxMap["field-%d" % idx] = idx
-            self._idxToKeyMap[idx] = "field-%d" % idx
+            self._keyToIdxMap[f"field-{idx}"] = idx
+            self._idxToKeyMap[idx] = f"field-{idx}"
 
     def __init__(self, **kwargs: typing.Any) -> None:
         base.ConstructedAsn1Type.__init__(self, **kwargs)
@@ -2560,7 +2553,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 idx = self._dynamicNames.getPositionByName(name)
 
             except KeyError as exc:
-                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
+                raise error.PyAsn1Error(f"Name {name} not found") from exc
 
         return self.getComponentByPosition(
             idx, default=default, instantiate=instantiate
@@ -2610,7 +2603,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 idx = self._dynamicNames.getPositionByName(name)
 
             except KeyError as exc:
-                raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
+                raise error.PyAsn1Error(f"Name {name} not found") from exc
 
         return self.setComponentByPosition(
             idx, value, verifyConstraints, matchTags, matchConstraints
@@ -2789,8 +2782,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
                 else:
                     raise error.PyAsn1Error(
-                        "%s can cast only scalar values"
-                        % componentType.__class__.__name__
+                        f"{componentType.__class__.__name__} can cast only scalar values"
                     )
 
             elif currentValue is not noValue and isinstance(
@@ -2800,7 +2792,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
             else:
                 raise error.PyAsn1Error(
-                    "%s undefined component type" % componentType.__class__.__name__
+                    f"{componentType.__class__.__name__} undefined component type"
                 )
 
         elif (verifyConstraints or matchTags or matchConstraints) and componentTypeLen:
@@ -2819,8 +2811,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 ):
                     if not componentType[idx].openType:
                         raise error.PyAsn1Error(
-                            "Component value is tag-incompatible: %r vs %r"
-                            % (value, componentType)
+                            f"Component value is tag-incompatible: {value!r} vs {componentType!r}"
                         )
 
         if componentTypeLen or idx in self._dynamicNames:
@@ -2949,9 +2940,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                     representation += self.componentType.getNameByPosition(idx)
                 else:
                     representation += self._dynamicNames.getNameByPosition(idx)
-                representation = "%s=%s\n" % (
-                    representation,
-                    componentValue.prettyPrint(scope),
+                representation = (
+                    f"{representation}={componentValue.prettyPrint(scope)}\n"
                 )
         return representation
 
@@ -2964,18 +2954,17 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             Human-friendly object type representation.
         """
         scope += 1
-        representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
+        representation = f"{self.tagSet} -> {self.__class__.__name__} {{\n"
         for idx, componentType in enumerate(
             self.componentType.values() or self._componentValues
         ):
             representation += " " * scope
             if self.componentType:
-                representation += '"%s"' % self.componentType.getNameByPosition(idx)
+                representation += f'"{self.componentType.getNameByPosition(idx)}"'
             else:
-                representation += '"%s"' % self._dynamicNames.getNameByPosition(idx)
-            representation = "%s = %s\n" % (
-                representation,
-                componentType.prettyPrintType(scope),
+                representation += f'"{self._dynamicNames.getNameByPosition(idx)}"'
+            representation = (
+                f"{representation} = {componentType.prettyPrintType(scope)}\n"
             )
         return representation + "\n" + " " * (scope - 1) + "}"
 

@@ -66,7 +66,6 @@ ignore = [
     "SIM105",  # suppressible-exception — existing pattern
     "SIM101",  # duplicate-isinstance-call — existing pattern
     "SIM110",  # reimplemented-builtin — existing pattern
-    "UP031",   # printf-string-formatting — existing codebase style
     # Migrated from the former [tool.pylint] config: R0913 was disabled there,
     # and ASN.1 codecs are inherently branchy, so the complexity family stays off.
     "PLR0911",  # too-many-return-statements

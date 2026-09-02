@@ -43,15 +43,17 @@ class AbstractConstraint:
             self._testValue(value, idx)
 
         except error.ValueConstraintError as exc:
-            raise error.ValueConstraintError("%s failed at: %r" % (self, exc)) from exc
+            raise error.ValueConstraintError(f"{self} failed at: {exc!r}") from exc
 
     def __repr__(self) -> str:
-        representation = "%s object" % (self.__class__.__name__)
+        representation = f"{self.__class__.__name__} object"
 
         if self._values:
-            representation += ", consts %s" % ", ".join([repr(x) for x in self._values])
+            representation += ", consts {}".format(
+                ", ".join([repr(x) for x in self._values])
+            )
 
-        return "<%s>" % representation
+        return f"<{representation}>"
 
     def __eq__(self, other: object) -> bool:
         return self is other or self._values == other
@@ -265,14 +267,11 @@ class ValueRangeConstraint(AbstractConstraint):
 
     def _setValues(self, values: Any) -> None:
         if len(values) != 2:
-            raise error.PyAsn1Error(
-                "%s: bad constraint values" % (self.__class__.__name__,)
-            )
+            raise error.PyAsn1Error(f"{self.__class__.__name__}: bad constraint values")
         self.start, self.stop = values
         if self.start > self.stop:
             raise error.PyAsn1Error(
-                "%s: screwed constraint values (start > stop): %s > %s"
-                % (self.__class__.__name__, self.start, self.stop)
+                f"{self.__class__.__name__}: screwed constraint values (start > stop): {self.start} > {self.stop}"
             )
         AbstractConstraint._setValues(self, values)
 
@@ -486,7 +485,7 @@ class ComponentAbsentConstraint(AbstractConstraint):
 
     def _testValue(self, value: Any, idx: Any) -> None:
         if value is not None:
-            raise error.ValueConstraintError("Component is not absent: %r" % value)
+            raise error.ValueConstraintError(f"Component is not absent: {value!r}")
 
 
 class WithComponentsConstraint(AbstractConstraint):
@@ -768,9 +767,7 @@ class ConstraintsUnion(AbstractConstraintSet):
             else:
                 return
 
-        raise error.ValueConstraintError(
-            'all of %s failed for "%s"' % (self._values, value)
-        )
+        raise error.ValueConstraintError(f'all of {self._values} failed for "{value}"')
 
 
 # TODO:

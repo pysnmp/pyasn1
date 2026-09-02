@@ -71,7 +71,7 @@ class AbstractItemEncoder:
             substrateLen = len(substrate)
 
             if substrateLen > 126:
-                raise error.PyAsn1Error("Length octets overflow (%d)" % substrateLen)
+                raise error.PyAsn1Error(f"Length octets overflow ({substrateLen})")
 
             return (0x80 | substrateLen,) + substrate
 
@@ -110,9 +110,7 @@ class AbstractItemEncoder:
                     )
 
                 except error.PyAsn1Error as exc:
-                    raise error.PyAsn1Error(
-                        "Error encoding %r: %s" % (value, exc)
-                    ) from exc
+                    raise error.PyAsn1Error(f"Error encoding {value!r}: {exc}") from exc
 
                 if LOG.isEnabledFor(logging.DEBUG):
                     LOG.debug(
@@ -345,7 +343,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             second = oid[1]
 
         except IndexError as exc:
-            raise error.PyAsn1Error("Short OID %s" % (value,)) from exc
+            raise error.PyAsn1Error(f"Short OID {value}") from exc
 
         if 0 <= second <= 39:
             if first == 1:
@@ -355,13 +353,13 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             elif first == 2:
                 oid = (second + 80,) + oid[2:]
             else:
-                raise error.PyAsn1Error("Impossible first/second arcs at %s" % (value,))
+                raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
 
         elif first == 2:
             oid = (second + 80,) + oid[2:]
 
         else:
-            raise error.PyAsn1Error("Impossible first/second arcs at %s" % (value,))
+            raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
 
         octets: tuple[int, ...] = ()
 
@@ -384,7 +382,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
                 octets += res
 
             else:
-                raise error.PyAsn1Error("Negative OID arc %s at %s" % (subOid, value))
+                raise error.PyAsn1Error(f"Negative OID arc {subOid} at {value}")
 
         return octets, False, False
 
@@ -479,7 +477,7 @@ class RealEncoder(AbstractItemEncoder):
                 LOG.debug("encoding REAL into character form")
 
             sign = "+" if e == 0 else ""
-            return ("\x03%dE%s%d" % (m, sign, e)).encode("ascii"), False, True
+            return f"\x03{m}E{sign}{e}".encode("ascii"), False, True
 
         elif b == 2:
             fo = 0x80  # binary encoding
@@ -559,7 +557,7 @@ class RealEncoder(AbstractItemEncoder):
             return substrate, False, True
 
         else:
-            raise error.PyAsn1Error("Prohibited Real base %s" % b)
+            raise error.PyAsn1Error(f"Prohibited Real base {b}")
 
 
 class SequenceEncoder(AbstractItemEncoder):
@@ -648,7 +646,7 @@ class SequenceEncoder(AbstractItemEncoder):
 
                 except KeyError as exc:
                     raise error.PyAsn1Error(
-                        'Component name "%s" not found in %r' % (namedType.name, value)
+                        f'Component name "{namedType.name}" not found in {value!r}'
                     ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
@@ -757,8 +755,9 @@ class ChoiceEncoder(AbstractItemEncoder):
             ]
             if len(names) != 1:
                 raise error.PyAsn1Error(
-                    "%s components for Choice at %r"
-                    % ("Multiple " if names else "None ", value)
+                    "{} components for Choice at {!r}".format(
+                        "Multiple " if names else "None ", value
+                    )
                 )
 
             name = names[0]
@@ -870,8 +869,7 @@ class Encoder:
 
         except AttributeError as exc:
             raise error.PyAsn1Error(
-                "Value %r is not ASN.1 type instance "
-                'and "asn1Spec" not given' % (value,)
+                f'Value {value!r} is not ASN.1 type instance and "asn1Spec" not given'
             ) from exc
 
         if LOG.isEnabledFor(logging.DEBUG):
@@ -918,9 +916,7 @@ class Encoder:
                 concreteEncoder = self.__tagMap[baseTagSet]
 
             except KeyError as exc:
-                raise error.PyAsn1Error(
-                    "No encoder for %r (%s)" % (value, tagSet)
-                ) from exc
+                raise error.PyAsn1Error(f"No encoder for {value!r} ({tagSet})") from exc
 
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug(
