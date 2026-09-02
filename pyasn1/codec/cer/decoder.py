@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""CER decoder for ASN.1 types."""
+
 from typing import Any, Final
 
 from pyasn1 import error

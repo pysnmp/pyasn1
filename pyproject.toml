@@ -50,7 +50,7 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF", "G", "LOG", "TRY", "BLE", "RSE"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF", "G", "LOG", "TRY", "BLE", "RSE", "D"]
 ignore = [
     "E501",    # line-too-long — existing codebase has long lines
     "E721",    # type-comparison — existing pattern
@@ -87,10 +87,14 @@ ignore = [
                 # every raise site and change what callers see
     "PLW1641",  # eq-without-hash — constructed types are mutable, so deliberately
                 # unhashable; SimpleAsn1Type re-adds __hash__ where it is wanted
+    "D105",     # undocumented-magic-method — dunders are self-describing here
 ]
 
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["B", "SIM", "PL", "RUF"]  # relax rules for tests
+"tests/**" = ["B", "SIM", "PL", "RUF", "D"]  # relax rules for tests
 
 [tool.mypy]
 python_version = "3.10"

@@ -1,3 +1,5 @@
+"""Sphinx configuration for the pyasn1 documentation build."""
+
 #
 # PyASN1 documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun 27 23:15:54 2015.

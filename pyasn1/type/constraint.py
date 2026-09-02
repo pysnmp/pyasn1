@@ -6,6 +6,8 @@
 #
 # Original concept and code by Mike C. Fletcher.
 #
+"""Value constraint classes used to validate ASN.1 type values."""
+
 from collections.abc import Iterator
 from typing import Any, TypeVar
 
@@ -569,7 +571,7 @@ class WithComponentsConstraint(AbstractConstraint):
 
 # This is a bit kludgy, meaning two op modes within a single constraint
 class InnerTypeConstraint(AbstractConstraint):
-    """Value must satisfy the type and presence constraints"""
+    """Value must satisfy the type and presence constraints."""
 
     def _testValue(self, value: Any, idx: Any) -> None:
         if self.__singleTypeConstraint:

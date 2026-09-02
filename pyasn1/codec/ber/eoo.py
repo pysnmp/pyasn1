@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""BER End-of-Octets marker type used to close indefinite-length values."""
+
 from typing import Any, Final
 
 from pyasn1.type import base, tag
