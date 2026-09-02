@@ -562,9 +562,10 @@ class ConstructedAsn1Type(Asn1Type):
             parts = []
             # Try to include field names for named-component types (Sequence/Set)
             component_type = getattr(self, "componentType", None)
-            has_named_components = isinstance(
-                component_type, namedtype.NamedTypes
-            ) and len(component_type) > 0
+            has_named_components = (
+                isinstance(component_type, namedtype.NamedTypes)
+                and len(component_type) > 0
+            )
 
             for idx, component in enumerate(self.components):
                 r = repr(component)
