@@ -579,17 +579,58 @@ class WithComponentsConstraint(AbstractConstraint):
 
 # This is a bit kludgy, meaning two op modes within a single constraint
 class InnerTypeConstraint(AbstractConstraint):
-    """Value must satisfy the type and presence constraints."""
+    """Value must satisfy the type and presence constraints.
+
+    Presence follows X.680 51.8.10.1. A component constrained PRESENT is
+    satisfied if and only if its value is present, one constrained ABSENT if
+    and only if its value is absent, and one constrained OPTIONAL carries no
+    presence constraint at all. An absent component is spelled `None`, as it
+    is for :class:`ComponentPresentConstraint`.
+
+    Per 51.8.9 the value constraint applies to the inner value, so it is
+    checked only where there is one: never under ABSENT, and under OPTIONAL
+    only when the component turns out to be present.
+
+    A component whose presence constraint is empty (`None`) is left
+    unconstrained in its presence. 51.8.10.3 would read it as PRESENT inside
+    a "FullSpecification", but this constraint object does not record which
+    specification form it came from.
+    """
+
+    #: X.680 51.8.10 "PresenceConstraint".
+    presenceConstraints = frozenset(("PRESENT", "ABSENT", "OPTIONAL"))
 
     def _testValue(self, value: Any, idx: Any) -> None:
         if self.__singleTypeConstraint:
             self.__singleTypeConstraint(value)
+
         elif self.__multipleTypeConstraint:
             if idx not in self.__multipleTypeConstraint:
-                raise error.ValueConstraintError(value)
+                raise error.ValueConstraintError(
+                    "No constraint for this component", idx=idx, value=value
+                )
+
             constraint, status = self.__multipleTypeConstraint[idx]
-            if status == "ABSENT":  # XXX presence is not checked!
-                raise error.ValueConstraintError(value)
+
+            if status == "ABSENT":
+                if value is not None:
+                    raise error.ValueConstraintError(
+                        "Component constrained ABSENT is present",
+                        idx=idx,
+                        value=value,
+                    )
+                # 51.8.9 has no inner value to constrain.
+                return
+
+            if status == "PRESENT" and value is None:
+                raise error.ValueConstraintError(
+                    "Component constrained PRESENT is absent", idx=idx
+                )
+
+            if value is None:
+                # OPTIONAL, or an empty presence constraint, and absent.
+                return
+
             constraint(value)
 
     def _setValues(self, values: Any) -> None:
@@ -597,6 +638,12 @@ class InnerTypeConstraint(AbstractConstraint):
         self.__singleTypeConstraint = None
         for v in values:
             if isinstance(v, tuple):
+                if v[2] is not None and v[2] not in self.presenceConstraints:
+                    raise error.PyAsn1Error(
+                        "Unknown presence constraint",
+                        status=v[2],
+                        expected=sorted(self.presenceConstraints),
+                    )
                 self.__multipleTypeConstraint[v[0]] = v[1], v[2]
             else:
                 self.__singleTypeConstraint = v
