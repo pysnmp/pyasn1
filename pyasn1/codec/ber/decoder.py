@@ -1892,15 +1892,17 @@ class Decoder:
 
                 if LOG.isEnabledFor(logging.DEBUG):
                     LOG.debug(
-                        "codec %s yields type %s, value:\n%s\n...remaining substrate is: %s",
-                        concreteDecoder.__class__.__name__,
-                        value.__class__.__name__,
-                        (
-                            value.prettyPrint()
-                            if isinstance(value, base.Asn1Type)
-                            else value
-                        ),
-                        debug.hexdump(substrate) if substrate else "<none>",
+                        "codec yields value",
+                        extra={
+                            "codec": concreteDecoder.__class__.__name__,
+                            "valueType": value.__class__.__name__,
+                            "value": (
+                                value.prettyPrint()
+                                if isinstance(value, base.Asn1Type)
+                                else value
+                            ),
+                            "substrate": substrate,
+                        },
                     )
 
                 state = stStop

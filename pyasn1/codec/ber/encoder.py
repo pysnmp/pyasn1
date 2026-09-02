@@ -874,15 +874,17 @@ class Encoder:
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(
-                "encoder called in %sdef mode, chunk size %s for type %s, value:\n%s",
-                "in" if not options.get("defMode", True) else "",
-                options.get("maxChunkSize", 0),
-                (
-                    value.prettyPrintType()
-                    if asn1Spec is None
-                    else asn1Spec.prettyPrintType()
-                ),
-                value,
+                "encoder called",
+                extra={
+                    "indefMode": not options.get("defMode", True),
+                    "maxChunkSize": options.get("maxChunkSize", 0),
+                    "asn1Type": (
+                        value.prettyPrintType()
+                        if asn1Spec is None
+                        else asn1Spec.prettyPrintType()
+                    ),
+                    "value": value,
+                },
             )
 
         if self.fixedDefLengthMode is not None:
