@@ -4,10 +4,11 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Exception classes raised throughout pyasn1."""
 
 
 class PyAsn1Error(Exception):
-    """Base pyasn1 exception
+    """Base pyasn1 exception.
 
     `PyAsn1Error` is the base exception class (based on
     :class:`Exception`) that represents all possible ASN.1 related
@@ -16,7 +17,7 @@ class PyAsn1Error(Exception):
 
 
 class ValueConstraintError(PyAsn1Error):
-    """ASN.1 type constraints violation exception
+    """ASN.1 type constraints violation exception.
 
     The `ValueConstraintError` exception indicates an ASN.1 value
     constraint violation.
@@ -27,7 +28,7 @@ class ValueConstraintError(PyAsn1Error):
 
 
 class SubstrateUnderrunError(PyAsn1Error):
-    """ASN.1 data structure deserialization error
+    """ASN.1 data structure deserialization error.
 
     The `SubstrateUnderrunError` exception indicates insufficient serialised
     data on input of a de-serialization codec.
@@ -35,7 +36,7 @@ class SubstrateUnderrunError(PyAsn1Error):
 
 
 class PyAsn1UnicodeError(PyAsn1Error, UnicodeError):
-    """Unicode text processing error
+    """Unicode text processing error.
 
     The `PyAsn1UnicodeError` exception is a base class for errors relating to
     unicode text de/serialization.
@@ -51,7 +52,7 @@ class PyAsn1UnicodeError(PyAsn1Error, UnicodeError):
 
 
 class PyAsn1UnicodeDecodeError(PyAsn1UnicodeError, UnicodeDecodeError):
-    """Unicode text decoding error
+    """Unicode text decoding error.
 
     The `PyAsn1UnicodeDecodeError` exception represents a failure to
     deserialize unicode text.
@@ -63,7 +64,7 @@ class PyAsn1UnicodeDecodeError(PyAsn1UnicodeError, UnicodeDecodeError):
 
 
 class PyAsn1UnicodeEncodeError(PyAsn1UnicodeError, UnicodeEncodeError):
-    """Unicode text encoding error
+    """Unicode text encoding error.
 
     The `PyAsn1UnicodeEncodeError` exception represents a failure to
     serialize unicode text.

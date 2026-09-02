@@ -5,6 +5,8 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
+"""Named-field descriptors for constructed ASN.1 types."""
+
 from collections import namedtuple
 from collections.abc import Iterator
 from typing import Any, NoReturn
@@ -41,6 +43,7 @@ class NamedType(_NamedTypeBase):
     isDefaulted = False
 
     def __new__(cls, name: str, asn1Object: Any, openType: Any = None) -> "NamedType":
+        """Construct a *NamedType* from *name*, *asn1Object* and optional *openType*."""
         return super().__new__(cls, name, asn1Object, openType)
 
     def __repr__(self) -> str:
@@ -100,7 +103,7 @@ class NamedType(_NamedTypeBase):
         return hash((self.name, self.asn1Object))
 
 
-class OptionalNamedType(NamedType):
+class OptionalNamedType(NamedType):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = NamedType.__doc__  # type: ignore[assignment]
 
     __slots__ = ()
@@ -108,7 +111,7 @@ class OptionalNamedType(NamedType):
     isOptional = True
 
 
-class DefaultedNamedType(NamedType):
+class DefaultedNamedType(NamedType):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = NamedType.__doc__  # type: ignore[assignment]
 
     __slots__ = ()
@@ -234,18 +237,24 @@ class NamedTypes:
     # Python dict protocol
 
     def values(self) -> tuple[Any, ...]:
+        """Return the ASN.1 type objects of all fields, in field order."""
         return self.__values
 
     def keys(self) -> frozenset[str]:
+        """Return the field names of all fields."""
         return self.__keys
 
     def items(self) -> tuple[tuple[str, Any], ...]:
+        """Return (name, asn1Object) pairs for all fields, in field order."""
         return self.__items
 
     def clone(self) -> "NamedTypes":
+        """Return a new *NamedTypes* built from the same *NamedType* objects."""
         return self.__class__(*self.__namedTypes)
 
     class PostponedError:
+        """Defer raising an error until the map it stands in for is used."""
+
         def __init__(self, errorMsg: str) -> None:
             self.__errorMsg = errorMsg
 
@@ -564,16 +573,20 @@ class NamedTypes:
 
     @property
     def hasOptionalOrDefault(self) -> bool:
+        """Return `True` if any field is OPTIONAL or DEFAULT."""
         return self.__hasOptionalOrDefault
 
     @property
     def hasOpenTypes(self) -> bool:
+        """Return `True` if any field carries an *openType*."""
         return self.__hasOpenTypes
 
     @property
     def namedTypes(self) -> tuple[NamedType, ...]:
+        """Return all *NamedType* objects as a tuple, in field order."""
         return tuple(self.__namedTypes)
 
     @property
     def requiredComponents(self) -> frozenset[int]:
+        """Return the positions of fields that are neither OPTIONAL nor DEFAULT."""
         return self.__requiredComponents

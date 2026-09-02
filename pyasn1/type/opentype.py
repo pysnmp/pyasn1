@@ -5,6 +5,8 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 
+"""Value-indexed type map for ASN.1 `ANY DEFINED BY` fields."""
+
 from collections.abc import ItemsView, Iterator, KeysView, ValuesView
 from typing import Any
 
@@ -12,7 +14,7 @@ __all__ = ["OpenType"]
 
 
 class OpenType(dict[Any, Any]):
-    """Create ASN.1 type map indexed by a value
+    """Create ASN.1 type map indexed by a value.
 
     The *OpenType* object models an untyped field of a constructed ASN.1
     type. In ASN.1 syntax it is usually represented by the
@@ -42,7 +44,6 @@ class OpenType(dict[Any, Any]):
 
     Examples
     --------
-
     For untyped scalars:
 
     .. code-block:: python
@@ -110,30 +111,39 @@ class OpenType(dict[Any, Any]):
         del self._typeMap[key]
 
     def keys(self) -> KeysView[Any]:  # type: ignore[override]
+        """Return a view of the underlying typeMap's keys."""
         return self._typeMap.keys()
 
     def values(self) -> ValuesView[Any]:  # type: ignore[override]
+        """Return a view of the underlying typeMap's values."""
         return self._typeMap.values()
 
     def items(self) -> ItemsView[Any, Any]:  # type: ignore[override]
+        """Return a view of the underlying typeMap's (key, value) pairs."""
         return self._typeMap.items()
 
     def get(self, key: Any, default: Any = None) -> Any:
+        """Return `typeMap[key]` if present, else *default*."""
         return self._typeMap.get(key, default)
 
     def update(self, *args: Any, **kwargs: Any) -> None:
+        """Update the underlying typeMap in place."""
         self._typeMap.update(*args, **kwargs)
 
     def pop(self, *args: Any, **kwargs: Any) -> Any:
+        """Remove and return a value from the underlying typeMap."""
         return self._typeMap.pop(*args, **kwargs)
 
     def popitem(self) -> tuple[Any, Any]:
+        """Remove and return a (key, value) pair from the underlying typeMap."""
         return self._typeMap.popitem()
 
     def clear(self) -> None:
+        """Remove all entries from the underlying typeMap."""
         self._typeMap.clear()
 
     def setdefault(self, *args: Any, **kwargs: Any) -> Any:
+        """Set and return the default for a missing key in the underlying typeMap."""
         return self._typeMap.setdefault(*args, **kwargs)
 
     def __eq__(self, other: object) -> bool:
@@ -148,6 +158,7 @@ class OpenType(dict[Any, Any]):
         return repr(self._typeMap)
 
     def copy(self) -> dict[Any, Any]:
+        """Return a shallow copy of the underlying typeMap as a plain dict."""
         return self._typeMap.copy()
 
     def __reduce__(self) -> tuple[Any, ...]:

@@ -84,6 +84,19 @@ class ContextFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
+        """Render `record` as ``%(message)s`` followed by its `extra` fields.
+
+        Parameters
+        ----------
+        record: :class:`logging.LogRecord`
+            The record being formatted.
+
+        Returns
+        -------
+        : :py:class:`str`
+            The formatted message, with any ``extra`` fields appended as
+            ``key=value`` pairs.
+        """
         # Read the fields before formatting: the base class writes `message`
         # and `asctime` onto the record, which would otherwise show up here.
         context = {
@@ -145,6 +158,13 @@ class Printer:
         return self.__logger
 
     def __call__(self, msg: str) -> None:
+        """Log `msg` to the wrapped logger at DEBUG level.
+
+        Parameters
+        ----------
+        msg: :py:class:`str`
+            The message to log.
+        """
         self.__logger.debug(msg)
 
     def __str__(self) -> str:
@@ -226,6 +246,13 @@ class Debug:
         return "logger %s, flags %x" % (self._printer, self._flags)
 
     def __call__(self, msg: str) -> None:
+        """Forward `msg` to this instance's printer.
+
+        Parameters
+        ----------
+        msg: :py:class:`str`
+            The message to log.
+        """
         self._printer(msg)
 
     def __and__(self, flag: int) -> int:
@@ -269,7 +296,7 @@ class _PrinterHandler(logging.Handler):
 
 
 def _reaches_pyasn1_logger(printer: Callable[[str], None]) -> bool:
-    """Would records written by ``printer`` come back to the pyasn1 loggers?
+    """Report whether records written by ``printer`` already reach pyasn1's loggers.
 
     True when the printer targets ``pyasn1`` itself or one of its ancestors,
     in which case pyasn1's own records already arrive there by propagation and
@@ -312,7 +339,7 @@ def _restoreLoggers() -> None:
 
 
 def setLogger(userLogger: "Debug | int | None") -> None:
-    """Deprecated. Turn pyasn1 debugging on or off.
+    """Turn pyasn1 debugging on or off. Deprecated.
 
     Passing a :class:`Debug` instance raises the level of the loggers its
     flags name and, when needed, routes their records to the instance's
@@ -366,7 +393,7 @@ def _setLogger(userLogger: "Debug | int | None") -> None:
 
 
 def registerLoggee(module: str, name: str = "LOG", flags: int = DEBUG_NONE) -> Any:
-    """Deprecated. Bind a module-global debug switch updated by :func:`setLogger`.
+    """Bind a module-global debug switch updated by :func:`setLogger`. Deprecated.
 
     pyasn1's own modules no longer use this; they hold ordinary
     :class:`logging.Logger` objects. It remains for out-of-tree code.
@@ -384,6 +411,18 @@ def registerLoggee(module: str, name: str = "LOG", flags: int = DEBUG_NONE) -> A
 
 
 def hexdump(octets: bytes) -> str:
+    """Render `octets` as a multi-line hex dump, 16 bytes per row.
+
+    Parameters
+    ----------
+    octets: :py:class:`bytes`
+        The bytes to render.
+
+    Returns
+    -------
+    : :py:class:`str`
+        The hex dump, with each row prefixed by its starting offset.
+    """
     return " ".join(
         [
             "%s%.2X" % ("\n%.5d: " % n if n % 16 == 0 else "", x)

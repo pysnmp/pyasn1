@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Character-string ASN.1 types."""
+
 from collections.abc import Iterator
 from typing import Any, Final
 
@@ -122,7 +124,7 @@ class AbstractCharacterString(univ.OctetString):
         return reversed(self._value)
 
 
-class NumericString(AbstractCharacterString):
+class NumericString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -137,7 +139,7 @@ class NumericString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class PrintableString(AbstractCharacterString):
+class PrintableString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -152,7 +154,7 @@ class PrintableString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class TeletexString(AbstractCharacterString):
+class TeletexString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -167,14 +169,14 @@ class TeletexString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class T61String(TeletexString):
+class T61String(TeletexString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = TeletexString.__doc__
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class VideotexString(AbstractCharacterString):
+class VideotexString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -189,7 +191,7 @@ class VideotexString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class IA5String(AbstractCharacterString):
+class IA5String(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -204,7 +206,7 @@ class IA5String(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class GraphicString(AbstractCharacterString):
+class GraphicString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -219,7 +221,7 @@ class GraphicString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class VisibleString(AbstractCharacterString):
+class VisibleString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -234,14 +236,14 @@ class VisibleString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class ISO646String(VisibleString):
+class ISO646String(VisibleString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = VisibleString.__doc__
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class GeneralString(AbstractCharacterString):
+class GeneralString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -256,7 +258,7 @@ class GeneralString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class UniversalString(AbstractCharacterString):
+class UniversalString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -271,7 +273,7 @@ class UniversalString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class BMPString(AbstractCharacterString):
+class BMPString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -286,7 +288,7 @@ class BMPString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class UTF8String(AbstractCharacterString):
+class UTF8String(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a

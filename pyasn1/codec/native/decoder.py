@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Decoder from native Python objects to ASN.1 types."""
+
 import logging
 from typing import Any, Final
 

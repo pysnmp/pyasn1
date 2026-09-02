@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Base classes for ASN.1 schema and value objects."""
+
 from typing import TYPE_CHECKING, Any, Final
 
 from pyasn1 import error
@@ -13,10 +15,28 @@ __all__ = ["Asn1Item", "Asn1Type", "ConstructedAsn1Type", "SimpleAsn1Type"]
 
 
 class Asn1Item:
+    """Base class providing a shared counter for generating ASN.1 type identifiers."""
+
     _typeCounter: int
 
     @classmethod
     def getTypeId(cls, increment: int = 1) -> int:
+        """Advance and return the shared ASN.1 type-identifier counter.
+
+        Concrete ASN.1 types call this once, when defining their
+        ``typeId`` class attribute, to obtain a unique numeric ID used
+        to speed up codec lookup.
+
+        Parameters
+        ----------
+        increment: :py:class:`int`
+            Amount by which to advance the shared counter.
+
+        Returns
+        -------
+        : :class:`int`
+            New value of the shared type-id counter.
+        """
         try:
             Asn1Item._typeCounter += increment
         except AttributeError:
@@ -67,11 +87,12 @@ class Asn1Type(Asn1Item):
 
     @property
     def readOnly(self) -> dict[str, Any]:
+        """Return the |ASN.1| object's read-only initializer attributes."""
         return self._readOnly
 
     @property
     def effectiveTagSet(self) -> tag.TagSet:
-        """For |ASN.1| type is equivalent to *tagSet*"""
+        """For |ASN.1| type is equivalent to *tagSet*."""
         return self.tagSet  # used by untagged types
 
     @property
@@ -140,12 +161,38 @@ class Asn1Type(Asn1Item):
 
     @staticmethod
     def isNoValue(*values: Any) -> bool:
+        """Return True if every value in *values* is the *noValue* sentinel.
+
+        Parameters
+        ----------
+        *values: variable number of values
+            Objects to test against the *noValue* sentinel.
+
+        Returns
+        -------
+        : :class:`bool`
+            :obj:`True` if all *values* are *noValue* (or none given),
+            :obj:`False` if any of *values* is not *noValue*.
+        """
         for value in values:
             if value is not noValue:
                 return False
         return True
 
     def prettyPrint(self, scope: int = 0) -> str:
+        """Return a human-friendly text representation of the |ASN.1| object.
+
+        Parameters
+        ----------
+        scope: :py:class:`int`
+            Nesting depth hint used by constructed types when indenting
+            their output.
+
+        Raises
+        ------
+        NotImplementedError
+            Always; subclasses must override this method.
+        """
         raise NotImplementedError
 
 
@@ -497,15 +544,66 @@ class SimpleAsn1Type(Asn1Type):
         return self.__class__(value, **initializers)
 
     def prettyIn(self, value: Any) -> Any:
+        """Convert an initializer *value* into the internal payload representation.
+
+        The base implementation returns *value* unchanged; subclasses
+        override it to parse or validate type-specific input.
+
+        Parameters
+        ----------
+        value:
+            Value passed to the |ASN.1| object's constructor.
+
+        Returns
+        -------
+        :
+            Value to store as the object's internal payload.
+        """
         return value
 
     def prettyOut(self, value: Any) -> Any:
+        """Convert the internal payload *value* into its printable form.
+
+        Parameters
+        ----------
+        value:
+            Internal payload value.
+
+        Returns
+        -------
+        : :class:`str`
+            Text representation of *value*.
+        """
         return str(value)
 
     def prettyPrint(self, scope: int = 0) -> str:
+        """Return a human-friendly text representation of the |ASN.1| value.
+
+        Parameters
+        ----------
+        scope: :py:class:`int`
+            Nesting depth hint, unused by this implementation.
+
+        Returns
+        -------
+        : :class:`str`
+            Result of :meth:`prettyOut` applied to the object's payload.
+        """
         return self.prettyOut(self._value)
 
     def prettyPrintType(self, scope: int = 0) -> str:
+        """Return a text representation of the |ASN.1| object's type.
+
+        Parameters
+        ----------
+        scope: :py:class:`int`
+            Nesting depth hint, unused by this implementation.
+
+        Returns
+        -------
+        : :class:`str`
+            String combining the object's tag set and class name.
+        """
         return "%s -> %s" % (self.tagSet, self.__class__.__name__)
 
 
@@ -555,7 +653,13 @@ class ConstructedAsn1Type(Asn1Type):
         # Declared read-only so subclasses may implement it as a property.
         # Type-check time only; the attribute itself comes from subclasses.
         @property
-        def isValue(self) -> bool: ...
+        def isValue(self) -> bool:
+            """Indicate whether |ASN.1| object represents an ASN.1 value.
+
+            Implemented by subclasses; declared here only so type
+            checkers see it as a read-only attribute of the base class.
+            """
+            ...
 
     def __init__(self, **kwargs: Any) -> None:
         readOnly = {"componentType": self.componentType}
@@ -612,6 +716,13 @@ class ConstructedAsn1Type(Asn1Type):
 
     @property
     def components(self) -> Any:
+        """Return the |ASN.1| object's component values.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            Always; subclasses must override this property.
+        """
         raise error.PyAsn1Error("Method not implemented")
 
     def _cloneComponentValues(self, myClone: Any, cloneValueFlag: Any) -> None:
@@ -693,7 +804,6 @@ class ConstructedAsn1Type(Asn1Type):
         Due to the mutable nature of the |ASN.1| object, even if no arguments
         are supplied, a new |ASN.1| object will be created and returned.
         """
-
         initializers = self.readOnly.copy()
 
         cloneValueFlag = kwargs.pop("cloneValueFlag", False)
@@ -717,14 +827,61 @@ class ConstructedAsn1Type(Asn1Type):
         return clone
 
     def getComponentByPosition(self, idx: int) -> Any:
+        """Return the |ASN.1| object's component identified by position.
+
+        Parameters
+        ----------
+        idx: :py:class:`int`
+            Component index.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            Always; subclasses must override this method.
+        """
         raise error.PyAsn1Error("Method not implemented")
 
     def setComponentByPosition(
         self, idx: int, value: Any, verifyConstraints: bool = True
     ) -> Any:
+        """Set the |ASN.1| object's component identified by position.
+
+        Parameters
+        ----------
+        idx: :py:class:`int`
+            Component index.
+
+        value:
+            Value to assign to the component.
+
+        verifyConstraints: :py:class:`bool`
+            If :obj:`True`, validate *value* against the component's
+            subtype constraints before assignment.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            Always; subclasses must override this method.
+        """
         raise error.PyAsn1Error("Method not implemented")
 
     def setComponents(self, *args: Any, **kwargs: Any) -> Any:
+        """Set multiple components of the |ASN.1| object at once.
+
+        Parameters
+        ----------
+        *args: variable number of values
+            Values assigned to components by position, in order.
+
+        **kwargs: variable number of values
+            Values assigned to components identified by name or
+            identifier, as accepted by the object's ``__setitem__``.
+
+        Returns
+        -------
+        :
+            *self*, to allow call chaining.
+        """
         for idx, value in enumerate(args):
             self[idx] = value  # type: ignore[index]
         for k, v in kwargs.items():
