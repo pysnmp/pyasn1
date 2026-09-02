@@ -7,6 +7,7 @@
 import sys
 import unittest
 
+import pyasn1.error
 from pyasn1.type import constraint, error
 from tests.base import BaseTestCase
 
@@ -516,6 +517,30 @@ class IndirectDerivationTestCase(BaseTestCase):
     def testBadVal(self):
         assert not self.c2.isSuperTypeOf(self.c1), "isSuperTypeOf failed"
         assert self.c2.isSubTypeOf(self.c1), "isSubTypeOf failed"
+
+
+class ValueConstraintErrorIdentityTestCase(BaseTestCase):
+    """The exception the documentation names must be the one that is raised.
+
+    `pyasn1.type.error` used to declare a second ValueConstraintError that was
+    a sibling of the one in `pyasn1.error`, not the same class, so an
+    ``except pyasn1.error.ValueConstraintError`` handler never fired.
+    """
+
+    def testSameClassAcrossModules(self):
+        self.assertIs(pyasn1.error.ValueConstraintError, error.ValueConstraintError)
+
+    def testDocumentedHandlerCatchesConstraintViolation(self):
+        c = constraint.SingleValueConstraint(1, 2)
+
+        with self.assertRaises(pyasn1.error.ValueConstraintError):
+            c(3)
+
+    def testStillCatchableAsPyAsn1Error(self):
+        c = constraint.SingleValueConstraint(1, 2)
+
+        with self.assertRaises(pyasn1.error.PyAsn1Error):
+            c(3)
 
 
 # TODO: how to apply size constraints to constructed types?

@@ -6,7 +6,9 @@
 #
 """BER decoder for ASN.1 types."""
 
+import decimal
 import logging
+import re
 from typing import Any, Final
 
 from pyasn1 import debug, error
@@ -553,6 +555,18 @@ _SPECIAL_REAL_VALUES = {
     0x43: -0.0,  # minus zero
 }
 
+#: The ISO 6093 number representations X.690 8.5.8 selects with bits 6 to 1 of
+#: the first contents octet. NR1 is an integer, NR2 adds a decimal mark, and
+#: NR3 adds an exponent; the mark is required in both of the latter. 8.5.8
+#: NOTE 1 makes a digit to the left of the mark a recommendation rather than a
+#: requirement, so ".5" is admitted, and 11.3.2.5 writes the canonical NR3
+#: mantissa with nothing to the right of it, as "15.E-1".
+_ISO6093_FORMS: Final = {
+    0x01: re.compile(r"[+-]?\d+\Z"),
+    0x02: re.compile(r"[+-]?(?:\d+[.,]\d*|\d*[.,]\d+)\Z"),
+    0x03: re.compile(r"[+-]?(?:\d+[.,]\d*|\d*[.,]\d+)[Ee][+-]?\d+\Z"),
+}
+
 
 class RealDecoder(AbstractSimpleDecoder):
     protoComponent = univ.Real()
@@ -592,18 +606,64 @@ class RealDecoder(AbstractSimpleDecoder):
 
     @staticmethod
     def _decodeCharacter(firstOctet: int, payload: bytes) -> Any:
+        """Decode the decimal form of X.690 8.5.8.
+
+        Bits 6 to 1 of the first contents octet choose the ISO 6093 number
+        representation. Every other value of those bits is reserved for a
+        further edition of X.690, so it is rejected rather than ignored.
+        """
         if not payload:
             raise error.PyAsn1Error("Incomplete floating-point value")
 
-        try:
-            if firstOctet & 0x03 == 0x01:
-                return int(payload), 10, 0
-            if firstOctet & 0x03 in (0x02, 0x03):
-                return float(payload)
-            raise error.SubstrateUnderrunError("Unknown NR", tag=firstOctet)
+        numberForm = firstOctet & 0x3F
 
-        except ValueError as exc:
+        try:
+            grammar = _ISO6093_FORMS[numberForm]
+
+        except KeyError:
+            raise error.SubstrateUnderrunError("Unknown NR", tag=firstOctet) from None
+
+        try:
+            # ISO 6093 fields are padded to a width the sender chooses, which
+            # is why 8.5.8 calls the contents octets a field, so SPACE around
+            # the number is expected. Nothing else is: a tab or a newline
+            # would have to survive the grammar below.
+            text = payload.decode("ascii").strip(" ")
+
+        except UnicodeDecodeError as exc:
             raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
+
+        # 8.5.8 has the sender name the ISO 6093 form and then encode
+        # according to it, so the octets are held to the form they declare.
+        # Decimal alone would read an exponent under an NR2 selector, take
+        # Python's own "1_0" as an NR1 integer, and accept "NaN" and
+        # "Infinity" under any of the three.
+        if not grammar.match(text):
+            raise error.SubstrateUnderrunError(
+                "Bad character Real syntax", numberForm=numberForm
+            )
+
+        if numberForm == 0x01:
+            return int(text), 10, 0
+
+        try:
+            # ISO 6093 admits either a comma or a full stop as the decimal
+            # mark; Decimal only knows the full stop.
+            sign, digits, exponent = decimal.Decimal(text.replace(",", ".")).as_tuple()
+
+        except decimal.InvalidOperation as exc:
+            raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
+
+        # The grammar admits only a finite decimal, so as_tuple() cannot have
+        # spelled the exponent with the letter it uses for a NaN or infinity.
+        assert isinstance(exponent, int)
+
+        mantissa = int("".join(str(digit) for digit in digits))
+
+        # Kept exact rather than passed through float(): 8.5.8 puts no ceiling
+        # on the exponent, and float("1E5000") is infinity, which would turn a
+        # finite value into a SpecialRealValue.
+        return -mantissa if sign else mantissa, 10, exponent
 
     def valueDecoder(
         self,

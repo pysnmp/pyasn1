@@ -6,6 +6,7 @@
 #
 """ASN.1 universal types: Integer, OctetString, Sequence, Choice and friends."""
 
+import decimal
 import math
 import typing
 import warnings
@@ -1475,11 +1476,51 @@ class Real(base.SimpleAsn1Type):
 
     @staticmethod
     def __normalizeBase10(value: typing.Any) -> typing.Any:
+        """Reduce a base 10 value to an integer mantissa and an exponent.
+
+        X.690 8.5.8 writes a base 10 value as an ISO 6093 field, which is a
+        string of digits. The mantissa therefore has to be an integer: a
+        float one whose repr uses exponent notation, such as ``1e+299``,
+        renders as a nested exponent that no decoder can read back.
+        """
         m, b, e = value
+
+        if isinstance(m, float):
+            while not m.is_integer():
+                m *= 10
+                e -= 1
+
+            m = int(m)
+
+        if not m:
+            # A zero mantissa leaves the exponent with nothing to scale, and
+            # repr(0.0) would otherwise decompose to (0, 10, -1).
+            return 0, b, 0
+
+        # This used to be true division, which made the mantissa a float and
+        # so produced encodings like "1e+299E1" and "1.0E2".
         while m and m % 10 == 0:
-            m /= 10
+            m //= 10
             e += 1
+
         return m, b, e
+
+    @staticmethod
+    def __decomposeBase10(value: float) -> tuple[int, int, int]:
+        """Decompose a float into an exact base 10 mantissa and exponent.
+
+        :func:`repr` gives the shortest decimal string that reads back as the
+        same double, so decomposing that keeps both the value and the mantissa
+        short. Multiplying by ten until the value came out whole, as this used
+        to, accumulated binary rounding error, and near the bottom of the
+        double range it lost the value altogether: 5e-324 decomposed to a
+        16-digit mantissa that read back as zero.
+        """
+        sign, digits, exponent = decimal.Decimal(repr(value)).as_tuple()
+
+        mantissa = int("".join(str(digit) for digit in digits))
+
+        return -mantissa if sign else mantissa, 10, typing.cast(int, exponent)
 
     @classmethod
     def _asSpecialFloat(cls, value: typing.Any) -> "float | None":
@@ -1558,11 +1599,7 @@ class Real(base.SimpleAsn1Type):
             if special is not None:
                 return special
             else:
-                e = 0
-                while int(value) != value:
-                    value *= 10
-                    e -= 1
-                return self.__normalizeBase10((int(value), 10, e))
+                return self.__normalizeBase10(self.__decomposeBase10(value))
         elif isinstance(value, Real):
             return tuple(typing.cast(typing.Iterable[typing.Any], value))
         raise error.PyAsn1Error("Bad real value syntax", value=value)
@@ -1691,10 +1728,32 @@ class Real(base.SimpleAsn1Type):
 
     def __float__(self) -> float:
         value = self._cmpValue("__float__")
+
         if isinstance(value, float):
             return value
-        else:
-            return float(value[0] * pow(value[1], value[2]))
+
+        mantissa, base, exponent = value
+
+        if not mantissa:
+            return 0.0
+
+        if base == 10:
+            # One correctly rounded decimal-to-binary conversion. Evaluating
+            # mantissa * 10 ** exponent instead rounds twice, and near the
+            # bottom of the double range 10 ** exponent underflows to zero
+            # before the multiplication can recover the value.
+            return float(f"{mantissa}E{exponent}")
+
+        if base == 2:
+            # ldexp scales by a power of two exactly and reaches into the
+            # subnormals, where 2 ** exponent has already underflowed.
+            try:
+                return math.ldexp(mantissa, exponent)
+
+            except OverflowError:
+                return float(mantissa * pow(base, exponent))
+
+        return float(mantissa * pow(base, exponent))
 
     def __abs__(self) -> typing.Any:
         return self.clone(abs(float(self)))
