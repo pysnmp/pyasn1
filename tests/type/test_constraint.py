@@ -103,14 +103,14 @@ class ContainedSubtypeConstraintUnionTestCase(BaseTestCase):
             try:
                 self.c1(value)
             except error.ValueConstraintError:
-                assert 0, "rejected %s permitted by the included constraint" % value
+                assert 0, f"rejected {value} permitted by the included constraint"
 
     def testLiteralValue(self):
         for value in (9, 18):
             try:
                 self.c1(value)
             except error.ValueConstraintError:
-                assert 0, "rejected literal %s" % value
+                assert 0, f"rejected literal {value}"
 
     def testBadVal(self):
         for value in (0, 7, 10, 19):
@@ -119,7 +119,7 @@ class ContainedSubtypeConstraintUnionTestCase(BaseTestCase):
             except error.ValueConstraintError:
                 pass
             else:
-                assert 0, "accepted %s permitted by no operand" % value
+                assert 0, f"accepted {value} permitted by no operand"
 
     def testLiteralOnly(self):
         c = constraint.ContainedSubtypeConstraint(9, 18)

@@ -188,8 +188,7 @@ class Decoder:
 
         if asn1Spec is None or not isinstance(asn1Spec, base.Asn1Item):
             raise error.PyAsn1Error(
-                "asn1Spec is not valid (should be an instance of an ASN.1 Item, not %s)"
-                % asn1Spec.__class__.__name__
+                f"asn1Spec is not valid (should be an instance of an ASN.1 Item, not {asn1Spec.__class__.__name__})"
             )
 
         try:
@@ -202,9 +201,7 @@ class Decoder:
             try:
                 valueDecoder = self.__tagMap[baseTagSet]
             except KeyError as exc:
-                raise error.PyAsn1Error(
-                    "Unknown ASN.1 tag %s" % asn1Spec.tagSet
-                ) from exc
+                raise error.PyAsn1Error(f"Unknown ASN.1 tag {asn1Spec.tagSet}") from exc
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(

@@ -209,16 +209,14 @@ class SchemaObjectComparisonTestCase(BaseTestCase):
             schema = typ()
             itself = schema
 
-            assert schema == itself, "%s schema is not equal to itself" % typ.__name__
+            assert schema == itself, f"{typ.__name__} schema is not equal to itself"
 
     def testNotUnequalToItself(self):
         for typ in self.types:
             schema = typ()
             itself = schema
 
-            assert not (schema != itself), (
-                "%s schema is unequal to itself" % typ.__name__
-            )
+            assert not (schema != itself), f"{typ.__name__} schema is unequal to itself"
 
     def testComparisonWithOtherSchemaRaises(self):
         for typ in self.types:
@@ -229,7 +227,7 @@ class SchemaObjectComparisonTestCase(BaseTestCase):
                 pass
 
             else:
-                assert False, "%s schema comparison does not raise" % typ.__name__
+                assert False, f"{typ.__name__} schema comparison does not raise"
 
     def testOrderingRaises(self):
         for typ in self.types:
@@ -240,7 +238,7 @@ class SchemaObjectComparisonTestCase(BaseTestCase):
                 pass
 
             else:
-                assert False, "%s schema ordering does not raise" % typ.__name__
+                assert False, f"{typ.__name__} schema ordering does not raise"
 
     def testDeepCopy(self):
         for typ in self.types:
@@ -248,7 +246,7 @@ class SchemaObjectComparisonTestCase(BaseTestCase):
                 copy.deepcopy(typ())
 
             except PyAsn1Error:
-                assert False, "deepcopy() fails for %s schema" % typ.__name__
+                assert False, f"deepcopy() fails for {typ.__name__} schema"
 
 
 class IntegerTestCase(BaseTestCase):

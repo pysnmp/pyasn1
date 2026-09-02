@@ -78,7 +78,7 @@ class Asn1Type(Asn1Item):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name[0] != "_" and name in self._readOnly:
-            raise error.PyAsn1Error('read-only instance attribute "%s"' % name)
+            raise error.PyAsn1Error(f'read-only instance attribute "{name}"')
 
         self.__dict__[name] = value
 
@@ -304,21 +304,17 @@ class NoValue:
         # the way they would on any other object, or copying and pickling of
         # schema objects would blow up instead of falling back.
         if attr.startswith("__") and attr.endswith("__"):
-            raise AttributeError("Attribute %s not present" % attr)
+            raise AttributeError(f"Attribute {attr} not present")
 
-        raise error.PyAsn1Error(
-            'Attempted "%s" operation on ASN.1 schema object' % attr
-        )
+        raise error.PyAsn1Error(f'Attempted "{attr}" operation on ASN.1 schema object')
 
     def __repr__(self) -> str:
-        return "<%s object>" % self.__class__.__name__
+        return f"<{self.__class__.__name__} object>"
 
 
 def _plugSchemaOperation(name: str) -> Any:
     def operation(self: Any, *args: Any, **kwargs: Any) -> Any:
-        raise error.PyAsn1Error(
-            'Attempted "%s" operation on ASN.1 schema object' % name
-        )
+        raise error.PyAsn1Error(f'Attempted "{name}" operation on ASN.1 schema object')
 
     operation.__name__ = name
 
@@ -362,26 +358,24 @@ class SimpleAsn1Type(Asn1Type):
                 self.subtypeSpec(value)
 
             except error.PyAsn1Error as exc:
-                raise exc.__class__(
-                    "%s at %s" % (exc, self.__class__.__name__)
-                ) from exc
+                raise exc.__class__(f"{exc} at {self.__class__.__name__}") from exc
 
         self._value = value
 
     def __repr__(self) -> str:
         if not self.isValue:
-            return "<%s schema object>" % self.__class__.__name__
+            return f"<{self.__class__.__name__} schema object>"
 
         value = self.prettyPrint()
         if len(value) > 32:
             value = value[:16] + "..." + value[-16:]
 
-        return "<%s value object, payload [%s]>" % (self.__class__.__name__, value)
+        return f"<{self.__class__.__name__} value object, payload [{value}]>"
 
     def _cmpValue(self, operation: str) -> Any:
         if self._value is noValue:
             raise error.PyAsn1Error(
-                'Attempted "%s" operation on ASN.1 schema object' % operation
+                f'Attempted "{operation}" operation on ASN.1 schema object'
             )
 
         return self._value
@@ -596,7 +590,7 @@ class SimpleAsn1Type(Asn1Type):
         : :class:`str`
             String combining the object's tag set and class name.
         """
-        return "%s -> %s" % (self.tagSet, self.__class__.__name__)
+        return f"{self.tagSet} -> {self.__class__.__name__}"
 
 
 # Constructed types:
@@ -662,7 +656,7 @@ class ConstructedAsn1Type(Asn1Type):
 
     def __repr__(self) -> str:
         if not (self.isValue and self.components):
-            return "<%s schema object>" % self.__class__.__name__
+            return f"<{self.__class__.__name__} schema object>"
 
         # Named-component types (Sequence/Set) label each component; the
         # positional ones (SequenceOf/SetOf) have no names to show.
@@ -673,12 +667,12 @@ class ConstructedAsn1Type(Asn1Type):
             part = repr(component).strip("<>")
             if getName is not None:
                 try:
-                    part = "%s=%s" % (getName(idx), part)
+                    part = f"{getName(idx)}={part}"
                 except error.PyAsn1Error:
                     pass
             parts.append(part)
 
-        return "<%s value object, payload [%s]>" % (
+        return "<{} value object, payload [{}]>".format(
             self.__class__.__name__,
             ", ".join(parts),
         )
@@ -686,7 +680,7 @@ class ConstructedAsn1Type(Asn1Type):
     def _cmpComponents(self, operation: str) -> Any:
         if self._componentValues is noValue:
             raise error.PyAsn1Error(
-                'Attempted "%s" operation on ASN.1 schema object' % operation
+                f'Attempted "{operation}" operation on ASN.1 schema object'
             )
 
         return self.components

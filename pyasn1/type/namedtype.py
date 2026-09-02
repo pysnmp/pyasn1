@@ -47,12 +47,12 @@ class NamedType(_NamedTypeBase):
         return super().__new__(cls, name, asn1Object, openType)
 
     def __repr__(self) -> str:
-        representation = "%s=%r" % (self.name, self.asn1Object)
+        representation = f"{self.name}={self.asn1Object!r}"
 
         if self.openType:
-            representation += ", openType %r" % self.openType
+            representation += f", openType {self.openType!r}"
 
-        return "<%s object, %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, {representation}>"
 
     # Iteration, indexing and length intentionally expose only
     # (name, asn1Object), matching the original 2-tuple duck-type behaviour.
@@ -192,7 +192,7 @@ class NamedTypes:
 
     def __repr__(self) -> str:
         representation = ", ".join([repr(x) for x in self.__namedTypes])
-        return "<%s object, types %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, types {representation}>"
 
     def __eq__(self, other: object) -> bool:
         return self.__namedTypes == other
@@ -272,7 +272,7 @@ class NamedTypes:
             for _tagSet in tagMap.presentTypes:
                 if _tagSet in tagToPosMap:
                     return NamedTypes.PostponedError(
-                        "Duplicate component tag %s at %s" % (_tagSet, namedType)
+                        f"Duplicate component tag {_tagSet} at {namedType}"
                     )
                 tagToPosMap[_tagSet] = idx
 
@@ -283,7 +283,7 @@ class NamedTypes:
         for idx, namedType in enumerate(self.__namedTypes):
             if namedType.name in nameToPosMap:
                 return NamedTypes.PostponedError(
-                    "Duplicate component name %s at %s" % (namedType.name, namedType)
+                    f"Duplicate component name {namedType.name} at {namedType}"
                 )
             nameToPosMap[namedType.name] = idx
 
@@ -349,7 +349,7 @@ class NamedTypes:
             return self.__tagToPosMap[tagSet]
 
         except KeyError as exc:
-            raise error.PyAsn1Error("Type %s not found" % (tagSet,)) from exc
+            raise error.PyAsn1Error(f"Type {tagSet} not found") from exc
 
     def getNameByPosition(self, idx: int) -> str:
         """Return field name by its position in fields set.
@@ -397,7 +397,7 @@ class NamedTypes:
             return self.__nameToPosMap[name]
 
         except KeyError as exc:
-            raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
+            raise error.PyAsn1Error(f"Name {name} not found") from exc
 
     def getTagMapNearPosition(self, idx: int) -> Any:
         """Return ASN.1 types that are allowed at or past given field position.
@@ -503,7 +503,7 @@ class NamedTypes:
             for tagSet in tagMap:
                 if unique and tagSet in presentTypes:
                     return NamedTypes.PostponedError(
-                        "Non-unique tagSet %s of %s at %s" % (tagSet, namedType, self)
+                        f"Non-unique tagSet {tagSet} of {namedType} at {self}"
                     )
                 presentTypes[tagSet] = namedType.asn1Object
             skipTypes.update(tagMap.skipTypes)
@@ -512,7 +512,7 @@ class NamedTypes:
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
                 return NamedTypes.PostponedError(
-                    "Duplicate default ASN.1 type at %s" % (self,)
+                    f"Duplicate default ASN.1 type at {self}"
                 )
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)

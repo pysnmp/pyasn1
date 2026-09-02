@@ -80,7 +80,7 @@ class TimeMixIn:
                 tz += "00"
 
             if len(tz) != 4:
-                raise error.PyAsn1Error("malformed time zone offset %s" % tz)
+                raise error.PyAsn1Error(f"malformed time zone offset {tz}")
 
             try:
                 minutes = int(tz[:2]) * 60 + int(tz[2:])
@@ -88,7 +88,7 @@ class TimeMixIn:
                     minutes *= -1
 
             except ValueError as exc:
-                raise error.PyAsn1Error("unknown time specification %s" % self) from exc
+                raise error.PyAsn1Error(f"unknown time specification {self}") from exc
 
             tzinfo = datetime.timezone(datetime.timedelta(minutes=minutes), "?")
 
@@ -106,7 +106,7 @@ class TimeMixIn:
 
             except ValueError as exc:
                 raise error.PyAsn1Error(
-                    "bad sub-second time specification %s" % self
+                    f"bad sub-second time specification {self}"
                 ) from exc
 
         else:
@@ -123,7 +123,7 @@ class TimeMixIn:
             )
 
         except ValueError as exc:
-            raise error.PyAsn1Error("malformed datetime format %s" % self) from exc
+            raise error.PyAsn1Error(f"malformed datetime format {self}") from exc
 
         return dt.replace(microsecond=ms, tzinfo=tzinfo)
 
@@ -144,7 +144,7 @@ class TimeMixIn:
         """
         text = dt.strftime("%Y%m%d%H%M%S" if cls._yearsDigits == 4 else "%y%m%d%H%M%S")
         if cls._hasSubsecond:
-            text += ".%d" % (dt.microsecond // 1000)
+            text += f".{dt.microsecond // 1000}"
 
         utcOffset = dt.utcoffset()
         if utcOffset:
@@ -153,7 +153,7 @@ class TimeMixIn:
                 text += "-"
             else:
                 text += "+"
-            text += "%.2d%.2d" % (seconds // 3600, seconds % 3600)
+            text += f"{seconds // 3600:02d}{seconds % 3600:02d}"
         else:
             text += "Z"
 
