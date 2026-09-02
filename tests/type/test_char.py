@@ -8,6 +8,7 @@ import pickle
 import sys
 import unittest
 
+from pyasn1 import error
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, constraint, univ
 from tests.base import BaseTestCase
@@ -166,6 +167,75 @@ class UniversalStringTestCase(AbstractStringTestCase, BaseTestCase):
     initializer = (0, 0, 4, 48, 0, 0, 4, 68)
     encoding = "utf-32-be"
     asn1Type = char.UniversalString
+
+
+class PermittedAlphabetTestCase(BaseTestCase):
+    """X.680 41: the repertoire each restricted character string type defines.
+
+    The constraints ship opt-in, so each case asserts both that the default
+    type still accepts an out-of-repertoire value and that a subtype carrying
+    the alphabet rejects it.
+    """
+
+    # (type, in-repertoire sample, out-of-repertoire sample, alphabet size)
+    ALPHABETS = (
+        # X.680 41.2, Table 9: digits and SPACE only.
+        (char.NumericString, "0123456789 ", "12-34", 11),
+        # X.680 41.4, Table 10. "*" and "@" are ASCII graphics but are not
+        # in Table 10, which is the whole point of the type.
+        (char.PrintableString, "Ab9 '()+,-./:=?", "user@host", 74),
+        (char.PrintableString, "Ab9 '()+,-./:=?", "wild*card", 74),
+        # X.680 41.1, Table 8: registrations 1 and 6 + SPACE + DELETE.
+        (char.IA5String, "\x00 ~\x7f", "é", 128),
+        # X.680 41.1, Table 8: registration 6 + SPACE. No controls, no DELETE.
+        (char.VisibleString, " ~", "\x7f", 95),
+        (char.VisibleString, " ~", "\t", 95),
+        (char.ISO646String, " ~", "\x7f", 95),
+    )
+
+    def testRepertoireIsOptIn(self):
+        for asn1Type, _, outside, _size in self.ALPHABETS:
+            with self.subTest(asn1Type.__name__, value=outside):
+                # The bare type must keep decoding what it decodes today.
+                self.assertEqual(str(asn1Type(outside)), outside)
+
+    def testAlphabetAcceptsRepertoire(self):
+        for asn1Type, inside, _, _size in self.ALPHABETS:
+            with self.subTest(asn1Type.__name__, value=inside):
+                strict = asn1Type(inside, subtypeSpec=asn1Type.permittedAlphabet)
+                self.assertEqual(str(strict), inside)
+
+    def testAlphabetRejectsOutsideRepertoire(self):
+        for asn1Type, _, outside, _size in self.ALPHABETS:
+            with self.subTest(asn1Type.__name__, value=outside):
+                self.assertRaises(
+                    error.ValueConstraintError,
+                    asn1Type,
+                    outside,
+                    subtypeSpec=asn1Type.permittedAlphabet,
+                )
+
+    def testAlphabetSize(self):
+        for asn1Type, _, _, size in self.ALPHABETS:
+            with self.subTest(asn1Type.__name__):
+                self.assertEqual(len(list(asn1Type.permittedAlphabet)), size)
+
+    def testRegistrationDefinedTypesCarryNoAlphabet(self):
+        # X.680 Table 8 defines these by ISO register entries, and 41.6/41.15
+        # /41.16 by the whole of ISO/IEC 10646. Shipping a set for those would
+        # be either wrong or enormous, so they stay None.
+        for asn1Type in (
+            char.TeletexString,
+            char.T61String,
+            char.VideotexString,
+            char.GraphicString,
+            char.GeneralString,
+            char.UniversalString,
+            char.BMPString,
+            char.UTF8String,
+        ):
+            with self.subTest(asn1Type.__name__):
+                self.assertIsNone(asn1Type.permittedAlphabet)
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

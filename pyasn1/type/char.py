@@ -10,7 +10,7 @@ from collections.abc import Iterator
 from typing import Any, Final
 
 from pyasn1 import error
-from pyasn1.type import tag, univ
+from pyasn1.type import constraint, tag, univ
 
 __all__ = [
     "BMPString",
@@ -66,6 +66,20 @@ class AbstractCharacterString(univ.OctetString):
     ~pyasn1.error.ValueConstraintError, ~pyasn1.error.PyAsn1Error
         On constraint violation or bad initializer.
     """
+
+    #: The X.680 41 repertoire for this type as a
+    #: :py:class:`~pyasn1.type.constraint.PermittedAlphabetConstraint`, or
+    #: :obj:`None` where X.680 defines the repertoire by external registration
+    #: or by the whole of ISO/IEC 10646.
+    #:
+    #: This is **not** part of the default ``subtypeSpec``: values that decode
+    #: today keep decoding. Attach it explicitly to opt in.
+    #:
+    #: .. code-block:: python
+    #:
+    #:     class StrictPrintable(char.PrintableString):
+    #:         subtypeSpec = char.PrintableString.permittedAlphabet
+    permittedAlphabet: constraint.PermittedAlphabetConstraint | None = None
 
     def __str__(self) -> str:
         return str(self._value)
@@ -139,6 +153,9 @@ class NumericString(AbstractCharacterString):  # noqa: D101 - docstring aliased 
     )
     encoding = "us-ascii"
 
+    # X.680 41.2, Table 9: digits and SPACE.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(*"0123456789 ")
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
@@ -153,6 +170,12 @@ class PrintableString(AbstractCharacterString):  # noqa: D101 - docstring aliase
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 19)
     )
     encoding = "us-ascii"
+
+    # X.680 41.4, Table 10. Note the absence of "*" and "@": PrintableString
+    # is narrower than the ASCII graphic set.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '()+,-./:=?"
+    )
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
@@ -206,6 +229,12 @@ class IA5String(AbstractCharacterString):  # noqa: D101 - docstring aliased from
     )
     encoding = "us-ascii"
 
+    # X.680 41.1, Table 8: registrations 1 (C0 controls) and 6 (ASCII
+    # graphics) plus SPACE and DELETE, i.e. the whole of ISO 646.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *(chr(x) for x in range(0x80))
+    )
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
@@ -235,6 +264,12 @@ class VisibleString(AbstractCharacterString):  # noqa: D101 - docstring aliased 
         tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 26)
     )
     encoding = "us-ascii"
+
+    # X.680 41.1, Table 8: registration 6 (ASCII graphics) plus SPACE. No
+    # control characters and no DELETE, unlike IA5String.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *(chr(x) for x in range(0x20, 0x7F))
+    )
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
