@@ -555,6 +555,12 @@ class RealEncoder(AbstractItemEncoder):
         if value.isMinusInf:
             return (0x41,), False, False
 
+        if value.isNaN:
+            return (0x42,), False, False
+
+        if value.isMinusZero:
+            return (0x43,), False, False
+
         m, b, e = value
 
         if not m:

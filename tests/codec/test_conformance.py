@@ -283,6 +283,82 @@ class NullTestCase(BaseTestCase):
         assert der_encoder.encode(univ.Null("")) == bytes((0x05, 0x00))
 
 
+class SpecialRealValueTestCase(BaseTestCase):
+    """X.690 8.5.9: when a SpecialRealValue or minus zero is encoded, there
+    shall be only one contents octet, with values as follows::
+
+        01000000    Value is PLUS-INFINITY
+        01000001    Value is MINUS-INFINITY
+        01000010    Value is NOT-A-NUMBER
+        01000011    Value is minus zero
+
+    "All other values having bits 8 and 7 equal to 0 and 1 respectively are
+    reserved."
+
+    NOT-A-NUMBER and minus zero were added after the 07/2002 edition that
+    parts of this source still cite, where only the two infinities were
+    defined and the remaining bit patterns were reserved.
+    """
+
+    def testPlusInfinity(self):
+        assert der_encoder.encode(univ.Real(float("inf"))) == bytes((0x09, 0x01, 0x40))
+
+    def testMinusInfinity(self):
+        assert der_encoder.encode(univ.Real(float("-inf"))) == bytes((0x09, 0x01, 0x41))
+
+    def testNotANumberEncodesToItsOwnOctet(self):
+        assert der_encoder.encode(univ.Real(float("nan"))) == bytes((0x09, 0x01, 0x42))
+
+    def testMinusZeroEncodesToItsOwnOctet(self):
+        # Distinct from the empty-contents encoding of positive zero that
+        # 8.5.2 requires, even though the two compare equal as floats.
+        assert der_encoder.encode(univ.Real(-0.0)) == bytes((0x09, 0x01, 0x43))
+        assert der_encoder.encode(univ.Real(0.0)) == bytes((0x09, 0x00))
+
+    def testNotANumberDecodes(self):
+        value, _ = der_decoder.decode(bytes((0x09, 0x01, 0x42)))
+
+        assert value.isNaN, "0x42 is NOT-A-NUMBER, not an infinity"
+        assert not value.isInf
+
+    def testMinusZeroDecodes(self):
+        value, _ = der_decoder.decode(bytes((0x09, 0x01, 0x43)))
+
+        assert value.isMinusZero, "0x43 is minus zero, not an infinity"
+        assert not value.isInf
+        assert float(value) == 0.0
+
+    def testInfinitiesAreNotConfusedWithTheOthers(self):
+        plusInf, _ = der_decoder.decode(bytes((0x09, 0x01, 0x40)))
+        minusInf, _ = der_decoder.decode(bytes((0x09, 0x01, 0x41)))
+
+        assert plusInf.isPlusInf and not plusInf.isNaN and not plusInf.isMinusZero
+        assert minusInf.isMinusInf and not minusInf.isNaN and not minusInf.isMinusZero
+
+    def testReservedValuesRejected(self):
+        # Bits 8 to 7 of 01 with any other pattern is reserved for addenda.
+        for firstOctet in (0x44, 0x45, 0x50, 0x60, 0x7F):
+            self.assertRaises(
+                error.PyAsn1Error,
+                ber_decoder.decode,
+                bytes((0x09, 0x01, firstOctet)),
+            )
+
+    def testSingleContentsOctetRequired(self):
+        self.assertRaises(
+            error.PyAsn1Error,
+            ber_decoder.decode,
+            bytes((0x09, 0x02, 0x40, 0x00)),
+        )
+
+    def testSpecialValuesSurviveTheRoundTrip(self):
+        nan, _ = der_decoder.decode(der_encoder.encode(univ.Real(float("nan"))))
+        minusZero, _ = der_decoder.decode(der_encoder.encode(univ.Real(-0.0)))
+
+        assert nan.isNaN
+        assert minusZero.isMinusZero
+
+
 class IntegerMinimalEncodingTestCase(BaseTestCase):
     """X.690 8.3.2: given more than one contents octet, the bits of the first
     octet and bit 8 of the second shall not all be ones, nor all be zero.
