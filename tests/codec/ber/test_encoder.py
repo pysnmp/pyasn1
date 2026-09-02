@@ -775,9 +775,9 @@ class BMPStringEncoderWithSchemaTestCase(BaseTestCase):
 
 class UTF8StringEncoderTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(char.UTF8String("abc")) == bytes(
-            (12, 3, 97, 98, 99)
-        ), "Incorrect encoding"
+        assert encoder.encode(char.UTF8String("abc")) == bytes((12, 3, 97, 98, 99)), (
+            "Incorrect encoding"
+        )
 
 
 class UTF8StringEncoderWithSchemaTestCase(BaseTestCase):

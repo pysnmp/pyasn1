@@ -1,5 +1,5 @@
 Quick start
-===========
+============
 
 .. _quickstart:
 
@@ -8,7 +8,7 @@ the three core concepts — **types**, **codecs**, and **native conversion** —
 with copy-pasteable snippets.
 
 Define an ASN.1 schema
----------------------
+----------------------
 
 ASN.1 types are expressed as Python classes that subclass the appropriate
 base type from :mod:`pyasn1.type.univ`:

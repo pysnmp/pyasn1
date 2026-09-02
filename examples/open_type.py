@@ -4,6 +4,7 @@
 Demonstrates the OpenType / ANY DEFINED BY construct where one field
 determines the ASN.1 type of another field at runtime.
 """
+
 from pyasn1.codec.der.decoder import decode as der_decode
 from pyasn1.codec.der.encoder import encode as der_encode
 from pyasn1.type import namedtype, opentype, univ

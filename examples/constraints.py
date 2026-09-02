@@ -4,6 +4,7 @@
 Demonstrates ValueRangeConstraint, ValueSizeConstraint,
 SingleValueConstraint, and PermittedAlphabetConstraint.
 """
+
 from pyasn1.type import char, constraint, univ
 
 
@@ -49,8 +50,22 @@ def main():
     # Pass each allowed character as a separate argument.
     class HexString(char.IA5String):
         subtypeSpec = constraint.PermittedAlphabetConstraint(
-            "0", "1", "2", "3", "4", "5", "6", "7",
-            "8", "9", "A", "B", "C", "D", "E", "F",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
         )
 
     hs = HexString("DEADBEEF")

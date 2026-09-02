@@ -59,12 +59,12 @@ _TAG_FORMAT_NAMES = {
 }
 
 
-def _tagClassName(tagClass):
+def _tagClassName(tagClass: int) -> str:
     """Return a human-readable name for an ASN.1 tag class."""
     return _TAG_CLASS_NAMES.get(tagClass, "0x%02x" % tagClass)
 
 
-def _tagFormatName(tagFormat):
+def _tagFormatName(tagFormat: int) -> str:
     """Return a human-readable name for an ASN.1 tag format."""
     return _TAG_FORMAT_NAMES.get(tagFormat, "0x%02x" % tagFormat)
 

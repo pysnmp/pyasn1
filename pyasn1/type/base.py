@@ -571,7 +571,7 @@ class ConstructedAsn1Type(Asn1Type):
                 # Strip outer angle brackets for cleaner inline display
                 if r.startswith("<") and r.endswith(">"):
                     r = r[1:-1]
-                if has_named_components:
+                if has_named_components and component_type is not None:
                     try:
                         name = component_type[idx].name
                         parts.append("%s=%s" % (name, r))

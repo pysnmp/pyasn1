@@ -7,6 +7,7 @@ Demonstrates the most common pyasn1 workflow:
   3. Encode to DER bytes
   4. Decode back from DER bytes
 """
+
 from pyasn1.codec.der.decoder import decode as der_decode
 from pyasn1.codec.der.encoder import encode as der_encode
 from pyasn1.type import char, namedtype, univ

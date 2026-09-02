@@ -109,9 +109,10 @@ class StdlibLoggingCaseBase(unittest.TestCase):
     def testQuietByDefault(self):
         roundTrip()
 
-        assert (
-            not self.collector.records
-        ), "records emitted without any level being set: %r" % (self.collector.records,)
+        assert not self.collector.records, (
+            "records emitted without any level being set: %r"
+            % (self.collector.records,)
+        )
 
     def testRecordsKeepTheirFormatArguments(self):
         """The point of lazy arguments: ``msg`` stays a template.
@@ -165,12 +166,12 @@ class LegacyDebugCaseBase(unittest.TestCase):
         ):
             setLoggerQuietly(debugQuietly(flag, printer=lambda msg: None))
 
-            assert logging.getLogger(enabled).isEnabledFor(
-                logging.DEBUG
-            ), "flag %r did not enable %s" % (flag, enabled)
-            assert not logging.getLogger(disabled).isEnabledFor(
-                logging.DEBUG
-            ), "flag %r leaked into %s" % (flag, disabled)
+            assert logging.getLogger(enabled).isEnabledFor(logging.DEBUG), (
+                "flag %r did not enable %s" % (flag, enabled)
+            )
+            assert not logging.getLogger(disabled).isEnabledFor(logging.DEBUG), (
+                "flag %r leaked into %s" % (flag, disabled)
+            )
 
             setLoggerQuietly(0)
 
@@ -183,10 +184,9 @@ class LegacyDebugCaseBase(unittest.TestCase):
             assert app.level == logging.DEBUG, logging.getLevelName(app.level)
 
             setLoggerQuietly(0)
-            assert (
-                app.level == logging.WARNING
-            ), "setLogger(0) left the application level at %s" % logging.getLevelName(
-                app.level
+            assert app.level == logging.WARNING, (
+                "setLogger(0) left the application level at %s"
+                % logging.getLevelName(app.level)
             )
 
         finally:
@@ -261,10 +261,9 @@ class LoggingHygieneCaseBase(unittest.TestCase):
             assert log.level == logging.WARNING, (
                 "pyasn1 overrode the application logger level: %s" % log.level
             )
-            assert (
-                log.handlers == handlersBefore
-            ), "pyasn1 attached handlers to the application logger: %r" % (
-                log.handlers,
+            assert log.handlers == handlersBefore, (
+                "pyasn1 attached handlers to the application logger: %r"
+                % (log.handlers,)
             )
 
         finally:

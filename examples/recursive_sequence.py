@@ -5,6 +5,7 @@ Demonstrates how to model recursive ASN.1 structures such as linked
 lists or tree nodes where a type contains an optional reference to
 itself.
 """
+
 from pyasn1.codec.der.decoder import decode as der_decode
 from pyasn1.codec.der.encoder import encode as der_encode
 from pyasn1.type import namedtype, univ

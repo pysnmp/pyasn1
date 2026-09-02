@@ -4,6 +4,7 @@
 Demonstrates encoding the same ASN.1 value with every codec pyasn1
 ships and verifying they all agree.
 """
+
 from pyasn1.codec.ber.decoder import decode as ber_decode
 from pyasn1.codec.ber.encoder import encode as ber_encode
 from pyasn1.codec.cer.decoder import decode as cer_decode

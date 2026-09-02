@@ -130,9 +130,9 @@ class NamedTypesCaseBase(BaseTestCase):
         assert list(self.e) == ["first-name", "age", "family-name"]
 
     def testGetTypeByPosition(self):
-        assert self.e.getTypeByPosition(0) == univ.OctetString(
-            ""
-        ), "getTypeByPosition() fails"
+        assert self.e.getTypeByPosition(0) == univ.OctetString(""), (
+            "getTypeByPosition() fails"
+        )
 
     def testGetNameByPosition(self):
         assert self.e.getNameByPosition(0) == "first-name", "getNameByPosition() fails"
@@ -192,9 +192,9 @@ class OrderedNamedTypesCaseBase(BaseTestCase):
         )
 
     def testGetTypeByPosition(self):
-        assert self.e.getTypeByPosition(0) == univ.OctetString(
-            ""
-        ), "getTypeByPosition() fails"
+        assert self.e.getTypeByPosition(0) == univ.OctetString(""), (
+            "getTypeByPosition() fails"
+        )
 
 
 class DuplicateNamedTypesCaseBase(BaseTestCase):

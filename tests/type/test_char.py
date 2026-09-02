@@ -46,9 +46,9 @@ class AbstractStringTestCase:
             assert False, "Size constraint failed"
 
     def testSerialised(self):
-        assert bytes(self.asn1String) == self.pythonString.encode(
-            self.encoding
-        ), "__str__() fails"
+        assert bytes(self.asn1String) == self.pythonString.encode(self.encoding), (
+            "__str__() fails"
+        )
 
     def testPrintable(self):
         assert str(self.asn1String) == self.pythonString, "__str__() fails"
@@ -79,9 +79,9 @@ class AbstractStringTestCase:
         )
 
     def testAsOctets(self):
-        assert self.asn1String.asOctets() == self.pythonString.encode(
-            self.encoding
-        ), "testAsOctets() fails"
+        assert self.asn1String.asOctets() == self.pythonString.encode(self.encoding), (
+            "testAsOctets() fails"
+        )
 
     def testAsNumbers(self):
         assert self.asn1String.asNumbers() == self.initializer, "testAsNumbers() fails"

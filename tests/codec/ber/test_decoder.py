@@ -3541,9 +3541,9 @@ class EndOfOctetsTestCase(BaseTestCase):
 
     def testIndefiniteEoo(self):
         result, remainder = decoder.decode(bytes((0x23, 0x80, 0x00, 0x00)))
-        assert (
-            result == () and remainder == _null
-        ), "incorrect decoding of indefinite length end-of-octets"
+        assert result == () and remainder == _null, (
+            "incorrect decoding of indefinite length end-of-octets"
+        )
 
     def testNoLongFormEoo(self):
         try:
@@ -3559,9 +3559,9 @@ class EndOfOctetsTestCase(BaseTestCase):
         except PyAsn1Error:
             pass
         else:
-            assert (
-                0
-            ), "end-of-contents octets accepted with invalid constructed encoding"
+            assert 0, (
+                "end-of-contents octets accepted with invalid constructed encoding"
+            )
 
     def testNoEooData(self):
         try:
