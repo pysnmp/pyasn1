@@ -931,6 +931,132 @@ class RealCanonicalFormTestCase(BaseTestCase):
             assert str(float(value)) == expected
 
 
+class RealRoundTripTestCase(BaseTestCase):
+    """A REAL must survive a trip through every codec unchanged.
+
+    X.690 8.5.8 writes a base 10 value as an ISO 6093 field, which is a
+    string of digits, so the mantissa has to stay an integer. It used to be
+    divided down with true division, which made it a float, and a float whose
+    repr uses exponent notation rendered as a nested exponent: 1e300 encoded
+    as "1e+299E1", which no decoder can read back.
+
+    The decomposition was also lossy. Multiplying by ten until the value came
+    out whole accumulated binary rounding error, and near the bottom of the
+    double range it lost the value outright.
+    """
+
+    # Named so a failure says which magnitude broke.
+    VALUES = (
+        ("zero", 0.0),
+        ("one", 1.0),
+        ("half", 0.5),
+        ("negative", -1.5),
+        ("hundred", 100.0),
+        ("recurring", 1 / 3),
+        ("negative recurring", -4.1),
+        # Large exponents, where a float mantissa starts rendering as "1e+299".
+        ("large", 1e300),
+        ("largest double", 1.7976931348623157e308),
+        ("small", 1e-300),
+        # Subnormals: below the smallest normal double, where 10 ** exponent
+        # has already underflowed to zero.
+        ("smallest normal", 2.2250738585072014e-308),
+        ("subnormal", 1e-320),
+        ("smallest subnormal", 5e-324),
+    )
+
+    CODECS = (
+        ("ber", ber_encoder, ber_decoder),
+        ("cer", cer_encoder, cer_decoder),
+        ("der", der_encoder, der_decoder),
+    )
+
+    def testRoundTrip(self):
+        for name, value in self.VALUES:
+            for codec, encode, decode in self.CODECS:
+                with self.subTest(name, codec=codec, value=value):
+                    substrate = encode.encode(univ.Real(value))
+                    decoded, rest = decode.decode(substrate, asn1Spec=univ.Real())
+
+                    self.assertEqual(rest, b"")
+                    self.assertEqual(float(decoded), value)
+
+    def testFloatParity(self):
+        # Real duck-types float, so the value it holds must be the value
+        # float() would hold, not one rounded on the way in.
+        for name, value in self.VALUES:
+            with self.subTest(name, value=value):
+                self.assertEqual(float(univ.Real(value)), value)
+
+    def testMantissaStaysAnInteger(self):
+        for name, value in self.VALUES:
+            with self.subTest(name, value=value):
+                mantissa, base, exponent = tuple(univ.Real(value))
+
+                self.assertIsInstance(mantissa, int)
+                self.assertIsInstance(exponent, int)
+                self.assertEqual(base, 10)
+
+    def testCharacterFormIsWellFormed(self):
+        # X.690 8.5.8: the contents octets after the first form an ISO 6093
+        # field. "1e+299E1" is not one.
+        for name, value in self.VALUES:
+            if not value:
+                continue
+
+            with self.subTest(name, value=value):
+                substrate = ber_encoder.encode(univ.Real(value))
+                firstOctet = substrate[2]
+
+                # Bits 8 to 7 zero selects the decimal encoding.
+                self.assertEqual(firstOctet & 0xC0, 0)
+
+                field = substrate[3:].decode("ascii")
+                mantissa, _, exponent = field.partition("E")
+
+                self.assertNotIn("e", field)
+                self.assertNotIn(" ", field)
+                float(field)
+                int(mantissa.replace(".", "") or "0")
+                int(exponent)
+
+    def testReservedNumberFormRejected(self):
+        # X.690 8.5.8: bits 6 to 1 choose the ISO 6093 form, and every value
+        # other than 1, 2 and 3 is "reserved for further editions". Only the
+        # low two bits used to be looked at, so 000101 read as NR1.
+        substrate = bytes((0x09, 0x04, 0x05)) + b"1E0"
+
+        self.assertRaises(
+            error.PyAsn1Error,
+            ber_decoder.decode,
+            substrate,
+            asn1Spec=univ.Real(),
+        )
+
+    def testCommaDecimalMark(self):
+        # ISO 6093 admits either a comma or a full stop as the decimal mark.
+        substrate = bytes((0x09, 0x06, 0x03)) + b"1,5E0"
+
+        decoded, _ = ber_decoder.decode(substrate, asn1Spec=univ.Real())
+
+        self.assertEqual(float(decoded), 1.5)
+
+    def testExponentBeyondDoubleRange(self):
+        # A value built from a tuple need not be a representable double. It
+        # still has to survive the codecs, and its mantissa still has to be
+        # written as digits.
+        value = univ.Real((1, 10, 5000))
+
+        for codec, encode, decode in self.CODECS:
+            with self.subTest(codec=codec):
+                decoded, rest = decode.decode(
+                    encode.encode(value), asn1Spec=univ.Real()
+                )
+
+                self.assertEqual(rest, b"")
+                self.assertEqual(tuple(decoded), (1, 10, 5000))
+
+
 class NullTestCase(BaseTestCase):
     """X.690 8.8.2: the contents octets of a NULL are empty."""
 

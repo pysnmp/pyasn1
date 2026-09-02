@@ -6,6 +6,7 @@
 #
 """BER decoder for ASN.1 types."""
 
+import decimal
 import logging
 from typing import Any, Final
 
@@ -592,18 +593,44 @@ class RealDecoder(AbstractSimpleDecoder):
 
     @staticmethod
     def _decodeCharacter(firstOctet: int, payload: bytes) -> Any:
+        """Decode the decimal form of X.690 8.5.8.
+
+        Bits 6 to 1 of the first contents octet choose the ISO 6093 number
+        representation. Every other value of those bits is reserved for a
+        further edition of X.690, so it is rejected rather than ignored.
+        """
         if not payload:
             raise error.PyAsn1Error("Incomplete floating-point value")
 
-        try:
-            if firstOctet & 0x03 == 0x01:
-                return int(payload), 10, 0
-            if firstOctet & 0x03 in (0x02, 0x03):
-                return float(payload)
+        numberForm = firstOctet & 0x3F
+
+        if numberForm not in (0x01, 0x02, 0x03):
             raise error.SubstrateUnderrunError("Unknown NR", tag=firstOctet)
 
-        except ValueError as exc:
+        try:
+            text = payload.decode("ascii").strip()
+
+            if numberForm == 0x01:
+                return int(text), 10, 0
+
+            # ISO 6093 admits either a comma or a full stop as the decimal
+            # mark; Decimal only knows the full stop.
+            sign, digits, exponent = decimal.Decimal(text.replace(",", ".")).as_tuple()
+
+        except (ValueError, UnicodeDecodeError, decimal.InvalidOperation) as exc:
             raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
+
+        if not isinstance(exponent, int):
+            # as_tuple() spells the exponent of a NaN or an infinity with a
+            # letter. Neither has an ISO 6093 spelling, so the field is junk.
+            raise error.SubstrateUnderrunError("Bad character Real syntax")
+
+        mantissa = int("".join(str(digit) for digit in digits))
+
+        # Kept exact rather than passed through float(): 8.5.8 puts no ceiling
+        # on the exponent, and float("1E5000") is infinity, which would turn a
+        # finite value into a SpecialRealValue.
+        return -mantissa if sign else mantissa, 10, exponent
 
     def valueDecoder(
         self,

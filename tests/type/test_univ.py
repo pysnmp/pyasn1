@@ -954,7 +954,11 @@ class RealTestCase(BaseTestCase):
         assert "-inf" in repr(univ.Real("-inf"))
 
     def testAdd(self):
-        assert univ.Real(-4.1) + 1.4 == -2.7, "__add__() fails"
+        # Real duck-types float, so it has to give what float gives. Plain
+        # Python makes -4.1 + 1.4 come out as -2.6999999999999997, and this
+        # case used to assert -2.7: it passed only because the base 10
+        # decomposition was lossy in a way that happened to cancel out.
+        assert univ.Real(-4.1) + 1.4 == -4.1 + 1.4, "__add__() fails"
 
     def testRadd(self):
         assert 4 + univ.Real(0.5) == 4.5, "__radd__() fails"
