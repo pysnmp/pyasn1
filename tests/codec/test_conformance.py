@@ -354,6 +354,58 @@ class BitStringTestCase(BaseTestCase):
         )
 
 
+class BitStringUnusedBitsTestCase(BaseTestCase):
+    """X.690 11.2.1: "Each unused bit in the final octet of the encoding of a
+    bit string value shall be set to zero."
+
+    BER leaves those bits to the sender (8.6.2 says nothing about them), so
+    the same abstract value has several BER spellings. CER and DER admit one.
+    """
+
+    def testNonZeroUnusedBitsRejected(self):
+        # 05 unused bits, final octet a1: bit 1 is set inside the padding.
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(
+                error.PyAsn1Error, decode, bytes((0x03, 0x02, 0x05, 0xA1))
+            )
+
+    def testAllPaddingBitsChecked(self):
+        # One unused bit, and it is the only thing wrong with the octet.
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(
+                error.PyAsn1Error, decode, bytes((0x03, 0x02, 0x01, 0xFF))
+            )
+
+    def testZeroUnusedBitsAccepted(self):
+        value, _ = der_decoder.decode(bytes((0x03, 0x02, 0x05, 0xA0)))
+
+        assert value == univ.BitString(binValue="101")
+
+    def testBerStillTolerant(self):
+        # The restriction is in clause 11, so BER keeps accepting both
+        # spellings and reads the same value from each.
+        lax, _ = ber_decoder.decode(bytes((0x03, 0x02, 0x05, 0xA1)))
+        canonical, _ = ber_decoder.decode(bytes((0x03, 0x02, 0x05, 0xA0)))
+
+        assert lax == canonical == univ.BitString(binValue="101")
+
+    def testEncoderEmitsZeroPadding(self):
+        # The encoder is already canonical; this pins it so the decoder
+        # restriction cannot be satisfied by accident.
+        assert der_encoder.encode(univ.BitString(binValue="101")) == bytes(
+            (0x03, 0x02, 0x05, 0xA0)
+        )
+        assert der_encoder.encode(univ.BitString(binValue="1")) == bytes(
+            (0x03, 0x02, 0x07, 0x80)
+        )
+
+    def testFullFinalOctetHasNoPadding(self):
+        # Nothing to check when the count is zero, whatever the octet holds.
+        value, _ = der_decoder.decode(bytes((0x03, 0x02, 0x00, 0xFF)))
+
+        assert value == univ.BitString(binValue="11111111")
+
+
 class OctetStringTestCase(BaseTestCase):
     def testDerRejectsConstructedForm(self):
         # 10.2: under DER an octetstring is encoded in the primitive form.

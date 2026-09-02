@@ -10,7 +10,7 @@ from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.codec.ber import decoder
-from pyasn1.type import univ
+from pyasn1.type import tag, univ
 
 __all__ = ["decode"]
 
@@ -45,8 +45,57 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
         return self._createComponent(asn1Spec, tagSet, value, **options), tail
 
 
+class BitStringDecoder(decoder.BitStringDecoder):
+    """BIT STRING decoder enforcing X.690 11.2.1.
+
+    BER leaves the unused bits in the final octet to the sender, so two
+    encodings of the same value can differ in bits nobody reads. CER and DER
+    close that off: "Each unused bit in the final octet of the encoding of a
+    bit string value shall be set to zero."
+    """
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        if not substrateFun and tagSet and tagSet[0].tagFormat == tag.tagFormatSimple:
+            self._verifyUnusedBitsAreZero(substrate[:length])
+
+        return super().valueDecoder(
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+    @staticmethod
+    def _verifyUnusedBitsAreZero(head: bytes) -> None:
+        # An initial octet on its own carries no bits to pad, and a count
+        # above seven is the base decoder's to reject.
+        if len(head) < 2:
+            return
+
+        unusedBits = head[0]
+        if unusedBits and unusedBits < 8 and head[-1] & ((1 << unusedBits) - 1):
+            raise error.PyAsn1Error(
+                "Unused bits in the final octet of a BIT STRING must be zero",
+                unusedBits=unusedBits,
+                finalOctet=head[-1],
+            )
+
+
 # TODO: prohibit non-canonical encoding
-BitStringDecoder = decoder.BitStringDecoder
 OctetStringDecoder = decoder.OctetStringDecoder
 RealDecoder = decoder.RealDecoder
 
