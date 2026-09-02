@@ -9,8 +9,8 @@
 from typing import Any, Final
 
 from pyasn1 import error
-from pyasn1.codec.ber import decoder
-from pyasn1.type import tag, univ, useful
+from pyasn1.codec.ber import decoder, eoo
+from pyasn1.type import char, tag, univ, useful
 
 __all__ = ["decode"]
 
@@ -206,6 +206,142 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
         return self._createComponent(asn1Spec, tagSet, value, **options), tail
 
 
+class CanonicalStringDecoderMixIn:
+    """Reject string encoding forms X.690 9.1 and 9.2 do not admit.
+
+    BER lets a sender split a string wherever it likes, or not at all, so one
+    value has many spellings. CER admits one: primitive up to 1000 contents
+    octets, and past that a constructed encoding of primitive fragments, all
+    but the last of them exactly 1000 contents octets long. 9.1 pins the
+    length form of the constructed encoding to the indefinite one.
+    """
+
+    fragmentSize = 1000
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        # This is the definite length path, so a constructed encoding reaching
+        # it already contradicts 9.1 whatever its fragments turn out to hold.
+        # A decoder that bars the constructed form outright, as DER does under
+        # 10.2, has a more specific complaint to make, so defer to it.
+        if (
+            getattr(self, "supportConstructedForm", True)
+            and not substrateFun
+            and tagSet
+            and tagSet[0].tagFormat != tag.tagFormatSimple
+        ):
+            raise error.PyAsn1Error(
+                "Constructed string encoding must use the indefinite length form",
+                decoder=self.__class__.__name__,
+            )
+
+        return super().valueDecoder(  # type: ignore[misc]
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+    def indefLenValueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        # A caller collecting raw substrate is assembling an outer value and
+        # never sees the fragments as such, so leave those to their own decode.
+        if not substrateFun and decodeFun:
+            self._verifyFragments(substrate, decodeFun, options)
+
+        return super().indefLenValueDecoder(  # type: ignore[misc]
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+    def _verifyFragments(
+        self, substrate: bytes, decodeFun: Any, options: dict[str, Any]
+    ) -> None:
+        sizes = []
+
+        while substrate:
+            # 9.2 admits primitive fragments only, so a constructed identifier
+            # octet is wrong however well formed the encoding beneath it is.
+            if substrate[0] & 0x20:
+                raise error.PyAsn1Error(
+                    "String fragment must use the primitive encoding form",
+                    decoder=self.__class__.__name__,
+                )
+
+            component, substrate = decodeFun(
+                substrate,
+                self.fragmentComponent,  # type: ignore[attr-defined]
+                substrateFun=self.substrateCollector,  # type: ignore[attr-defined]
+                allowEoo=True,
+                **options,
+            )
+
+            if component is eoo.endOfOctets:
+                break
+
+            sizes.append(len(component))
+
+        else:
+            # Nothing closed the encoding; the base decoder reports that.
+            return
+
+        # One fragment carries no more than 1000 octets, which 9.2 requires to
+        # have been sent primitively. Two is the shortest conforming split.
+        if len(sizes) < 2:
+            raise error.PyAsn1Error(
+                "String of no more than 1000 octets must use the primitive "
+                "encoding form",
+                fragments=len(sizes),
+                decoder=self.__class__.__name__,
+            )
+
+        for size in sizes[:-1]:
+            if size != self.fragmentSize:
+                raise error.PyAsn1Error(
+                    "String fragment before the last carries the wrong "
+                    "number of contents octets",
+                    fragmentSize=size,
+                    expectedSize=self.fragmentSize,
+                    decoder=self.__class__.__name__,
+                )
+
+        if not 1 <= sizes[-1] <= self.fragmentSize:
+            raise error.PyAsn1Error(
+                "Last string fragment carries the wrong number of contents octets",
+                fragmentSize=sizes[-1],
+                maxSize=self.fragmentSize,
+                decoder=self.__class__.__name__,
+            )
+
+
 class BitStringDecoder(decoder.BitStringDecoder):
     """BIT STRING decoder enforcing X.690 11.2.1.
 
@@ -292,16 +428,80 @@ class CanonicalTimeDecoderMixIn:
         return component, tail
 
 
-class GeneralizedTimeDecoder(CanonicalTimeDecoderMixIn, decoder.GeneralizedTimeDecoder):
+class GeneralizedTimeDecoder(
+    CanonicalStringDecoderMixIn,
+    CanonicalTimeDecoderMixIn,
+    decoder.GeneralizedTimeDecoder,
+):
     pass
 
 
-class UTCTimeDecoder(CanonicalTimeDecoderMixIn, decoder.UTCTimeDecoder):
+class UTCTimeDecoder(
+    CanonicalStringDecoderMixIn, CanonicalTimeDecoderMixIn, decoder.UTCTimeDecoder
+):
     pass
 
 
-# TODO: prohibit non-canonical encoding
-OctetStringDecoder = decoder.OctetStringDecoder
+class OctetStringDecoder(CanonicalStringDecoderMixIn, decoder.OctetStringDecoder):
+    pass
+
+
+# 9.2 names bitstring, octetstring and the restricted character string types.
+# The parent codec derives all of these from its own OctetStringDecoder, so
+# each needs its own subclass here for the restriction to reach it.
+class UTF8StringDecoder(CanonicalStringDecoderMixIn, decoder.UTF8StringDecoder):
+    pass
+
+
+class NumericStringDecoder(CanonicalStringDecoderMixIn, decoder.NumericStringDecoder):
+    pass
+
+
+class PrintableStringDecoder(
+    CanonicalStringDecoderMixIn, decoder.PrintableStringDecoder
+):
+    pass
+
+
+class TeletexStringDecoder(CanonicalStringDecoderMixIn, decoder.TeletexStringDecoder):
+    pass
+
+
+class VideotexStringDecoder(CanonicalStringDecoderMixIn, decoder.VideotexStringDecoder):
+    pass
+
+
+class IA5StringDecoder(CanonicalStringDecoderMixIn, decoder.IA5StringDecoder):
+    pass
+
+
+class GraphicStringDecoder(CanonicalStringDecoderMixIn, decoder.GraphicStringDecoder):
+    pass
+
+
+class VisibleStringDecoder(CanonicalStringDecoderMixIn, decoder.VisibleStringDecoder):
+    pass
+
+
+class GeneralStringDecoder(CanonicalStringDecoderMixIn, decoder.GeneralStringDecoder):
+    pass
+
+
+class UniversalStringDecoder(
+    CanonicalStringDecoderMixIn, decoder.UniversalStringDecoder
+):
+    pass
+
+
+class BMPStringDecoder(CanonicalStringDecoderMixIn, decoder.BMPStringDecoder):
+    pass
+
+
+class ObjectDescriptorDecoder(
+    CanonicalStringDecoderMixIn, decoder.ObjectDescriptorDecoder
+):
+    pass
+
 
 tagMap: Final = decoder.tagMap.copy()
 tagMap.update(
@@ -312,6 +512,18 @@ tagMap.update(
         univ.BitString.tagSet: BitStringDecoder(),
         univ.OctetString.tagSet: OctetStringDecoder(),
         univ.Real.tagSet: RealDecoder(),
+        char.UTF8String.tagSet: UTF8StringDecoder(),
+        char.NumericString.tagSet: NumericStringDecoder(),
+        char.PrintableString.tagSet: PrintableStringDecoder(),
+        char.TeletexString.tagSet: TeletexStringDecoder(),
+        char.VideotexString.tagSet: VideotexStringDecoder(),
+        char.IA5String.tagSet: IA5StringDecoder(),
+        char.GraphicString.tagSet: GraphicStringDecoder(),
+        char.VisibleString.tagSet: VisibleStringDecoder(),
+        char.GeneralString.tagSet: GeneralStringDecoder(),
+        char.UniversalString.tagSet: UniversalStringDecoder(),
+        char.BMPString.tagSet: BMPStringDecoder(),
+        useful.ObjectDescriptor.tagSet: ObjectDescriptorDecoder(),
         useful.GeneralizedTime.tagSet: GeneralizedTimeDecoder(),
         useful.UTCTime.tagSet: UTCTimeDecoder(),
     }

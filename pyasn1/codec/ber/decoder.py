@@ -213,6 +213,10 @@ class BitStringDecoder(AbstractSimpleDecoder):
     protoComponent = univ.BitString(())
     supportConstructedForm = True
 
+    # 8.6.4.1: "the tags in the contents octets are always universal class,
+    # number 3", which is the prototype's own tag.
+    fragmentComponent = univ.BitString(())
+
     def valueDecoder(
         self,
         substrate: bytes,
@@ -361,6 +365,12 @@ class OctetStringDecoder(AbstractSimpleDecoder):
     protoComponent = univ.OctetString("")
     supportConstructedForm = True
 
+    # 8.7.3.2: "the tags in the contents octets are always universal class,
+    # number 4". A restricted character string is encoded as if it were
+    # [UNIVERSAL x] IMPLICIT OCTET STRING (8.23.3), so the outer tag belongs to
+    # the string type while its fragments stay plain octetstrings.
+    fragmentComponent = univ.OctetString("")
+
     def valueDecoder(
         self,
         substrate: bytes,
@@ -400,7 +410,7 @@ class OctetStringDecoder(AbstractSimpleDecoder):
 
         while head:
             component, head = decodeFun(
-                head, self.protoComponent, substrateFun=substrateFun, **options
+                head, self.fragmentComponent, substrateFun=substrateFun, **options
             )
             header += component
 
@@ -429,7 +439,7 @@ class OctetStringDecoder(AbstractSimpleDecoder):
         while substrate:
             component, substrate = decodeFun(
                 substrate,
-                self.protoComponent,
+                self.fragmentComponent,
                 substrateFun=substrateFun,
                 allowEoo=True,
                 **options,
