@@ -88,6 +88,7 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
+   /quickstart
    /pyasn1/contents
 
 Use case

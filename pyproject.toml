@@ -95,6 +95,9 @@ convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["B", "SIM", "PL", "RUF", "D"]  # relax rules for tests
+# Illustrative scripts, not public API: the numpy docstring convention would
+# bury the ASN.1 point of each example under boilerplate.
+"examples/**" = ["D"]
 
 [tool.mypy]
 python_version = "3.10"

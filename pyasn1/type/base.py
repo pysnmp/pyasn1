@@ -369,22 +369,14 @@ class SimpleAsn1Type(Asn1Type):
         self._value = value
 
     def __repr__(self) -> str:
-        representation = "%s %s object" % (
-            self.__class__.__name__,
-            "value" if self.isValue else "schema",
-        )
+        if not self.isValue:
+            return "<%s schema object>" % self.__class__.__name__
 
-        for attr, value in self.readOnly.items():
-            if value:
-                representation += ", %s %s" % (attr, value)
+        value = self.prettyPrint()
+        if len(value) > 32:
+            value = value[:16] + "..." + value[-16:]
 
-        if self.isValue:
-            value = self.prettyPrint()
-            if len(value) > 32:
-                value = value[:16] + "..." + value[-16:]
-            representation += ", payload [%s]" % value
-
-        return "<%s>" % representation
+        return "<%s value object, payload [%s]>" % (self.__class__.__name__, value)
 
     def _cmpValue(self, operation: str) -> Any:
         if self._value is noValue:
@@ -669,21 +661,27 @@ class ConstructedAsn1Type(Asn1Type):
         Asn1Type.__init__(self, **readOnly)
 
     def __repr__(self) -> str:
-        representation = "%s %s object" % (
+        if not (self.isValue and self.components):
+            return "<%s schema object>" % self.__class__.__name__
+
+        # Named-component types (Sequence/Set) label each component; the
+        # positional ones (SequenceOf/SetOf) have no names to show.
+        getName = getattr(self.componentType, "getNameByPosition", None)
+
+        parts = []
+        for idx, component in enumerate(self.components):
+            part = repr(component).strip("<>")
+            if getName is not None:
+                try:
+                    part = "%s=%s" % (getName(idx), part)
+                except error.PyAsn1Error:
+                    pass
+            parts.append(part)
+
+        return "<%s value object, payload [%s]>" % (
             self.__class__.__name__,
-            "value" if self.isValue else "schema",
+            ", ".join(parts),
         )
-
-        for attr, value in self.readOnly.items():
-            if value is not noValue:
-                representation += ", %s=%r" % (attr, value)
-
-        if self.isValue and self.components:
-            representation += ", payload [%s]" % ", ".join(
-                [repr(x) for x in self.components]
-            )
-
-        return "<%s>" % representation
 
     def _cmpComponents(self, operation: str) -> Any:
         if self._componentValues is noValue:

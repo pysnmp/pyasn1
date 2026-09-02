@@ -11,6 +11,10 @@ import sys
 import unittest
 import warnings
 
+from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
+from pyasn1.type import char, constraint, error, namedtype, namedval, tag, univ, useful
+from tests.base import BaseTestCase
+
 
 def _str2octs(s):
     return s.encode("iso-8859-1")
@@ -21,10 +25,6 @@ def _octs2str(b):
 
 
 _null = b""
-
-from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
-from pyasn1.type import char, constraint, error, namedtype, namedval, tag, univ, useful
-from tests.base import BaseTestCase
 
 
 class NoValueTestCase(BaseTestCase):
@@ -1152,6 +1152,13 @@ class SequenceOf(BaseTestCase):
     def testRepr(self):
         assert "a" in repr(self.s1.clone().setComponents("a", "b"))
 
+    def testReprWithScalarComponentType(self):
+        value = univ.SequenceOf(componentType=univ.Integer()).setComponents(1, 2)
+
+        representation = repr(value)
+        assert "Integer value object, payload [1]" in representation
+        assert "Integer value object, payload [2]" in representation
+
     def testTag(self):
         assert self.s1.tagSet == tag.TagSet(
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10)
@@ -2003,6 +2010,13 @@ class SetOf(BaseTestCase):
         assert self.s1.tagSet == tag.TagSet(
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11)
         ), "wrong tagSet"
+
+    def testReprWithScalarComponentType(self):
+        value = univ.SetOf(componentType=univ.Integer()).setComponents(1, 2)
+
+        representation = repr(value)
+        assert "Integer value object, payload [1]" in representation
+        assert "Integer value object, payload [2]" in representation
 
     def testSeq(self):
         self.s1.setComponentByPosition(0, univ.OctetString("abc"))

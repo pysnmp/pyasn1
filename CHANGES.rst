@@ -43,6 +43,20 @@ unreleased
   library base types to reduce boilerplate code
 - Removed legacy type accessors, aliases, deprecated BIT STRING notation,
   positional constructed-type initialization, and ``sizeSpec`` support.
+- Simplified ``repr()`` for ``Tag``, ``TagSet``, ``SimpleAsn1Type``, and
+  ``ConstructedAsn1Type``: tag classes now use human-readable names
+  (``UNIVERSAL``, ``CONTEXT``, etc.) instead of raw hex; value objects
+  show only the payload; schema objects show only the class name;
+  constructed types include field names in the payload display
+- Fixed E402 import-order violations in test files and reformatted
+  ``ber/encoder.py`` and ``test_univ.py``; all of ``pyasn1/`` and
+  ``tests/`` now passes ``ruff check`` and ``ruff format --check``
+- Added ``docs/source/quickstart.rst`` with copy-pasteable snippets
+  covering schema definition, encode/decode, native conversion,
+  ``repr()`` inspection, constraints, and open types
+- Added ``examples/`` directory with five runnable scripts:
+  ``simple_sequence.py``, ``open_type.py``, ``constraints.py``,
+  ``recursive_sequence.py``, ``round_trip.py``
 - Dropped Python 2 residue throughout: the ``_int2oct``/``_str2octs``/``_null``
   byte shims in the BER/CER codecs, ``sys.exc_info()`` in favour of bound
   ``except ... as exc`` handlers, and the ``cond and a or b`` ternary idiom.

@@ -7,12 +7,12 @@
 import sys
 import unittest
 
-_null = b""
-
 from pyasn1.codec.der import decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
+
+_null = b""
 
 
 class BitStringDecoderTestCase(BaseTestCase):
