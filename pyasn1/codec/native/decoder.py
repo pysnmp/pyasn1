@@ -177,9 +177,11 @@ class Decoder:
         if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(pyObject).__name__)
             LOG.debug(
-                "decoder called at scope %s, working with type %s",
-                debug.scope,
-                type(pyObject).__name__,
+                "decoder called",
+                extra={
+                    "scope": str(debug.scope),
+                    "pyObjectType": type(pyObject).__name__,
+                },
             )
 
         if asn1Spec is None or not isinstance(asn1Spec, base.Asn1Item):
@@ -204,20 +206,24 @@ class Decoder:
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(
-                "calling decoder %s on Python type %s <%s>",
-                type(valueDecoder).__name__,
-                type(pyObject).__name__,
-                repr(pyObject),
+                "calling decoder",
+                extra={
+                    "decoder": type(valueDecoder).__name__,
+                    "pyObjectType": type(pyObject).__name__,
+                    "pyObject": pyObject,
+                },
             )
 
         value = valueDecoder(pyObject, asn1Spec, self, **options)
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(
-                "decoder %s produced ASN.1 type %s <%s>",
-                type(valueDecoder).__name__,
-                type(value).__name__,
-                repr(value),
+                "decoder produced ASN.1 type",
+                extra={
+                    "decoder": type(valueDecoder).__name__,
+                    "valueType": type(value).__name__,
+                    "value": value,
+                },
             )
             debug.scope.pop()
 
