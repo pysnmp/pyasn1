@@ -54,8 +54,15 @@ class IntegerDecoderTestCase(BaseTestCase):
     def testNegInt(self):
         assert decoder.decode(bytes((2, 1, 244))) == (-12, _null)
 
-    def testZero(self):
-        assert decoder.decode(bytes((2, 0))) == (0, _null)
+    def testZeroLengthRejected(self):
+        # X.690 8.3.1: the contents octets shall consist of one or more
+        # octets, so zero is not a spelling of INTEGER 0.
+        try:
+            decoder.decode(bytes((2, 0)))
+        except PyAsn1Error:
+            pass
+        else:
+            assert 0, "zero-length INTEGER accepted"
 
     def testZeroLong(self):
         assert decoder.decode(bytes((2, 1, 0))) == (0, _null)
