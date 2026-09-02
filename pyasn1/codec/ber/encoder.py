@@ -297,44 +297,26 @@ class OctetStringEncoder(AbstractItemEncoder):
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug("encoding into chunks", extra={"maxChunkSize": maxChunkSize})
 
-        # strip off explicit tags for inner chunks
-
-        if asn1Spec is None:
-            baseTag = value.tagSet.baseTag
-
-            # strip off explicit tags
-            if baseTag:
-                tagSet = tag.TagSet(baseTag, baseTag)
-
-            else:
-                tagSet = tag.TagSet()
-
-            asn1Spec = value.clone(tagSet=tagSet)
-
-        elif not isinstance(value, bytes):
-            baseTag = asn1Spec.tagSet.baseTag
-
-            # strip off explicit tags
-            if baseTag:
-                tagSet = tag.TagSet(baseTag, baseTag)
-
-            else:
-                tagSet = tag.TagSet()
-
-            asn1Spec = asn1Spec.clone(tagSet=tagSet)
+        # 8.23.3 encodes a character string as if it were an implicitly tagged
+        # octetstring, and 8.7.3.2 gives its fragments the universal OCTET
+        # STRING tag whatever the outer type. So the fragments are cut from the
+        # octets, not from the characters: the two part company for the string
+        # types that spend more than one octet on a character, where a chunk
+        # counted in characters overruns the budget and segments again forever.
+        fragmentSpec = univ.OctetString()
 
         pos = 0
-        substrate = b""
+        fragments = b""
 
         while True:
-            chunk = value[pos : pos + maxChunkSize]
+            chunk = substrate[pos : pos + maxChunkSize]
             if not chunk:
                 break
 
-            substrate += encodeFun(chunk, asn1Spec, **options)
+            fragments += encodeFun(fragmentSpec.clone(chunk), None, **options)
             pos += maxChunkSize
 
-        return substrate, True, True
+        return fragments, True, True
 
 
 class NullEncoder(AbstractItemEncoder):

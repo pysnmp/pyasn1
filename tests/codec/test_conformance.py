@@ -26,7 +26,7 @@ from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
-from pyasn1.type import constraint, namedtype, univ, useful
+from pyasn1.type import char, constraint, namedtype, univ, useful
 from tests.base import BaseTestCase
 
 
@@ -370,6 +370,245 @@ class SchemaGuidedStrictnessTestCase(BaseTestCase):
 
 def _time(tag, text):
     return bytes((tag, len(text))) + text.encode("ascii")
+
+
+class StringEncodingFormTestCase(BaseTestCase):
+    """X.690 9.1, 9.2 and 10.2 on the form a string encoding may take.
+
+    BER lets a sender split a string wherever it likes, or not at all. CER
+    admits exactly one split, DER admits none, and both refuse the forms the
+    other codecs allow.
+    """
+
+    # 9.2 and 10.2 name bitstring, octetstring and the restricted character
+    # string types. Each entry is the type's universal tag number and a value
+    # long enough to force segmentation under CER.
+    STRING_TYPES = (
+        (univ.OctetString, 0x04),
+        (char.UTF8String, 0x0C),
+        (char.NumericString, 0x12),
+        (char.PrintableString, 0x13),
+        (char.TeletexString, 0x14),
+        (char.VideotexString, 0x15),
+        (char.IA5String, 0x16),
+        (char.GraphicString, 0x19),
+        (char.VisibleString, 0x1A),
+        (char.GeneralString, 0x1B),
+        (char.UniversalString, 0x1C),
+        (char.BMPString, 0x1E),
+        (useful.ObjectDescriptor, 0x07),
+    )
+
+    @staticmethod
+    def _constructed(tagNumber, fragments, definite):
+        """Splice fragments into a constructed encoding of the given type.
+
+        8.7.3.2 gives every fragment the universal OCTET STRING tag, whatever
+        the tag of the string they belong to.
+        """
+        body = b""
+        for fragment in fragments:
+            if len(fragment) < 128:
+                body += bytes((0x04, len(fragment)))
+            else:
+                body += bytes((0x04, 0x82)) + len(fragment).to_bytes(2, "big")
+            body += fragment
+
+        identifier = bytes((tagNumber | 0x20,))
+
+        if definite:
+            return identifier + bytes((0x82,)) + len(body).to_bytes(2, "big") + body
+
+        return identifier + b"\x80" + body + b"\x00\x00"
+
+    def testEveryStringTypeRefusesConstructedUnderDer(self):
+        # 10.2: "For bitstring, octetstring and restricted character string
+        # types, the constructed form of encoding shall not be used."
+        for asn1Type, tagNumber in self.STRING_TYPES:
+            substrate = self._constructed(tagNumber, [b"A", b"B"], definite=True)
+
+            for decoder in (der_decoder, cer_decoder):
+                try:
+                    decoder.decode(substrate)
+                except error.PyAsn1Error:
+                    continue
+                raise AssertionError(
+                    f"{asn1Type.__name__} constructed accepted by {decoder.__name__}"
+                )
+
+    def testBerStillAcceptsConstructed(self):
+        # 8.7.2 leaves the form to the sender under BER, and 7.3 requires a
+        # receiver to handle every permitted one, so the restriction above
+        # belongs to CER and DER alone.
+        for asn1Type, tagNumber in ((univ.OctetString, 0x04), (char.IA5String, 0x16)):
+            for definite in (True, False):
+                substrate = self._constructed(
+                    tagNumber, [b"A", b"B"], definite=definite
+                )
+
+                assert ber_decoder.decode(substrate)[0] == asn1Type("AB")
+
+    def testEveryStringTypeRefusesConstructedUnderDerWithSchema(self):
+        # The schema-guided path dispatches on type ID rather than on tag, so
+        # it has to reach the same decoder.
+        for asn1Type, tagNumber in self.STRING_TYPES:
+            substrate = self._constructed(tagNumber, [b"A", b"B"], definite=True)
+
+            for decoder in (der_decoder, cer_decoder):
+                try:
+                    decoder.decode(substrate, asn1Spec=asn1Type())
+                except error.PyAsn1Error:
+                    continue
+                raise AssertionError(
+                    f"{asn1Type.__name__} constructed accepted by {decoder.__name__}"
+                )
+
+    def testCerRefusesDefiniteLengthConstructed(self):
+        # 9.1: "If the encoding is constructed, it shall employ the indefinite
+        # length form."
+        fragments = [b"x" * 1000, b"y"]
+        substrate = self._constructed(0x04, fragments, definite=True)
+
+        with self.assertRaises(error.PyAsn1Error):
+            cer_decoder.decode(substrate)
+
+        # The same fragments under the indefinite form are what CER admits.
+        substrate = self._constructed(0x04, fragments, definite=False)
+
+        assert cer_decoder.decode(substrate)[0] == univ.OctetString(b"x" * 1000 + b"y")
+
+    def testCerRefusesShortConstructed(self):
+        # 9.2: a value of no more than 1000 contents octets "shall be encoded
+        # with a primitive encoding", so a split that short has no conforming
+        # spelling however its fragments are sized.
+        for fragments in ([b"A", b"B"], [b"x" * 999, b"y"], [b"x" * 1000]):
+            substrate = self._constructed(0x04, fragments, definite=False)
+
+            with self.assertRaises(error.PyAsn1Error):
+                cer_decoder.decode(substrate)
+
+    def testCerRefusesUndersizedLeadingFragment(self):
+        # 9.2: "The encoding of each fragment, except possibly the last, shall
+        # have 1000 contents octets."
+        for leading in (999, 1001):
+            fragments = [b"x" * leading, b"x" * 1000, b"y"]
+            substrate = self._constructed(0x04, fragments, definite=False)
+
+            with self.assertRaises(error.PyAsn1Error):
+                cer_decoder.decode(substrate)
+
+    def testCerRefusesEmptyLastFragment(self):
+        # 9.2: "The last fragment shall have at least one, and no more than
+        # 1000, contents octets."
+        substrate = self._constructed(0x04, [b"x" * 1000, b""], definite=False)
+
+        with self.assertRaises(error.PyAsn1Error):
+            cer_decoder.decode(substrate)
+
+    def testCerRefusesConstructedFragment(self):
+        # 9.2: "The string fragments contained in the constructed encoding
+        # shall be encoded with a primitive encoding."
+        inner = self._constructed(0x04, [b"x" * 1000, b"y"], definite=False)
+        substrate = b"\x24\x80" + inner + b"\x04\x01z" + b"\x00\x00"
+
+        with self.assertRaises(error.PyAsn1Error):
+            cer_decoder.decode(substrate)
+
+    def testCerAcceptsConformingSegmentation(self):
+        substrate = self._constructed(
+            0x04, [b"x" * 1000, b"y" * 1000, b"z" * 500], definite=False
+        )
+
+        decoded, remainder = cer_decoder.decode(substrate)
+
+        assert remainder == b""
+        assert decoded == univ.OctetString(b"x" * 1000 + b"y" * 1000 + b"z" * 500)
+
+
+class SegmentedStringRoundTripTestCase(BaseTestCase):
+    """Every string type survives its own segmented encoding.
+
+    8.23.3 encodes a character string as if it were `[UNIVERSAL x] IMPLICIT
+    OCTET STRING`, and 8.7.3.2 gives its fragments the universal OCTET STRING
+    tag. A codec that segments on characters rather than octets, or that
+    expects the outer tag back on a fragment, fails here and nowhere else in
+    the suite: the value is unchanged either way, only the octets differ.
+    """
+
+    VALUES = (
+        univ.OctetString(b"x" * 2500),
+        char.PrintableString("x" * 3000),
+        char.UTF8String("é" * 600),
+        char.BMPString("x" * 1500),
+        char.UniversalString("x" * 1500),
+        useful.ObjectDescriptor("x" * 1200),
+        # Two fragments' worth of bits, kept under the ~14285 that #98 makes
+        # unprintable: the suite renders every debug record it emits.
+        univ.BitString(binValue="1" * 12000),
+    )
+
+    def testRoundTripThroughEveryCodec(self):
+        codecs = (
+            (ber_encoder, ber_decoder),
+            (cer_encoder, cer_decoder),
+            (der_encoder, der_decoder),
+        )
+
+        for value in self.VALUES:
+            for encoder, decoder in codecs:
+                decoded, remainder = decoder.decode(encoder.encode(value))
+
+                assert remainder == b"", (type(value).__name__, encoder.__name__)
+                assert decoded == value, (type(value).__name__, encoder.__name__)
+
+    def testCerSegmentsOnContentsOctets(self):
+        for value in self.VALUES:
+            substrate = cer_encoder.encode(value)
+
+            assert substrate[0] & 0x20, type(value).__name__
+            assert substrate[1] == 0x80, type(value).__name__
+
+            # 8.6.4.1 tags bitstring fragments universal 3, 8.7.3.2 tags every
+            # other string's fragments universal 4.
+            expectedTag = 0x03 if isinstance(value, univ.BitString) else 0x04
+
+            offset = 2
+            sizes = []
+
+            while substrate[offset : offset + 2] != b"\x00\x00":
+                assert substrate[offset] == expectedTag, type(value).__name__
+
+                offset += 1
+                size = substrate[offset]
+
+                if size & 0x80:
+                    sizeOctets = size & 0x7F
+                    size = int.from_bytes(
+                        substrate[offset + 1 : offset + 1 + sizeOctets], "big"
+                    )
+                    offset += 1 + sizeOctets
+                else:
+                    offset += 1
+
+                sizes.append(size)
+                offset += size
+
+            assert all(size == 1000 for size in sizes[:-1]), (
+                type(value).__name__,
+                sizes,
+            )
+            assert 1 <= sizes[-1] <= 1000, (type(value).__name__, sizes)
+
+    def testMultiOctetCharactersTerminate(self):
+        # Segmenting a BMPString or UniversalString on characters leaves every
+        # chunk over the octet budget, so the encoder recurses without bound.
+        for value in (char.BMPString("x" * 1500), char.UniversalString("x" * 1500)):
+            depth = sys.getrecursionlimit()
+            sys.setrecursionlimit(200)
+            try:
+                cer_encoder.encode(value)
+            finally:
+                sys.setrecursionlimit(depth)
 
 
 class CanonicalTimeTestCase(BaseTestCase):
