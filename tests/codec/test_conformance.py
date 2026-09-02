@@ -353,6 +353,79 @@ class BitStringTestCase(BaseTestCase):
             bytes((0x23, 0x04, 0x03, 0x02, 0x00, 0x00)),
         )
 
+    def testEmptyBitStringMustHaveZeroInitialOctet(self):
+        # 8.6.2.3: "If the bitstring is empty, there shall be no subsequent
+        # octets, and the initial octet shall be zero." A non-zero count with
+        # no octets to take the bits from is unsatisfiable.
+        for unusedBits in range(1, 8):
+            self.assertRaises(
+                error.PyAsn1Error,
+                ber_decoder.decode,
+                bytes((0x03, 0x01, unusedBits)),
+            )
+
+    def testEmptyBitStringWithZeroInitialOctetAccepted(self):
+        value, _ = ber_decoder.decode(bytes((0x03, 0x01, 0x00)))
+
+        assert value == univ.BitString(())
+
+    def testEmptySegmentInConstructedFormRejected(self):
+        # Each fragment of a constructed bitstring is itself a primitive
+        # bitstring, so 8.6.2.3 binds the fragments too.
+        self.assertRaises(
+            error.PyAsn1Error,
+            ber_decoder.decode,
+            bytes((0x23, 0x03, 0x03, 0x01, 0x03)),
+        )
+
+
+class MalformedPrimitiveTestCase(BaseTestCase):
+    """Encodings clause 8 makes structurally impossible.
+
+    These are rejected in BER as well as CER and DER: the restriction is in
+    the base encoding rules, and no tolerant reading of the octets exists.
+    """
+
+    def testZeroLengthIntegerRejected(self):
+        # 8.3.1: "The contents octets shall consist of one or more octets."
+        self.assertRaises(error.PyAsn1Error, ber_decoder.decode, bytes((0x02, 0x00)))
+
+    def testZeroLengthEnumeratedRejected(self):
+        # 8.4: an enumerated value is encoded as the integer value, so 8.3.1
+        # carries over.
+        self.assertRaises(error.PyAsn1Error, ber_decoder.decode, bytes((0x0A, 0x00)))
+
+    def testSingleOctetIntegerZeroAccepted(self):
+        value, _ = ber_decoder.decode(bytes((0x02, 0x01, 0x00)))
+
+        assert value == univ.Integer(0)
+
+    def testZeroLengthBooleanRejected(self):
+        # 8.2.1: "The contents octets shall consist of a single octet."
+        self.assertRaises(error.PyAsn1Error, ber_decoder.decode, bytes((0x01, 0x00)))
+
+    def testMultiOctetBooleanRejected(self):
+        self.assertRaises(
+            error.PyAsn1Error, ber_decoder.decode, bytes((0x01, 0x02, 0xFF, 0xFF))
+        )
+
+    def testSingleOctetBooleanAccepted(self):
+        # 8.2.2 leaves the non-zero octet to the sender, so BER takes any of
+        # them as TRUE.
+        for octet in (0x01, 0x7F, 0xFF):
+            value, _ = ber_decoder.decode(bytes((0x01, 0x01, octet)))
+            assert value == univ.Boolean(1)
+
+        value, _ = ber_decoder.decode(bytes((0x01, 0x01, 0x00)))
+        assert value == univ.Boolean(0)
+
+    def testZeroLengthRealIsZero(self):
+        # 8.5.2 is the exception that proves the rule: a real value of zero
+        # is the one primitive with no contents octets at all.
+        value, _ = ber_decoder.decode(bytes((0x09, 0x00)))
+
+        assert value == univ.Real(0.0)
+
 
 class OctetStringTestCase(BaseTestCase):
     def testDerRejectsConstructedForm(self):

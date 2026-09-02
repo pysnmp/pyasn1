@@ -157,7 +157,10 @@ class IntegerDecoder(AbstractSimpleDecoder):
         head, tail = substrate[:length], substrate[length:]
 
         if not head:
-            return self._createComponent(asn1Spec, tagSet, 0, **options), tail
+            raise error.PyAsn1Error(
+                "INTEGER contents octets shall consist of one or more octets",
+                tagSet=tagSet,
+            )
 
         value = int.from_bytes(head, "big", signed=True)
 
@@ -166,6 +169,37 @@ class IntegerDecoder(AbstractSimpleDecoder):
 
 class BooleanDecoder(IntegerDecoder):
     protoComponent = univ.Boolean(0)
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        # X.690 8.2.1: the contents octets of a boolean shall consist of a
+        # single octet. Any other count is not a tolerable BOOLEAN.
+        if length != 1:
+            raise error.PyAsn1Error(
+                "BOOLEAN contents octets shall consist of a single octet",
+                length=length,
+            )
+
+        return IntegerDecoder.valueDecoder(
+            self,
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
 
     def _createComponent(
         self, asn1Spec: Any, tagSet: Any, value: Any, **options: Any
@@ -209,6 +243,15 @@ class BitStringDecoder(AbstractSimpleDecoder):
                     "Trailing bits overflow", trailingBits=trailingBits
                 )
 
+            # X.690 8.6.2.3: an empty bitstring has no subsequent octets and a
+            # zero initial octet, so a non-zero count with nothing to take the
+            # bits from cannot be satisfied.
+            if len(head) == 1 and trailingBits:
+                raise error.PyAsn1Error(
+                    "Empty BIT STRING must carry a zero initial octet",
+                    trailingBits=trailingBits,
+                )
+
             value = self.protoComponent.fromOctetString(
                 head[1:], internalFormat=True, padding=trailingBits
             )
@@ -238,6 +281,12 @@ class BitStringDecoder(AbstractSimpleDecoder):
             if trailingBits > 7:
                 raise error.PyAsn1Error(
                     "Trailing bits overflow", trailingBits=trailingBits
+                )
+
+            if len(component) == 1 and trailingBits:
+                raise error.PyAsn1Error(
+                    "Empty BIT STRING segment must carry a zero initial octet",
+                    trailingBits=trailingBits,
                 )
 
             bitString = self.protoComponent.fromOctetString(
@@ -287,6 +336,12 @@ class BitStringDecoder(AbstractSimpleDecoder):
             if trailingBits > 7:
                 raise error.PyAsn1Error(
                     "Trailing bits overflow", trailingBits=trailingBits
+                )
+
+            if len(component) == 1 and trailingBits:
+                raise error.PyAsn1Error(
+                    "Empty BIT STRING segment must carry a zero initial octet",
+                    trailingBits=trailingBits,
                 )
 
             bitString = self.protoComponent.fromOctetString(
