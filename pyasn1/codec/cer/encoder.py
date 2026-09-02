@@ -62,13 +62,13 @@ class TimeEncoderMixIn:
         numbers = value.asNumbers()
 
         if self.PLUS_CHAR in numbers or self.MINUS_CHAR in numbers:
-            raise error.PyAsn1Error(f"Must be UTC time: {value!r}")
+            raise error.PyAsn1Error("Must be UTC time", value=value)
 
         if numbers[-1] != self.Z_CHAR:
-            raise error.PyAsn1Error(f'Missing "Z" time zone specifier: {value!r}')
+            raise error.PyAsn1Error('Missing "Z" time zone specifier', value=value)
 
         if self.COMMA_CHAR in numbers:
-            raise error.PyAsn1Error(f"Comma in fractions disallowed: {value!r}")
+            raise error.PyAsn1Error("Comma in fractions disallowed", value=value)
 
         if self.DOT_CHAR in numbers:
             isModified = False
@@ -96,7 +96,7 @@ class TimeEncoderMixIn:
                 value = value.clone(numbers)
 
         if not self.MIN_LENGTH < len(numbers) < self.MAX_LENGTH:
-            raise error.PyAsn1Error(f"Length constraint violated: {value!r}")
+            raise error.PyAsn1Error("Length constraint violated", value=value)
 
         options.update(maxChunkSize=1000)
 
@@ -210,7 +210,9 @@ class SetEncoder(encoder.SequenceEncoder):
 
                 except KeyError as exc:
                     raise error.PyAsn1Error(
-                        f'Component name "{namedType.name}" not found in {value!r}'
+                        "Component name not found",
+                        name=namedType.name,
+                        value=value,
                     ) from exc
 
                 if namedType.isOptional and namedType.name not in value:

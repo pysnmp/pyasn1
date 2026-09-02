@@ -80,7 +80,7 @@ class TimeMixIn:
                 tz += "00"
 
             if len(tz) != 4:
-                raise error.PyAsn1Error(f"malformed time zone offset {tz}")
+                raise error.PyAsn1Error("malformed time zone offset", timeZone=tz)
 
             try:
                 minutes = int(tz[:2]) * 60 + int(tz[2:])
@@ -88,7 +88,9 @@ class TimeMixIn:
                     minutes *= -1
 
             except ValueError as exc:
-                raise error.PyAsn1Error(f"unknown time specification {self}") from exc
+                raise error.PyAsn1Error(
+                    "unknown time specification", value=str(self)
+                ) from exc
 
             tzinfo = datetime.timezone(datetime.timedelta(minutes=minutes), "?")
 
@@ -106,7 +108,7 @@ class TimeMixIn:
 
             except ValueError as exc:
                 raise error.PyAsn1Error(
-                    f"bad sub-second time specification {self}"
+                    "bad sub-second time specification", value=str(self)
                 ) from exc
 
         else:
@@ -123,7 +125,9 @@ class TimeMixIn:
             )
 
         except ValueError as exc:
-            raise error.PyAsn1Error(f"malformed datetime format {self}") from exc
+            raise error.PyAsn1Error(
+                "malformed datetime format", value=str(self)
+            ) from exc
 
         return dt.replace(microsecond=ms, tzinfo=tzinfo)
 

@@ -75,8 +75,10 @@ class AbstractCharacterString(univ.OctetString):
             return self._value.encode(self.encoding)
         except UnicodeEncodeError as exc:
             raise error.PyAsn1UnicodeEncodeError(
-                f"Can't encode string '{self._value}' with codec {self.encoding}",
+                "Can't encode string with codec",
                 exc,
+                value=self._value,
+                codec=self.encoding,
             ) from exc
 
     def prettyIn(self, value: Any) -> str:
@@ -94,8 +96,10 @@ class AbstractCharacterString(univ.OctetString):
 
         except (UnicodeDecodeError, LookupError) as exc:
             raise error.PyAsn1UnicodeDecodeError(
-                f"Can't decode string '{value}' with codec {self.encoding}",
+                "Can't decode string with codec",
                 exc,
+                value=value,
+                codec=self.encoding,
             ) from exc
 
     def asOctets(self, padding: bool = True) -> bytes:

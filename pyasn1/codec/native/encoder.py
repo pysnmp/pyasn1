@@ -205,7 +205,7 @@ class Encoder:
                 concreteEncoder = self.__tagMap[baseTagSet]
 
             except KeyError as exc:
-                raise error.PyAsn1Error(f"No encoder for {value}") from exc
+                raise error.PyAsn1Error("No encoder for value", value=value) from exc
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(

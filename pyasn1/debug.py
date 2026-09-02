@@ -233,7 +233,7 @@ class Debug:
                 else:
                     self._flags |= FLAG_MAP[flag]
             except KeyError as exc:
-                raise error.PyAsn1Error(f"bad debug flag {flag}") from exc
+                raise error.PyAsn1Error("bad debug flag", flag=flag) from exc
 
             self._printer(
                 "debug category '{}' {}".format(
