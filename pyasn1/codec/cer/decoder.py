@@ -10,7 +10,7 @@ from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.codec.ber import decoder
-from pyasn1.type import tag, univ
+from pyasn1.type import tag, univ, useful
 
 __all__ = ["decode"]
 
@@ -95,6 +95,50 @@ class BitStringDecoder(decoder.BitStringDecoder):
             )
 
 
+class CanonicalTimeDecoderMixIn:
+    """Reject time values X.690 11.7 and 11.8 do not admit.
+
+    BER accepts local time, an omitted seconds element, hour 24 for midnight
+    and fractional seconds padded with zeros, so one instant has many
+    spellings. CER and DER admit one, and the type knows how to check it.
+    """
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        component, tail = super().valueDecoder(  # type: ignore[misc]
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+        if isinstance(component, useful.TimeMixIn):
+            component.verifyCanonicalForm()
+
+        return component, tail
+
+
+class GeneralizedTimeDecoder(CanonicalTimeDecoderMixIn, decoder.GeneralizedTimeDecoder):
+    pass
+
+
+class UTCTimeDecoder(CanonicalTimeDecoderMixIn, decoder.UTCTimeDecoder):
+    pass
+
+
 # TODO: prohibit non-canonical encoding
 OctetStringDecoder = decoder.OctetStringDecoder
 RealDecoder = decoder.RealDecoder
@@ -106,6 +150,8 @@ tagMap.update(
         univ.BitString.tagSet: BitStringDecoder(),
         univ.OctetString.tagSet: OctetStringDecoder(),
         univ.Real.tagSet: RealDecoder(),
+        useful.GeneralizedTime.tagSet: GeneralizedTimeDecoder(),
+        useful.UTCTime.tagSet: UTCTimeDecoder(),
     }
 )
 

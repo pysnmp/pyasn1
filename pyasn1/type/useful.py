@@ -56,6 +56,67 @@ class TimeMixIn:
         )
         return datetime.timezone(datetime.timedelta(minutes=offset), name)
 
+    def verifyCanonicalForm(self) -> None:
+        """Check the value against the CER and DER restrictions on time.
+
+        X.690 11.7 and 11.8 cut the many BER spellings of an instant down to
+        one: the encoding terminates with "Z", the seconds element is always
+        present, fractional seconds carry no trailing zeros and are omitted
+        outright when they would be zero, and midnight is written as the
+        start of the following day rather than as hour 24.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If the value is not in the canonical form.
+        """
+        text = str(self)
+
+        if not text.endswith("Z"):
+            raise error.PyAsn1Error('Time value must terminate with "Z"', value=text)
+
+        body = text[:-1]
+
+        if "," in body:
+            raise error.PyAsn1Error(
+                "Fractional seconds must use a full stop, not a comma", value=text
+            )
+
+        integral, dot, fraction = body.partition(".")
+
+        # YYYYMMDDHHMMSS, or YYMMDDHHMMSS for UTCTime. The seconds element is
+        # not optional here, however optional X.680 leaves it.
+        expectedDigits = self._yearsDigits + 10
+
+        if len(integral) != expectedDigits or not integral.isdigit():
+            raise error.PyAsn1Error(
+                "Time value must carry the seconds element and nothing else",
+                value=text,
+                expectedDigits=expectedDigits,
+            )
+
+        if dot:
+            if not self._hasSubsecond:
+                raise error.PyAsn1Error("Fractional seconds prohibited", value=text)
+
+            if not fraction.isdigit():
+                raise error.PyAsn1Error("Malformed fractional seconds", value=text)
+
+            # A trailing zero covers both spurious precision ("26.520") and a
+            # fraction that is wholly zero ("26.0"), which 11.7.3 requires be
+            # dropped along with the decimal point.
+            if fraction.endswith("0"):
+                raise error.PyAsn1Error(
+                    "Fractional seconds must omit trailing zeros", value=text
+                )
+
+        hours = integral[self._yearsDigits + 4 : self._yearsDigits + 6]
+        if hours == "24":
+            raise error.PyAsn1Error(
+                "Midnight must be encoded as 000000 of the following day",
+                value=text,
+            )
+
     @property
     def asDateTime(self) -> datetime.datetime:
         """Create :py:class:`datetime.datetime` object from a |ASN.1| object.

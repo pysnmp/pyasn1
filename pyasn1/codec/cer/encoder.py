@@ -98,6 +98,10 @@ class TimeEncoderMixIn:
         if not self.MIN_LENGTH < len(numbers) < self.MAX_LENGTH:
             raise error.PyAsn1Error("Length constraint violated", value=value)
 
+        # The normalisation above fixes what it can; this rejects what is
+        # left, notably a missing seconds element and hour 24 for midnight.
+        value.verifyCanonicalForm()
+
         options.update(maxChunkSize=1000)
 
         return encoder.OctetStringEncoder.encodeValue(
