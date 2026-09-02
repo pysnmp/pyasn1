@@ -99,12 +99,12 @@ Schema objects show only the class name; value objects show the payload:
     ...     )
     >>> schema = User()
     >>> repr(schema)
-    '<Sequence schema object>'
+    '<User schema object>'
     >>> user = User()
     >>> user['id'] = 42
     >>> user['name'] = 'Alice'
     >>> repr(user)
-    '<Sequence value object, payload [id=Integer value object, payload [42], name=UTF8String value object, payload [Alice]]>'
+    '<User value object, payload [id=Integer value object, payload [42], name=UTF8String value object, payload [Alice]]>'
 
 Tags also use human-readable class names:
 

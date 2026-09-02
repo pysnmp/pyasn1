@@ -48,10 +48,9 @@ unreleased
   (``UNIVERSAL``, ``CONTEXT``, etc.) instead of raw hex; value objects
   show only the payload; schema objects show only the class name;
   constructed types include field names in the payload display
-- Fixed E402 import-order violations in test files; applied ``black``
-  formatting to ``ber/encoder.py`` and ``test_univ.py``; all of
-  ``pyasn1/`` and ``tests/`` now passes ``flake8``, ``ruff``, and
-  ``black --check``
+- Fixed E402 import-order violations in test files and reformatted
+  ``ber/encoder.py`` and ``test_univ.py``; all of ``pyasn1/`` and
+  ``tests/`` now passes ``ruff check`` and ``ruff format --check``
 - Added ``docs/source/quickstart.rst`` with copy-pasteable snippets
   covering schema definition, encode/decode, native conversion,
   ``repr()`` inspection, constraints, and open types

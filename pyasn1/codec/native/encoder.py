@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Encoder from ASN.1 types to native Python objects."""
+
 import logging
 from collections.abc import Callable
 from typing import Any, Final
@@ -186,9 +188,8 @@ class Encoder:
         if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(value).__name__)
             LOG.debug(
-                "encoder called for type %s <%s>",
-                type(value).__name__,
-                value.prettyPrint(),
+                "encoder called",
+                extra={"valueType": type(value).__name__, "value": value.prettyPrint()},
             )
 
         tagSet = value.tagSet
@@ -208,18 +209,19 @@ class Encoder:
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(
-                "using value codec %s chosen by %s",
-                concreteEncoder.__class__.__name__,
-                tagSet,
+                "using value codec chosen by tagSet",
+                extra={
+                    "codec": concreteEncoder.__class__.__name__,
+                    "tagSet": tagSet,
+                },
             )
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug(
-                "encoder %s produced: %s",
-                type(concreteEncoder).__name__,
-                repr(pyObject),
+                "encoder produced value",
+                extra={"codec": type(concreteEncoder).__name__, "pyObject": pyObject},
             )
             debug.scope.pop()
 

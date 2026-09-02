@@ -5,6 +5,7 @@ Demonstrates ValueRangeConstraint, ValueSizeConstraint,
 SingleValueConstraint, and PermittedAlphabetConstraint.
 """
 
+from pyasn1 import error
 from pyasn1.type import char, constraint, univ
 
 
@@ -18,7 +19,7 @@ def main():
 
     try:
         Age(200)
-    except Exception as e:
+    except error.PyAsn1Error as e:
         print("Age(200) correctly rejected:", type(e).__name__)
 
     # --- ValueSizeConstraint on OctetString ---
@@ -30,7 +31,7 @@ def main():
 
     try:
         Password(b"short")
-    except Exception as e:
+    except error.PyAsn1Error as e:
         print("Short password correctly rejected:", type(e).__name__)
 
     # --- SingleValueConstraint on INTEGER ---
@@ -42,7 +43,7 @@ def main():
 
     try:
         Protocol(99)
-    except Exception as e:
+    except error.PyAsn1Error as e:
         print("Protocol(99) correctly rejected:", type(e).__name__)
 
     # --- PermittedAlphabetConstraint on IA5String ---
@@ -73,7 +74,7 @@ def main():
 
     try:
         HexString("hello")
-    except Exception as e:
+    except error.PyAsn1Error as e:
         print("Non-hex string correctly rejected:", type(e).__name__)
 
 

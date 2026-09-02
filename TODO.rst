@@ -18,6 +18,19 @@ Completed (removed from backlog)
   CHANGES.rst).  ``Tag`` is now a ``namedtuple`` subclass, ``NamedType`` is a
   ``namedtuple`` subclass, ``OpenType`` is a ``dict`` subclass, ``NamedValues``
   is a ``dict`` subclass with reverse index.  No further action needed.
+* **Python 3-only codebase** — DONE.  Dropped the Python 2 byte shims,
+  ``sys.exc_info()`` handlers and ``cond and a or b`` idiom; the minimum
+  supported version is 3.10.
+* **Type hints** — DONE.  Every module under ``pyasn1/`` is annotated,
+  ships a ``py.typed`` marker and is gated by ``mypy`` with
+  ``disallow_untyped_defs``.
+* **Logging** — DONE.  ``pyasn1.debug`` logs through per-module stdlib
+  loggers, configures nothing at import time, and emits constant messages
+  with context in ``extra`` (enforced by ``tests/test_logging_contract.py``).
+* **Docstring coverage** — DONE.  The public API is documented and ruff's
+  ``pydocstyle`` (numpy convention) gates it.
+* **Tooling** — DONE.  Linting and formatting consolidated on ``ruff``;
+  packaging and environments on ``uv`` and ``hatchling``.
 
 
 Phase 1 — Non-breaking cleanup & documentation (DONE)
@@ -27,12 +40,12 @@ Lowest risk.  No API changes or intended wire-format changes; ``repr()``
 representation changes are observable.  Safe to ship independently.
 
 * **PEP 8 cleanup** — DONE.  Fixed E402 import-order violations in test
-  files, applied ``black`` formatting to ``ber/encoder.py`` and
-  ``test_univ.py``.  All of ``pyasn1/`` and ``tests/`` now pass
-  ``flake8``, ``ruff``, and ``black --check``.
+  files and reformatted ``ber/encoder.py`` and ``test_univ.py``.  All of
+  ``pyasn1/`` and ``tests/`` now pass ``ruff check`` and
+  ``ruff format --check``.
 * **Simplify ``repr()``** — DONE.  ``Tag`` and ``TagSet`` now use
   human-readable class names (``UNIVERSAL``, ``CONTEXT``, etc.) instead of
-  raw hex.  ``SimpleAsn1Type`` and ``ConstructedAsn1Type`` repr no longer
+  raw integers.  ``SimpleAsn1Type`` and ``ConstructedAsn1Type`` repr no longer
   dump verbose ``tagSet`` / ``subtypeSpec`` / ``componentType`` at every
   level; value objects show only ``payload [...]`` with field names for
   constructed types; schema objects show only the class name.

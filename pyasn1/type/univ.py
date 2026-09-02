@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""ASN.1 universal types: Integer, OctetString, Sequence, Choice and friends."""
+
 import math
 import typing
 import warnings
@@ -236,6 +238,25 @@ class Integer(base.SimpleAsn1Type):
         return self.clone(math.trunc(self._value))
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into a plain :class:`int`.
+
+        Parameters
+        ----------
+        value: :class:`int`, :class:`str` or |ASN.1| object
+            Value to coerce. A :class:`str` is first looked up among
+            `namedValues` if it cannot be parsed as an integer.
+
+        Returns
+        -------
+        : :class:`int`
+            The coerced integer value.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` can be coerced to neither an :class:`int` nor a
+            known named value.
+        """
         try:
             return int(value)
 
@@ -249,6 +270,18 @@ class Integer(base.SimpleAsn1Type):
                 ) from exc
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
+        """Return the human-friendly text representation of `value`.
+
+        Parameters
+        ----------
+        value: :class:`int`
+            Value to render, looked up among `namedValues` first.
+
+        Returns
+        -------
+        : :class:`str`
+            The named value alias if one is defined, otherwise `str(value)`.
+        """
         try:
             return str(self.namedValues[value])
 
@@ -654,7 +687,7 @@ class BitString(base.SimpleAsn1Type):
         prepend: typing.Any = None,
         padding: int = 0,
     ) -> typing.Any:
-        """Create a |ASN.1| object initialized from a string.
+        r"""Create a |ASN.1| object initialized from a string.
 
         Parameters
         ----------
@@ -676,6 +709,27 @@ class BitString(base.SimpleAsn1Type):
         return bits
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into an internal :class:`SizedInteger`.
+
+        Parameters
+        ----------
+        value: :class:`SizedInteger`, :class:`str`, :class:`tuple`,
+        :class:`list`, |ASN.1| object or :class:`int`
+            Value to coerce: a bit-position tuple/list, a binary/hex
+            string (optionally prefixed with '0b'/'0x'), a comma-separated
+            string of named bits, or another |ASN.1| BitString/int value.
+
+        Returns
+        -------
+        : :class:`SizedInteger`
+            The coerced bit string value.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` is of an unsupported type or references unknown
+            named bits.
+        """
         if isinstance(value, SizedInteger):
             return value
         elif isinstance(value, str):
@@ -829,6 +883,25 @@ class OctetString(base.SimpleAsn1Type):
         base.SimpleAsn1Type.__init__(self, value, **kwargs)
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into plain :class:`bytes`.
+
+        Parameters
+        ----------
+        value: :class:`bytes`, :class:`str`, :class:`tuple`, :class:`list`
+        or |ASN.1| object
+            Value to coerce. A :class:`str` is encoded with `self.encoding`.
+
+        Returns
+        -------
+        : :class:`bytes`
+            The coerced octet string value.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1UnicodeEncodeError
+            If `value` is a :class:`str` that cannot be encoded with
+            `self.encoding`.
+        """
         if isinstance(value, bytes):
             return value
 
@@ -884,9 +957,11 @@ class OctetString(base.SimpleAsn1Type):
         return bytes(self._value)
 
     def asOctets(self) -> bytes:
+        """Get |ASN.1| value as a sequence of octets."""
         return bytes(self._value)
 
     def asNumbers(self) -> tuple[int, ...]:
+        """Get |ASN.1| value as a sequence of 8-bit integers."""
         return tuple(self._value)
 
     #
@@ -909,9 +984,29 @@ class OctetString(base.SimpleAsn1Type):
     #
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
+        """Return `value` unchanged.
+
+        Parameters
+        ----------
+        value: :class:`bytes`
+            Internal octet string value.
+
+        Returns
+        -------
+        : :class:`bytes`
+            The `value` argument, unchanged.
+        """
         return value
 
     def prettyPrint(self, scope: int = 0) -> str:
+        """Return a human-friendly text or hexadecimal representation of the value.
+
+        Returns
+        -------
+        : :class:`str`
+            The text representation if all octets are printable ASCII,
+            otherwise a "0x"-prefixed hexadecimal representation.
+        """
         # first see if subclass has its own .prettyOut()
         value = self.prettyOut(self._value)
 
@@ -1063,6 +1158,20 @@ class Null(OctetString):
     typeId = OctetString.getTypeId()
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into an empty :class:`bytes` object.
+
+        Parameters
+        ----------
+        value: :class:`object`
+            Value to coerce. Any falsy value yields an empty byte string;
+            any truthy value is returned unchanged (and later rejected by
+            `subtypeSpec`).
+
+        Returns
+        -------
+        : :class:`bytes`
+            The coerced NULL value.
+        """
         if value:
             return value
 
@@ -1137,6 +1246,7 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         return self.clone(other + self._value)
 
     def asTuple(self) -> tuple[int, ...]:
+        """Get |ASN.1| value as a tuple of integer sub-identifiers."""
         return self._value
 
     # Sequence object protocol
@@ -1157,6 +1267,23 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         return value in self._value
 
     def index(self, suboid: typing.Any) -> int:
+        """Return the position of the first occurrence of `suboid`.
+
+        Parameters
+        ----------
+        suboid: :class:`int`
+            Sub-identifier value to look up.
+
+        Returns
+        -------
+        : :class:`int`
+            Zero-based position of `suboid` within this |ASN.1| object.
+
+        Raises
+        ------
+        ValueError
+            If `suboid` is not present.
+        """
         return self._value.index(suboid)
 
     def isPrefixOf(self, other: typing.Any) -> bool:
@@ -1180,6 +1307,25 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         return False
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into a tuple of non-negative integers.
+
+        Parameters
+        ----------
+        value: :class:`tuple`, :class:`str` or |ASN.1| object
+            A dotted-decimal string like '2.6.7', an iterable of
+            non-negative integers, or another |ASN.1| ObjectIdentifier.
+
+        Returns
+        -------
+        : :class:`tuple`
+            The coerced tuple of sub-identifiers.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` is malformed (e.g. contains a hyphen, a
+            non-integer, or a negative sub-identifier).
+        """
         if isinstance(value, ObjectIdentifier):
             return tuple(value)
         elif isinstance(value, str):
@@ -1212,6 +1358,18 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         )
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
+        """Return the dotted-decimal text representation of `value`.
+
+        Parameters
+        ----------
+        value: :class:`tuple`
+            Sequence of integer sub-identifiers.
+
+        Returns
+        -------
+        : :class:`str`
+            Dotted-decimal string, e.g. '2.6.7'.
+        """
         return ".".join([str(x) for x in value])
 
 
@@ -1287,6 +1445,29 @@ class Real(base.SimpleAsn1Type):
         return m, b, e
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into an internal (mantissa, base, exponent) tuple.
+
+        Parameters
+        ----------
+        value: :class:`tuple`, :class:`int`, :class:`float`, :class:`str`
+        or |ASN.1| object
+            A (mantissa, base, exponent) tuple, a plain number, a string
+            parseable as a float, or another |ASN.1| Real object. Infinite
+            float values are passed through unchanged.
+
+        Returns
+        -------
+        : :class:`tuple` or :class:`float`
+            The coerced (mantissa, base, exponent) tuple, or an infinite
+            :class:`float` value.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` is of an unsupported type or shape, uses a base
+            other than 2 or 10, or is a string that cannot be parsed as
+            a float.
+        """
         if isinstance(value, tuple) and len(value) == 3:
             if (
                 not isinstance(value[0], numericTypes)
@@ -1326,6 +1507,14 @@ class Real(base.SimpleAsn1Type):
         raise error.PyAsn1Error("Bad real value syntax: %s" % (value,))
 
     def prettyPrint(self, scope: int = 0) -> str:
+        """Return a human-friendly text representation of the value.
+
+        Returns
+        -------
+        : :class:`str`
+            Text representation of the float value, or '<overflow>' if
+            the value cannot be represented as a Python float.
+        """
         try:
             return self.prettyOut(float(self))
 
@@ -1334,7 +1523,7 @@ class Real(base.SimpleAsn1Type):
 
     @property
     def isPlusInf(self) -> bool:
-        """Indicate PLUS-INFINITY object value
+        """Indicate PLUS-INFINITY object value.
 
         Returns
         -------
@@ -1347,7 +1536,7 @@ class Real(base.SimpleAsn1Type):
 
     @property
     def isMinusInf(self) -> bool:
-        """Indicate MINUS-INFINITY object value
+        """Indicate MINUS-INFINITY object value.
 
         Returns
         -------
@@ -1359,6 +1548,7 @@ class Real(base.SimpleAsn1Type):
 
     @property
     def isInf(self) -> bool:
+        """Indicate whether the calling object represents plus or minus infinity."""
         return self._value in self._inf
 
     def __add__(self, value: typing.Any) -> typing.Any:
@@ -1597,6 +1787,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             raise IndexError(exc) from exc
 
     def append(self, value: typing.Any) -> None:
+        """Append `value` as a new component at the end of the |ASN.1| object."""
         if self._componentValues is noValue:
             pos = 0
 
@@ -1606,9 +1797,11 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         self[pos] = value
 
     def count(self, value: typing.Any) -> int:
+        """Return the number of components equal to `value`."""
         return list(self._componentValues.values()).count(value)
 
     def extend(self, values: typing.Any) -> None:
+        """Append each item of `values` as a new component."""
         for value in values:
             self.append(value)
 
@@ -1616,6 +1809,29 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             self._componentValues = {}
 
     def index(self, value: typing.Any, start: int = 0, stop: typing.Any = None) -> int:
+        """Return the position of the first component equal to `value`.
+
+        Parameters
+        ----------
+        value: :class:`object`
+            Component value to look up.
+
+        start: :class:`int`
+            Position to start searching from (default 0).
+
+        stop: :class:`int`
+            Position to stop searching at (default the object length).
+
+        Returns
+        -------
+        : :class:`int`
+            Zero-based position of `value` within this |ASN.1| object.
+
+        Raises
+        ------
+        ValueError
+            If `value` is not present in the given range.
+        """
         if stop is None:
             stop = len(self)
 
@@ -1630,9 +1846,21 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             raise ValueError(exc) from exc
 
     def reverse(self) -> None:
+        """Reverse the order of components in place."""
         self._componentValues.reverse()
 
     def sort(self, key: typing.Any = None, reverse: bool = False) -> None:
+        """Sort the components in place.
+
+        Parameters
+        ----------
+        key: :class:`~collections.abc.Callable`
+            Function of one argument used to extract a comparison key
+            from each component.
+
+        reverse: :class:`bool`
+            If :obj:`True`, sort in descending order.
+        """
         self._componentValues = dict(
             enumerate(sorted(self._componentValues.values(), key=key, reverse=reverse))
         )
@@ -1883,11 +2111,13 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
     @property
     def componentTagMap(self) -> typing.Any:
+        """Return a :class:`~pyasn1.type.tagmap.TagMap` for `componentType`, or :obj:`None`."""
         if self.componentType is not None:
             return self.componentType.tagMap
 
     @property
     def components(self) -> typing.Any:
+        """Return the list of component values, ordered by position."""
         return [self._componentValues[idx] for idx in sorted(self._componentValues)]
 
     def clear(self) -> typing.Any:
@@ -1909,6 +2139,13 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return self
 
     def prettyPrint(self, scope: int = 0) -> str:
+        """Return an object representation string.
+
+        Returns
+        -------
+        : :class:`str`
+            Human-friendly object representation.
+        """
         scope += 1
         representation = self.__class__.__name__ + ":\n"
 
@@ -1925,6 +2162,13 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return representation
 
     def prettyPrintType(self, scope: int = 0) -> str:
+        """Return an object type layout string.
+
+        Returns
+        -------
+        : :class:`str`
+            Human-friendly object type representation.
+        """
         scope += 1
         representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
         if self.componentType is not None:
@@ -2007,7 +2251,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         return False
 
 
-class SequenceOf(SequenceOfAndSetOfBase):
+class SequenceOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = SequenceOfAndSetOfBase.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -2030,7 +2274,7 @@ class SequenceOf(SequenceOfAndSetOfBase):
     typeId = SequenceOfAndSetOfBase.getTypeId()
 
 
-class SetOf(SequenceOfAndSetOfBase):
+class SetOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = SequenceOfAndSetOfBase.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -2103,7 +2347,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     componentType: typing.Any = namedtype.NamedTypes()
 
     class DynamicNames:
-        """Fields names/positions mapping for component-less objects"""
+        """Fields names/positions mapping for component-less objects."""
 
         def __init__(self) -> None:
             self._keyToIdxMap: dict[typing.Any, int] = {}
@@ -2126,6 +2370,13 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 return self._idxToKeyMap[item]
 
         def getNameByPosition(self, idx: int) -> typing.Any:
+            """Return the field name assigned to position `idx`.
+
+            Raises
+            ------
+            ~pyasn1.error.PyAsn1Error
+                If `idx` was not previously registered with `addField`.
+            """
             try:
                 return self._idxToKeyMap[idx]
 
@@ -2133,6 +2384,13 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 raise error.PyAsn1Error("Type position out of range") from exc
 
         def getPositionByName(self, name: str) -> int:
+            """Return the position assigned to field `name`.
+
+            Raises
+            ------
+            ~pyasn1.error.PyAsn1Error
+                If `name` was not previously registered with `addField`.
+            """
             try:
                 return self._keyToIdxMap[name]
 
@@ -2140,6 +2398,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 raise error.PyAsn1Error("Name %s not found" % (name,)) from exc
 
         def addField(self, idx: int) -> None:
+            """Register a synthetic 'field-<idx>' name for position `idx`."""
             self._keyToIdxMap["field-%d" % idx] = idx
             self._idxToKeyMap[idx] = "field-%d" % idx
 
@@ -2201,13 +2460,16 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     # Python dict protocol
 
     def values(self) -> typing.Any:
+        """Return an iterator over the component values."""
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             yield self[idx]
 
     def keys(self) -> typing.Any:
+        """Return an iterator over the component names."""
         return iter(self)
 
     def items(self) -> typing.Any:
+        """Return an iterator over (name, value) pairs for each component."""
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             if self._componentTypeLen:
                 yield self.componentType[idx].name, self[idx]
@@ -2215,6 +2477,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 yield self._dynamicNames[idx], self[idx]
 
     def update(self, *iterValue: typing.Any, **mappingValue: typing.Any) -> None:
+        """Set components from an iterable of (name, value) pairs and/or keyword arguments."""
         for k, v in iterValue:
             self[k] = v
         for k, v in mappingValue.items():
@@ -2242,6 +2505,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
     @property
     def components(self) -> typing.Any:
+        """Return the list of component values, in declaration order."""
         return self._componentValues
 
     def _cloneComponentValues(
@@ -2262,7 +2526,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     def getComponentByName(
         self, name: str, default: typing.Any = noValue, instantiate: bool = True
     ) -> typing.Any:
-        """Returns |ASN.1| type component by name.
+        """Return |ASN.1| type component by name.
 
         Equivalent to Python :class:`dict` subscription operation (e.g. `[]`).
 
@@ -2355,7 +2619,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
     def getComponentByPosition(
         self, idx: int, default: typing.Any = noValue, instantiate: bool = True
     ) -> typing.Any:
-        """Returns |ASN.1| type component by index.
+        """Return |ASN.1| type component by index.
 
         Equivalent to Python sequence subscription operation (e.g. `[]`).
 
@@ -2692,6 +2956,13 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         return representation
 
     def prettyPrintType(self, scope: int = 0) -> str:
+        """Return an object type layout string.
+
+        Returns
+        -------
+        : :class:`str`
+            Human-friendly object type representation.
+        """
         scope += 1
         representation = "%s -> %s {\n" % (self.tagSet, self.__class__.__name__)
         for idx, componentType in enumerate(
@@ -2709,11 +2980,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         return representation + "\n" + " " * (scope - 1) + "}"
 
     def getNameByPosition(self, idx: int) -> typing.Any:
+        """Return the component name at position `idx`, or :obj:`None` if `componentType` is unset."""
         if self._componentTypeLen:
             return self.componentType[idx].name
 
 
-class Sequence(SequenceAndSetBase):
+class Sequence(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = SequenceAndSetBase.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -2736,7 +3008,7 @@ class Sequence(SequenceAndSetBase):
     typeId = SequenceAndSetBase.getTypeId()
 
 
-class Set(SequenceAndSetBase):
+class Set(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = SequenceAndSetBase.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -2759,6 +3031,7 @@ class Set(SequenceAndSetBase):
     typeId = SequenceAndSetBase.getTypeId()
 
     def getComponent(self, innerFlag: bool = False) -> typing.Any:
+        """Return this |ASN.1| object itself (a SET has no single "current" component)."""
         return self
 
     def getComponentByType(
@@ -2768,7 +3041,7 @@ class Set(SequenceAndSetBase):
         instantiate: bool = True,
         innerFlag: bool = False,
     ) -> typing.Any:
-        """Returns |ASN.1| type component by ASN.1 tag.
+        """Return |ASN.1| type component by ASN.1 tag.
 
         Parameters
         ----------
@@ -2871,6 +3144,7 @@ class Set(SequenceAndSetBase):
 
     @property
     def componentTagMap(self) -> typing.Any:
+        """Return a unique :class:`~pyasn1.type.tagmap.TagMap` for `componentType`, or :obj:`None`."""
         if self.componentType:
             return self.componentType.tagMapUnique
 
@@ -2995,18 +3269,28 @@ class Choice(Set):
     # Python dict protocol
 
     def values(self) -> typing.Any:
+        """Return an iterator yielding the chosen component's value, if any."""
         if self._currentIdx is not None:
             yield self._componentValues[self._currentIdx]
 
     def keys(self) -> typing.Any:
+        """Return an iterator yielding the chosen component's name, if any."""
         if self._currentIdx is not None:
             yield self.componentType[self._currentIdx].name
 
     def items(self) -> typing.Any:
+        """Return an iterator yielding the chosen (name, value) pair, if any."""
         if self._currentIdx is not None:
             yield self.componentType[self._currentIdx].name, self[self._currentIdx]
 
     def checkConsistency(self) -> None:
+        """Verify that a component has been chosen.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If no component has been chosen.
+        """
         if self._currentIdx is None:
             raise error.PyAsn1Error("Component not chosen")
 
@@ -3032,6 +3316,33 @@ class Choice(Set):
     def getComponentByPosition(
         self, idx: int, default: typing.Any = noValue, instantiate: bool = True
     ) -> typing.Any:
+        """Return |ASN.1| type component by index.
+
+        Equivalent to Python sequence subscription operation (e.g. `[]`).
+
+        Parameters
+        ----------
+        idx: :class:`int`
+            Component index (zero-based).
+
+        Keyword Args
+        ------------
+        default: :class:`object`
+            If set and requested component is a schema object, return the `default`
+            object instead of the requested component.
+
+        instantiate: :class:`bool`
+            If :obj:`True` (default), inner component will be automatically
+            instantiated.
+            If :obj:`False` either existing component or the :class:`NoValue`
+            object will be returned.
+
+        Returns
+        -------
+        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+            Instantiate |ASN.1| component type or return existing
+            component value
+        """
         if self._currentIdx is None or self._currentIdx != idx:
             return Set.getComponentByPosition(
                 self, idx, default=default, instantiate=instantiate
@@ -3100,8 +3411,9 @@ class Choice(Set):
 
     @property
     def tagMap(self) -> typing.Any:
-        """ "Return a :class:`~pyasn1.type.tagmap.TagMap` object mapping
-        ASN.1 tags to ASN.1 objects contained within callee.
+        """Return a :class:`~pyasn1.type.tagmap.TagMap` object.
+
+        Maps ASN.1 tags to ASN.1 objects contained within callee.
         """
         if self.tagSet:
             return Set.tagMap.fget(self)  # type: ignore[attr-defined]
@@ -3178,6 +3490,7 @@ class Choice(Set):
         return componentValue is not noValue and componentValue.isValue
 
     def clear(self) -> typing.Any:
+        """Remove the chosen component and become an empty |ASN.1| value object."""
         self._currentIdx = None
         return Set.clear(self)
 
@@ -3266,8 +3579,9 @@ class Any(OctetString):
 
     @property
     def tagMap(self) -> typing.Any:
-        """ "Return a :class:`~pyasn1.type.tagmap.TagMap` object mapping
-        ASN.1 tags to ASN.1 objects contained within callee.
+        """Return a :class:`~pyasn1.type.tagmap.TagMap` object.
+
+        Maps ASN.1 tags to ASN.1 objects contained within callee.
         """
         try:
             return self._tagMap

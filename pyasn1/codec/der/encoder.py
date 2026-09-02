@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""DER encoder for ASN.1 types."""
+
 from typing import Any, Final
 
 from pyasn1 import error
@@ -16,7 +18,7 @@ __all__ = ["encode"]
 class SetEncoder(encoder.SetEncoder):
     @staticmethod
     def _componentSortKey(componentAndType: Any) -> Any:
-        """Sort SET components by tag
+        """Sort SET components by tag.
 
         Sort depending on the actual Choice value (dynamic sort)
         """

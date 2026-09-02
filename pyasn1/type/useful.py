@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Useful ASN.1 types: ObjectDescriptor, GeneralizedTime and UTCTime."""
+
 import datetime
 import warnings
 from typing import Any, Final
@@ -17,7 +19,7 @@ NoValue = univ.NoValue
 noValue: Final = univ.noValue
 
 
-class ObjectDescriptor(char.GraphicString):
+class ObjectDescriptor(char.GraphicString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = char.GraphicString.__doc__
 
     #: Default :py:class:`~pyasn1.type.tag.TagSet` object for |ASN.1| objects
@@ -40,7 +42,7 @@ class TimeMixIn:
 
     @staticmethod
     def FixedOffset(offset: int = 0, name: str = "UTC") -> datetime.timezone:
-        """Fixed offset in minutes east from UTC.
+        """Return a fixed offset in minutes east of UTC.
 
         .. deprecated::
            Use :py:class:`datetime.timezone` with a
@@ -158,7 +160,7 @@ class TimeMixIn:
         return cls(text)  # type: ignore[call-arg]
 
 
-class GeneralizedTime(char.VisibleString, TimeMixIn):
+class GeneralizedTime(char.VisibleString, TimeMixIn):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = char.VisibleString.__doc__
 
     #: Default :py:class:`~pyasn1.type.tag.TagSet` object for |ASN.1| objects
@@ -175,7 +177,7 @@ class GeneralizedTime(char.VisibleString, TimeMixIn):
     _shortTZ = True
 
 
-class UTCTime(char.VisibleString, TimeMixIn):
+class UTCTime(char.VisibleString, TimeMixIn):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = char.VisibleString.__doc__
 
     #: Default :py:class:`~pyasn1.type.tag.TagSet` object for |ASN.1| objects

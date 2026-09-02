@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""Map ASN.1 tag sets to the types they identify."""
+
 from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any
 
@@ -16,7 +18,7 @@ __all__ = ["TagMap"]
 
 
 class TagMap:
-    """Map *TagSet* objects to ASN.1 types
+    """Map *TagSet* objects to ASN.1 types.
 
     Create an object mapping *TagSet* object to ASN.1 type.
 
@@ -61,7 +63,7 @@ class TagMap:
             return self.__presentTypes[tagSet]
         except KeyError as exc:
             if self.__defaultType is None:
-                raise KeyError() from None
+                raise KeyError from None
             elif tagSet in self.__skipTypes:
                 raise error.PyAsn1Error("Key in negative map") from exc
             else:
@@ -86,15 +88,15 @@ class TagMap:
 
     @property
     def presentTypes(self) -> "dict[TagSet, Any]":
-        """Return *TagSet* to ASN.1 type map present in callee *TagMap*"""
+        """Return *TagSet* to ASN.1 type map present in callee *TagMap*."""
         return self.__presentTypes
 
     @property
     def skipTypes(self) -> "dict[TagSet, Any]":
-        """Return *TagSet* collection unconditionally absent in callee *TagMap*"""
+        """Return *TagSet* collection unconditionally absent in callee *TagMap*."""
         return self.__skipTypes
 
     @property
     def defaultType(self) -> Any:
-        """Return default ASN.1 type being returned for any missing *TagSet*"""
+        """Return default ASN.1 type being returned for any missing *TagSet*."""
         return self.__defaultType

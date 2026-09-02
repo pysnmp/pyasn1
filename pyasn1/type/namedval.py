@@ -6,6 +6,8 @@
 #
 # ASN.1 named integers
 #
+"""Named-value maps used to label numeric ASN.1 values."""
+
 from collections.abc import Iterator
 from typing import Any, NoReturn
 
@@ -122,18 +124,23 @@ class NamedValues(dict[Any, Any]):
         self._immutable("item deletion")
 
     def update(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
         self._immutable("update")
 
     def pop(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
         self._immutable("pop")
 
     def popitem(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
         self._immutable("popitem")
 
     def clear(self) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
         self._immutable("clear")
 
     def setdefault(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
         self._immutable("setdefault")
 
     def __ior__(self, other: Any) -> NoReturn:  # type: ignore[misc]
@@ -176,5 +183,6 @@ class NamedValues(dict[Any, Any]):
     # XXX clone/subtype?
 
     def clone(self, *args: Any, **kwargs: Any) -> "NamedValues":
+        """Return a new `NamedValues` merging *args*/*kwargs* into this one."""
         new = self.__class__(*args, **kwargs)
         return self + new
