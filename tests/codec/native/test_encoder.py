@@ -7,15 +7,14 @@
 import sys
 import unittest
 
-
-def _str2octs(s):
-    return s.encode("iso-8859-1")
-
-
 from pyasn1.codec.native import encoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import namedtype, univ
 from tests.base import BaseTestCase
+
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
 
 
 class BadAsn1SpecTestCase(BaseTestCase):

@@ -48,6 +48,31 @@ tagCategoryExplicit: Final = 0x02
 tagCategoryUntagged: Final = 0x04
 
 
+#: Human-readable names for the ASN.1 tag classes, used by ``repr()``.
+_TAG_CLASS_NAMES: Final = {
+    tagClassUniversal: "UNIVERSAL",
+    tagClassApplication: "APPLICATION",
+    tagClassContext: "CONTEXT",
+    tagClassPrivate: "PRIVATE",
+}
+
+#: Human-readable names for the ASN.1 tag formats, used by ``repr()``.
+_TAG_FORMAT_NAMES: Final = {
+    tagFormatSimple: "simple",
+    tagFormatConstructed: "constructed",
+}
+
+
+def _tagClassName(tagClass: int) -> str:
+    """Return a human-readable name for ASN.1 tag class *tagClass*."""
+    return _TAG_CLASS_NAMES.get(tagClass, "0x%02x" % tagClass)
+
+
+def _tagFormatName(tagFormat: int) -> str:
+    """Return a human-readable name for ASN.1 tag format *tagFormat*."""
+    return _TAG_FORMAT_NAMES.get(tagFormat, "0x%02x" % tagFormat)
+
+
 _TagBase = namedtuple("_TagBase", ["tagClass", "tagFormat", "tagId"])
 
 
@@ -81,10 +106,10 @@ class Tag(_TagBase):
         return super().__new__(cls, tagClass, tagFormat, tagId)
 
     def __repr__(self) -> str:
-        return "<%s object, tag [%s:%s:%s]>" % (
+        return "<%s object, tag [%s:%s:%d]>" % (
             self.__class__.__name__,
-            self.tagClass,
-            self.tagFormat,
+            _tagClassName(self.tagClass),
+            _tagFormatName(self.tagFormat),
             self.tagId,
         )
 
@@ -159,15 +184,15 @@ class TagSet:
         self.__hash = hash(self.__superTagsClassId)
 
     def __repr__(self) -> str:
-        representation = "-".join(
-            ["%s:%s:%s" % (x.tagClass, x.tagFormat, x.tagId) for x in self.__superTags]
-        )
-        if representation:
-            representation = "tags " + representation
-        else:
-            representation = "untagged"
+        if not self.__superTags:
+            return "<%s object, untagged>" % self.__class__.__name__
 
-        return "<%s object, %s>" % (self.__class__.__name__, representation)
+        return "<%s object, tags %s>" % (
+            self.__class__.__name__,
+            "-".join(
+                "%s:%d" % (_tagClassName(x.tagClass), x.tagId) for x in self.__superTags
+            ),
+        )
 
     def __add__(self, superTag: Tag) -> "TagSet":
         return self.__class__(self.__baseTag, *self.__superTags + (superTag,))
