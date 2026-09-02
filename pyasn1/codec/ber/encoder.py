@@ -453,6 +453,83 @@ class RealEncoder(AbstractItemEncoder):
 
         return sign, m, encbase, e
 
+    @staticmethod
+    def _encodeExponent(exponent: int) -> bytes:
+        if exponent in (0, -1):
+            return bytes((exponent & 0xFF,))
+
+        octets = b""
+        while exponent not in (0, -1):
+            octets = bytes((exponent & 0xFF,)) + octets
+            exponent >>= 8
+
+        if exponent == 0 and octets[0] & 0x80:
+            return bytes((0,)) + octets
+        if exponent == -1 and not octets[0] & 0x80:
+            return bytes((0xFF,)) + octets
+        return octets
+
+    @staticmethod
+    def _encodeMantissa(mantissa: int) -> bytes:
+        octets = b""
+        while mantissa:
+            octets = bytes((mantissa & 0xFF,)) + octets
+            mantissa >>= 8
+        return octets
+
+    def _encodeBinary(self, value: Any) -> bytes:
+        firstOctet = 0x80
+        sign, mantissa, encbase, exponent = self._chooseEncBase(value)
+
+        if sign < 0:
+            firstOctet |= 0x40
+
+        if encbase == 2:
+            while mantissa & 0x1 == 0:
+                mantissa >>= 1
+                exponent += 1
+
+        elif encbase == 8:
+            while mantissa & 0x7 == 0:
+                mantissa >>= 3
+                exponent += 1
+            firstOctet |= 0x10
+
+        else:  # encbase = 16
+            while mantissa & 0xF == 0:
+                mantissa >>= 4
+                exponent += 1
+            firstOctet |= 0x20
+
+        scaleFactor = 0
+        while mantissa & 0x1 == 0:
+            mantissa >>= 1
+            scaleFactor += 1
+
+        if scaleFactor > 3:
+            raise error.PyAsn1Error("Scale factor overflow")
+
+        firstOctet |= scaleFactor << 2
+        exponentOctets = self._encodeExponent(exponent)
+        exponentLength = len(exponentOctets)
+
+        if exponentLength > 0xFF:
+            raise error.PyAsn1Error("Real exponent overflow")
+        if exponentLength == 2:
+            firstOctet |= 1
+        elif exponentLength == 3:
+            firstOctet |= 2
+        elif exponentLength > 3:
+            firstOctet |= 3
+            exponentOctets = bytes((exponentLength,)) + exponentOctets
+
+        return bytes((firstOctet,)) + exponentOctets + self._encodeMantissa(mantissa)
+
+    @staticmethod
+    def _encodeCharacter(mantissa: int, exponent: int) -> bytes:
+        sign = "+" if exponent == 0 else ""
+        return ("\x03%dE%s%d" % (mantissa, sign, exponent)).encode("ascii")
+
     def encodeValue(
         self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
     ) -> tuple[Any, bool, bool]:
@@ -474,85 +551,10 @@ class RealEncoder(AbstractItemEncoder):
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug("encoding REAL into character form")
 
-            sign = "+" if e == 0 else ""
-            return ("\x03%dE%s%d" % (m, sign, e)).encode("ascii"), False, True
+            return self._encodeCharacter(m, e), False, True
 
         elif b == 2:
-            fo = 0x80  # binary encoding
-            ms, m, encbase, e = self._chooseEncBase(value)
-
-            if ms < 0:  # mantissa sign
-                fo |= 0x40  # sign bit
-
-            # exponent & mantissa normalization
-            if encbase == 2:
-                while m & 0x1 == 0:
-                    m >>= 1
-                    e += 1
-
-            elif encbase == 8:
-                while m & 0x7 == 0:
-                    m >>= 3
-                    e += 1
-                fo |= 0x10
-
-            else:  # encbase = 16
-                while m & 0xF == 0:
-                    m >>= 4
-                    e += 1
-                fo |= 0x20
-
-            sf = 0  # scale factor
-
-            while m & 0x1 == 0:
-                m >>= 1
-                sf += 1
-
-            if sf > 3:
-                raise error.PyAsn1Error("Scale factor overflow")  # bug if raised
-
-            fo |= sf << 2
-            eo = b""
-            if e in (0, -1):
-                eo = bytes((e & 0xFF,))
-
-            else:
-                while e not in (0, -1):
-                    eo = bytes((e & 0xFF,)) + eo
-                    e >>= 8
-
-                if e == 0 and eo and eo[0] & 0x80:
-                    eo = bytes((0,)) + eo
-
-                if e == -1 and eo and not (eo[0] & 0x80):
-                    eo = bytes((0xFF,)) + eo
-
-            n = len(eo)
-            if n > 0xFF:
-                raise error.PyAsn1Error("Real exponent overflow")
-
-            if n == 1:
-                pass
-
-            elif n == 2:
-                fo |= 1
-
-            elif n == 3:
-                fo |= 2
-
-            else:
-                fo |= 3
-                eo = bytes((n & 0xFF,)) + eo
-
-            po = b""
-
-            while m:
-                po = bytes((m & 0xFF,)) + po
-                m >>= 8
-
-            substrate = bytes((fo,)) + eo + po
-
-            return substrate, False, True
+            return self._encodeBinary(value), False, True
 
         else:
             raise error.PyAsn1Error("Prohibited Real base %s" % b)
@@ -843,8 +845,10 @@ class Encoder:
         try:
             if asn1Spec is None:
                 typeId = value.typeId
+                tagSet = value.tagSet
             else:
                 typeId = asn1Spec.typeId
+                tagSet = asn1Spec.tagSet
 
         except AttributeError as exc:
             raise error.PyAsn1Error(
@@ -871,8 +875,29 @@ class Encoder:
         if self.fixedChunkSize is not None:
             options.update(maxChunkSize=self.fixedChunkSize)
 
+        # Give explicitly tagged values an opportunity to select a custom
+        # codec. Base tags are deliberately excluded here: several built-in
+        # types share them (e.g. SEQUENCE and SEQUENCE OF) and must use the
+        # faster, unambiguous type ID dispatch below.
+        if tagSet.baseTag:
+            baseTagSet = tag.TagSet(tagSet.baseTag, tagSet.baseTag)
+        else:
+            baseTagSet = tag.TagSet()
+        concreteEncoder = None
+
+        if tagSet != baseTagSet:
+            concreteEncoder = self.__tagMap.get(tagSet)
+
+            if concreteEncoder and LOG.isEnabledFor(logging.DEBUG):
+                LOG.debug(
+                    "using value codec %s chosen by complete tagSet %s",
+                    concreteEncoder.__class__.__name__,
+                    tagSet,
+                )
+
         try:
-            concreteEncoder = self.__typeMap[typeId]
+            if concreteEncoder is None:
+                concreteEncoder = self.__typeMap[typeId]
 
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug(
@@ -882,14 +907,7 @@ class Encoder:
                 )
 
         except KeyError:
-            if asn1Spec is None:
-                tagSet = value.tagSet
-            else:
-                tagSet = asn1Spec.tagSet
-
             # use base type for codec lookup to recover untagged types
-            baseTagSet = tag.TagSet(tagSet.baseTag, tagSet.baseTag)
-
             try:
                 concreteEncoder = self.__tagMap[baseTagSet]
 

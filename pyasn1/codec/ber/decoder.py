@@ -474,6 +474,54 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
 class RealDecoder(AbstractSimpleDecoder):
     protoComponent = univ.Real()
 
+    @staticmethod
+    def _decodeBinary(firstOctet: int, payload: bytes) -> tuple[int, int, int]:
+        if not payload:
+            raise error.PyAsn1Error("Incomplete floating-point value")
+
+        exponentLength = (firstOctet & 0x03) + 1
+        if exponentLength == 4:
+            exponentLength = payload[0]
+            payload = payload[1:]
+
+        exponentOctets, mantissaOctets = (
+            payload[:exponentLength],
+            payload[exponentLength:],
+        )
+        if not exponentOctets or not mantissaOctets:
+            raise error.PyAsn1Error("Real exponent screwed")
+
+        exponent = int.from_bytes(exponentOctets, "big", signed=True)
+        baseBits = firstOctet >> 4 & 0x03
+        if baseBits > 2:
+            raise error.PyAsn1Error("Illegal Real base")
+        if baseBits == 1:
+            exponent *= 3
+        elif baseBits == 2:
+            exponent *= 4
+
+        mantissa = int.from_bytes(mantissaOctets, "big")
+        if firstOctet & 0x40:
+            mantissa = -mantissa
+        mantissa *= 2 ** (firstOctet >> 2 & 0x03)
+
+        return mantissa, 2, exponent
+
+    @staticmethod
+    def _decodeCharacter(firstOctet: int, payload: bytes) -> Any:
+        if not payload:
+            raise error.PyAsn1Error("Incomplete floating-point value")
+
+        try:
+            if firstOctet & 0x03 == 0x01:
+                return int(payload), 10, 0
+            if firstOctet & 0x03 in (0x02, 0x03):
+                return float(payload)
+            raise error.SubstrateUnderrunError("Unknown NR (tag %s)" % firstOctet)
+
+        except ValueError as exc:
+            raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
+
     def valueDecoder(
         self,
         substrate: bytes,
@@ -493,85 +541,28 @@ class RealDecoder(AbstractSimpleDecoder):
         if not head:
             return self._createComponent(asn1Spec, tagSet, 0.0, **options), tail
 
-        fo = head[0]
-        head = head[1:]
-        if fo & 0x80:  # binary encoding
-            if not head:
-                raise error.PyAsn1Error("Incomplete floating-point value")
-
+        firstOctet = head[0]
+        payload = head[1:]
+        if firstOctet & 0x80:
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug("decoding binary encoded REAL")
 
-            n = (fo & 0x03) + 1
+            value: Any = self._decodeBinary(firstOctet, payload)
 
-            if n == 4:
-                n = head[0]
-                head = head[1:]
-
-            eo, head = head[:n], head[n:]
-
-            if not eo or not head:
-                raise error.PyAsn1Error("Real exponent screwed")
-
-            e = -1 if eo[0] & 0x80 else 0
-
-            while eo:  # exponent
-                e <<= 8
-                e |= eo[0]
-                eo = eo[1:]
-
-            b = fo >> 4 & 0x03  # base bits
-
-            if b > 2:
-                raise error.PyAsn1Error("Illegal Real base")
-
-            if b == 1:  # encbase = 8
-                e *= 3
-
-            elif b == 2:  # encbase = 16
-                e *= 4
-            p = 0
-
-            while head:  # value
-                p <<= 8
-                p |= head[0]
-                head = head[1:]
-
-            if fo & 0x40:  # sign bit
-                p = -p
-
-            sf = fo >> 2 & 0x03  # scale bits
-            p *= 2**sf
-            value: Any = (p, 2, e)
-
-        elif fo & 0x40:  # infinite value
+        elif firstOctet & 0x40:
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug("decoding infinite REAL")
 
-            value = "-inf" if fo & 0x01 else "inf"
+            value = "-inf" if firstOctet & 0x01 else "inf"
 
-        elif fo & 0xC0 == 0:  # character encoding
-            if not head:
-                raise error.PyAsn1Error("Incomplete floating-point value")
-
+        elif firstOctet & 0xC0 == 0:
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug("decoding character encoded REAL")
 
-            try:
-                if fo & 0x3 == 0x1:  # NR1
-                    value = (int(head), 10, 0)
-
-                elif fo & 0x3 == 0x2 or fo & 0x3 == 0x3:  # NR2
-                    value = float(head)
-
-                else:
-                    raise error.SubstrateUnderrunError("Unknown NR (tag %s)" % fo)
-
-            except ValueError as exc:
-                raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
+            value = self._decodeCharacter(firstOctet, payload)
 
         else:
-            raise error.SubstrateUnderrunError("Unknown encoding (tag %s)" % fo)
+            raise error.SubstrateUnderrunError("Unknown encoding (tag %s)" % firstOctet)
 
         return self._createComponent(asn1Spec, tagSet, value, **options), tail
 
@@ -583,6 +574,13 @@ class AbstractConstructedDecoder(AbstractDecoder):
 class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
     protoRecordComponent: Any = None
     protoSequenceComponent: Any = None
+
+    @staticmethod
+    def _validateConstructedValue(asn1Object: Any) -> None:
+        """Raise an ASN.1 constraint error for an inconsistent decoded value."""
+        inconsistency = asn1Object.isInconsistent
+        if inconsistency:
+            raise inconsistency
 
     def _getComponentTagMap(self, asn1Object: Any, idx: int) -> Any:
         raise NotImplementedError()
@@ -845,11 +843,6 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
                                 asn1Object.setComponentByPosition(idx, component)
 
-            else:
-                inconsistency = asn1Object.isInconsistent
-                if inconsistency:
-                    raise inconsistency
-
         else:
             asn1Object = asn1Spec.clone()
             asn1Object.clear()
@@ -872,6 +865,8 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                 )
 
                 idx += 1
+
+        self._validateConstructedValue(asn1Object)
 
         return asn1Object, tail
 
@@ -1075,11 +1070,6 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
                                 if component is not eoo.endOfOctets:
                                     asn1Object.setComponentByPosition(idx, component)
 
-                else:
-                    inconsistency = asn1Object.isInconsistent
-                    if inconsistency:
-                        raise inconsistency
-
         else:
             asn1Object = asn1Spec.clone()
             asn1Object.clear()
@@ -1111,6 +1101,8 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
 
             else:
                 raise error.SubstrateUnderrunError("No EOO seen before substrate ends")
+
+        self._validateConstructedValue(asn1Object)
 
         return asn1Object, substrate
 
@@ -1952,7 +1944,9 @@ class Decoder:
 #: -------
 #: : :py:class:`tuple`
 #:     A tuple of pyasn1 object recovered from BER substrate (:py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
-#:     and the unprocessed trailing portion of the *substrate* (may be empty)
+#:     and the unprocessed trailing portion of the *substrate* (may be empty).
+#:     Omitted DEFAULT components remain absent until normal component access
+#:     resolves their schema default.
 #:
 #: Raises
 #: ------
