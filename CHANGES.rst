@@ -6,6 +6,21 @@ unreleased
   library base types to reduce boilerplate code
 - Removed legacy type accessors, aliases, deprecated BIT STRING notation,
   positional constructed-type initialization, and ``sizeSpec`` support.
+- Simplified ``repr()`` for ``Tag``, ``TagSet``, ``SimpleAsn1Type``, and
+  ``ConstructedAsn1Type``: tag classes now use human-readable names
+  (``UNIVERSAL``, ``CONTEXT``, etc.) instead of raw hex; value objects
+  show only the payload; schema objects show only the class name;
+  constructed types include field names in the payload display
+- Fixed E402 import-order violations in test files; applied ``black``
+  formatting to ``ber/encoder.py`` and ``test_univ.py``; all of
+  ``pyasn1/`` and ``tests/`` now passes ``flake8``, ``ruff``, and
+  ``black --check``
+- Added ``docs/source/quickstart.rst`` with copy-pasteable snippets
+  covering schema definition, encode/decode, native conversion,
+  ``repr()`` inspection, constraints, and open types
+- Added ``examples/`` directory with five runnable scripts:
+  ``simple_sequence.py``, ``open_type.py``, ``constraints.py``,
+  ``recursive_sequence.py``, ``round_trip.py``
 
 
 Revision 1.0.2, released 2021-11-13
