@@ -448,6 +448,104 @@ class CanonicalTimeTestCase(BaseTestCase):
         )
 
 
+class IntegerMinimalOctetsTestCase(BaseTestCase):
+    """X.690 8.3.2: given more than one contents octet, the bits of the first
+    octet and bit 8 of the second shall not all be ones, nor all be zero.
+
+    The note to 8.3.2 gives the intent: "These rules ensure that an integer
+    value is always encoded in the smallest possible number of octets."
+
+    8.3.2 sits in clause 8, so it binds BER too. pyasn1 enforces it only under
+    CER and DER: rejecting padded integers in BER would break callers parsing
+    output from encoders that pad, and the padded form decodes to an
+    unambiguous value. The encoder never emits one under any codec.
+    """
+
+    #: (label, contents octets, value) -- each is the shortest encoding.
+    MINIMAL = (
+        ("zero", bytes((0x00,)), 0),
+        ("one", bytes((0x01,)), 1),
+        ("minus one", bytes((0xFF,)), -1),
+        ("minus 128", bytes((0x80,)), -128),
+        # 255 needs the leading zero: bit 8 of ff is set, so without it the
+        # value would read as -1. 8.3.2 permits it because the two octets are
+        # not all zero taken together with bit 8 of the second.
+        ("255", bytes((0x00, 0xFF)), 255),
+        ("minus 129", bytes((0xFF, 0x7F)), -129),
+    )
+
+    #: (label, contents octets) -- each pads a shorter encoding.
+    NON_MINIMAL = (
+        ("leading zero on 1", bytes((0x00, 0x01))),
+        ("leading zero on 0", bytes((0x00, 0x00))),
+        ("leading sign on -1", bytes((0xFF, 0xFF))),
+        ("leading sign on -128", bytes((0xFF, 0x80))),
+        ("two leading zeros", bytes((0x00, 0x00, 0x01))),
+    )
+
+    def testMinimalEncodingsAccepted(self):
+        for label, contents, expected in self.MINIMAL:
+            substrate = bytes((0x02, len(contents))) + contents
+
+            for decode in (
+                ber_decoder.decode,
+                cer_decoder.decode,
+                der_decoder.decode,
+            ):
+                value, _ = decode(substrate)
+                assert value == expected, label
+
+    def testNonMinimalRejectedUnderCerAndDer(self):
+        for label, contents in self.NON_MINIMAL:
+            substrate = bytes((0x02, len(contents))) + contents
+
+            for decode in (cer_decoder.decode, der_decoder.decode):
+                self.assertRaises(error.PyAsn1Error, decode, substrate)
+                self.assertRaises(
+                    error.PyAsn1Error,
+                    decode,
+                    substrate,
+                    asn1Spec=univ.Integer(),
+                )
+
+    def testNonMinimalToleratedUnderBer(self):
+        # The padded form is unambiguous, so BER keeps decoding it.
+        for label, contents in self.NON_MINIMAL:
+            substrate = bytes((0x02, len(contents))) + contents
+
+            value, _ = ber_decoder.decode(substrate)
+            assert value == int.from_bytes(contents, "big", signed=True), label
+
+    def testEnumeratedFollowsIntegerRules(self):
+        # 8.4: "The encoding of an enumerated value shall be that of the
+        # integer value with which it is associated."
+        substrate = bytes((0x0A, 0x02, 0x00, 0x01))
+
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(error.PyAsn1Error, decode, substrate)
+            self.assertRaises(
+                error.PyAsn1Error, decode, substrate, asn1Spec=univ.Enumerated()
+            )
+
+        value, _ = ber_decoder.decode(substrate)
+        assert value == 1
+
+    def testEncoderNeverEmitsNonMinimal(self):
+        # Every codec must produce the shortest form, so a value that
+        # round-trips through DER survives its own strictness.
+        for value in (0, 1, -1, 127, -128, 128, -129, 255, -256, 65535, -65536):
+            for encode, decode in (
+                (ber_encoder.encode, ber_decoder.decode),
+                (cer_encoder.encode, cer_decoder.decode),
+                (der_encoder.encode, der_decoder.decode),
+            ):
+                substrate = encode(univ.Integer(value))
+                # der_decoder is the strict reader; feed every encoding to it.
+                recovered, _ = der_decoder.decode(substrate)
+
+                assert recovered == value, (value, substrate.hex())
+
+
 class NullTestCase(BaseTestCase):
     """X.690 8.8.2: the contents octets of a NULL are empty."""
 
