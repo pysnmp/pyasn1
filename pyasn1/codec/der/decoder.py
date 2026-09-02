@@ -36,11 +36,14 @@ tagMap.update(
 
 typeMap: Final = decoder.typeMap.copy()
 
-# Put in non-ambiguous types for faster codec lookup
+# Put in non-ambiguous types for faster codec lookup.
+# This map starts as a copy of the parent codec's, so an entry already
+# exists for every type overridden above. The override has to win: guarding
+# on absence would leave the parent's laxer decoder in place.
 for typeDecoder in tagMap.values():
     if typeDecoder.protoComponent is not None:
         typeId = typeDecoder.protoComponent.__class__.typeId
-        if typeId is not None and typeId not in typeMap:
+        if typeId is not None:
             typeMap[typeId] = typeDecoder
 
 

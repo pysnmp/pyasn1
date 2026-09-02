@@ -271,6 +271,86 @@ class BooleanStrictnessTestCase(BaseTestCase):
             self.assertRaises(error.PyAsn1Error, decode, bytes((0x01, 0x00)))
 
 
+class SchemaGuidedStrictnessTestCase(BaseTestCase):
+    """A restriction must hold whether or not the caller supplies a schema.
+
+    The decoders reach their per-type handlers two ways: by tag when the
+    substrate is decoded blind, and by ``typeId`` when an ``asn1Spec`` guides
+    them. CER and DER install their stricter handlers in both maps, and a
+    restriction that binds on one path but not the other is a bug -- the
+    schema-guided path is the one that parses X.509 and SNMP in practice.
+    """
+
+    def assertRejectedBothWays(self, decode, substrate, asn1Spec):
+        self.assertRaises(error.PyAsn1Error, decode, substrate)
+        self.assertRaises(error.PyAsn1Error, decode, substrate, asn1Spec=asn1Spec)
+
+    def assertAcceptedBothWays(self, decode, substrate, asn1Spec, expected):
+        byTag, _ = decode(substrate)
+        bySpec, _ = decode(substrate, asn1Spec=asn1Spec)
+
+        assert byTag == expected
+        assert bySpec == expected
+
+    def testBooleanCanonicalTrue(self):
+        # 11.1: TRUE has all eight bits set. The tag-driven path has enforced
+        # this for a long time; the schema-guided path used to fall through
+        # to the BER decoder and accept any non-zero octet.
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRejectedBothWays(
+                decode, bytes((0x01, 0x01, 0x01)), univ.Boolean()
+            )
+            self.assertRejectedBothWays(
+                decode, bytes((0x01, 0x01, 0x7F)), univ.Boolean()
+            )
+
+    def testBooleanCanonicalValuesAccepted(self):
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertAcceptedBothWays(
+                decode, bytes((0x01, 0x01, 0xFF)), univ.Boolean(), univ.Boolean(1)
+            )
+            self.assertAcceptedBothWays(
+                decode, bytes((0x01, 0x01, 0x00)), univ.Boolean(), univ.Boolean(0)
+            )
+
+    def testBerToleratesOnBothPaths(self):
+        # The mirror of the above: BER is lax either way round.
+        for kwargs in ({}, {"asn1Spec": univ.Boolean()}):
+            value, _ = ber_decoder.decode(bytes((0x01, 0x01, 0x01)), **kwargs)
+
+            assert value == univ.Boolean(1)
+
+    def testDerConstructedStringRejectedBothWays(self):
+        # 10.2: the constructed form is prohibited under DER.
+        self.assertRejectedBothWays(
+            der_decoder.decode,
+            bytes((0x24, 0x04, 0x04, 0x02, 0x41, 0x42)),
+            univ.OctetString(),
+        )
+
+    def testStrictDecodersReachableByTypeId(self):
+        # The structural claim behind the cases above, asserted directly:
+        # the map keyed by typeId must carry the codec's own decoder, not the
+        # one inherited from the codec it derives from.
+        for module in (cer_decoder, der_decoder):
+            byTag = module.tagMap[univ.Boolean.tagSet]
+            byTypeId = module.typeMap[univ.Boolean.typeId]
+
+            assert type(byTag) is type(byTypeId), (
+                f"{module.__name__} resolves Boolean to different decoders "
+                f"by tag ({type(byTag).__name__}) and by typeId "
+                f"({type(byTypeId).__name__})"
+            )
+
+    def testDecoderUsesItsOwnTypeMap(self):
+        # cer.decode was constructed with the BER typeMap, discarding the one
+        # assembled directly above it in the module.
+        for module in (cer_decoder, der_decoder):
+            assert module.decode._Decoder__typeMap is module.typeMap, (
+                f"{module.__name__}.decode is not using the module typeMap"
+            )
+
+
 class NullTestCase(BaseTestCase):
     """X.690 8.8.2: the contents octets of a NULL are empty."""
 
