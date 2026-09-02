@@ -40,6 +40,28 @@ class TimeMixIn:
     #: Alias for :py:const:`datetime.timezone.utc`.
     UTC = datetime.timezone.utc
 
+    def prettyOut(self: Any, value: Any) -> Any:
+        """Render the instant in ISO 8601 form for human-facing output.
+
+        The stored value is the ASN.1 spelling, e.g. ``19851106210627.3Z``,
+        and that is what :func:`str` and the codecs keep using. Only
+        :meth:`prettyPrint` differs, showing
+        ``1985-11-06T21:06:27.300000+00:00`` so that a debug log reads as a
+        timestamp rather than as an undifferentiated character string.
+
+        A value that does not parse is handed back untouched. The BER
+        decoder calls :meth:`prettyPrint` while logging, so this must not
+        raise on the lax spellings BER still accepts.
+        """
+        if not isinstance(value, str):
+            return value
+
+        try:
+            return self.asDateTime.isoformat()
+
+        except (error.PyAsn1Error, ValueError):
+            return value
+
     @staticmethod
     def FixedOffset(offset: int = 0, name: str = "UTC") -> datetime.timezone:
         """Return a fixed offset in minutes east of UTC.
@@ -164,16 +186,18 @@ class TimeMixIn:
             else:
                 text, _, subsecond = text.partition(",")
 
-            try:
-                ms = int(subsecond) * 1000
-
-            except ValueError as exc:
+            if not subsecond.isdigit():
                 raise error.PyAsn1Error(
                     "bad sub-second time specification", value=str(self)
-                ) from exc
+                )
+
+            # X.680 46.3 a) 2: the fraction is a decimal fraction of a second,
+            # so ".3" is 300 ms and ".003" is 3 ms. Scale by the position of
+            # the digits, not by how many of them there are.
+            microsecond = round(float("0." + subsecond) * 1000000)
 
         else:
-            ms = 0
+            microsecond = 0
 
         if self._optionalMinutes and len(text) - self._yearsDigits == 6:
             text += "0000"
@@ -190,7 +214,7 @@ class TimeMixIn:
                 "malformed datetime format", value=str(self)
             ) from exc
 
-        return dt.replace(microsecond=ms, tzinfo=tzinfo)
+        return dt.replace(microsecond=microsecond, tzinfo=tzinfo)
 
     @classmethod
     def fromDateTime(cls, dt: datetime.datetime) -> Any:
@@ -208,18 +232,31 @@ class TimeMixIn:
             new instance of |ASN.1| value
         """
         text = dt.strftime("%Y%m%d%H%M%S" if cls._yearsDigits == 4 else "%y%m%d%H%M%S")
-        if cls._hasSubsecond:
-            text += f".{dt.microsecond // 1000}"
+
+        if cls._hasSubsecond and dt.microsecond:
+            # X.680 46.3 a) 2: a decimal fraction of a second, so 300000 us is
+            # ".3". Trailing zeros carry no accuracy here and X.690 11.7.3
+            # bars them from the canonical form, so drop them. A whole second
+            # takes no fraction at all, for the same reason.
+            text += f".{dt.microsecond:06d}".rstrip("0")
 
         utcOffset = dt.utcoffset()
+
         if utcOffset:
-            seconds = utcOffset.seconds
-            if seconds < 0:
-                text += "-"
-            else:
-                text += "+"
-            text += f"{seconds // 3600:02d}{seconds % 3600:02d}"
+            # timedelta normalises a negative offset into a negative day plus
+            # a positive seconds count, so -05:00 is days=-1, seconds=68400.
+            # Read the sign off the whole offset rather than off .seconds,
+            # which is never negative.
+            minutes = round(utcOffset.total_seconds() / 60)
+            sign = "-" if minutes < 0 else "+"
+            minutes = abs(minutes)
+
+            # X.680 46.3 c): the difference from UTC is written as HHMM.
+            text += f"{sign}{minutes // 60:02d}{minutes % 60:02d}"
+
         else:
+            # Both UTC and a naive datetime land here. pyasn1 has always read
+            # a naive value as UTC rather than as X.680 46.3 a) local time.
             text += "Z"
 
         return cls(text)  # type: ignore[call-arg]
@@ -241,6 +278,11 @@ class GeneralizedTime(char.VisibleString, TimeMixIn):  # noqa: D101 - docstring 
     _optionalMinutes = True
     _shortTZ = True
 
+    # TimeMixIn trails AbstractCharacterString in the MRO, so its prettyOut
+    # would lose to the identity one inherited from the string types. Bind it
+    # here rather than reorder the bases.
+    prettyOut = TimeMixIn.prettyOut
+
 
 class UTCTime(char.VisibleString, TimeMixIn):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = char.VisibleString.__doc__
@@ -257,3 +299,6 @@ class UTCTime(char.VisibleString, TimeMixIn):  # noqa: D101 - docstring aliased 
     _hasSubsecond = False
     _optionalMinutes = False
     _shortTZ = False
+
+    # See the note on GeneralizedTime.prettyOut.
+    prettyOut = TimeMixIn.prettyOut
