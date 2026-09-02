@@ -64,12 +64,12 @@ _TAG_FORMAT_NAMES: Final = {
 
 def _tagClassName(tagClass: int) -> str:
     """Return a human-readable name for ASN.1 tag class *tagClass*."""
-    return _TAG_CLASS_NAMES.get(tagClass, "0x%02x" % tagClass)
+    return _TAG_CLASS_NAMES.get(tagClass, f"0x{tagClass:02x}")
 
 
 def _tagFormatName(tagFormat: int) -> str:
     """Return a human-readable name for ASN.1 tag format *tagFormat*."""
-    return _TAG_FORMAT_NAMES.get(tagFormat, "0x%02x" % tagFormat)
+    return _TAG_FORMAT_NAMES.get(tagFormat, f"0x{tagFormat:02x}")
 
 
 _TagBase = namedtuple("_TagBase", ["tagClass", "tagFormat", "tagId"])
@@ -101,16 +101,11 @@ class Tag(_TagBase):
     def __new__(cls, tagClass: int, tagFormat: int, tagId: int) -> "Tag":
         """Construct a *Tag*, rejecting a negative *tagId*."""
         if tagId < 0:
-            raise error.PyAsn1Error("Negative tag ID (%s) not allowed" % tagId)
+            raise error.PyAsn1Error(f"Negative tag ID ({tagId}) not allowed")
         return super().__new__(cls, tagClass, tagFormat, tagId)
 
     def __repr__(self) -> str:
-        return "<%s object, tag [%s:%s:%d]>" % (
-            self.__class__.__name__,
-            _tagClassName(self.tagClass),
-            _tagFormatName(self.tagFormat),
-            self.tagId,
-        )
+        return f"<{self.__class__.__name__} object, tag [{_tagClassName(self.tagClass)}:{_tagFormatName(self.tagFormat)}:{self.tagId}]>"
 
     # Equality and hashing intentionally consider only (tagClass, tagId),
     # matching the original implementation.  tagFormat is excluded so that
@@ -184,12 +179,12 @@ class TagSet:
 
     def __repr__(self) -> str:
         if not self.__superTags:
-            return "<%s object, untagged>" % self.__class__.__name__
+            return f"<{self.__class__.__name__} object, untagged>"
 
-        return "<%s object, tags %s>" % (
+        return "<{} object, tags {}>".format(
             self.__class__.__name__,
             "-".join(
-                "%s:%d" % (_tagClassName(x.tagClass), x.tagId) for x in self.__superTags
+                f"{_tagClassName(x.tagClass)}:{x.tagId}" for x in self.__superTags
             ),
         )
 

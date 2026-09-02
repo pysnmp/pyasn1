@@ -33,6 +33,6 @@ def renderDebugRecords():
         logger.removeHandler(handler)
         logger.setLevel(level)
 
-    assert not handler.failures, "malformed debug records: %s" % "; ".join(
-        handler.failures
+    assert not handler.failures, "malformed debug records: {}".format(
+        "; ".join(handler.failures)
     )

@@ -3735,12 +3735,10 @@ class ErrorOnDecodingTestCase(BaseTestCase):
 
         except PyAsn1Error:
             exc = sys.exc_info()[1]
-            assert isinstance(exc, PyAsn1Error), "Unexpected exception raised %r" % (
-                exc,
-            )
+            assert isinstance(exc, PyAsn1Error), f"Unexpected exception raised {exc!r}"
 
         else:
-            assert False, "Unexpected decoder result %r" % (asn1Object,)
+            assert False, f"Unexpected decoder result {asn1Object!r}"
 
     def testRawDump(self):
         decode = decoder.Decoder(decoder.tagMap, decoder.typeMap)
@@ -3749,8 +3747,8 @@ class ErrorOnDecodingTestCase(BaseTestCase):
 
         asn1Object, rest = decode(bytes((31, 8, 2, 1, 1, 131, 3, 2, 1, 12)))
 
-        assert isinstance(asn1Object, univ.Any), "Unexpected raw dump type %r" % (
-            asn1Object,
+        assert isinstance(asn1Object, univ.Any), (
+            f"Unexpected raw dump type {asn1Object!r}"
         )
         assert asn1Object.asNumbers() == (
             31,
@@ -3758,9 +3756,9 @@ class ErrorOnDecodingTestCase(BaseTestCase):
             2,
             1,
             1,
-        ), "Unexpected raw dump value %r" % (asn1Object,)
+        ), f"Unexpected raw dump value {asn1Object!r}"
         assert rest == bytes((131, 3, 2, 1, 12)), (
-            "Unexpected rest of substrate after raw dump %r" % rest
+            f"Unexpected rest of substrate after raw dump {rest!r}"
         )
 
 

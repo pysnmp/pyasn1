@@ -51,14 +51,15 @@ class StructuredLoggingTestCase(BaseTestCase):
 
     def testMessagesAreConstant(self):
         offenders = [
-            "%s:%d" % (path, lineno)
+            f"{path}:{lineno}"
             for path, lineno, node in logCalls()
             if len(node.args) != 1 or not isinstance(node.args[0], ast.Constant)
         ]
 
         assert not offenders, (
-            "log messages must be constant strings with context in `extra`: %s"
-            % ", ".join(offenders)
+            "log messages must be constant strings with context in `extra`: {}".format(
+                ", ".join(offenders)
+            )
         )
 
     def testContextKeysDoNotShadowRecordAttributes(self):
@@ -71,19 +72,19 @@ class StructuredLoggingTestCase(BaseTestCase):
                     continue
 
                 assert isinstance(keyword.value, ast.Dict), (
-                    "%s:%d: `extra` must be a dict literal" % (path, lineno)
+                    f"{path}:{lineno}: `extra` must be a dict literal"
                 )
 
                 for key in keyword.value.keys:
                     assert isinstance(key, ast.Constant), (
-                        "%s:%d: `extra` keys must be literals" % (path, lineno)
+                        f"{path}:{lineno}: `extra` keys must be literals"
                     )
 
                     if key.value in debug._RECORD_ATTRS:
-                        offenders.append("%s:%d: %s" % (path, lineno, key.value))
+                        offenders.append(f"{path}:{lineno}: {key.value}")
 
-        assert not offenders, (
-            "`extra` keys shadow LogRecord attributes: %s" % ", ".join(offenders)
+        assert not offenders, "`extra` keys shadow LogRecord attributes: {}".format(
+            ", ".join(offenders)
         )
 
 
@@ -109,7 +110,7 @@ class ContextFormatterTestCase(BaseTestCase):
         text = self.format(substrate=b"\x04\x02\x0c")
 
         assert text == "decoding substrate=04 02 0c", text
-        assert "\n" not in text, "a record must render on one line: %r" % (text,)
+        assert "\n" not in text, f"a record must render on one line: {text!r}"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

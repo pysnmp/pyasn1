@@ -110,8 +110,7 @@ class StdlibLoggingCaseBase(unittest.TestCase):
         roundTrip()
 
         assert not self.collector.records, (
-            "records emitted without any level being set: %r"
-            % (self.collector.records,)
+            f"records emitted without any level being set: {self.collector.records!r}"
         )
 
     def testMessagesAreInvariant(self):
@@ -128,10 +127,8 @@ class StdlibLoggingCaseBase(unittest.TestCase):
         assert self.collector.records, "nothing emitted"
 
         for record in self.collector.records:
-            assert not record.args, "record carries positional args: %r" % (record.msg,)
-            assert "%" not in record.msg, "record message interpolates: %r" % (
-                record.msg,
-            )
+            assert not record.args, f"record carries positional args: {record.msg!r}"
+            assert "%" not in record.msg, f"record message interpolates: {record.msg!r}"
 
     def testRecordsCarryTheirContextAsFields(self):
         """The values dropped from the messages have to be on the records."""
@@ -192,10 +189,10 @@ class LegacyDebugCaseBase(unittest.TestCase):
             setLoggerQuietly(debugQuietly(flag, printer=lambda msg: None))
 
             assert logging.getLogger(enabled).isEnabledFor(logging.DEBUG), (
-                "flag %r did not enable %s" % (flag, enabled)
+                f"flag {flag!r} did not enable {enabled}"
             )
             assert not logging.getLogger(disabled).isEnabledFor(logging.DEBUG), (
-                "flag %r leaked into %s" % (flag, disabled)
+                f"flag {flag!r} leaked into {disabled}"
             )
 
             setLoggerQuietly(0)
@@ -210,8 +207,7 @@ class LegacyDebugCaseBase(unittest.TestCase):
 
             setLoggerQuietly(0)
             assert app.level == logging.WARNING, (
-                "setLogger(0) left the application level at %s"
-                % logging.getLevelName(app.level)
+                f"setLogger(0) left the application level at {logging.getLevelName(app.level)}"
             )
 
         finally:
@@ -284,11 +280,10 @@ class LoggingHygieneCaseBase(unittest.TestCase):
                 setLoggerQuietly(debugQuietly("all", loggerName="pyasn1-test-app"))
 
             assert log.level == logging.WARNING, (
-                "pyasn1 overrode the application logger level: %s" % log.level
+                f"pyasn1 overrode the application logger level: {log.level}"
             )
             assert log.handlers == handlersBefore, (
-                "pyasn1 attached handlers to the application logger: %r"
-                % (log.handlers,)
+                f"pyasn1 attached handlers to the application logger: {log.handlers!r}"
             )
 
         finally:

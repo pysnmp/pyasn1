@@ -73,18 +73,18 @@ class TagMap:
         return iter(self.__presentTypes)
 
     def __repr__(self) -> str:
-        representation = "%s object" % self.__class__.__name__
+        representation = f"{self.__class__.__name__} object"
 
         if self.__presentTypes:
-            representation += ", present %s" % repr(self.__presentTypes)
+            representation += f", present {self.__presentTypes!r}"
 
         if self.__skipTypes:
-            representation += ", skip %s" % repr(self.__skipTypes)
+            representation += f", skip {self.__skipTypes!r}"
 
         if self.__defaultType is not None:
-            representation += ", default %s" % repr(self.__defaultType)
+            representation += f", default {self.__defaultType!r}"
 
-        return "<%s>" % representation
+        return f"<{representation}>"
 
     @property
     def presentTypes(self) -> "dict[TagSet, Any]":
