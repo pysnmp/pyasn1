@@ -2,6 +2,43 @@
 unreleased
 ---------------------------------
 
+- The codecs now log through ordinary :mod:`logging` loggers named after their
+  modules (``pyasn1.codec.ber.decoder`` and siblings), guarded with
+  ``Logger.isEnabledFor(logging.DEBUG)``. Debugging is enabled the standard
+  way, ``logging.getLogger('pyasn1').setLevel(logging.DEBUG)``, with no pyasn1
+  API involved. Previously the only way in was ``debug.setLogger()``: raising
+  the level on the ``pyasn1`` logger did nothing at all, because each module
+  held a private switch that only ``setLogger`` could flip.
+- Debug records keep their format arguments instead of being rendered at the
+  call site, so ``record.msg`` stays a template and ``record.args`` holds the
+  values. Structured handlers can group by call site and emit the arguments as
+  fields without parsing the message.
+- Per-module logger names replace the ``encoder``/``decoder`` flags, which
+  could not distinguish the BER codecs from the native ones. Enabling
+  ``pyasn1.codec.ber.decoder`` alone is now possible.
+- ``debug.Debug``, ``debug.setLogger`` and ``debug.registerLoggee`` are
+  deprecated and raise ``DeprecationWarning``. They continue to work: the
+  flags map onto the new loggers, ``registerLoggee`` still serves out-of-tree
+  modules, and the emitted message stream is unchanged. Note that while a
+  ``Debug`` instance is installed, ``setLogger`` drives the ``pyasn1.codec.*``
+  logger levels itself and restores them on ``setLogger(None)``.
+- Importing pyasn1 no longer configures logging for the importing application.
+  Previously ``pyasn1.debug`` built its default ``Printer`` at class-definition
+  time, so merely importing any codec attached a ``StreamHandler`` writing to
+  stderr on the ``pyasn1`` logger and forced that logger to ``DEBUG``. The
+  handler is now built on first use of ``debug.Debug()``, and the package
+  installs only a ``logging.NullHandler``, per the standard library's guidance
+  for libraries.
+- ``debug.Debug(..., loggerName=...)`` no longer mutates the application logger
+  it is pointed at. It previously forced that logger to ``DEBUG`` and attached
+  a fresh ``NullHandler`` on every construction, so handlers accumulated and
+  ``hasHandlers()`` changed answer. pyasn1 now configures only the ``pyasn1``
+  logger it owns; records on a caller-named logger just propagate.
+- Added a regression test asserting that every failure escaping the BER, CER
+  and DER decoders derives from ``PyAsn1Error``, so ``except PyAsn1Error`` is
+  sufficient to contain decoding of hostile input.
+- Documented the debugging procedure under :ref:`pyasn1-debugging`.
+
 - Replaced hand-rolled internal type wrappers with Python standard
   library base types to reduce boilerplate code
 - Removed legacy type accessors, aliases, deprecated BIT STRING notation,
@@ -21,6 +58,55 @@ unreleased
 - Added ``examples/`` directory with five runnable scripts:
   ``simple_sequence.py``, ``open_type.py``, ``constraints.py``,
   ``recursive_sequence.py``, ``round_trip.py``
+- Dropped Python 2 residue throughout: the ``_int2oct``/``_str2octs``/``_null``
+  byte shims in the BER/CER codecs, ``sys.exc_info()`` in favour of bound
+  ``except ... as exc`` handlers, and the ``cond and a or b`` ternary idiom.
+- All exceptions raised while handling another now chain with ``raise ... from``,
+  so the originating error is preserved in tracebacks. The ``B904`` lint rule
+  is enabled to keep it that way.
+- Fixed a bug in ``ObjectIdentifier.prettyIn`` where the "Malformed Object ID"
+  message for a value containing ``-`` interpolated ``sys.exc_info()[1]`` read
+  outside any ``except`` block, rendering a stale exception or ``None``.
+- ``TimeMixIn.FixedOffset`` is deprecated in favour of
+  :py:class:`datetime.timezone`; it now emits a ``DeprecationWarning`` and
+  returns a ``datetime.timezone``. ``TimeMixIn.UTC`` is now
+  ``datetime.timezone.utc``. Note that ``dst()`` on the returned object is
+  ``None`` rather than ``timedelta(0)``, matching the standard library.
+- Comparing a schema object now behaves the same for every ASN.1 type.
+  Previously ``schema == schema`` returned :obj:`True` for ``OctetString``,
+  ``ObjectIdentifier`` and the constructed types, raised ``PyAsn1Error`` for
+  ``Integer``, ``Boolean`` and ``Real``, and raised ``TypeError`` for
+  ``BitString``; ``schema != schema`` raised for all of them. A schema object
+  is now equal to itself and unequal to nothing, and every other comparison
+  raises ``PyAsn1Error``.
+- Fixed ``BitString`` comparison converting the right-hand operand before
+  testing identity, so its identity shortcut could never be taken.
+- ``copy.deepcopy()`` now works on schema objects. ``NoValue.__getattr__``
+  answered the ``__deepcopy__`` protocol probe with ``PyAsn1Error`` instead of
+  ``AttributeError``, so deep-copying any schema object raised.
+- ``NoValue`` no longer derives the set of operations it rejects by scanning
+  ``dir()`` of :class:`str`, :class:`int`, :class:`list` and :class:`dict` at
+  first instantiation. The set is now the explicit ``NoValue.plugMethods``
+  tuple, which no longer sweeps up class machinery (``__init_subclass__``,
+  ``__subclasshook__``, ``__class_getitem__``, ``__dir__``) and no longer
+  varies with the Python version. The ``NoValue.skipMethods`` attribute is
+  gone; ``dir()`` on a schema object works again.
+- ``BitString.__int__`` returns a plain :class:`int` rather than a
+  ``SizedInteger``, clearing a ``DeprecationWarning`` that Python raises for
+  ``__int__`` implementations returning an :class:`int` subclass.
+- ``str()`` on an ``OctetString`` (and on ``Any``) now emits a
+  ``DeprecationWarning``. It still decodes the payload as text using the
+  ``encoding`` codec, but a future major release will return the hexadecimal
+  representation instead -- an ASN.1 OCTET STRING is not text. Use
+  ``.asOctets()`` for the octet stream, or ``.asOctets().decode(encoding)``
+  for text. The character string types in ``pyasn1.type.char`` and the time
+  types in ``pyasn1.type.useful`` model text and are unaffected.
+  ``prettyPrint()``, ``repr()`` and ``asOctets()`` do not warn.
+- Fixed two residual ``cond and a or b`` expressions in the BER codec debug
+  logging that PR #38 missed. Both could take the wrong branch when the
+  left-hand result was falsy: ``Decoder`` fell back to the raw value whenever
+  ``prettyPrint()`` returned an empty string, and ``Encoder`` would call
+  ``prettyPrintType()`` on ``None`` whenever it returned an empty string.
 
 
 Revision 1.0.2, released 2021-11-13

@@ -5,44 +5,45 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 from collections import namedtuple
+from typing import Any, Final
 
 from pyasn1 import error
 
 __all__ = [
-    "tagClassUniversal",
+    "Tag",
+    "TagSet",
+    "tagCategoryExplicit",
+    "tagCategoryImplicit",
+    "tagCategoryUntagged",
     "tagClassApplication",
     "tagClassContext",
     "tagClassPrivate",
-    "tagFormatSimple",
+    "tagClassUniversal",
     "tagFormatConstructed",
-    "tagCategoryImplicit",
-    "tagCategoryExplicit",
-    "tagCategoryUntagged",
-    "Tag",
-    "TagSet",
+    "tagFormatSimple",
 ]
 
 #: Identifier for ASN.1 class UNIVERSAL
-tagClassUniversal = 0x00
+tagClassUniversal: Final = 0x00
 
 #: Identifier for ASN.1 class APPLICATION
-tagClassApplication = 0x40
+tagClassApplication: Final = 0x40
 
 #: Identifier for ASN.1 class context-specific
-tagClassContext = 0x80
+tagClassContext: Final = 0x80
 
 #: Identifier for ASN.1 class private
-tagClassPrivate = 0xC0
+tagClassPrivate: Final = 0xC0
 
 #: Identifier for "simple" ASN.1 structure (e.g. scalar)
-tagFormatSimple = 0x00
+tagFormatSimple: Final = 0x00
 
 #: Identifier for "constructed" ASN.1 structure (e.g. may have inner components)
-tagFormatConstructed = 0x20
+tagFormatConstructed: Final = 0x20
 
-tagCategoryImplicit = 0x01
-tagCategoryExplicit = 0x02
-tagCategoryUntagged = 0x04
+tagCategoryImplicit: Final = 0x01
+tagCategoryExplicit: Final = 0x02
+tagCategoryUntagged: Final = 0x04
 
 # Human-readable names for repr() output
 _TAG_CLASS_NAMES = {
@@ -68,7 +69,7 @@ def _tagFormatName(tagFormat):
     return _TAG_FORMAT_NAMES.get(tagFormat, "0x%02x" % tagFormat)
 
 
-_TagBase = namedtuple("Tag", ["tagClass", "tagFormat", "tagId"])
+_TagBase = namedtuple("_TagBase", ["tagClass", "tagFormat", "tagId"])
 
 
 class Tag(_TagBase):
@@ -94,12 +95,12 @@ class Tag(_TagBase):
 
     __slots__ = ()
 
-    def __new__(cls, tagClass, tagFormat, tagId):
+    def __new__(cls, tagClass: int, tagFormat: int, tagId: int) -> "Tag":
         if tagId < 0:
             raise error.PyAsn1Error("Negative tag ID (%s) not allowed" % tagId)
         return super().__new__(cls, tagClass, tagFormat, tagId)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s object, tag [%s:%s:%d]>" % (
             self.__class__.__name__,
             _tagClassName(self.tagClass),
@@ -110,25 +111,25 @@ class Tag(_TagBase):
     # Equality and hashing intentionally consider only (tagClass, tagId),
     # matching the original implementation.  tagFormat is excluded so that
     # a simple and a constructed tag with the same class/id compare equal.
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (self.tagClass, self.tagId) == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return (self.tagClass, self.tagId) != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return (self.tagClass, self.tagId) < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return (self.tagClass, self.tagId) <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return (self.tagClass, self.tagId) > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return (self.tagClass, self.tagId) >= other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.tagClass, self.tagId))
 
 
@@ -168,7 +169,7 @@ class TagSet:
         orderNumber = OrderNumber('1234')
     """
 
-    def __init__(self, baseTag=(), *superTags):
+    def __init__(self, baseTag: "Tag | tuple[()]" = (), *superTags: Tag) -> None:
         self.__baseTag = baseTag
         self.__superTags = superTags
         self.__superTagsClassId = tuple(
@@ -177,7 +178,7 @@ class TagSet:
         self.__lenOfSuperTags = len(superTags)
         self.__hash = hash(self.__superTagsClassId)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if not self.__superTags:
             return "<%s object, untagged>" % self.__class__.__name__
 
@@ -190,44 +191,44 @@ class TagSet:
             "-".join(parts),
         )
 
-    def __add__(self, superTag):
+    def __add__(self, superTag: Tag) -> "TagSet":
         return self.__class__(self.__baseTag, *self.__superTags + (superTag,))
 
-    def __radd__(self, superTag):
+    def __radd__(self, superTag: Tag) -> "TagSet":
         return self.__class__(self.__baseTag, *(superTag,) + self.__superTags)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: Any) -> Any:
         if i.__class__ is slice:
             return self.__class__(self.__baseTag, *self.__superTags[i])
         else:
             return self.__superTags[i]
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__superTagsClassId == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self.__superTagsClassId != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return self.__superTagsClassId < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return self.__superTagsClassId <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return self.__superTagsClassId > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return self.__superTagsClassId >= other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.__hash
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.__lenOfSuperTags
 
     @property
-    def baseTag(self):
+    def baseTag(self) -> Any:
         """Return base ASN.1 tag
 
         Returns
@@ -238,7 +239,7 @@ class TagSet:
         return self.__baseTag
 
     @property
-    def superTags(self):
+    def superTags(self) -> tuple[Tag, ...]:
         """Return ASN.1 tags
 
         Returns
@@ -248,7 +249,7 @@ class TagSet:
         """
         return self.__superTags
 
-    def tagExplicitly(self, superTag):
+    def tagExplicitly(self, superTag: Tag) -> "TagSet":
         """Return explicitly tagged *TagSet*
 
         Create a new *TagSet* representing callee *TagSet* explicitly tagged
@@ -271,7 +272,7 @@ class TagSet:
             superTag = Tag(superTag.tagClass, tagFormatConstructed, superTag.tagId)
         return self + superTag
 
-    def tagImplicitly(self, superTag):
+    def tagImplicitly(self, superTag: Tag) -> "TagSet":
         """Return implicitly tagged *TagSet*
 
         Create a new *TagSet* representing callee *TagSet* implicitly tagged
@@ -294,7 +295,7 @@ class TagSet:
             )
         return self[:-1] + superTag
 
-    def isSuperTagSetOf(self, tagSet):
+    def isSuperTagSetOf(self, tagSet: "TagSet") -> bool:
         """Test type relationship against given *TagSet*
 
         The callee is considered to be a supertype of given *TagSet*
@@ -316,5 +317,5 @@ class TagSet:
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
 
 
-def initTagSet(tag):
+def initTagSet(tag: Tag) -> TagSet:
     return TagSet(tag, tag)

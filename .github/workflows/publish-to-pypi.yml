@@ -15,7 +15,7 @@ jobs:
     name: Validate Version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Verify version matches tag
@@ -32,61 +32,38 @@ jobs:
             exit 1
           fi
 
-  # Build the packages for multiple platforms using tox
+  # Pure-python (py3-none-any) package: one build serves every platform and version
   build-packages:
-    name: Build packages on ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    name: Build package
     needs: [validate-version]
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install build twine tox
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
       - name: Build package
-        run: python -m build
+        run: uv build
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: dist-${{ matrix.os }}-${{ matrix.python-version }}
+          name: dist
           path: dist/
 
-  # Publish all built packages to PyPI
   publish-to-pypi:
     name: Publish Release to PyPI
     needs: [build-packages]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Download build artifacts
+        uses: actions/download-artifact@v8
         with:
-          python-version: "3.10"
-      - name: Install tox
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install tox
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      - name: Organize artifacts
-        run: |
-          mkdir -p dist
-          find artifacts -name "*.whl" -o -name "*.tar.gz" | xargs -I{} cp {} dist/
-          ls -la dist/
-      - name: Publish to PyPI with tox
+          name: dist
+          path: dist
+      - name: Publish to PyPI
         env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: tox -e publish
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish

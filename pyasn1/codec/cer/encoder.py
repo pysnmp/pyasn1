@@ -4,22 +4,19 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import error
 from pyasn1.codec.ber import encoder
 from pyasn1.type import univ, useful
-
-
-def _str2octs(s):
-    return s.encode("iso-8859-1")
-
-
-_null = b""
 
 __all__ = ["encode"]
 
 
 class BooleanEncoder(encoder.IntegerEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if value == 0:
             substrate = (0,)
         else:
@@ -28,7 +25,7 @@ class BooleanEncoder(encoder.IntegerEncoder):
 
 
 class RealEncoder(encoder.RealEncoder):
-    def _chooseEncBase(self, value):
+    def _chooseEncBase(self, value: Any) -> tuple[int, int, int, int]:
         m, b, e = value
         return self._dropFloatingPoint(m, b, e)
 
@@ -47,7 +44,9 @@ class TimeEncoderMixIn:
     MIN_LENGTH = 12
     MAX_LENGTH = 19
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         # CER encoding constraints:
         # - minutes are mandatory, seconds are optional
         # - sub-seconds must NOT be zero / no meaningless zeros
@@ -100,7 +99,11 @@ class TimeEncoderMixIn:
         options.update(maxChunkSize=1000)
 
         return encoder.OctetStringEncoder.encodeValue(
-            self, value, asn1Spec, encodeFun, **options
+            self,  # type: ignore[arg-type]
+            value,
+            asn1Spec,
+            encodeFun,
+            **options,
         )
 
 
@@ -115,34 +118,38 @@ class UTCTimeEncoder(TimeEncoderMixIn, encoder.OctetStringEncoder):
 
 
 class SetOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
         # sort by serialised and padded components
         if len(chunks) > 1:
-            zero = _str2octs("\x00")
+            zero = b"\x00"
             maxLen = max(map(len, chunks))
             paddedChunks = [(x.ljust(maxLen, zero), x) for x in chunks]
             paddedChunks.sort(key=lambda x: x[0])
 
             chunks = [x[1] for x in paddedChunks]
 
-        return _null.join(chunks), True, True
+        return b"".join(chunks), True, True
 
 
 class SequenceOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if options.get("ifNotEmpty", False) and not len(value):
-            return _null, True, True
+            return b"", True, True
 
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
-        return _null.join(chunks), True, True
+        return b"".join(chunks), True, True
 
 
 class SetEncoder(encoder.SequenceEncoder):
     @staticmethod
-    def _componentSortKey(componentAndType):
+    def _componentSortKey(componentAndType: Any) -> Any:
         """Sort SET components by tag
 
         Sort regardless of the Choice value (static sort)
@@ -160,8 +167,10 @@ class SetEncoder(encoder.SequenceEncoder):
         else:
             return asn1Spec.tagSet
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
-        substrate = _null
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
+        substrate = b""
 
         comps = []
         compsMap = {}
@@ -197,10 +206,10 @@ class SetEncoder(encoder.SequenceEncoder):
                 try:
                     component = value[namedType.name]
 
-                except KeyError:
+                except KeyError as exc:
                     raise error.PyAsn1Error(
                         'Component name "%s" not found in %r' % (namedType.name, value)
-                    )
+                    ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
                     continue
@@ -234,7 +243,7 @@ class SequenceEncoder(encoder.SequenceEncoder):
     omitEmptyOptionals = True
 
 
-tagMap = encoder.tagMap.copy()
+tagMap: Final = encoder.tagMap.copy()
 tagMap.update(
     {
         univ.Boolean.tagSet: BooleanEncoder(),
@@ -243,11 +252,16 @@ tagMap.update(
         useful.UTCTime.tagSet: UTCTimeEncoder(),
         # Sequence & Set have same tags as SequenceOf & SetOf
         univ.SetOf.tagSet: SetOfEncoder(),
-        univ.Sequence.typeId: SequenceEncoder(),
+        # FIXME: every other entry here is keyed by tagSet; this one is keyed
+        # by typeId, so it can never match a tag lookup. Inherited verbatim
+        # from upstream pyasn1. Left as-is because univ.Sequence.tagSet equals
+        # univ.SequenceOf.tagSet, so correcting the key would displace the
+        # inherited SequenceOfEncoder and change CER output.
+        univ.Sequence.typeId: SequenceEncoder(),  # type: ignore[dict-item]
     }
 )
 
-typeMap = encoder.typeMap.copy()
+typeMap: Final = encoder.typeMap.copy()
 typeMap.update(
     {
         univ.Boolean.typeId: BooleanEncoder(),
@@ -313,6 +327,6 @@ class Encoder(encoder.Encoder):
 #:    >>> encode(seq)
 #:    b'0\x80\x02\x01\x01\x02\x01\x02\x02\x01\x03\x00\x00'
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)
 
 # EncoderFactory queries class instance and builds a map of tags -> encoders

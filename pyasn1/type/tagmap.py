@@ -4,7 +4,13 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from collections.abc import Iterator
+from typing import TYPE_CHECKING, Any
+
 from pyasn1 import error
+
+if TYPE_CHECKING:
+    from pyasn1.type.tag import TagSet
 
 __all__ = ["TagMap"]
 
@@ -33,33 +39,38 @@ class TagMap:
         in *presentTypes* (unless given key is present in *skipTypes*).
     """
 
-    def __init__(self, presentTypes=None, skipTypes=None, defaultType=None):
+    def __init__(
+        self,
+        presentTypes: "dict[TagSet, Any] | None" = None,
+        skipTypes: "dict[TagSet, Any] | None" = None,
+        defaultType: Any = None,
+    ) -> None:
         self.__presentTypes = presentTypes or {}
         self.__skipTypes = skipTypes or {}
         self.__defaultType = defaultType
 
-    def __contains__(self, tagSet):
+    def __contains__(self, tagSet: "TagSet") -> bool:
         return (
             tagSet in self.__presentTypes
             or self.__defaultType is not None
             and tagSet not in self.__skipTypes
         )
 
-    def __getitem__(self, tagSet):
+    def __getitem__(self, tagSet: "TagSet") -> Any:
         try:
             return self.__presentTypes[tagSet]
-        except KeyError:
+        except KeyError as exc:
             if self.__defaultType is None:
-                raise KeyError()
+                raise KeyError() from None
             elif tagSet in self.__skipTypes:
-                raise error.PyAsn1Error("Key in negative map")
+                raise error.PyAsn1Error("Key in negative map") from exc
             else:
                 return self.__defaultType
 
-    def __iter__(self):
+    def __iter__(self) -> "Iterator[TagSet]":
         return iter(self.__presentTypes)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         representation = "%s object" % self.__class__.__name__
 
         if self.__presentTypes:
@@ -74,16 +85,16 @@ class TagMap:
         return "<%s>" % representation
 
     @property
-    def presentTypes(self):
+    def presentTypes(self) -> "dict[TagSet, Any]":
         """Return *TagSet* to ASN.1 type map present in callee *TagMap*"""
         return self.__presentTypes
 
     @property
-    def skipTypes(self):
+    def skipTypes(self) -> "dict[TagSet, Any]":
         """Return *TagSet* collection unconditionally absent in callee *TagMap*"""
         return self.__skipTypes
 
     @property
-    def defaultType(self):
+    def defaultType(self) -> Any:
         """Return default ASN.1 type being returned for any missing *TagSet*"""
         return self.__defaultType

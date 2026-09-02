@@ -20,8 +20,8 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
       - uses: pre-commit/action@v3.0.1
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: false
           fetch-depth: "0"
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     name: security-sast-semgrep
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Semgrep
         id: semgrep
         uses: returntocorp/semgrep-action@v1
@@ -51,35 +51,55 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: "3.13"
       - name: Install UV
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
       - name: Install dependencies
-        run: uv pip install -e ".[dev]" --system
+        run: uv sync --locked
       - name: Run Ruff
-        run: ruff check .
-      - name: Run Pylint
-        run: pylint pyasn1
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Run mypy
+        run: uv run mypy
+
+      # Advisory only. ty is pre-1.0 and has no disallow_untyped_defs
+      # equivalent, so mypy above remains the blocking gate. ty catches
+      # things mypy misses, notably Liskov override violations.
+      - name: Run ty (advisory)
+        run: uv run ty check pyasn1
+        continue-on-error: true
+
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Build docs
+        run: uv run sphinx-build -W -b html docs/source docs/build
 
   build:
     name: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
       - name: Install UV
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
       - name: Build
-        run: |
-          uv pip install -e ".[dev]" --system
-          uv build
-      - uses: actions/upload-artifact@v4
+        run: uv build
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist
@@ -89,28 +109,28 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Install UV
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
       - name: Run tests
         run: |
-          uv pip install -e ".[dev]" --system
-          uv run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
-      - uses: actions/upload-artifact@v4
+          uv sync --locked --python ${{ matrix.python }}
+          uv run pytest --junitxml=test-results/results.xml --cov=pyasn1 --cov-report=xml tests
+      - uses: actions/upload-artifact@v7
         with:
           name: unit tests test-results
           path: test-results
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.os }}, ${{ matrix.python }}
@@ -124,22 +144,20 @@ jobs:
       - run-unit-tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: false
           persist-credentials: false
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
       - name: Install UV
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
       - name: Build
-        run: |
-          uv pip install -e ".[dev]" --system
-          uv build
+        run: uv build
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           semantic_version: 24
           extra_plugins: |
@@ -156,5 +174,5 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: haya14busa/action-update-semver@v1

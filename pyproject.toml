@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pysnmp-pyasn1"
-version = "1.1.4-beta.5"
+version = "1.2.0-beta.4"
 description = "ASN.1 types and codecs"
 readme = "README.md"
 license = "BSD-2-Clause"
 requires-python = ">=3.10"
 authors = [
-    {name = "rfaircloth-splunk", email = "rfaircloth@splunk.com"},
+    {name = "Ryan Faircloth", email = "actual@rfaircloth.com"},
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -26,19 +26,20 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "ruff>=0.4",
-    "pylint>=3.0",
-    "mypy>=1.0",
-    "Sphinx>=4.3",
-    "pre-commit>=3.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.5",
+    "mypy>=2.3.1",
+    "ty>=0.0.77",
+    "Sphinx>=9.1.0; python_version >= '3.12'",
+    "pre-commit>=4.6.2",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -49,7 +50,7 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF"]
 ignore = [
     "E501",    # line-too-long — existing codebase has long lines
     "E721",    # type-comparison — existing pattern
@@ -58,8 +59,6 @@ ignore = [
     "E712",    # true-false-comparison — existing pattern
     "E402",    # module-import-not-at-top — some imports after variable defs
     "B011",    # assert-false — used in tests
-    "B904",    # raise-without-from-inside-except — existing pattern
-    "B006",    # mutable-argument-default — existing pattern
     "B007",    # unused-loop-control-variable — existing pattern
     "B905",    # zip-without-explicit-strict — existing pattern
     "SIM108",  # if-else-block-instead-of-if-exp — readability preference
@@ -68,25 +67,69 @@ ignore = [
     "SIM101",  # duplicate-isinstance-call — existing pattern
     "SIM110",  # reimplemented-builtin — existing pattern
     "UP031",   # printf-string-formatting — existing codebase style
+    # Migrated from the former [tool.pylint] config: R0913 was disabled there,
+    # and ASN.1 codecs are inherently branchy, so the complexity family stays off.
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments — was disabled for pylint
+    "PLR0915",  # too-many-statements
+    "PLR0917",  # too-many-positional-arguments
+    "PLR2004",  # magic-value-comparison — ASN.1 tag and length constants
+    "PLC0415",  # import-outside-top-level — deliberate, breaks import cycles
+    "PLW2901",  # redefined-loop-name — existing pattern
+    "RUF005",   # collection-literal-concatenation — style preference
+    "RUF012",   # mutable-class-default — existing pattern
+    "RUF021",   # parenthesize-chained-operators — existing pattern
+    "RUF059",   # unused-unpacked-variable — matches B007 above
+    "PLW0603",  # global-statement — setLogger() intentionally rebinds the module logger
+    "PLW1641",  # eq-without-hash — constructed types are mutable, so deliberately
+                # unhashable; SimpleAsn1Type re-adds __hash__ where it is wanted
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["B", "SIM"]  # relax rules for tests
+"tests/**" = ["B", "SIM", "PL", "RUF"]  # relax rules for tests
 
-[tool.pylint.messages_control]
-disable = [
-    "C0114",  # missing-module-docstring
-    "C0115",  # missing-class-docstring
-    "C0116",  # missing-function-docstring
-    "R0903",  # too-few-public-methods
-    "R0913",  # too-many-arguments
+[tool.mypy]
+python_version = "3.10"
+files = ["pyasn1"]
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+no_implicit_optional = true
+strict_equality = true
+disallow_any_generics = true
+no_implicit_reexport = true
+
+# Modules below are fully annotated and must stay that way. Move entries out of
+# this list only to widen coverage, never to relax it.
+[[tool.mypy.overrides]]
+module = [
+    "pyasn1.debug",
+    "pyasn1.error",
+    "pyasn1.codec.*",
+    "pyasn1.type.base",
+    "pyasn1.type.char",
+    "pyasn1.type.constraint",
+    "pyasn1.type.namedtype",
+    "pyasn1.type.namedval",
+    "pyasn1.type.opentype",
+    "pyasn1.type.tag",
+    "pyasn1.type.tagmap",
+    "pyasn1.type.univ",
+    "pyasn1.type.useful",
 ]
-
-[tool.pylint.format]
-max-line-length = 88
-
-[tool.pylint.basic]
-good-names = ["e", "f", "i", "j", "k", "n", "o", "s", "x", "id", "dt"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    # The suite deliberately exercises OctetString.__str__(), whose text
+    # decoding is deprecated. The warning is asserted directly by
+    # OctetStringStrDeprecationTestCase.
+    'ignore:str\(\) on .*decodes the payload as text:DeprecationWarning',
+]
+
+[tool.coverage.run]
+source = ["pyasn1"]
+relative_files = true

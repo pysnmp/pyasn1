@@ -4,29 +4,30 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
+from collections.abc import Iterator
+from typing import Any, Final
 
 from pyasn1 import error
 from pyasn1.type import tag, univ
 
 __all__ = [
+    "BMPString",
+    "GeneralString",
+    "GraphicString",
+    "IA5String",
+    "ISO646String",
     "NumericString",
     "PrintableString",
-    "TeletexString",
     "T61String",
-    "VideotexString",
-    "IA5String",
-    "GraphicString",
-    "VisibleString",
-    "ISO646String",
-    "GeneralString",
-    "UniversalString",
-    "BMPString",
+    "TeletexString",
     "UTF8String",
+    "UniversalString",
+    "VideotexString",
+    "VisibleString",
 ]
 
 NoValue = univ.NoValue
-noValue = univ.noValue
+noValue: Final = univ.noValue
 
 
 class AbstractCharacterString(univ.OctetString):
@@ -64,21 +65,19 @@ class AbstractCharacterString(univ.OctetString):
         On constraint violation or bad initializer.
     """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self._value)
 
-    def __bytes__(self):
+    def __bytes__(self) -> bytes:
         try:
             return self._value.encode(self.encoding)
-        except UnicodeEncodeError:
-            exc = sys.exc_info()[1]
+        except UnicodeEncodeError as exc:
             raise error.PyAsn1UnicodeEncodeError(
-                "Can't encode string '%s' with codec "
-                "%s" % (self._value, self.encoding),
+                "Can't encode string '%s' with codec %s" % (self._value, self.encoding),
                 exc,
-            )
+            ) from exc
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: Any) -> str:
         try:
             if isinstance(value, str):
                 return value
@@ -91,27 +90,26 @@ class AbstractCharacterString(univ.OctetString):
             else:
                 return str(value)
 
-        except (UnicodeDecodeError, LookupError):
-            exc = sys.exc_info()[1]
+        except (UnicodeDecodeError, LookupError) as exc:
             raise error.PyAsn1UnicodeDecodeError(
-                "Can't decode string '%s' with codec " "%s" % (value, self.encoding),
+                "Can't decode string '%s' with codec %s" % (value, self.encoding),
                 exc,
-            )
+            ) from exc
 
-    def asOctets(self, padding=True):
+    def asOctets(self, padding: bool = True) -> bytes:
         return bytes(self)
 
-    def asNumbers(self, padding=True):
+    def asNumbers(self, padding: bool = True) -> tuple[int, ...]:
         return tuple(bytes(self))
 
     #
     # See OctetString.prettyPrint() for the explanation
     #
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: Any) -> Any:
         return value
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         # first see if subclass has its own .prettyOut()
         value = self.prettyOut(self._value)
 
@@ -120,7 +118,7 @@ class AbstractCharacterString(univ.OctetString):
 
         return AbstractCharacterString.__str__(self)
 
-    def __reversed__(self):
+    def __reversed__(self) -> Iterator[str]:
         return reversed(self._value)
 
 

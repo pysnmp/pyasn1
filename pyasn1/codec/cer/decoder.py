@@ -4,6 +4,8 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+from typing import Any, Final
+
 from pyasn1 import error
 from pyasn1.codec.ber import decoder
 from pyasn1.type import univ
@@ -16,15 +18,15 @@ class BooleanDecoder(decoder.AbstractSimpleDecoder):
 
     def valueDecoder(
         self,
-        substrate,
-        asn1Spec,
-        tagSet=None,
-        length=None,
-        state=None,
-        decodeFun=None,
-        substrateFun=None,
-        **options,
-    ):
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
         head, tail = substrate[:length], substrate[length:]
         if not head or length != 1:
             raise error.PyAsn1Error("Not single-octet Boolean payload")
@@ -46,7 +48,7 @@ BitStringDecoder = decoder.BitStringDecoder
 OctetStringDecoder = decoder.OctetStringDecoder
 RealDecoder = decoder.RealDecoder
 
-tagMap = decoder.tagMap.copy()
+tagMap: Final = decoder.tagMap.copy()
 tagMap.update(
     {
         univ.Boolean.tagSet: BooleanDecoder(),
@@ -56,7 +58,7 @@ tagMap.update(
     }
 )
 
-typeMap = decoder.typeMap.copy()
+typeMap: Final = decoder.typeMap.copy()
 
 # Put in non-ambiguous types for faster codec lookup
 for typeDecoder in tagMap.values():
@@ -120,4 +122,4 @@ class Decoder(decoder.Decoder):
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, decoder.typeMap)
+decode: Final = Decoder(tagMap, decoder.typeMap)

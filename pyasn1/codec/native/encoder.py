@@ -4,63 +4,67 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import logging
+from collections.abc import Callable
+from typing import Any, Final
+
 from pyasn1 import debug, error
 from pyasn1.type import base, char, tag, univ, useful
 
 __all__ = ["encode"]
 
-LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_ENCODER)
+LOG = logging.getLogger(__name__)
 
 
 class AbstractItemEncoder:
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         raise error.PyAsn1Error("Not implemented")
 
 
 class BooleanEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return bool(value)
 
 
 class IntegerEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return int(value)
 
 
 class BitStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class OctetStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return value.asOctets()
 
 
 class TextStringEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class NullEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return None
 
 
 class ObjectIdentifierEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return str(value)
 
 
 class RealEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return float(value)
 
 
 class SetEncoder(AbstractItemEncoder):
     protoDict = dict
 
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
             raise inconsistency
@@ -80,7 +84,7 @@ class SequenceEncoder(SetEncoder):
 
 
 class SequenceOfEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
             raise inconsistency
@@ -92,11 +96,11 @@ class ChoiceEncoder(SequenceEncoder):
 
 
 class AnyEncoder(AbstractItemEncoder):
-    def encode(self, value, encodeFun, **options):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return value.asOctets()
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, AbstractItemEncoder]] = {
     univ.Boolean.tagSet: BooleanEncoder(),
     univ.Integer.tagSet: IntegerEncoder(),
     univ.BitString.tagSet: BitStringEncoder(),
@@ -129,7 +133,7 @@ tagMap = {
 
 
 # Put in ambiguous & non-ambiguous types for faster codec lookup
-typeMap = {
+typeMap: Final[dict[int, AbstractItemEncoder]] = {
     univ.Boolean.typeId: BooleanEncoder(),
     univ.Integer.typeId: IntegerEncoder(),
     univ.BitString.typeId: BitStringEncoder(),
@@ -165,22 +169,26 @@ typeMap = {
 
 
 class Encoder:
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap={}):
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, AbstractItemEncoder],
+        typeMap: dict[int, AbstractItemEncoder] | None = None,
+    ) -> None:
         self.__tagMap = tagMap
-        self.__typeMap = typeMap
+        self.__typeMap = typeMap if typeMap is not None else {}
 
-    def __call__(self, value, **options):
+    def __call__(self, value: base.Asn1Type, **options: Any) -> Any:
         if not isinstance(value, base.Asn1Item):
             raise error.PyAsn1Error(
                 "value is not valid (should be an instance of an ASN.1 Item)"
             )
 
-        if LOG:
+        if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(value).__name__)
-            LOG(
-                "encoder called for type %s <%s>"
-                % (type(value).__name__, value.prettyPrint())
+            LOG.debug(
+                "encoder called for type %s <%s>",
+                type(value).__name__,
+                value.prettyPrint(),
             )
 
         tagSet = value.tagSet
@@ -195,21 +203,23 @@ class Encoder:
             try:
                 concreteEncoder = self.__tagMap[baseTagSet]
 
-            except KeyError:
-                raise error.PyAsn1Error("No encoder for %s" % (value,))
+            except KeyError as exc:
+                raise error.PyAsn1Error("No encoder for %s" % (value,)) from exc
 
-        if LOG:
-            LOG(
-                "using value codec %s chosen by %s"
-                % (concreteEncoder.__class__.__name__, tagSet)
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "using value codec %s chosen by %s",
+                concreteEncoder.__class__.__name__,
+                tagSet,
             )
 
         pyObject = concreteEncoder.encode(value, self, **options)
 
-        if LOG:
-            LOG(
-                "encoder %s produced: %s"
-                % (type(concreteEncoder).__name__, repr(pyObject))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "encoder %s produced: %s",
+                type(concreteEncoder).__name__,
+                repr(pyObject),
             )
             debug.scope.pop()
 
@@ -251,4 +261,4 @@ class Encoder:
 #:    >>> encode(seq)
 #:    [1, 2, 3]
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)
