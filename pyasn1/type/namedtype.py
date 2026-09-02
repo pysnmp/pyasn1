@@ -255,11 +255,12 @@ class NamedTypes:
     class PostponedError:
         """Defer raising an error until the map it stands in for is used."""
 
-        def __init__(self, errorMsg: str) -> None:
+        def __init__(self, errorMsg: str, **context: Any) -> None:
             self.__errorMsg = errorMsg
+            self.__context = context
 
         def __getitem__(self, item: Any) -> NoReturn:
-            raise error.PyAsn1Error(self.__errorMsg)
+            raise error.PyAsn1Error(self.__errorMsg, **self.__context)
 
     def __computeTagToPosMap(self) -> Any:
         tagToPosMap = {}
@@ -272,7 +273,9 @@ class NamedTypes:
             for _tagSet in tagMap.presentTypes:
                 if _tagSet in tagToPosMap:
                     return NamedTypes.PostponedError(
-                        f"Duplicate component tag {_tagSet} at {namedType}"
+                        "Duplicate component tag",
+                        tagSet=_tagSet,
+                        namedType=namedType,
                     )
                 tagToPosMap[_tagSet] = idx
 
@@ -283,7 +286,9 @@ class NamedTypes:
         for idx, namedType in enumerate(self.__namedTypes):
             if namedType.name in nameToPosMap:
                 return NamedTypes.PostponedError(
-                    f"Duplicate component name {namedType.name} at {namedType}"
+                    "Duplicate component name",
+                    name=namedType.name,
+                    namedType=namedType,
                 )
             nameToPosMap[namedType.name] = idx
 
@@ -325,7 +330,7 @@ class NamedTypes:
             return self.__namedTypes[idx].asn1Object
 
         except IndexError as exc:
-            raise error.PyAsn1Error("Type position out of range") from exc
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
     def getPositionByType(self, tagSet: tag.TagSet) -> int:
         """Return field position by its ASN.1 type.
@@ -349,7 +354,7 @@ class NamedTypes:
             return self.__tagToPosMap[tagSet]
 
         except KeyError as exc:
-            raise error.PyAsn1Error(f"Type {tagSet} not found") from exc
+            raise error.PyAsn1Error("Type not found", tagSet=tagSet) from exc
 
     def getNameByPosition(self, idx: int) -> str:
         """Return field name by its position in fields set.
@@ -373,7 +378,7 @@ class NamedTypes:
             return self.__namedTypes[idx].name
 
         except IndexError as exc:
-            raise error.PyAsn1Error("Type position out of range") from exc
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
     def getPositionByName(self, name: str) -> int:
         """Return field position by filed name.
@@ -397,7 +402,7 @@ class NamedTypes:
             return self.__nameToPosMap[name]
 
         except KeyError as exc:
-            raise error.PyAsn1Error(f"Name {name} not found") from exc
+            raise error.PyAsn1Error("Name not found", name=name) from exc
 
     def getTagMapNearPosition(self, idx: int) -> Any:
         """Return ASN.1 types that are allowed at or past given field position.
@@ -426,7 +431,7 @@ class NamedTypes:
             return self.__ambiguousTypes[idx].tagMap
 
         except KeyError as exc:
-            raise error.PyAsn1Error("Type position out of range") from exc
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
     def getPositionNearType(self, tagSet: tag.TagSet, idx: int) -> int:
         """Return the closest field position where given ASN.1 type is allowed.
@@ -459,7 +464,9 @@ class NamedTypes:
             return idx + self.__ambiguousTypes[idx].getPositionByType(tagSet)
 
         except KeyError as exc:
-            raise error.PyAsn1Error("Type position out of range") from exc
+            raise error.PyAsn1Error(
+                "Type position out of range", position=idx, tagSet=tagSet
+            ) from exc
 
     def __computeMinTagSet(self) -> tag.TagSet:
         minTagSet = None
@@ -503,7 +510,10 @@ class NamedTypes:
             for tagSet in tagMap:
                 if unique and tagSet in presentTypes:
                     return NamedTypes.PostponedError(
-                        f"Non-unique tagSet {tagSet} of {namedType} at {self}"
+                        "Non-unique tagSet",
+                        tagSet=tagSet,
+                        namedType=namedType,
+                        namedTypes=self,
                     )
                 presentTypes[tagSet] = namedType.asn1Object
             skipTypes.update(tagMap.skipTypes)
@@ -512,7 +522,7 @@ class NamedTypes:
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
                 return NamedTypes.PostponedError(
-                    f"Duplicate default ASN.1 type at {self}"
+                    "Duplicate default ASN.1 type", namedTypes=self
                 )
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)

@@ -266,7 +266,7 @@ class Integer(base.SimpleAsn1Type):
 
             except KeyError as exc:
                 raise error.PyAsn1Error(
-                    f"Can't coerce {value!r} into integer: {exc}"
+                    "Can't coerce value into integer", value=value, cause=exc
                 ) from exc
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
@@ -637,7 +637,7 @@ class BitString(base.SimpleAsn1Type):
 
         except ValueError as exc:
             raise error.PyAsn1Error(
-                f"{cls.__name__}.fromHexString() error: {exc}"
+                "fromHexString() error", asn1Type=cls.__name__, cause=exc
             ) from exc
 
         if prepend is not None:
@@ -666,7 +666,7 @@ class BitString(base.SimpleAsn1Type):
 
         except ValueError as exc:
             raise error.PyAsn1Error(
-                f"{cls.__name__}.fromBinaryString() error: {exc}"
+                "fromBinaryString() error", asn1Type=cls.__name__, cause=exc
             ) from exc
 
         if prepend is not None:
@@ -746,7 +746,7 @@ class BitString(base.SimpleAsn1Type):
 
                 except KeyError as exc:
                     raise error.PyAsn1Error(
-                        f"unknown bit name(s) in {names!r}"
+                        "Unknown bit name(s)", names=names, cause=exc
                     ) from exc
 
                 rightmostPosition = max(bitPositions)
@@ -778,7 +778,7 @@ class BitString(base.SimpleAsn1Type):
             return SizedInteger(value)
 
         else:
-            raise error.PyAsn1Error(f"Bad BitString initializer type '{value}'")
+            raise error.PyAsn1Error("Bad BitString initializer type", value=value)
 
 
 class OctetString(base.SimpleAsn1Type):
@@ -911,8 +911,10 @@ class OctetString(base.SimpleAsn1Type):
 
             except UnicodeEncodeError as exc:
                 raise error.PyAsn1UnicodeEncodeError(
-                    f"Can't encode string '{value}' with '{self.encoding}' codec",
+                    "Can't encode string with codec",
                     exc,
+                    value=value,
+                    codec=self.encoding,
                 ) from exc
         elif isinstance(
             value, OctetString
@@ -936,9 +938,11 @@ class OctetString(base.SimpleAsn1Type):
 
         except UnicodeDecodeError as exc:
             raise error.PyAsn1UnicodeDecodeError(
-                f"Can't decode string '{self._value}' with '{self.encoding}' codec at "
-                f"'{self.__class__.__name__}'",
+                "Can't decode string with codec",
                 exc,
+                value=self._value,
+                codec=self.encoding,
+                asn1Type=self.__class__.__name__,
             ) from exc
 
     def __str__(self) -> str:
@@ -1043,7 +1047,7 @@ class OctetString(base.SimpleAsn1Type):
             if v in ("0", "1"):
                 v = int(v)
             else:
-                raise error.PyAsn1Error(f"Non-binary OCTET STRING initializer {v}")
+                raise error.PyAsn1Error("Non-binary OCTET STRING initializer", value=v)
             byte |= v << bitNo
 
         r.append(byte)
@@ -1330,13 +1334,18 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         elif isinstance(value, str):
             if "-" in value:
                 raise error.PyAsn1Error(
-                    f"Malformed Object ID {value} at {self.__class__.__name__}"
+                    "Malformed Object ID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
                 )
             try:
                 return tuple([int(subOid) for subOid in value.split(".") if subOid])
             except ValueError as exc:
                 raise error.PyAsn1Error(
-                    f"Malformed Object ID {value} at {self.__class__.__name__}: {exc}"
+                    "Malformed Object ID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
+                    cause=exc,
                 ) from exc
 
         try:
@@ -1344,14 +1353,17 @@ class ObjectIdentifier(base.SimpleAsn1Type):
 
         except (ValueError, TypeError) as exc:
             raise error.PyAsn1Error(
-                f"Malformed Object ID {value} at {self.__class__.__name__}: {exc}"
+                "Malformed Object ID",
+                value=value,
+                asn1Type=self.__class__.__name__,
+                cause=exc,
             ) from exc
 
         if len(tupleOfInts) == len(value):
             return tupleOfInts
 
         raise error.PyAsn1Error(
-            f"Malformed Object ID {value} at {self.__class__.__name__}"
+            "Malformed Object ID", value=value, asn1Type=self.__class__.__name__
         )
 
     def prettyOut(self, value: typing.Any) -> typing.Any:
@@ -1471,11 +1483,11 @@ class Real(base.SimpleAsn1Type):
                 or not isinstance(value[1], intTypes)
                 or not isinstance(value[2], intTypes)
             ):
-                raise error.PyAsn1Error(f"Lame Real value syntax: {value}")
+                raise error.PyAsn1Error("Lame Real value syntax", value=value)
             if isinstance(value[0], float) and self._inf and value[0] in self._inf:
                 return value[0]
             if value[1] not in (2, 10):
-                raise error.PyAsn1Error(f"Prohibited base for Real value: {value[1]}")
+                raise error.PyAsn1Error("Prohibited base for Real value", base=value[1])
             if value[1] == 10:
                 value = self.__normalizeBase10(value)
             return value
@@ -1486,7 +1498,9 @@ class Real(base.SimpleAsn1Type):
                 try:
                     value = float(value)
                 except ValueError as exc:
-                    raise error.PyAsn1Error(f"Bad real value syntax: {value}") from exc
+                    raise error.PyAsn1Error(
+                        "Bad real value syntax", value=value
+                    ) from exc
             if self._inf and value in self._inf:
                 return value
             else:
@@ -1497,7 +1511,7 @@ class Real(base.SimpleAsn1Type):
                 return self.__normalizeBase10((int(value), 10, e))
         elif isinstance(value, Real):
             return tuple(typing.cast(typing.Iterable[typing.Any], value))
-        raise error.PyAsn1Error(f"Bad real value syntax: {value}")
+        raise error.PyAsn1Error("Bad real value syntax", value=value)
 
     def prettyPrint(self, scope: int = 0) -> str:
         """Return a human-friendly text representation of the value.
@@ -2072,8 +2086,9 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
             else:
                 raise error.PyAsn1Error(
-                    f"Non-ASN.1 value {value!r} and undefined component"
-                    f" type at {self!r}"
+                    "Non-ASN.1 value and undefined component type",
+                    value=value,
+                    asn1Object=self,
                 )
 
         elif componentType is not None and (matchTags or matchConstraints):
@@ -2092,8 +2107,9 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
                 # additional properties associated with componentType
                 if componentType.typeId != Any.typeId:
                     raise error.PyAsn1Error(
-                        f"Component value is tag-incompatible: {value!r} vs "
-                        f"{componentType!r}"
+                        "Component value is tag-incompatible",
+                        value=value,
+                        componentType=componentType,
                     )
 
         componentValues[idx] = value
@@ -2388,7 +2404,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 return self._keyToIdxMap[name]
 
             except KeyError as exc:
-                raise error.PyAsn1Error(f"Name {name} not found") from exc
+                raise error.PyAsn1Error("Name not found", name=name) from exc
 
         def addField(self, idx: int) -> None:
             """Register a synthetic 'field-<idx>' name for position `idx`."""
@@ -2553,7 +2569,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 idx = self._dynamicNames.getPositionByName(name)
 
             except KeyError as exc:
-                raise error.PyAsn1Error(f"Name {name} not found") from exc
+                raise error.PyAsn1Error("Name not found", name=name) from exc
 
         return self.getComponentByPosition(
             idx, default=default, instantiate=instantiate
@@ -2603,7 +2619,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 idx = self._dynamicNames.getPositionByName(name)
 
             except KeyError as exc:
-                raise error.PyAsn1Error(f"Name {name} not found") from exc
+                raise error.PyAsn1Error("Name not found", name=name) from exc
 
         return self.setComponentByPosition(
             idx, value, verifyConstraints, matchTags, matchConstraints
@@ -2782,7 +2798,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
                 else:
                     raise error.PyAsn1Error(
-                        f"{componentType.__class__.__name__} can cast only scalar values"
+                        "Component type can cast only scalar values",
+                        componentType=componentType.__class__.__name__,
                     )
 
             elif currentValue is not noValue and isinstance(
@@ -2792,7 +2809,8 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
             else:
                 raise error.PyAsn1Error(
-                    f"{componentType.__class__.__name__} undefined component type"
+                    "Undefined component type",
+                    componentType=componentType.__class__.__name__,
                 )
 
         elif (verifyConstraints or matchTags or matchConstraints) and componentTypeLen:
@@ -2811,7 +2829,9 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
                 ):
                     if not componentType[idx].openType:
                         raise error.PyAsn1Error(
-                            f"Component value is tag-incompatible: {value!r} vs {componentType!r}"
+                            "Component value is tag-incompatible",
+                            value=value,
+                            componentType=componentType,
                         )
 
         if componentTypeLen or idx in self._dynamicNames:

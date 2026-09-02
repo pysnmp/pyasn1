@@ -78,7 +78,7 @@ class Asn1Type(Asn1Item):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name[0] != "_" and name in self._readOnly:
-            raise error.PyAsn1Error(f'read-only instance attribute "{name}"')
+            raise error.PyAsn1Error("read-only instance attribute", attribute=name)
 
         self.__dict__[name] = value
 
@@ -306,7 +306,9 @@ class NoValue:
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError(f"Attribute {attr} not present")
 
-        raise error.PyAsn1Error(f'Attempted "{attr}" operation on ASN.1 schema object')
+        raise error.PyAsn1Error(
+            "Attempted operation on ASN.1 schema object", operation=attr
+        )
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} object>"
@@ -314,7 +316,9 @@ class NoValue:
 
 def _plugSchemaOperation(name: str) -> Any:
     def operation(self: Any, *args: Any, **kwargs: Any) -> Any:
-        raise error.PyAsn1Error(f'Attempted "{name}" operation on ASN.1 schema object')
+        raise error.PyAsn1Error(
+            "Attempted operation on ASN.1 schema object", operation=name
+        )
 
     operation.__name__ = name
 
@@ -358,7 +362,11 @@ class SimpleAsn1Type(Asn1Type):
                 self.subtypeSpec(value)
 
             except error.PyAsn1Error as exc:
-                raise exc.__class__(f"{exc} at {self.__class__.__name__}") from exc
+                # Re-raise the same class, keeping the original message and context
+                # and naming the type whose constraints rejected the value.
+                context = dict(exc.context)
+                context.setdefault("asn1Type", self.__class__.__name__)
+                raise exc.__class__(*exc.args, **context) from exc
 
         self._value = value
 
@@ -375,7 +383,7 @@ class SimpleAsn1Type(Asn1Type):
     def _cmpValue(self, operation: str) -> Any:
         if self._value is noValue:
             raise error.PyAsn1Error(
-                f'Attempted "{operation}" operation on ASN.1 schema object'
+                "Attempted operation on ASN.1 schema object", operation=operation
             )
 
         return self._value
@@ -680,7 +688,7 @@ class ConstructedAsn1Type(Asn1Type):
     def _cmpComponents(self, operation: str) -> Any:
         if self._componentValues is noValue:
             raise error.PyAsn1Error(
-                f'Attempted "{operation}" operation on ASN.1 schema object'
+                "Attempted operation on ASN.1 schema object", operation=operation
             )
 
         return self.components

@@ -71,7 +71,7 @@ class AbstractItemEncoder:
             substrateLen = len(substrate)
 
             if substrateLen > 126:
-                raise error.PyAsn1Error(f"Length octets overflow ({substrateLen})")
+                raise error.PyAsn1Error("Length octets overflow", length=substrateLen)
 
             return (0x80 | substrateLen,) + substrate
 
@@ -110,7 +110,9 @@ class AbstractItemEncoder:
                     )
 
                 except error.PyAsn1Error as exc:
-                    raise error.PyAsn1Error(f"Error encoding {value!r}: {exc}") from exc
+                    raise error.PyAsn1Error(
+                        "Error encoding value", value=value, cause=exc
+                    ) from exc
 
                 if LOG.isEnabledFor(logging.DEBUG):
                     LOG.debug(
@@ -343,7 +345,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             second = oid[1]
 
         except IndexError as exc:
-            raise error.PyAsn1Error(f"Short OID {value}") from exc
+            raise error.PyAsn1Error("Short OID", value=value) from exc
 
         if 0 <= second <= 39:
             if first == 1:
@@ -353,13 +355,13 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
             elif first == 2:
                 oid = (second + 80,) + oid[2:]
             else:
-                raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
+                raise error.PyAsn1Error("Impossible first/second arcs", value=value)
 
         elif first == 2:
             oid = (second + 80,) + oid[2:]
 
         else:
-            raise error.PyAsn1Error(f"Impossible first/second arcs at {value}")
+            raise error.PyAsn1Error("Impossible first/second arcs", value=value)
 
         octets: tuple[int, ...] = ()
 
@@ -382,7 +384,7 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
                 octets += res
 
             else:
-                raise error.PyAsn1Error(f"Negative OID arc {subOid} at {value}")
+                raise error.PyAsn1Error("Negative OID arc", arc=subOid, value=value)
 
         return octets, False, False
 
@@ -559,7 +561,7 @@ class RealEncoder(AbstractItemEncoder):
             return self._encodeBinary(value), False, True
 
         else:
-            raise error.PyAsn1Error(f"Prohibited Real base {b}")
+            raise error.PyAsn1Error("Prohibited Real base", base=b)
 
 
 class SequenceEncoder(AbstractItemEncoder):
@@ -648,7 +650,9 @@ class SequenceEncoder(AbstractItemEncoder):
 
                 except KeyError as exc:
                     raise error.PyAsn1Error(
-                        f'Component name "{namedType.name}" not found in {value!r}'
+                        "Component name not found",
+                        name=namedType.name,
+                        value=value,
                     ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
@@ -757,9 +761,10 @@ class ChoiceEncoder(AbstractItemEncoder):
             ]
             if len(names) != 1:
                 raise error.PyAsn1Error(
-                    "{} components for Choice at {!r}".format(
-                        "Multiple " if names else "None ", value
-                    )
+                    "Multiple components for Choice"
+                    if names
+                    else "No components for Choice",
+                    value=value,
                 )
 
             name = names[0]
@@ -873,7 +878,8 @@ class Encoder:
 
         except AttributeError as exc:
             raise error.PyAsn1Error(
-                f'Value {value!r} is not ASN.1 type instance and "asn1Spec" not given'
+                'Value is not ASN.1 type instance and "asn1Spec" not given',
+                value=value,
             ) from exc
 
         if LOG.isEnabledFor(logging.DEBUG):
@@ -936,7 +942,9 @@ class Encoder:
                 concreteEncoder = self.__tagMap[baseTagSet]
 
             except KeyError as exc:
-                raise error.PyAsn1Error(f"No encoder for {value!r} ({tagSet})") from exc
+                raise error.PyAsn1Error(
+                    "No encoder for value", value=value, tagSet=tagSet
+                ) from exc
 
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug(

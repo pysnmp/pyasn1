@@ -72,7 +72,7 @@ class NamedValues(dict[Any, Any]):
 
                 except ValueError as exc:
                     raise error.PyAsn1Error(
-                        f"Not a proper attribute-value pair {namedValue!r}"
+                        "Not a proper attribute-value pair", namedValue=namedValue
                     ) from exc
 
             else:
@@ -80,20 +80,20 @@ class NamedValues(dict[Any, Any]):
                 continue
 
             if name in self:
-                raise error.PyAsn1Error(f"Duplicate name {name}")
+                raise error.PyAsn1Error("Duplicate name", name=name)
 
             if number in self._numbers:
-                raise error.PyAsn1Error(f"Duplicate number  {name}={number}")
+                raise error.PyAsn1Error("Duplicate number", name=name, number=number)
 
             dict.__setitem__(self, name, number)
             self._numbers[number] = name
 
         for name, number in kwargs.items():
             if name in self:
-                raise error.PyAsn1Error(f"Duplicate name {name}")
+                raise error.PyAsn1Error("Duplicate name", name=name)
 
             if number in self._numbers:
-                raise error.PyAsn1Error(f"Duplicate number  {name}={number}")
+                raise error.PyAsn1Error("Duplicate number", name=name, number=number)
 
             dict.__setitem__(self, name, number)
             self._numbers[number] = name
@@ -103,7 +103,7 @@ class NamedValues(dict[Any, Any]):
 
             for name in anonymousNames:
                 if name in self:
-                    raise error.PyAsn1Error(f"Duplicate name {name}")
+                    raise error.PyAsn1Error("Duplicate name", name=name)
 
                 dict.__setitem__(self, name, number)
                 self._numbers[number] = name
@@ -115,7 +115,7 @@ class NamedValues(dict[Any, Any]):
     # reverse index can never fall out of sync.  Construction populates the
     # storage via dict.__setitem__ to bypass these guards.
     def _immutable(self, op: str) -> NoReturn:
-        raise error.PyAsn1Error(f"NamedValues is immutable, attempted {op}")
+        raise error.PyAsn1Error("NamedValues is immutable", operation=op)
 
     def __setitem__(self, key: Any, value: Any) -> NoReturn:
         self._immutable("item assignment")

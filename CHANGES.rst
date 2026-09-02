@@ -2,6 +2,21 @@
 unreleased
 ---------------------------------
 
+- Exceptions now carry structured context. ``PyAsn1Error`` and its subclasses
+  accept arbitrary keyword arguments, keep them as ``exc.context``, and render
+  them as ``key=value`` pairs only when the exception is formatted. A caller
+  that needs the shortfall behind a ``SubstrateUnderrunError`` reads
+  ``exc.context['shortBy']`` instead of parsing it out of the message. The
+  mapping can be passed straight to the ``extra`` argument of a ``logging``
+  call.
+- Every raise site in the library was converted to a constant message with the
+  varying parts passed as keywords, mirroring the convention already applied to
+  logging. A regression test enforces this statically, so an interpolated
+  exception message fails the build.
+- Exception messages gained information rather than losing it: sites that
+  previously named only the offending value now also name the ASN.1 type,
+  tag set or field position involved. Formatting a value whose ``repr()``
+  raises no longer masks the original error.
 - The codecs now log through ordinary :mod:`logging` loggers named after their
   modules (``pyasn1.codec.ber.decoder`` and siblings), guarded with
   ``Logger.isEnabledFor(logging.DEBUG)``. Debugging is enabled the standard

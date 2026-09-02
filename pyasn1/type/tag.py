@@ -101,7 +101,7 @@ class Tag(_TagBase):
     def __new__(cls, tagClass: int, tagFormat: int, tagId: int) -> "Tag":
         """Construct a *Tag*, rejecting a negative *tagId*."""
         if tagId < 0:
-            raise error.PyAsn1Error(f"Negative tag ID ({tagId}) not allowed")
+            raise error.PyAsn1Error("Negative tag ID not allowed", tagId=tagId)
         return super().__new__(cls, tagClass, tagFormat, tagId)
 
     def __repr__(self) -> str:
