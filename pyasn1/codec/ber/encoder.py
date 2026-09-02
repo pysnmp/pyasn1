@@ -15,11 +15,20 @@ from pyasn1.type import char, tag, univ, useful
 
 
 def _int_to_bytes(value: int, signed: bool = False, length: int = 0) -> bytes:
-    """Convert an integer to bytes with length calculation."""
+    """Convert an integer to bytes with length calculation.
+
+    Signed conversion uses the fewest two's complement octets that hold
+    ``value``, as X.690 8.3.2 requires. ``int.bit_length`` ignores the sign
+    and so undercounts negative powers of two -- ``(-128).bit_length()`` is
+    8, yet -128 is exactly representable in one octet -- hence the sign is
+    folded in with ``~value`` before sizing rather than by padding an octet.
+    """
+    if signed:
+        size = ((value if value >= 0 else ~value).bit_length() // 8) + 1
+        return value.to_bytes(max(size, (length + 7) // 8), "big", signed=True)
+
     length = max(value.bit_length(), length)
-    if signed and length % 8 == 0:
-        length += 1
-    return value.to_bytes((length + 7) // 8, "big", signed=signed)
+    return value.to_bytes((length + 7) // 8, "big", signed=False)
 
 
 __all__ = ["encode"]

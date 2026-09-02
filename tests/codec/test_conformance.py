@@ -283,6 +283,55 @@ class NullTestCase(BaseTestCase):
         assert der_encoder.encode(univ.Null("")) == bytes((0x05, 0x00))
 
 
+class IntegerMinimalEncodingTestCase(BaseTestCase):
+    """X.690 8.3.2: given more than one contents octet, the bits of the first
+    octet and bit 8 of the second shall not all be ones, nor all be zero.
+
+    The note to 8.3.2 states the intent: "These rules ensure that an integer
+    value is always encoded in the smallest possible number of octets." The
+    all-ones half is the one that bites, because ``int.bit_length`` ignores
+    the sign: -128 needs exactly one octet, but a naive sizing pads it to
+    ``ff 80`` -- nine leading one-bits, which 8.3.2 a) forbids outright.
+    """
+
+    @staticmethod
+    def minimalOctetCount(value):
+        count = 1
+        while not -(1 << (8 * count - 1)) <= value <= (1 << (8 * count - 1)) - 1:
+            count += 1
+        return count
+
+    def testNegativePowersOfTwoUseOneOctetLess(self):
+        for value, expected in (
+            (-128, bytes((0x02, 0x01, 0x80))),
+            (-32768, bytes((0x02, 0x02, 0x80, 0x00))),
+            (-8388608, bytes((0x02, 0x03, 0x80, 0x00, 0x00))),
+        ):
+            for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+                assert encode(univ.Integer(value)) == expected, value
+
+    def testFirstNineBitsAreNeverAllOnesOrAllZero(self):
+        for value in range(-70000, 70000):
+            octets = der_encoder.encode(univ.Integer(value))[2:]
+            if len(octets) < 2:
+                continue
+
+            leading = (octets[0] << 1) | (octets[1] >> 7)
+            assert leading != 0x1FF, f"{value} encodes with nine leading ones"
+            assert leading != 0x000, f"{value} encodes with nine leading zeros"
+
+    def testEveryValueUsesTheSmallestPossibleNumberOfOctets(self):
+        for value in range(-70000, 70000):
+            octets = der_encoder.encode(univ.Integer(value))[2:]
+            assert len(octets) == self.minimalOctetCount(value), value
+
+    def testBoundariesRoundTrip(self):
+        for value in (-8388608, -32769, -32768, -129, -128, -1, 0, 127, 128, 32767):
+            assert (
+                der_decoder.decode(der_encoder.encode(univ.Integer(value)))[0] == value
+            )
+
+
 class BitStringTestCase(BaseTestCase):
     """X.690 8.6."""
 
