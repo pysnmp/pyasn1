@@ -1431,6 +1431,8 @@ class Real(base.SimpleAsn1Type):
     _plusInf = float("inf")
     _minusInf = float("-inf")
     _inf = _plusInf, _minusInf
+    _nan = float("nan")
+    _minusZero = -0.0
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
@@ -1452,6 +1454,30 @@ class Real(base.SimpleAsn1Type):
             m /= 10
             e += 1
         return m, b, e
+
+    @classmethod
+    def _asSpecialFloat(cls, value: typing.Any) -> "float | None":
+        """Return `value` as a bare float if it is a SpecialRealValue.
+
+        X.690 8.5.9 encodes four such values in a single contents octet.
+        Anything else returns :obj:`None`.
+
+        PLUS-INFINITY, MINUS-INFINITY, NOT-A-NUMBER and minus zero have no
+        (mantissa, base, exponent) representation, so they are held as plain
+        floats. Minus zero needs :func:`math.copysign` to spot because it
+        compares equal to zero, and NOT-A-NUMBER needs the self-inequality
+        test because it compares equal to nothing at all.
+        """
+        if not isinstance(value, float):
+            return None
+
+        if math.isnan(value) or value in cls._inf:
+            return value
+
+        if value == 0.0 and math.copysign(1.0, value) < 0:
+            return value
+
+        return None
 
     def prettyIn(self, value: typing.Any) -> typing.Any:
         """Convert an initializer value into an internal (mantissa, base, exponent) tuple.
@@ -1484,8 +1510,9 @@ class Real(base.SimpleAsn1Type):
                 or not isinstance(value[2], intTypes)
             ):
                 raise error.PyAsn1Error("Lame Real value syntax", value=value)
-            if isinstance(value[0], float) and self._inf and value[0] in self._inf:
-                return value[0]
+            special = self._asSpecialFloat(value[0])
+            if special is not None:
+                return special
             if value[1] not in (2, 10):
                 raise error.PyAsn1Error("Prohibited base for Real value", base=value[1])
             if value[1] == 10:
@@ -1501,8 +1528,9 @@ class Real(base.SimpleAsn1Type):
                     raise error.PyAsn1Error(
                         "Bad real value syntax", value=value
                     ) from exc
-            if self._inf and value in self._inf:
-                return value
+            special = self._asSpecialFloat(value)
+            if special is not None:
+                return special
             else:
                 e = 0
                 while int(value) != value:
@@ -1558,6 +1586,38 @@ class Real(base.SimpleAsn1Type):
         """Indicate whether the calling object represents plus or minus infinity."""
         return self._value in self._inf
 
+    @property
+    def isNaN(self) -> bool:
+        """Indicate NOT-A-NUMBER object value.
+
+        Returns
+        -------
+        : :class:`bool`
+            :obj:`True` if calling object represents the X.690 8.5.9
+            NOT-A-NUMBER value or :obj:`False` otherwise.
+        """
+        return isinstance(self._value, float) and math.isnan(self._value)
+
+    @property
+    def isMinusZero(self) -> bool:
+        """Indicate minus zero object value.
+
+        Minus zero is a distinct encoding under X.690 8.5.9 even though it
+        compares equal to zero, so this is the only way to tell the two
+        apart.
+
+        Returns
+        -------
+        : :class:`bool`
+            :obj:`True` if calling object represents minus zero or
+            :obj:`False` otherwise.
+        """
+        return (
+            isinstance(self._value, float)
+            and self._value == 0.0
+            and math.copysign(1.0, self._value) < 0
+        )
+
     def __add__(self, value: typing.Any) -> typing.Any:
         return self.clone(float(self) + value)
 
@@ -1605,7 +1665,7 @@ class Real(base.SimpleAsn1Type):
 
     def __float__(self) -> float:
         value = self._cmpValue("__float__")
-        if value in self._inf:
+        if isinstance(value, float):
             return value
         else:
             return float(value[0] * pow(value[1], value[2]))

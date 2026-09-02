@@ -479,6 +479,16 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         return self._createComponent(asn1Spec, tagSet, oid, **options), tail
 
 
+#: The four values X.690 8.5.9 encodes as a single contents octet with
+#: bits 8 to 7 set to 01. Every other value in that range is reserved.
+_SPECIAL_REAL_VALUES = {
+    0x40: float("inf"),  # PLUS-INFINITY
+    0x41: float("-inf"),  # MINUS-INFINITY
+    0x42: float("nan"),  # NOT-A-NUMBER
+    0x43: -0.0,  # minus zero
+}
+
+
 class RealDecoder(AbstractSimpleDecoder):
     protoComponent = univ.Real()
 
@@ -559,9 +569,21 @@ class RealDecoder(AbstractSimpleDecoder):
 
         elif firstOctet & 0x40:
             if LOG.isEnabledFor(logging.DEBUG):
-                LOG.debug("decoding infinite REAL")
+                LOG.debug("decoding SpecialRealValue")
 
-            value = "-inf" if firstOctet & 0x01 else "inf"
+            if payload:
+                raise error.PyAsn1Error(
+                    "SpecialRealValue must occupy a single contents octet",
+                    length=len(head),
+                )
+
+            try:
+                value = _SPECIAL_REAL_VALUES[firstOctet]
+
+            except KeyError:
+                raise error.PyAsn1Error(
+                    "Reserved SpecialRealValue encoding", tag=firstOctet
+                ) from None
 
         elif firstOctet & 0xC0 == 0:
             if LOG.isEnabledFor(logging.DEBUG):
