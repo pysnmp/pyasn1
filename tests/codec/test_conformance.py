@@ -546,6 +546,135 @@ class IntegerMinimalOctetsTestCase(BaseTestCase):
                 assert recovered == value, (value, substrate.hex())
 
 
+class RealCanonicalFormTestCase(BaseTestCase):
+    """X.690 11.3 admits one encoding per real value.
+
+    11.3.1 fixes the binary form: base 2, a zero scaling factor, a mantissa
+    that is zero or odd, and the fewest octets for M and E. 11.3.2 fixes the
+    decimal form as ISO 6093 NR3 with a further six restrictions on its
+    spelling.
+    """
+
+    #: (label, contents octets) -- binary forms 11.3.1 rules out.
+    NON_CANONICAL_BINARY = (
+        # 11.3.1: M shall be odd. 6 * 2^0 is 3 * 2^1 written wastefully.
+        ("even mantissa", bytes((0x80, 0x00, 0x06))),
+        # 11.3.1: "the binary scaling factor F shall be zero" (bits 4 to 3).
+        ("non-zero scaling factor", bytes((0x84, 0x00, 0x03))),
+        # 11.3.1: base 2 only. 8.5.7.2 spells base 8 as bits 6-5 = 01.
+        ("base 8", bytes((0x90, 0x00, 0x03))),
+        ("base 16", bytes((0xA0, 0x00, 0x03))),
+        # 11.3.1: "M and E shall each be represented in the fewest octets."
+        ("padded exponent", bytes((0x81, 0x00, 0x01, 0x03))),
+        ("padded mantissa", bytes((0x80, 0x00, 0x00, 0x03))),
+    )
+
+    #: (label, contents octets) -- canonical, and must stay accepted.
+    CANONICAL_BINARY = (
+        ("three", bytes((0x80, 0x00, 0x03)), 3.0),
+        ("six as 3 x 2^1", bytes((0x80, 0x01, 0x03)), 6.0),
+        ("negative three", bytes((0xC0, 0x00, 0x03)), -3.0),
+    )
+
+    def testNonCanonicalBinaryRejectedUnderCerAndDer(self):
+        for label, contents in self.NON_CANONICAL_BINARY:
+            substrate = bytes((0x09, len(contents))) + contents
+
+            for decode in (cer_decoder.decode, der_decoder.decode):
+                self.assertRaises(error.PyAsn1Error, decode, substrate)
+                self.assertRaises(
+                    error.PyAsn1Error, decode, substrate, asn1Spec=univ.Real()
+                )
+
+            # BER is free to accept them, and does.
+            ber_decoder.decode(substrate)
+
+    def testCanonicalBinaryAccepted(self):
+        for label, contents, expected in self.CANONICAL_BINARY:
+            substrate = bytes((0x09, len(contents))) + contents
+
+            for decode in (
+                ber_decoder.decode,
+                cer_decoder.decode,
+                der_decoder.decode,
+            ):
+                value, _ = decode(substrate)
+                assert float(value) == expected, label
+
+    def testOnlyNr3AcceptedUnderCerAndDer(self):
+        # 11.3.2.1: "The ISO 6093 NR3 form shall be used". 8.5.8 spells the
+        # form in bits 6 to 1 of the first contents octet.
+        nr1 = bytes((0x09, 0x04, 0x01)) + b"123"
+        nr2 = bytes((0x09, 0x06, 0x02)) + b"1.234"
+
+        for substrate in (nr1, nr2):
+            for decode in (cer_decoder.decode, der_decoder.decode):
+                self.assertRaises(error.PyAsn1Error, decode, substrate)
+                self.assertRaises(
+                    error.PyAsn1Error, decode, substrate, asn1Spec=univ.Real()
+                )
+
+            # BER accepts all three ISO 6093 forms.
+            ber_decoder.decode(substrate)
+
+        nr3 = bytes((0x09, 0x07, 0x03)) + b"15.E-1"
+        for decode in (
+            ber_decoder.decode,
+            cer_decoder.decode,
+            der_decoder.decode,
+        ):
+            value, _ = decode(nr3)
+            assert float(value) == 1.5
+
+    def testDecimalEncodingSpelling(self):
+        # 11.3.2.5: the last mantissa digit is immediately followed by FULL
+        # STOP, then the exponent-mark. 11.3.2.6: a zero exponent is written
+        # "+0", and PLUS SIGN is not used otherwise.
+        expected = {
+            1.5: b"15.E-1",
+            -0.75: b"-75.E-2",
+            1.0: b"1.E+0",
+            -1.0: b"-1.E+0",
+        }
+
+        for value, contents in expected.items():
+            substrate = der_encoder.encode(univ.Real(value))
+
+            assert substrate == bytes((0x09, len(contents) + 1, 0x03)) + contents, (
+                value,
+                substrate.hex(),
+            )
+
+    def testMantissaTrailingZeroMovedIntoExponent(self):
+        # 11.3.2.4: "Neither the first nor the last digit of the mantissa may
+        # be a 0."
+        for value in (10.0, 100.0, 1e10):
+            substrate = der_encoder.encode(univ.Real(value))
+            mantissa = substrate[3:].split(b".")[0].lstrip(b"-")
+
+            assert not mantissa.endswith(b"0"), substrate
+            assert not mantissa.startswith(b"0"), substrate
+
+            recovered, _ = der_decoder.decode(substrate)
+            assert float(recovered) == value
+
+    def testEncoderOutputSurvivesStrictReader(self):
+        for value in (0.0, 1.0, -1.0, 1.5, -0.75, 3.0, 10.0, 1e10, 1e-10):
+            for encode in (cer_encoder.encode, der_encoder.encode):
+                substrate = encode(univ.Real(value))
+                recovered, _ = der_decoder.decode(substrate)
+
+                assert float(recovered) == value, (value, substrate.hex())
+
+    def testSpecialValuesUnaffected(self):
+        # 8.5.9 encodings are a single octet and carry no canonical variants.
+        for octet, expected in ((0x40, "inf"), (0x41, "-inf")):
+            substrate = bytes((0x09, 0x01, octet))
+            value, _ = der_decoder.decode(substrate)
+
+            assert str(float(value)) == expected
+
+
 class NullTestCase(BaseTestCase):
     """X.690 8.8.2: the contents octets of a NULL are empty."""
 

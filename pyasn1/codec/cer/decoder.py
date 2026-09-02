@@ -68,6 +68,114 @@ class IntegerDecoder(decoder.IntegerDecoder):
             )
 
 
+class RealDecoder(decoder.RealDecoder):
+    """REAL decoder enforcing X.690 11.3.
+
+    BER offers three bases, a scaling factor and three ISO 6093 forms, so one
+    real value has many encodings. 11.3 admits one of each: base 2 with a zero
+    scaling factor and an odd mantissa for binary, NR3 for decimal.
+    """
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        self._verifyCanonicalForm(substrate[:length])
+
+        return super().valueDecoder(
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+    @classmethod
+    def _verifyCanonicalForm(cls, head: bytes) -> None:
+        # No contents octets is the value zero (8.5.2) and a SpecialRealValue
+        # occupies a single octet (8.5.9); neither admits a variant spelling.
+        if len(head) < 2:
+            return
+
+        firstOctet = head[0]
+
+        if firstOctet & 0x80:
+            cls._verifyBinaryForm(head)
+
+        elif not firstOctet & 0x40:
+            # 11.3.2.1: "The ISO 6093 NR3 form shall be used". 8.5.8 puts the
+            # form in bits 6 to 1, with NR3 spelled 00 0011.
+            if firstOctet & 0x3F != 0x03:
+                raise error.PyAsn1Error(
+                    "Decimal REAL must use the ISO 6093 NR3 form",
+                    firstOctet=firstOctet,
+                )
+
+    @staticmethod
+    def _verifyBinaryForm(head: bytes) -> None:
+        firstOctet = head[0]
+
+        # 11.3.1: "binary encoding employing base 2 shall be used". 8.5.7.2
+        # puts the base in bits 6 to 5, with base 2 spelled 00.
+        if firstOctet & 0x30:
+            raise error.PyAsn1Error(
+                "Binary REAL must use base 2", firstOctet=firstOctet
+            )
+
+        # 11.3.1: "the binary scaling factor F shall be zero" (bits 4 to 3).
+        if firstOctet & 0x0C:
+            raise error.PyAsn1Error(
+                "Binary REAL scaling factor must be zero", firstOctet=firstOctet
+            )
+
+        exponentFormat = firstOctet & 0x03
+
+        if exponentFormat == 0x03:
+            exponentLength = head[1]
+            mantissaStart = 2 + exponentLength
+            exponentOctets = head[2:mantissaStart]
+        else:
+            exponentLength = exponentFormat + 1
+            mantissaStart = 1 + exponentLength
+            exponentOctets = head[1:mantissaStart]
+
+        mantissaOctets = head[mantissaStart:]
+
+        if not exponentOctets or not mantissaOctets:
+            # Malformed rather than non-canonical; the base decoder says so.
+            return
+
+        # 11.3.1: "M and E shall each be represented in the fewest octets
+        # necessary." E is two's complement, so 8.3.2 sizes it; M is an
+        # unsigned integer, so a leading zero octet is simply redundant.
+        if len(exponentOctets) > 1:
+            if exponentOctets[0] == 0x00 and not exponentOctets[1] & 0x80:
+                raise error.PyAsn1Error("Non-minimal REAL exponent encoding")
+            if exponentOctets[0] == 0xFF and exponentOctets[1] & 0x80:
+                raise error.PyAsn1Error("Non-minimal REAL exponent encoding")
+
+        if len(mantissaOctets) > 1 and mantissaOctets[0] == 0x00:
+            raise error.PyAsn1Error("Non-minimal REAL mantissa encoding")
+
+        # 11.3.1: "the mantissa M and exponent E are chosen so that M is
+        # either 0 or is odd."
+        mantissa = int.from_bytes(mantissaOctets, "big")
+        if mantissa and not mantissa & 0x01:
+            raise error.PyAsn1Error(
+                "Binary REAL mantissa must be zero or odd", mantissa=mantissa
+            )
+
+
 class BooleanDecoder(decoder.AbstractSimpleDecoder):
     protoComponent = univ.Boolean(0)
 
@@ -194,7 +302,6 @@ class UTCTimeDecoder(CanonicalTimeDecoderMixIn, decoder.UTCTimeDecoder):
 
 # TODO: prohibit non-canonical encoding
 OctetStringDecoder = decoder.OctetStringDecoder
-RealDecoder = decoder.RealDecoder
 
 tagMap: Final = decoder.tagMap.copy()
 tagMap.update(

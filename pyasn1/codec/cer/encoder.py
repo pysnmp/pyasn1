@@ -31,6 +31,35 @@ class RealEncoder(encoder.RealEncoder):
         m, b, e = value
         return self._dropFloatingPoint(m, b, e)
 
+    @staticmethod
+    def _encodeCharacter(mantissa: int, exponent: int) -> bytes:
+        """Encode a decimal REAL in the form X.690 11.3.2 admits.
+
+        The BER spelling omits the FULL STOP that 11.3.2.5 requires and signs
+        a positive exponent that 11.3.2.6 says to leave bare, so it is
+        rewritten here rather than reused.
+        """
+        # Real.prettyIn divides the mantissa down with true division, so a
+        # normalised value arrives here as a float and would render with a
+        # spurious ".0".
+        mantissa = int(mantissa)
+
+        # 11.3.2.4: "Neither the first nor the last digit of the mantissa may
+        # be a 0." A trailing zero moves into the exponent; a leading one
+        # cannot arise, since the mantissa is held as an integer.
+        while mantissa and not mantissa % 10:
+            mantissa //= 10
+            exponent += 1
+
+        # 11.3.2.6: a zero exponent is written "+0"; otherwise PLUS SIGN is
+        # not used, and str() spells a negative exponent with its MINUS SIGN.
+        exponentPart = "+0" if not exponent else str(exponent)
+
+        # 11.3.2.5: the last mantissa digit is immediately followed by FULL
+        # STOP, then the exponent-mark. 11.3.2.3 leaves a negative mantissa
+        # to begin with the MINUS SIGN that str() supplies.
+        return f"\x03{mantissa}.E{exponentPart}".encode("ascii")
+
 
 # specialized GeneralStringEncoder here
 
