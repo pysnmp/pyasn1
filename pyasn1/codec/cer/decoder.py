@@ -15,6 +15,59 @@ from pyasn1.type import tag, univ, useful
 __all__ = ["decode"]
 
 
+class IntegerDecoder(decoder.IntegerDecoder):
+    """INTEGER decoder enforcing X.690 8.3.2.
+
+    A redundant leading 00 or ff octet leaves the value unchanged, so BER
+    accepts it and one integer has unboundedly many spellings. 8.3.2 forbids
+    it: given more than one contents octet, the bits of the first octet and
+    bit 8 of the second shall not all be ones, nor all be zero.
+    """
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: int | None = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        self._verifyMinimalEncoding(substrate[:length])
+
+        return super().valueDecoder(
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            decodeFun,
+            substrateFun,
+            **options,
+        )
+
+    @staticmethod
+    def _verifyMinimalEncoding(head: bytes) -> None:
+        # A single contents octet is always minimal, and an empty one is the
+        # base decoder's to reject under 8.3.1.
+        if len(head) < 2:
+            return
+
+        if head[0] == 0x00 and not head[1] & 0x80:
+            raise error.PyAsn1Error(
+                "Non-minimal INTEGER encoding: redundant leading zero octet",
+                payload=head[:2],
+            )
+
+        if head[0] == 0xFF and head[1] & 0x80:
+            raise error.PyAsn1Error(
+                "Non-minimal INTEGER encoding: redundant leading sign octet",
+                payload=head[:2],
+            )
+
+
 class BooleanDecoder(decoder.AbstractSimpleDecoder):
     protoComponent = univ.Boolean(0)
 
@@ -146,6 +199,8 @@ RealDecoder = decoder.RealDecoder
 tagMap: Final = decoder.tagMap.copy()
 tagMap.update(
     {
+        univ.Integer.tagSet: IntegerDecoder(),
+        univ.Enumerated.tagSet: IntegerDecoder(),
         univ.Boolean.tagSet: BooleanDecoder(),
         univ.BitString.tagSet: BitStringDecoder(),
         univ.OctetString.tagSet: OctetStringDecoder(),
