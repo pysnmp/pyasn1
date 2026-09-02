@@ -71,12 +71,29 @@ class CerStringSegmentationTestCase(BaseTestCase):
         assert segments == [1000, 1000, 500]
 
     def testBitStringSegmentedOnContentOctets(self):
-        # A BIT STRING segment carries the unused-bits octet plus 999 octets of
-        # bits, so the first content octet count is 1000 like every other type.
+        # 8.6.2.2 spends the first content octet of a BIT STRING on the unused
+        # bit count, so a 1000-octet segment carries 999 octets of bits.
         substrate = cer_encoder.encode(univ.BitString(hexValue="00" * 1500))
 
         assert substrate[:2] == bytes((0x23, 0x80)), "expected constructed, indefinite"
-        assert substrate[2:6] == bytes((0x03, 0x82, 0x03, 0xE9))
+        assert substrate[2:6] == bytes((0x03, 0x82, 0x03, 0xE8))
+        assert substrate[6] == 0x00, "leading segment is octet aligned"
+
+        # 999 octets of bits leave 501 octets, plus the unused bits octet.
+        assert substrate[1006:1010] == bytes((0x03, 0x82, 0x01, 0xF6))
+        assert substrate[-2:] == bytes((0x00, 0x00))
+
+    def testBitStringPrimitiveAtBoundary(self):
+        # 7992 bits fill 999 octets, which the unused bits octet brings to the
+        # 1000 content octets 9.2 still admits as primitive.
+        substrate = cer_encoder.encode(univ.BitString(binValue="1" * 7992))
+
+        assert substrate[:4] == bytes((0x03, 0x82, 0x03, 0xE8))
+        assert len(substrate) == 1004
+
+        substrate = cer_encoder.encode(univ.BitString(binValue="1" * 7993))
+
+        assert substrate[:2] == bytes((0x23, 0x80)), "one bit more must segment"
 
 
 class DerSetOfOrderingTestCase(BaseTestCase):

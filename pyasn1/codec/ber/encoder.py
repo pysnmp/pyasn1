@@ -239,7 +239,16 @@ class BitStringEncoder(AbstractItemEncoder):
             alignedValue = value
 
         maxChunkSize = options.get("maxChunkSize", 0)
-        if not maxChunkSize or len(alignedValue) <= maxChunkSize * 8:
+
+        # maxChunkSize budgets the contents octets of a fragment, and 8.6.2.2
+        # spends the first of them on the unused-bit count, so a fragment
+        # carries one octet less of bit data than the budget suggests. CER
+        # 9.2 counts the same way when it caps a fragment at 1000 contents
+        # octets. A budget of one leaves no room at all; keep a single octet
+        # of bit data so chunking still makes progress.
+        maxChunkBits = max(maxChunkSize - 1, 1) * 8 if maxChunkSize else 0
+
+        if not maxChunkBits or len(alignedValue) <= maxChunkBits:
             substrate = alignedValue.asOctets()
             return bytes((len(substrate) * 8 - valueLength,)) + substrate, False, True
 
@@ -261,7 +270,7 @@ class BitStringEncoder(AbstractItemEncoder):
         substrate = b""
         while stop < valueLength:
             start = stop
-            stop = min(start + maxChunkSize * 8, valueLength)
+            stop = min(start + maxChunkBits, valueLength)
             substrate += encodeFun(alignedValue[start:stop], asn1Spec, **options)
 
         return substrate, True, True
