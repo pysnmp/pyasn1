@@ -7,6 +7,8 @@ on:
       - "develop"
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+      # Prerelease tags, so update-semver runs for betas as well.
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
     branches: [main, develop]
 
@@ -137,6 +139,9 @@ jobs:
 
   publish:
     name: Build Release
+    # Semantic release cuts tags from a branch. Now that tag pushes run this
+    # workflow, skip the job on the tags it created itself.
+    if: startsWith(github.ref, 'refs/heads/')
     needs:
       - review_secrets
       - semgrep
