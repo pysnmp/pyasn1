@@ -194,7 +194,15 @@ class TimeMixIn:
             # X.680 46.3 a) 2: the fraction is a decimal fraction of a second,
             # so ".3" is 300 ms and ".003" is 3 ms. Scale by the position of
             # the digits, not by how many of them there are.
-            microsecond = round(float("0." + subsecond) * 1000000)
+            #
+            # 46.3 admits a fraction "to any degree of accuracy", which is
+            # finer than datetime can hold, so the digits past microsecond
+            # resolution are dropped the way datetime.fromisoformat drops
+            # them. Rounding instead would carry ".9999999" up to a whole
+            # second, which datetime rejects as a microsecond count. Padding
+            # and slicing keeps this exact: a fraction long enough to matter
+            # has already exhausted the precision of a float.
+            microsecond = int(subsecond[:6].ljust(6, "0"))
 
         else:
             microsecond = 0

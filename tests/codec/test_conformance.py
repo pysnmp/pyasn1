@@ -1033,6 +1033,63 @@ class RealRoundTripTestCase(BaseTestCase):
             asn1Spec=univ.Real(),
         )
 
+    def testNumberFormGrammarEnforced(self):
+        # X.690 8.5.8 has the sender name the ISO 6093 form in bits 6 to 1 and
+        # then encode "according to ISO 6093", so the octets are held to the
+        # form they declare. Decimal on its own reads all of these.
+        rejected = (
+            # NR1 is an integer: no decimal mark, no exponent.
+            (0x01, b"1.5"),
+            (0x01, b"1E2"),
+            # Python's own int() reads "1_0" as 10. ISO 6093 does not.
+            (0x01, b"1_0"),
+            # NR2 carries a decimal mark but no exponent.
+            (0x02, b"1E2"),
+            (0x02, b"15"),
+            # NR3 requires both.
+            (0x03, b"15E-1"),
+            (0x03, b"1.5"),
+            # None of the three has a spelling for a special value, which
+            # 8.5.9 gives a single contents octet of its own.
+            (0x02, b"NaN"),
+            (0x03, b"Infinity"),
+            (0x01, b"-Infinity"),
+            # Padding is SPACE; a tab or a newline is not an ISO 6093 field.
+            (0x01, b"\t15"),
+            (0x03, b"1.5E1\n"),
+        )
+
+        for numberForm, field in rejected:
+            with self.subTest(numberForm=numberForm, field=field):
+                substrate = bytes((0x09, len(field) + 1, numberForm)) + field
+
+                self.assertRaises(
+                    error.PyAsn1Error,
+                    ber_decoder.decode,
+                    substrate,
+                    asn1Spec=univ.Real(),
+                )
+
+    def testNumberFormGrammarAccepts(self):
+        accepted = (
+            (0x01, b"15", (15, 10, 0)),
+            (0x01, b"-15", (-15, 10, 0)),
+            # 8.5.8 NOTE 1 leaves a digit left of the mark optional.
+            (0x02, b".5", (5, 10, -1)),
+            (0x02, b"15.", (15, 10, 0)),
+            (0x03, b"15.E-1", (15, 10, -1)),
+            (0x03, b"1.5E1", (15, 10, 0)),
+            # ISO 6093 fields are padded to a width the sender chooses.
+            (0x01, b"  15  ", (15, 10, 0)),
+        )
+
+        for numberForm, field, expected in accepted:
+            with self.subTest(numberForm=numberForm, field=field):
+                substrate = bytes((0x09, len(field) + 1, numberForm)) + field
+                decoded, _ = ber_decoder.decode(substrate, asn1Spec=univ.Real())
+
+                self.assertEqual(tuple(decoded), expected)
+
     def testCommaDecimalMark(self):
         # ISO 6093 admits either a comma or a full stop as the decimal mark.
         substrate = bytes((0x09, 0x06, 0x03)) + b"1,5E0"

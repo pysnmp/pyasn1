@@ -900,9 +900,19 @@ class ObjectIdentifierDecoderTestCase(BaseTestCase):
 
 class RealDecoderTestCase(BaseTestCase):
     def testChar(self):
-        assert decoder.decode(bytes((9, 7, 3, 49, 50, 51, 69, 49, 49))) == (
+        # "123.E11". X.690 8.5.8 has the sender name the ISO 6093 form and
+        # then encode according to it, and NR3 requires the decimal mark.
+        assert decoder.decode(bytes((9, 8, 3, 49, 50, 51, 46, 69, 49, 49))) == (
             univ.Real((123, 10, 11)),
             _null,
+        )
+
+    def testCharWithoutDecimalMark(self):
+        # "123E11" under an NR3 selector: NR2-shaped octets declaring NR3.
+        self.assertRaises(
+            PyAsn1Error,
+            decoder.decode,
+            bytes((9, 7, 3, 49, 50, 51, 69, 49, 49)),
         )
 
     def testBin1(self):  # check base = 2

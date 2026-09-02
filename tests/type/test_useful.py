@@ -120,6 +120,19 @@ class GeneralizedTimeTestCase(BaseTestCase):
         ):
             assert useful.GeneralizedTime.fromDateTime(dt).asDateTime == dt
 
+    def testLongFractionTruncates(self):
+        # X.680 46.3 a) 2 admits a fraction "to any degree of accuracy", which
+        # is finer than datetime holds. Digits past microsecond resolution are
+        # dropped, as datetime.fromisoformat drops them. Rounding instead
+        # carried ".9999999" up to 1000000 us, which datetime rejects.
+        assert useful.GeneralizedTime(
+            "20170101000000.9999999Z"
+        ).asDateTime == datetime.datetime(2017, 1, 1, 0, 0, 0, 999999, tzinfo=UTC)
+
+        assert useful.GeneralizedTime(
+            "20170101000000.1234567Z"
+        ).asDateTime == datetime.datetime(2017, 1, 1, 0, 0, 0, 123456, tzinfo=UTC)
+
     def testSpecExample(self):
         # X.680 46.3, case b): "19851106210627.3Z" is 6 minutes, 27.3 seconds
         # after 9 pm on 6 November 1985.

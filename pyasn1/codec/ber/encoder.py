@@ -531,8 +531,18 @@ class RealEncoder(AbstractItemEncoder):
 
     @staticmethod
     def _encodeCharacter(mantissa: int, exponent: int) -> bytes:
-        sign = "+" if exponent == 0 else ""
-        return f"\x03{mantissa}E{sign}{exponent}".encode("ascii")
+        """Encode a base 10 REAL as an ISO 6093 NR3 field (X.690 8.5.8).
+
+        NR3 requires a decimal mark. This used to emit "15E-1", which
+        declares NR3 in the first contents octet and then carries NR2-shaped
+        octets, so a decoder holding the sender to the form it named could
+        not read it back.
+        """
+        # str() already spells a negative exponent with its MINUS SIGN, and
+        # ISO 6093 leaves the PLUS SIGN optional on a positive one. The
+        # canonical spelling of 11.3.2.6 is tighter still and belongs to the
+        # CER and DER encoders, which override this.
+        return f"\x03{mantissa}.E{exponent}".encode("ascii")
 
     def encodeValue(
         self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any

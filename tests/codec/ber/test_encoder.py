@@ -718,7 +718,9 @@ class ObjectIdentifierWithSchemaEncoderTestCase(BaseTestCase):
 class RealEncoderTestCase(BaseTestCase):
     def testChar(self):
         assert encoder.encode(univ.Real((123, 10, 11))) == bytes(
-            (9, 7, 3, 49, 50, 51, 69, 49, 49)
+            # ISO 6093 NR3 requires the decimal mark: "123.E11", not
+            # "123E11", which declares NR3 and carries NR2-shaped octets.
+            (9, 8, 3, 49, 50, 51, 46, 69, 49, 49)
         )
 
     def testBin1(self):
@@ -788,7 +790,9 @@ class RealEncoderTestCase(BaseTestCase):
 class RealEncoderWithSchemaTestCase(BaseTestCase):
     def testChar(self):
         assert encoder.encode((123, 10, 11), asn1Spec=univ.Real()) == bytes(
-            (9, 7, 3, 49, 50, 51, 69, 49, 49)
+            # ISO 6093 NR3 requires the decimal mark: "123.E11", not
+            # "123E11", which declares NR3 and carries NR2-shaped octets.
+            (9, 8, 3, 49, 50, 51, 46, 69, 49, 49)
         )
 
 

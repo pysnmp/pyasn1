@@ -8,6 +8,7 @@
 
 import decimal
 import logging
+import re
 from typing import Any, Final
 
 from pyasn1 import debug, error
@@ -554,6 +555,18 @@ _SPECIAL_REAL_VALUES = {
     0x43: -0.0,  # minus zero
 }
 
+#: The ISO 6093 number representations X.690 8.5.8 selects with bits 6 to 1 of
+#: the first contents octet. NR1 is an integer, NR2 adds a decimal mark, and
+#: NR3 adds an exponent; the mark is required in both of the latter. 8.5.8
+#: NOTE 1 makes a digit to the left of the mark a recommendation rather than a
+#: requirement, so ".5" is admitted, and 11.3.2.5 writes the canonical NR3
+#: mantissa with nothing to the right of it, as "15.E-1".
+_ISO6093_FORMS: Final = {
+    0x01: re.compile(r"[+-]?\d+\Z"),
+    0x02: re.compile(r"[+-]?(?:\d+[.,]\d*|\d*[.,]\d+)\Z"),
+    0x03: re.compile(r"[+-]?(?:\d+[.,]\d*|\d*[.,]\d+)[Ee][+-]?\d+\Z"),
+}
+
 
 class RealDecoder(AbstractSimpleDecoder):
     protoComponent = univ.Real()
@@ -604,26 +617,46 @@ class RealDecoder(AbstractSimpleDecoder):
 
         numberForm = firstOctet & 0x3F
 
-        if numberForm not in (0x01, 0x02, 0x03):
-            raise error.SubstrateUnderrunError("Unknown NR", tag=firstOctet)
+        try:
+            grammar = _ISO6093_FORMS[numberForm]
+
+        except KeyError:
+            raise error.SubstrateUnderrunError("Unknown NR", tag=firstOctet) from None
 
         try:
-            text = payload.decode("ascii").strip()
+            # ISO 6093 fields are padded to a width the sender chooses, which
+            # is why 8.5.8 calls the contents octets a field, so SPACE around
+            # the number is expected. Nothing else is: a tab or a newline
+            # would have to survive the grammar below.
+            text = payload.decode("ascii").strip(" ")
 
-            if numberForm == 0x01:
-                return int(text), 10, 0
+        except UnicodeDecodeError as exc:
+            raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
 
+        # 8.5.8 has the sender name the ISO 6093 form and then encode
+        # according to it, so the octets are held to the form they declare.
+        # Decimal alone would read an exponent under an NR2 selector, take
+        # Python's own "1_0" as an NR1 integer, and accept "NaN" and
+        # "Infinity" under any of the three.
+        if not grammar.match(text):
+            raise error.SubstrateUnderrunError(
+                "Bad character Real syntax", numberForm=numberForm
+            )
+
+        if numberForm == 0x01:
+            return int(text), 10, 0
+
+        try:
             # ISO 6093 admits either a comma or a full stop as the decimal
             # mark; Decimal only knows the full stop.
             sign, digits, exponent = decimal.Decimal(text.replace(",", ".")).as_tuple()
 
-        except (ValueError, UnicodeDecodeError, decimal.InvalidOperation) as exc:
+        except decimal.InvalidOperation as exc:
             raise error.SubstrateUnderrunError("Bad character Real syntax") from exc
 
-        if not isinstance(exponent, int):
-            # as_tuple() spells the exponent of a NaN or an infinity with a
-            # letter. Neither has an ISO 6093 spelling, so the field is junk.
-            raise error.SubstrateUnderrunError("Bad character Real syntax")
+        # The grammar admits only a finite decimal, so as_tuple() cannot have
+        # spelled the exponent with the letter it uses for a NaN or infinity.
+        assert isinstance(exponent, int)
 
         mantissa = int("".join(str(digit) for digit in digits))
 
