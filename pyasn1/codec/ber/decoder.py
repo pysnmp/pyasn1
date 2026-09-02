@@ -1602,6 +1602,20 @@ class Decoder:
     defaultRawDecoder = AnyDecoder()
     supportIndefLength = True
 
+    # X.690 10.1 (DER) and 9.1 (CER) both require the definite length to be
+    # encoded in the fewest octets. BER leaves it open: 8.1.3.5 note 2 makes
+    # the octet count a sender's option, so this stays off for the base codec.
+    requireMinimalLength = False
+
+    # X.690 9.1: under CER a constructed encoding uses the indefinite form.
+    requireIndefLengthForConstructed = False
+
+    # X.690 8.1.2.2 reserves the single-octet identifier for tags up to 30.
+    # Clause 8 states it unconditionally, but a high tag number carrying a
+    # small tag still decodes unambiguously, so BER keeps accepting it and
+    # the canonical codecs do not.
+    requireLowTagNumberForm = False
+
     def __init__(
         self,
         tagMap: dict[tag.TagSet, AbstractDecoder],
@@ -1613,6 +1627,32 @@ class Decoder:
         self.__tagCache: dict[int, tag.Tag] = {}
         self.__tagSetCache: dict[int, tag.TagSet] = {}
         self.__eooSentinel = bytes((0, 0))
+
+    @staticmethod
+    def _checkMinimalLength(length: int, sizeOctets: int, tagSet: Any) -> None:
+        """Reject a long form that could have been written in fewer octets.
+
+        X.690 10.1 and 9.1 both demand the fewest length octets. A length
+        below 128 has a short form available, and above it the count of
+        subsequent octets is fixed by the magnitude of the length.
+        """
+        if length < 128:
+            raise error.PyAsn1Error(
+                "Long length form used where the short form suffices",
+                length=length,
+                tagSet=tagSet,
+            )
+
+        minimalSize = (length.bit_length() + 7) // 8
+
+        if sizeOctets != minimalSize:
+            raise error.PyAsn1Error(
+                "Non-minimal length encoding",
+                length=length,
+                expectedSize=minimalSize,
+                actualSize=sizeOctets,
+                tagSet=tagSet,
+            )
 
     def __call__(
         self,
@@ -1692,6 +1732,13 @@ class Decoder:
                         try:
                             while True:
                                 integerTag = substrate[lengthOctetIdx]
+                                if lengthOctetIdx == 0 and not integerTag & 0x7F:
+                                    # 8.1.2.4.2 c): bits 7 to 1 of the first
+                                    # subsequent octet shall not all be zero,
+                                    # which rules out padding the tag number.
+                                    raise error.PyAsn1Error(
+                                        "Non-minimal tag number encoding"
+                                    )
                                 lengthOctetIdx += 1
                                 tagId <<= 7
                                 tagId |= integerTag & 0x7F
@@ -1712,6 +1759,20 @@ class Decoder:
                     if isShortTag:
                         # cache short tags
                         tagCache[firstOctet] = lastTag
+
+                if (
+                    self.requireLowTagNumberForm
+                    and not isShortTag
+                    and lastTag.tagId < 0x1F
+                ):
+                    # 8.1.2.2 reserves the single octet for these tags. Short
+                    # tags are the only ones cached, so a cache hit leaves
+                    # isShortTag set and skips the check.
+                    raise error.PyAsn1Error(
+                        "High tag number form used where the low tag number "
+                        "form suffices",
+                        tagId=lastTag.tagId,
+                    )
 
                 if tagSet is None:
                     if isShortTag:
@@ -1747,6 +1808,15 @@ class Decoder:
                     length = firstOctet
 
                 elif firstOctet > 128:
+                    if firstOctet == 0xFF:
+                        # 8.1.3.5 c): reserved for a future extension. Caught
+                        # here so it does not read as a 127-octet length that
+                        # merely ran off the end of the substrate.
+                        raise error.PyAsn1Error(
+                            "Length octet 0xff is reserved by X.690 8.1.3.5",
+                            tagSet=tagSet,
+                        )
+
                     size = firstOctet & 0x7F
                     # encoded in size bytes
                     encodedLength = substrate[1 : size + 1]
@@ -1764,6 +1834,10 @@ class Decoder:
                     for lengthOctet in encodedLength:
                         length <<= 8
                         length |= lengthOctet
+
+                    if self.requireMinimalLength:
+                        self._checkMinimalLength(length, size, tagSet)
+
                     size += 1
 
                 else:
@@ -1777,6 +1851,15 @@ class Decoder:
                         raise error.PyAsn1Error(
                             "Indefinite length encoding not supported by this codec"
                         )
+
+                elif (
+                    self.requireIndefLengthForConstructed
+                    and lastTag.tagFormat == tag.tagFormatConstructed
+                ):
+                    raise error.PyAsn1Error(
+                        "Definite length form used for a constructed encoding",
+                        tagSet=tagSet,
+                    )
 
                 elif len(substrate) < length:
                     raise error.SubstrateUnderrunError(

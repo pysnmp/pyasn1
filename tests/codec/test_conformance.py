@@ -26,7 +26,7 @@ from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
-from pyasn1.type import char, constraint, namedtype, univ, useful
+from pyasn1.type import char, constraint, namedtype, tag, univ, useful
 from tests.base import BaseTestCase
 
 
@@ -1344,6 +1344,136 @@ class SequenceComponentTestCase(BaseTestCase):
 
         assert value["first"] == 1
         assert value["second"] == True
+
+
+class LengthFormTestCase(BaseTestCase):
+    """X.690 10.1: DER uses the definite length form in the minimum number of
+    octets. 9.1: CER uses the fewest length octets for a primitive encoding
+    and the indefinite form for a constructed one. BER leaves the octet count
+    to the sender per the note to 8.1.3.5."""
+
+    # INTEGER 5 with the length spelled three ways.
+    minimal = bytes((0x02, 0x01, 0x05))
+    longForm = bytes((0x02, 0x81, 0x01, 0x05))
+    paddedLongForm = bytes((0x02, 0x82, 0x00, 0x01, 0x05))
+
+    def testMinimalFormAcceptedEverywhere(self):
+        for decode in (ber_decoder.decode, cer_decoder.decode, der_decoder.decode):
+            value, _ = decode(self.minimal)
+            assert value == 5
+
+    def testLongFormForSmallLengthRejectedUnderCerAndDer(self):
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(error.PyAsn1Error, decode, self.longForm)
+            self.assertRaises(error.PyAsn1Error, decode, self.paddedLongForm)
+
+    def testLongFormToleratedUnderBer(self):
+        # The note to 8.1.3.5 makes the octet count a sender's option, so
+        # neither spelling is an error under BER.
+        for substrate in (self.longForm, self.paddedLongForm):
+            value, _ = ber_decoder.decode(substrate)
+            assert value == 5
+
+    def testPaddedLongFormRejectedAtEveryWidth(self):
+        # 201 octets of contents needs exactly one length octet, so the
+        # two-octet spelling is non-minimal even though the short form is
+        # unavailable.
+        contents = b"\x00" * 201
+        minimal = bytes((0x04, 0x81, 0xC9)) + contents
+        padded = bytes((0x04, 0x82, 0x00, 0xC9)) + contents
+
+        value, _ = der_decoder.decode(minimal)
+        assert value == univ.OctetString(contents)
+
+        self.assertRaises(error.PyAsn1Error, der_decoder.decode, padded)
+
+    def testReservedLengthOctetRejected(self):
+        # 8.1.3.5 c): the value 11111111 shall not be used. This holds under
+        # BER too, since no sender's option covers it.
+        for decode in (ber_decoder.decode, cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(error.PyAsn1Error, decode, bytes((0x02, 0xFF, 0x01)))
+
+    def testCerRequiresIndefiniteFormForConstructed(self):
+        definite = bytes((0x30, 0x03, 0x02, 0x01, 0x05))
+        indefinite = bytes((0x30, 0x80, 0x02, 0x01, 0x05, 0x00, 0x00))
+
+        self.assertRaises(error.PyAsn1Error, cer_decoder.decode, definite)
+
+        value, _ = cer_decoder.decode(indefinite)
+        assert value[0] == 5
+
+    def testDerRequiresDefiniteFormForConstructed(self):
+        definite = bytes((0x30, 0x03, 0x02, 0x01, 0x05))
+        indefinite = bytes((0x30, 0x80, 0x02, 0x01, 0x05, 0x00, 0x00))
+
+        value, _ = der_decoder.decode(definite)
+        assert value[0] == 5
+
+        self.assertRaises(error.PyAsn1Error, der_decoder.decode, indefinite)
+
+    def testEncodersEmitMinimalLengths(self):
+        # 127 contents octets is the last length the short form reaches.
+        for size in (0, 1, 127, 128, 255, 256):
+            substrate = der_encoder.encode(univ.OctetString(b"x" * size))
+
+            if size < 128:
+                assert substrate[1] == size, f"{size} should use the short form"
+            else:
+                sizeOctets = substrate[1] & 0x7F
+                assert substrate[1] & 0x80, f"{size} should use the long form"
+                assert sizeOctets == (size.bit_length() + 7) // 8
+
+
+class TagFormTestCase(BaseTestCase):
+    """X.690 8.1.2.2: tags from 0 to 30 occupy a single identifier octet.
+    8.1.2.4.2 c): bits 7 to 1 of the first subsequent octet of a high tag
+    number shall not all be zero."""
+
+    def testLowTagNumberFormAcceptedEverywhere(self):
+        for decode in (ber_decoder.decode, cer_decoder.decode, der_decoder.decode):
+            value, _ = decode(bytes((0x02, 0x01, 0x05)))
+            assert value == 5
+
+    def testHighTagNumberFormForSmallTagRejectedUnderCerAndDer(self):
+        # Tag 2 spelled the long way. It decodes to the same tag as 0x02, so
+        # accepting it admits two encodings of one value.
+        substrate = bytes((0x1F, 0x02, 0x01, 0x05))
+
+        for decode in (cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(error.PyAsn1Error, decode, substrate)
+
+    def testHighTagNumberFormForSmallTagToleratedUnderBer(self):
+        value, _ = ber_decoder.decode(bytes((0x1F, 0x02, 0x01, 0x05)))
+        assert value == 5
+
+    def testPaddedTagNumberRejectedEverywhere(self):
+        # 8.1.2.4.2 c) admits no sender's option, so the padding is invalid
+        # under BER as well.
+        substrate = bytes((0x1F, 0x80, 0x02, 0x01, 0x05))
+
+        for decode in (ber_decoder.decode, cer_decoder.decode, der_decoder.decode):
+            self.assertRaises(error.PyAsn1Error, decode, substrate)
+
+    def testHighTagNumberFormAcceptedForLargeTag(self):
+        # Tag 31 is the smallest that needs the high tag number form.
+        largeTag = univ.Integer(5).subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 31)
+        )
+        substrate = der_encoder.encode(largeTag)
+
+        assert substrate == bytes((0x9F, 0x1F, 0x01, 0x05))
+
+        value, _ = der_decoder.decode(substrate, asn1Spec=largeTag)
+        assert value == 5
+
+    def testEncodersNeverEmitHighTagNumberFormForSmallTag(self):
+        for tagId in range(31):
+            asn1Object = univ.Integer(5).subtype(
+                implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, tagId)
+            )
+            substrate = der_encoder.encode(asn1Object)
+
+            assert substrate[0] & 0x1F != 0x1F, f"tag {tagId} took the long form"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
