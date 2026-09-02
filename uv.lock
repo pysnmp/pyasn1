@@ -863,7 +863,7 @@ wheels = [
 
 [[package]]
 name = "pysnmp-pyasn1"
-version = "1.2.0b13"
+version = "1.2.0b14"
 source = { editable = "." }
 
 [package.dev-dependencies]
