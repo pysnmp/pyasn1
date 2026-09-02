@@ -47,30 +47,6 @@ tagCategoryImplicit: Final = 0x01
 tagCategoryExplicit: Final = 0x02
 tagCategoryUntagged: Final = 0x04
 
-# Human-readable names for repr() output
-_TAG_CLASS_NAMES = {
-    tagClassUniversal: "UNIVERSAL",
-    tagClassApplication: "APPLICATION",
-    tagClassContext: "CONTEXT",
-    tagClassPrivate: "PRIVATE",
-}
-
-_TAG_FORMAT_NAMES = {
-    tagFormatSimple: "simple",
-    tagFormatConstructed: "constructed",
-}
-
-
-def _tagClassName(tagClass: int) -> str:
-    """Return a human-readable name for an ASN.1 tag class."""
-    return _TAG_CLASS_NAMES.get(tagClass, "0x%02x" % tagClass)
-
-
-def _tagFormatName(tagFormat: int) -> str:
-    """Return a human-readable name for an ASN.1 tag format."""
-    return _TAG_FORMAT_NAMES.get(tagFormat, "0x%02x" % tagFormat)
-
-
 #: Human-readable names for the ASN.1 tag classes, used by ``repr()``.
 _TAG_CLASS_NAMES: Final = {
     tagClassUniversal: "UNIVERSAL",
