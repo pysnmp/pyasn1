@@ -31,13 +31,25 @@ class LargeTagDecoderTestCase(BaseTestCase):
     def testLongTag(self):
         assert decoder.decode(bytes((0x1F, 2, 1, 0)))[0].tagSet == univ.Integer.tagSet
 
-    def testTagsEquivalence(self):
+    def testPaddedTagNumberRejected(self):
+        # X.690 8.1.2.4.2 c): bits 7 to 1 of the first subsequent octet shall
+        # not all be zero. Tag 0 therefore has no high tag number form at all,
+        # padded or otherwise, and 8.1.2.2 gives it the single octet 0x80.
+        # Both spellings below used to decode, silently aliasing that tag.
         integer = univ.Integer(2).subtype(
             implicitTag=tag.Tag(tag.tagClassContext, 0, 0)
         )
-        assert decoder.decode(
-            bytes((0x9F, 0x80, 0x00, 0x02, 0x01, 0x02)), asn1Spec=integer
-        ) == decoder.decode(bytes((0x9F, 0x00, 0x02, 0x01, 0x02)), asn1Spec=integer)
+
+        for substrate in (
+            bytes((0x9F, 0x80, 0x00, 0x02, 0x01, 0x02)),
+            bytes((0x9F, 0x00, 0x02, 0x01, 0x02)),
+        ):
+            self.assertRaises(PyAsn1Error, decoder.decode, substrate, asn1Spec=integer)
+
+        assert decoder.decode(bytes((0x80, 0x01, 0x02)), asn1Spec=integer) == (
+            2,
+            _null,
+        )
 
 
 class DecoderCacheTestCase(BaseTestCase):

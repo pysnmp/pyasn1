@@ -434,7 +434,7 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesChoiceOne(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 1, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 1, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -444,7 +444,7 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesUnknownId(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 3, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 3, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -475,7 +475,7 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesChoiceOne(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 1, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 1, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -485,7 +485,7 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesUnknownId(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 3, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 3, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )

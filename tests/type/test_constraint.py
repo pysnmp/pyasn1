@@ -342,6 +342,69 @@ class InnerTypeConstraintTestCase(BaseTestCase):
 
         # Constraints compositions
 
+    def testAbsentSatisfiedByAbsentComponent(self):
+        # X.680 51.8.10.1: a component constrained ABSENT is satisfied if and
+        # only if its value is absent. ABSENT used to raise unconditionally,
+        # rejecting the one case that satisfies it.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "ABSENT"),
+        )
+
+        c(None, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 4, 0)
+
+    def testPresentRejectsAbsentComponent(self):
+        # 51.8.10.1: a component constrained PRESENT is satisfied if and only
+        # if its value is present. Presence was never checked, so an absent
+        # component satisfied the constraint.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "PRESENT"),
+        )
+
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, None, 0)
+
+    def testOptionalConstrainsValueOnlyWhenPresent(self):
+        # 51.8.10.1: OPTIONAL places no constraint on presence. 51.8.9 still
+        # constrains the inner value where there is one. OPTIONAL was not
+        # recognised at all and ran the value constraint against None.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "OPTIONAL"),
+        )
+
+        c(None, 0)
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 5, 0)
+
+    def testEmptyPresenceConstraintLeavesPresenceFree(self):
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), None),
+        )
+
+        c(None, 0)
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 5, 0)
+
+    def testUnknownPresenceConstraintRejected(self):
+        # 51.8.10 admits PRESENT, ABSENT, OPTIONAL and empty. Anything else
+        # used to be stored and then quietly behave like PRESENT.
+        self.assertRaises(
+            error.PyAsn1Error,
+            constraint.InnerTypeConstraint,
+            (0, constraint.SingleValueConstraint(4), "MANDATORY"),
+        )
+
+    def testUnconstrainedComponentRejected(self):
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "PRESENT"),
+        )
+
+        self.assertRaises(error.ValueConstraintError, c, 4, 1)
+
 
 class ConstraintsIntersectionRangeTestCase(BaseTestCase):
     def setUp(self):

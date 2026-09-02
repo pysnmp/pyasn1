@@ -543,7 +543,11 @@ for typeDecoder in tagMap.values():
 
 
 class Decoder(decoder.Decoder):
-    pass
+    # X.690 9.1: a constructed encoding takes the indefinite form, and a
+    # primitive one the fewest length octets.
+    requireMinimalLength = True
+    requireIndefLengthForConstructed = True
+    requireLowTagNumberForm = True
 
 
 #: Turns CER octet stream into an ASN.1 object.

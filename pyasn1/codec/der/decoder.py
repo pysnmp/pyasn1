@@ -124,6 +124,10 @@ for typeDecoder in tagMap.values():
 class Decoder(decoder.Decoder):
     supportIndefLength = False
 
+    # X.690 10.1: the definite form throughout, so the CER rule that pushes
+    # constructed encodings onto the indefinite form does not carry over.
+    requireIndefLengthForConstructed = False
+
 
 #: Turns DER octet stream into an ASN.1 object.
 #:

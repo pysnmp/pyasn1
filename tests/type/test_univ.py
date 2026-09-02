@@ -540,6 +540,28 @@ class BitStringTestCase(BaseTestCase):
     def testStr(self):
         assert str(self.b.clone("Urgent")) == "01"
 
+    def testPrettyPrintRendersBits(self):
+        # The inherited prettyOut() rendered the payload as a decimal
+        # integer, so '1011' came out as '11' and the leading zeros that
+        # carry the bit length were lost.
+        assert univ.BitString(binValue="1011").prettyPrint() == "1011"
+        assert univ.BitString(binValue="0011").prettyPrint() == "0011"
+        assert univ.BitString(hexValue="A98A").prettyPrint() == "1010100110001010"
+
+    def testPrettyPrintEmptyBitString(self):
+        # X.690 8.6.2.3 admits a bit string of no bits.
+        assert univ.BitString(binValue="").prettyPrint() == ""
+        assert univ.BitString(binValue="").asBinary() == ""
+
+    def testPrettyPrintBeyondIntegerConversionLimit(self):
+        # CPython 3.11+ refuses to render an integer wider than 4300 decimal
+        # digits, which a bit string reaches at roughly 14285 bits. The
+        # decoder calls prettyPrint() to build its debug records, so this
+        # used to crash any decode of a large BIT STRING under logging.
+        bits = "1" * 15000
+
+        assert univ.BitString(binValue=bits).prettyPrint() == bits
+
     def testRepr(self):
         assert "BitString" in repr(self.b.clone("Urgent,Active"))
 
