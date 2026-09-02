@@ -618,8 +618,7 @@ class BitString(base.SimpleAsn1Type):
 
     def asBinary(self) -> str:
         """Get |ASN.1| value as a text string of bits."""
-        binString = bin(self._value)[2:]
-        return "0" * (len(self._value) - len(binString)) + binString
+        return self.prettyOut(self._value)
 
     @classmethod
     def fromHexString(
@@ -779,6 +778,33 @@ class BitString(base.SimpleAsn1Type):
 
         else:
             raise error.PyAsn1Error("Bad BitString initializer type", value=value)
+
+    def prettyOut(self, value: typing.Any) -> str:
+        """Render the value as its bits, matching :meth:`asBinary`.
+
+        The inherited implementation renders the payload as a decimal
+        integer, which drops the leading zeros that carry the bit length and,
+        past the CPython integer conversion limit, raises outright.
+
+        Parameters
+        ----------
+        value: :class:`SizedInteger`
+            Internal payload value.
+
+        Returns
+        -------
+        : :class:`str`
+            The bits, most significant first, zero padded to the bit length.
+        """
+        bitLength = len(value)
+
+        if not bitLength:
+            # X.690 8.6.2.3 admits a bit string of no bits, which has no
+            # bits to render.
+            return ""
+
+        binString = bin(value)[2:]
+        return "0" * (bitLength - len(binString)) + binString
 
 
 class OctetString(base.SimpleAsn1Type):
