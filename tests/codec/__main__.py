@@ -8,6 +8,7 @@ import unittest
 
 suite = unittest.TestLoader().loadTestsFromNames(
     [
+        "tests.codec.test_conformance.suite",
         "tests.codec.test_error_contract.suite",
         "tests.codec.ber.__main__.suite",
         "tests.codec.cer.__main__.suite",
