@@ -32,19 +32,22 @@ def main():
 
     # --- DER ---
     der = der_encode(point)
-    p_der, _ = der_decode(der, asn1Spec=Point())
+    p_der, rest = der_decode(der, asn1Spec=Point())
+    assert rest == b""
     assert (p_der["x"], p_der["y"]) == (10, -20)
     print("DER:", der.hex())
 
     # --- BER ---
     ber = ber_encode(point)
-    p_ber, _ = ber_decode(ber, asn1Spec=Point())
+    p_ber, rest = ber_decode(ber, asn1Spec=Point())
+    assert rest == b""
     assert (p_ber["x"], p_ber["y"]) == (10, -20)
     print("BER:", ber.hex())
 
     # --- CER ---
     cer = cer_encode(point)
-    p_cer, _ = cer_decode(cer, asn1Spec=Point())
+    p_cer, rest = cer_decode(cer, asn1Spec=Point())
+    assert rest == b""
     assert (p_cer["x"], p_cer["y"]) == (10, -20)
     print("CER:", cer.hex())
 

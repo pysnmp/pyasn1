@@ -23,8 +23,8 @@ Completed (removed from backlog)
 Phase 1 — Non-breaking cleanup & documentation (DONE)
 ----------------------------------------------------
 
-Lowest risk.  No API changes, no behavioural shifts.  Safe to ship
-independently.
+Lowest risk.  No API changes or intended wire-format changes; ``repr()``
+representation changes are observable.  Safe to ship independently.
 
 * **PEP 8 cleanup** — DONE.  Fixed E402 import-order violations in test
   files, applied ``black`` formatting to ``ber/encoder.py`` and
@@ -48,8 +48,9 @@ independently.
 Phase 2 — Low-risk type-system improvements
 -------------------------------------------
 
-Internal enhancements to ``pyasn1.type`` that are additive and unlikely to
-break existing callers.  New constraints / pretty-printing are opt-in.
+Internal enhancements to ``pyasn1.type`` that are intended to be low risk.
+New constraints / pretty-printing are opt-in unless a documented compatibility
+change is made.
 
 * **``type.useful``: implement ``prettyIn``/``prettyOut``** —
   ``GeneralizedTime`` / ``UTCTime`` / ``ObjectDescriptor`` currently rely on
@@ -58,7 +59,9 @@ break existing callers.  New constraints / pretty-printing are opt-in.
 * **``type.char``: implement constraints** — character string types
   (``PrintableString``, ``NumericString``, ``IA5String``, etc.) accept
   ``subtypeSpec`` but do not enforce per-alphabet constraints by default.
-  Adding ``PermittedAlphabetConstraint`` instances would close this gap.
+  Keep ``PermittedAlphabetConstraint`` opt-in: adding it to default
+  ``subtypeSpec`` can reject existing values and would require a documented
+  migration plan.
 * **Specialise ASN.1 character and useful types** — individual character
   string classes are thin subclasses of ``AbstractCharacterString``; useful
   types are thin subclasses of char types.  Specialising them (distinct
@@ -78,8 +81,9 @@ Changes to ``codec/ber`` encoder/decoder.  May affect encoding/decoding
 edge-cases; require test coverage but should not change the public API.
 
 * **``ber.encoder``: large length encoder** — ``encodeLength`` raises
-  ``PyAsn1Error`` when length octets exceed 126.  Implement multi-byte
-  length encoding for very large payloads (> 126 length octets).
+  ``PyAsn1Error`` when more than 126 subsequent length octets are needed.
+  BER long-form lengths support at most 126 subsequent length octets; larger
+  payloads exceed this standard limit.
 * **``ber.encoder``: lookup type by tag first for custom codecs** — the
   encoder currently resolves by ``typeId`` first, then falls back to
   ``baseTagSet``.  Full ``tagSet`` lookup is needed so custom codecs for

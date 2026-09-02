@@ -43,7 +43,8 @@ def main():
 
     # Encode / decode round-trip
     der = der_encode(lst)
-    recovered, _ = der_decode(der, asn1Spec=LinkedList())
+    recovered, rest = der_decode(der, asn1Spec=LinkedList())
+    assert rest == b""
 
     # Walk the list using positional access
     values = []

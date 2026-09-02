@@ -1152,6 +1152,13 @@ class SequenceOf(BaseTestCase):
     def testRepr(self):
         assert "a" in repr(self.s1.clone().setComponents("a", "b"))
 
+    def testReprWithScalarComponentType(self):
+        value = univ.SequenceOf(componentType=univ.Integer()).setComponents(1, 2)
+
+        representation = repr(value)
+        assert "Integer value object, payload [1]" in representation
+        assert "Integer value object, payload [2]" in representation
+
     def testTag(self):
         assert self.s1.tagSet == tag.TagSet(
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10)
@@ -2003,6 +2010,13 @@ class SetOf(BaseTestCase):
         assert self.s1.tagSet == tag.TagSet(
             (), tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11)
         ), "wrong tagSet"
+
+    def testReprWithScalarComponentType(self):
+        value = univ.SetOf(componentType=univ.Integer()).setComponents(1, 2)
+
+        representation = repr(value)
+        assert "Integer value object, payload [1]" in representation
+        assert "Integer value object, payload [2]" in representation
 
     def testSeq(self):
         self.s1.setComponentByPosition(0, univ.OctetString("abc"))

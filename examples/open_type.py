@@ -41,18 +41,22 @@ def main():
     choice1["id"] = 1
     choice1["blob"] = univ.Integer(99)
     der1 = der_encode(choice1)
-    recovered1, _ = der_decode(der1, asn1Spec=Choice())
+    recovered1, _ = der_decode(der1, asn1Spec=Choice(), decodeOpenTypes=True)
     print("Case id=1:", repr(recovered1))
     assert recovered1["id"] == 1
+    assert isinstance(recovered1["blob"], univ.Integer)
+    assert recovered1["blob"] == 99
 
     # --- case 2: id=2 means blob is an OctetString ---
     choice2 = Choice()
     choice2["id"] = 2
     choice2["blob"] = univ.OctetString("hello")
     der2 = der_encode(choice2)
-    recovered2, _ = der_decode(der2, asn1Spec=Choice())
+    recovered2, _ = der_decode(der2, asn1Spec=Choice(), decodeOpenTypes=True)
     print("Case id=2:", repr(recovered2))
     assert recovered2["id"] == 2
+    assert isinstance(recovered2["blob"], univ.OctetString)
+    assert recovered2["blob"] == b"hello"
 
     print("Open type round-trip OK")
 
