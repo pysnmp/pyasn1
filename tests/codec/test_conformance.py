@@ -26,7 +26,7 @@ from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
-from pyasn1.type import constraint, namedtype, univ
+from pyasn1.type import constraint, namedtype, univ, useful
 from tests.base import BaseTestCase
 
 
@@ -349,6 +349,103 @@ class SchemaGuidedStrictnessTestCase(BaseTestCase):
             assert module.decode._Decoder__typeMap is module.typeMap, (
                 f"{module.__name__}.decode is not using the module typeMap"
             )
+
+
+def _time(tag, text):
+    return bytes((tag, len(text))) + text.encode("ascii")
+
+
+class CanonicalTimeTestCase(BaseTestCase):
+    """X.690 11.7 and 11.8 reduce the BER spellings of an instant to one.
+
+    The invalid representations below are the specification's own examples.
+    """
+
+    GENERALIZED = 0x18
+    UTC = 0x17
+
+    def testGeneralizedTimeInvalidRepresentations(self):
+        # 11.7: the examples given as invalid, plus the two forms 11.7.1 and
+        # 11.7.2 rule out.
+        for text in (
+            "19920520240000Z",  # midnight represented incorrectly (11.7.5)
+            "19920622123421.0Z",  # spurious trailing zeros (11.7.3)
+            "19920722132100.30Z",  # spurious trailing zeros (11.7.3)
+            "199206221234Z",  # seconds omitted (11.7.2)
+            "19920622123421",  # no "Z" (11.7.1)
+            "19920622123421+0200",  # not UTC (11.7.1)
+            "19920622123421,5Z",  # comma for the point (11.7.4)
+        ):
+            for decode in (cer_decoder.decode, der_decoder.decode):
+                self.assertRaises(
+                    error.PyAsn1Error, decode, _time(self.GENERALIZED, text)
+                )
+
+    def testGeneralizedTimeValidRepresentations(self):
+        for text in ("19920521000000Z", "19920622123421Z", "19920722132100.3Z"):
+            value, _ = der_decoder.decode(_time(self.GENERALIZED, text))
+
+            assert str(value) == text
+
+    def testUtcTimeInvalidRepresentations(self):
+        for text in (
+            "920520240000Z",  # midnight represented incorrectly (11.8.3)
+            "9207221321Z",  # seconds of "00" omitted (11.8.2)
+            "920622123421",  # no "Z" (11.8.1)
+            "920622123421.5Z",  # UTCTime carries no fractional seconds
+        ):
+            for decode in (cer_decoder.decode, der_decoder.decode):
+                self.assertRaises(error.PyAsn1Error, decode, _time(self.UTC, text))
+
+    def testUtcTimeValidRepresentations(self):
+        for text in ("920521000000Z", "920622123421Z", "920722132100Z"):
+            value, _ = der_decoder.decode(_time(self.UTC, text))
+
+            assert str(value) == text
+
+    def testBerRemainsTolerant(self):
+        # Clause 11 binds CER and DER only, so BER keeps reading the lot.
+        for text in ("199206221234Z", "19920520240000Z", "19920622123421.0Z"):
+            value, _ = ber_decoder.decode(_time(self.GENERALIZED, text))
+
+            assert str(value) == text
+
+    def testEncoderNormalisesFractionalSeconds(self):
+        # 11.7.3 gives these two conversions as examples: a seconds element
+        # of "26.000" is represented as "26", and "26.5200" as "26.52".
+        assert der_encoder.encode(
+            useful.GeneralizedTime("19920622123426.000Z")
+        ) == _time(self.GENERALIZED, "19920622123426Z")
+
+        assert der_encoder.encode(
+            useful.GeneralizedTime("19920622123426.5200Z")
+        ) == _time(self.GENERALIZED, "19920622123426.52Z")
+
+    def testEncoderRejectsMissingSeconds(self):
+        self.assertRaises(
+            error.PyAsn1Error,
+            der_encoder.encode,
+            useful.GeneralizedTime("199206221234Z"),
+        )
+        self.assertRaises(
+            error.PyAsn1Error, der_encoder.encode, useful.UTCTime("9207221321Z")
+        )
+
+    def testEncoderRejectsHourTwentyFour(self):
+        # 11.7.5 and 11.8.3: midnight is the zero hour of the following day.
+        self.assertRaises(
+            error.PyAsn1Error,
+            der_encoder.encode,
+            useful.GeneralizedTime("19920520240000Z"),
+        )
+        self.assertRaises(
+            error.PyAsn1Error, der_encoder.encode, useful.UTCTime("920520240000Z")
+        )
+
+    def testMidnightAsZeroHourAccepted(self):
+        assert der_encoder.encode(useful.GeneralizedTime("19920521000000Z")) == _time(
+            self.GENERALIZED, "19920521000000Z"
+        )
 
 
 class NullTestCase(BaseTestCase):

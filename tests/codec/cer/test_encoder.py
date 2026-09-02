@@ -190,10 +190,14 @@ class GeneralizedTimeEncoderTestCase(BaseTestCase):
             (24, 15, 50, 48, 49, 55, 48, 56, 48, 49, 49, 50, 48, 49, 49, 50, 90)
         )
 
-    def testWithMinutes(self):
-        assert encoder.encode(useful.GeneralizedTime("201708011201Z")) == bytes(
-            (24, 13, 50, 48, 49, 55, 48, 56, 48, 49, 49, 50, 48, 49, 90)
-        )
+    def testWithMinutesOnlyRejected(self):
+        # X.690 11.7.2: "The seconds element shall always be present."
+        try:
+            encoder.encode(useful.GeneralizedTime("201708011201Z"))
+        except PyAsn1Error:
+            pass
+        else:
+            assert 0, "GeneralizedTime without seconds accepted"
 
 
 class UTCTimeEncoderTestCase(BaseTestCase):
@@ -228,10 +232,15 @@ class UTCTimeEncoderTestCase(BaseTestCase):
             (23, 13, 57, 57, 48, 56, 48, 49, 49, 50, 48, 49, 49, 50, 90)
         )
 
-    def testWithMinutes(self):
-        assert encoder.encode(useful.UTCTime("9908011201Z")) == bytes(
-            (23, 11, 57, 57, 48, 56, 48, 49, 49, 50, 48, 49, 90)
-        )
+    def testWithMinutesOnlyRejected(self):
+        # X.690 11.8.2: "The seconds element shall always be present." 11.8.5
+        # gives "9207221321Z" as an invalid representation for this reason.
+        try:
+            encoder.encode(useful.UTCTime("9908011201Z"))
+        except PyAsn1Error:
+            pass
+        else:
+            assert 0, "UTCTime without seconds accepted"
 
 
 class SequenceOfEncoderTestCase(BaseTestCase):
