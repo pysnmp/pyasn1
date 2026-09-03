@@ -4,31 +4,49 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-from pyasn1 import debug
-from pyasn1 import error
-from pyasn1.type import base
-from pyasn1.type import char
-from pyasn1.type import tag
-from pyasn1.type import univ
-from pyasn1.type import useful
+"""Decoder from native Python objects to ASN.1 types."""
+
+import logging
+from typing import Any, Final
+
+from pyasn1 import debug, error
+from pyasn1.type import base, char, tag, univ, useful
 
 __all__ = ["decode"]
 
-LOG = debug.registerLoggee(__name__, flags=debug.DEBUG_DECODER)
+LOG = logging.getLogger(__name__)
 
 
-class AbstractScalarDecoder(object):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+class AbstractScalarDecoder:
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         return asn1Spec.clone(pyObject)
 
 
 class BitStringDecoder(AbstractScalarDecoder):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         return asn1Spec.clone(univ.BitString.fromBinaryString(pyObject))
 
 
-class SequenceOrSetDecoder(object):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+class SequenceOrSetDecoder:
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         componentsTypes = asn1Spec.componentType
@@ -42,8 +60,14 @@ class SequenceOrSetDecoder(object):
         return asn1Value
 
 
-class SequenceOfOrSetOfDecoder(object):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+class SequenceOfOrSetOfDecoder:
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         for pyValue in pyObject:
@@ -52,8 +76,14 @@ class SequenceOfOrSetOfDecoder(object):
         return asn1Value
 
 
-class ChoiceDecoder(object):
-    def __call__(self, pyObject, asn1Spec, decodeFun=None, **options):
+class ChoiceDecoder:
+    def __call__(
+        self,
+        pyObject: Any,
+        asn1Spec: Any,
+        decodeFun: Any = None,
+        **options: Any,
+    ) -> Any:
         asn1Value = asn1Spec.clone()
 
         componentsTypes = asn1Spec.componentType
@@ -68,7 +98,7 @@ class ChoiceDecoder(object):
         return asn1Value
 
 
-tagMap = {
+tagMap: Final[dict[tag.TagSet, Any]] = {
     univ.Integer.tagSet: AbstractScalarDecoder(),
     univ.Boolean.tagSet: AbstractScalarDecoder(),
     univ.BitString.tagSet: BitStringDecoder(),
@@ -99,7 +129,7 @@ tagMap = {
 }
 
 # Put in ambiguous & non-ambiguous types for faster codec lookup
-typeMap = {
+typeMap: Final[dict[int, Any]] = {
     univ.Integer.typeId: AbstractScalarDecoder(),
     univ.Boolean.typeId: AbstractScalarDecoder(),
     univ.BitString.typeId: BitStringDecoder(),
@@ -134,26 +164,32 @@ typeMap = {
 }
 
 
-class Decoder(object):
-
-    # noinspection PyDefaultArgument
-    def __init__(self, tagMap, typeMap):
+class Decoder:
+    def __init__(
+        self,
+        tagMap: dict[tag.TagSet, Any],
+        typeMap: dict[int, Any],
+    ) -> None:
         self.__tagMap = tagMap
         self.__typeMap = typeMap
 
-    def __call__(self, pyObject, asn1Spec, **options):
-
-        if LOG:
+    def __call__(
+        self, pyObject: Any, asn1Spec: base.Asn1Type, **options: Any
+    ) -> base.Asn1Item:
+        if LOG.isEnabledFor(logging.DEBUG):
             debug.scope.push(type(pyObject).__name__)
-            LOG(
-                "decoder called at scope %s, working with type %s"
-                % (debug.scope, type(pyObject).__name__)
+            LOG.debug(
+                "decoder called",
+                extra={
+                    "scope": str(debug.scope),
+                    "pyObjectType": type(pyObject).__name__,
+                },
             )
 
         if asn1Spec is None or not isinstance(asn1Spec, base.Asn1Item):
             raise error.PyAsn1Error(
-                "asn1Spec is not valid (should be an instance of an ASN.1 Item, not %s)"
-                % asn1Spec.__class__.__name__
+                "asn1Spec is not valid (should be an instance of an ASN.1 Item)",
+                asn1Spec=asn1Spec.__class__.__name__,
             )
 
         try:
@@ -165,21 +201,31 @@ class Decoder(object):
 
             try:
                 valueDecoder = self.__tagMap[baseTagSet]
-            except KeyError:
-                raise error.PyAsn1Error("Unknown ASN.1 tag %s" % asn1Spec.tagSet)
+            except KeyError as exc:
+                raise error.PyAsn1Error(
+                    "Unknown ASN.1 tag", tagSet=asn1Spec.tagSet
+                ) from exc
 
-        if LOG:
-            LOG(
-                "calling decoder %s on Python type %s <%s>"
-                % (type(valueDecoder).__name__, type(pyObject).__name__, repr(pyObject))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "calling decoder",
+                extra={
+                    "decoder": type(valueDecoder).__name__,
+                    "pyObjectType": type(pyObject).__name__,
+                    "pyObject": pyObject,
+                },
             )
 
         value = valueDecoder(pyObject, asn1Spec, self, **options)
 
-        if LOG:
-            LOG(
-                "decoder %s produced ASN.1 type %s <%s>"
-                % (type(valueDecoder).__name__, type(value).__name__, repr(value))
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "decoder produced ASN.1 type",
+                extra={
+                    "decoder": type(valueDecoder).__name__,
+                    "valueType": type(value).__name__,
+                    "value": value,
+                },
             )
             debug.scope.pop()
 
@@ -226,4 +272,4 @@ class Decoder(object):
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, typeMap)
+decode: Final = Decoder(tagMap, typeMap)

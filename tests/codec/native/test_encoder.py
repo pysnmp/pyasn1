@@ -5,20 +5,16 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
-
+from pyasn1.codec.native import encoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, univ
 from tests.base import BaseTestCase
 
-from pyasn1.type import namedtype
-from pyasn1.type import univ
-from pyasn1.codec.native import encoder
-from pyasn1.compat.octets import str2octs
-from pyasn1.error import PyAsn1Error
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
 
 
 class BadAsn1SpecTestCase(BaseTestCase):
@@ -64,7 +60,7 @@ class OctetStringEncoderTestCase(BaseTestCase):
         self.o = univ.OctetString("Quick brown fox")
 
     def testValue(self):
-        assert encoder.encode(self.o) == str2octs("Quick brown fox")
+        assert encoder.encode(self.o) == _str2octs("Quick brown fox")
 
 
 class NullEncoderTestCase(BaseTestCase):
@@ -110,7 +106,7 @@ class SequenceEncoderTestCase(BaseTestCase):
         s[2] = 123
         assert encoder.encode(s) == {
             "place-holder": None,
-            "first-name": str2octs("abc"),
+            "first-name": _str2octs("abc"),
             "age": 123,
         }
 
@@ -146,7 +142,7 @@ class AnyEncoderTestCase(BaseTestCase):
         self.s = univ.Any(encoder.encode(univ.OctetString("fox")))
 
     def testSimple(self):
-        assert encoder.encode(self.s) == str2octs("fox")
+        assert encoder.encode(self.s) == _str2octs("fox")
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

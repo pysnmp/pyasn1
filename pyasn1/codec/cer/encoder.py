@@ -4,17 +4,21 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""CER encoder for ASN.1 types."""
+
+from typing import Any, Final
+
 from pyasn1 import error
 from pyasn1.codec.ber import encoder
-from pyasn1.compat.octets import str2octs, null
-from pyasn1.type import univ
-from pyasn1.type import useful
+from pyasn1.type import univ, useful
 
 __all__ = ["encode"]
 
 
 class BooleanEncoder(encoder.IntegerEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if value == 0:
             substrate = (0,)
         else:
@@ -23,15 +27,44 @@ class BooleanEncoder(encoder.IntegerEncoder):
 
 
 class RealEncoder(encoder.RealEncoder):
-    def _chooseEncBase(self, value):
+    def _chooseEncBase(self, value: Any) -> tuple[int, int, int, int]:
         m, b, e = value
         return self._dropFloatingPoint(m, b, e)
+
+    @staticmethod
+    def _encodeCharacter(mantissa: int, exponent: int) -> bytes:
+        """Encode a decimal REAL in the form X.690 11.3.2 admits.
+
+        The BER spelling omits the FULL STOP that 11.3.2.5 requires and signs
+        a positive exponent that 11.3.2.6 says to leave bare, so it is
+        rewritten here rather than reused.
+        """
+        # Real.prettyIn divides the mantissa down with true division, so a
+        # normalised value arrives here as a float and would render with a
+        # spurious ".0".
+        mantissa = int(mantissa)
+
+        # 11.3.2.4: "Neither the first nor the last digit of the mantissa may
+        # be a 0." A trailing zero moves into the exponent; a leading one
+        # cannot arise, since the mantissa is held as an integer.
+        while mantissa and not mantissa % 10:
+            mantissa //= 10
+            exponent += 1
+
+        # 11.3.2.6: a zero exponent is written "+0"; otherwise PLUS SIGN is
+        # not used, and str() spells a negative exponent with its MINUS SIGN.
+        exponentPart = "+0" if not exponent else str(exponent)
+
+        # 11.3.2.5: the last mantissa digit is immediately followed by FULL
+        # STOP, then the exponent-mark. 11.3.2.3 leaves a negative mantissa
+        # to begin with the MINUS SIGN that str() supplies.
+        return f"\x03{mantissa}.E{exponentPart}".encode("ascii")
 
 
 # specialized GeneralStringEncoder here
 
 
-class TimeEncoderMixIn(object):
+class TimeEncoderMixIn:
     Z_CHAR = ord("Z")
     PLUS_CHAR = ord("+")
     MINUS_CHAR = ord("-")
@@ -42,7 +75,9 @@ class TimeEncoderMixIn(object):
     MIN_LENGTH = 12
     MAX_LENGTH = 19
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         # CER encoding constraints:
         # - minutes are mandatory, seconds are optional
         # - sub-seconds must NOT be zero / no meaningless zeros
@@ -56,16 +91,15 @@ class TimeEncoderMixIn(object):
         numbers = value.asNumbers()
 
         if self.PLUS_CHAR in numbers or self.MINUS_CHAR in numbers:
-            raise error.PyAsn1Error("Must be UTC time: %r" % value)
+            raise error.PyAsn1Error("Must be UTC time", value=value)
 
         if numbers[-1] != self.Z_CHAR:
-            raise error.PyAsn1Error('Missing "Z" time zone specifier: %r' % value)
+            raise error.PyAsn1Error('Missing "Z" time zone specifier', value=value)
 
         if self.COMMA_CHAR in numbers:
-            raise error.PyAsn1Error("Comma in fractions disallowed: %r" % value)
+            raise error.PyAsn1Error("Comma in fractions disallowed", value=value)
 
         if self.DOT_CHAR in numbers:
-
             isModified = False
 
             numbers = list(numbers)
@@ -91,12 +125,20 @@ class TimeEncoderMixIn(object):
                 value = value.clone(numbers)
 
         if not self.MIN_LENGTH < len(numbers) < self.MAX_LENGTH:
-            raise error.PyAsn1Error("Length constraint violated: %r" % value)
+            raise error.PyAsn1Error("Length constraint violated", value=value)
+
+        # The normalisation above fixes what it can; this rejects what is
+        # left, notably a missing seconds element and hour 24 for midnight.
+        value.verifyCanonicalForm()
 
         options.update(maxChunkSize=1000)
 
         return encoder.OctetStringEncoder.encodeValue(
-            self, value, asn1Spec, encodeFun, **options
+            self,  # type: ignore[arg-type]
+            value,
+            asn1Spec,
+            encodeFun,
+            **options,
         )
 
 
@@ -111,36 +153,39 @@ class UTCTimeEncoder(TimeEncoderMixIn, encoder.OctetStringEncoder):
 
 
 class SetOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
         # sort by serialised and padded components
         if len(chunks) > 1:
-            zero = str2octs("\x00")
+            zero = b"\x00"
             maxLen = max(map(len, chunks))
             paddedChunks = [(x.ljust(maxLen, zero), x) for x in chunks]
             paddedChunks.sort(key=lambda x: x[0])
 
             chunks = [x[1] for x in paddedChunks]
 
-        return null.join(chunks), True, True
+        return b"".join(chunks), True, True
 
 
 class SequenceOfEncoder(encoder.SequenceOfEncoder):
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
         if options.get("ifNotEmpty", False) and not len(value):
-            return null, True, True
+            return b"", True, True
 
         chunks = self._encodeComponents(value, asn1Spec, encodeFun, **options)
 
-        return null.join(chunks), True, True
+        return b"".join(chunks), True, True
 
 
 class SetEncoder(encoder.SequenceEncoder):
     @staticmethod
-    def _componentSortKey(componentAndType):
-        """Sort SET components by tag
+    def _componentSortKey(componentAndType: Any) -> Any:
+        """Sort SET components by tag.
 
         Sort regardless of the Choice value (static sort)
         """
@@ -157,9 +202,10 @@ class SetEncoder(encoder.SequenceEncoder):
         else:
             return asn1Spec.tagSet
 
-    def encodeValue(self, value, asn1Spec, encodeFun, **options):
-
-        substrate = null
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
+        substrate = b""
 
         comps = []
         compsMap = {}
@@ -192,14 +238,15 @@ class SetEncoder(encoder.SequenceEncoder):
         else:
             # bare Python value + ASN.1 schema
             for idx, namedType in enumerate(asn1Spec.componentType.namedTypes):
-
                 try:
                     component = value[namedType.name]
 
-                except KeyError:
+                except KeyError as exc:
                     raise error.PyAsn1Error(
-                        'Component name "%s" not found in %r' % (namedType.name, value)
-                    )
+                        "Component name not found",
+                        name=namedType.name,
+                        value=value,
+                    ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
                     continue
@@ -233,7 +280,7 @@ class SequenceEncoder(encoder.SequenceEncoder):
     omitEmptyOptionals = True
 
 
-tagMap = encoder.tagMap.copy()
+tagMap: Final = encoder.tagMap.copy()
 tagMap.update(
     {
         univ.Boolean.tagSet: BooleanEncoder(),
@@ -242,11 +289,16 @@ tagMap.update(
         useful.UTCTime.tagSet: UTCTimeEncoder(),
         # Sequence & Set have same tags as SequenceOf & SetOf
         univ.SetOf.tagSet: SetOfEncoder(),
-        univ.Sequence.typeId: SequenceEncoder(),
+        # FIXME: every other entry here is keyed by tagSet; this one is keyed
+        # by typeId, so it can never match a tag lookup. Inherited verbatim
+        # from upstream pyasn1. Left as-is because univ.Sequence.tagSet equals
+        # univ.SequenceOf.tagSet, so correcting the key would displace the
+        # inherited SequenceOfEncoder and change CER output.
+        univ.Sequence.typeId: SequenceEncoder(),  # type: ignore[dict-item]
     }
 )
 
-typeMap = encoder.typeMap.copy()
+typeMap: Final = encoder.typeMap.copy()
 typeMap.update(
     {
         univ.Boolean.typeId: BooleanEncoder(),
@@ -312,6 +364,6 @@ class Encoder(encoder.Encoder):
 #:    >>> encode(seq)
 #:    b'0\x80\x02\x01\x01\x02\x01\x02\x02\x01\x03\x00\x00'
 #:
-encode = Encoder(tagMap, typeMap)
+encode: Final = Encoder(tagMap, typeMap)
 
 # EncoderFactory queries class instance and builds a map of tags -> encoders

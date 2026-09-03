@@ -6,12 +6,17 @@
 #
 # ASN.1 named integers
 #
+"""Named-value maps used to label numeric ASN.1 values."""
+
+from collections.abc import Iterator
+from typing import Any, NoReturn
+
 from pyasn1 import error
 
 __all__ = ["NamedValues"]
 
 
-class NamedValues(object):
+class NamedValues(dict[Any, Any]):
     """Create named values object.
 
     The |NamedValues| object represents a collection of string names
@@ -53,142 +58,131 @@ class NamedValues(object):
         2
     """
 
-    def __init__(self, *args, **kwargs):
-        self.__names = {}
-        self.__numbers = {}
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        # The primary dict stores name -> number (the natural dict mapping).
+        # A reverse index stores number -> name for bidirectional lookup.
+        self._numbers: dict[Any, Any] = {}
 
         anonymousNames = []
 
         for namedValue in args:
-            if isinstance(namedValue, (tuple, list)):
+            if isinstance(namedValue, tuple | list):
                 try:
                     name, number = namedValue
 
-                except ValueError:
+                except ValueError as exc:
                     raise error.PyAsn1Error(
-                        "Not a proper attribute-value pair %r" % (namedValue,)
-                    )
+                        "Not a proper attribute-value pair", namedValue=namedValue
+                    ) from exc
 
             else:
                 anonymousNames.append(namedValue)
                 continue
 
-            if name in self.__names:
-                raise error.PyAsn1Error("Duplicate name %s" % (name,))
+            if name in self:
+                raise error.PyAsn1Error("Duplicate name", name=name)
 
-            if number in self.__numbers:
-                raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
+            if number in self._numbers:
+                raise error.PyAsn1Error("Duplicate number", name=name, number=number)
 
-            self.__names[name] = number
-            self.__numbers[number] = name
+            dict.__setitem__(self, name, number)
+            self._numbers[number] = name
 
         for name, number in kwargs.items():
-            if name in self.__names:
-                raise error.PyAsn1Error("Duplicate name %s" % (name,))
+            if name in self:
+                raise error.PyAsn1Error("Duplicate name", name=name)
 
-            if number in self.__numbers:
-                raise error.PyAsn1Error("Duplicate number  %s=%s" % (name, number))
+            if number in self._numbers:
+                raise error.PyAsn1Error("Duplicate number", name=name, number=number)
 
-            self.__names[name] = number
-            self.__numbers[number] = name
+            dict.__setitem__(self, name, number)
+            self._numbers[number] = name
 
         if anonymousNames:
-
-            number = self.__numbers and max(self.__numbers) + 1 or 0
+            number = max(self._numbers) + 1 if self._numbers else 0
 
             for name in anonymousNames:
+                if name in self:
+                    raise error.PyAsn1Error("Duplicate name", name=name)
 
-                if name in self.__names:
-                    raise error.PyAsn1Error("Duplicate name %s" % (name,))
-
-                self.__names[name] = number
-                self.__numbers[number] = name
+                dict.__setitem__(self, name, number)
+                self._numbers[number] = name
 
                 number += 1
 
-    def __repr__(self):
-        representation = ", ".join(["%s=%d" % x for x in self.items()])
+    # NamedValues is immutable (see class docstring).  Block every dict
+    # mutation path so the primary name->number mapping and the _numbers
+    # reverse index can never fall out of sync.  Construction populates the
+    # storage via dict.__setitem__ to bypass these guards.
+    def _immutable(self, op: str) -> NoReturn:
+        raise error.PyAsn1Error("NamedValues is immutable", operation=op)
+
+    def __setitem__(self, key: Any, value: Any) -> NoReturn:
+        self._immutable("item assignment")
+
+    def __delitem__(self, key: Any) -> NoReturn:
+        self._immutable("item deletion")
+
+    def update(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
+        self._immutable("update")
+
+    def pop(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
+        self._immutable("pop")
+
+    def popitem(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
+        self._immutable("popitem")
+
+    def clear(self) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
+        self._immutable("clear")
+
+    def setdefault(self, *args: Any, **kwargs: Any) -> NoReturn:
+        """Raise `PyAsn1Error`; `NamedValues` objects are immutable."""
+        self._immutable("setdefault")
+
+    def __ior__(self, other: Any) -> NoReturn:  # type: ignore[misc]
+        self._immutable("in-place merge")
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        # Reconstruct via __init__ (which populates storage with
+        # dict.__setitem__, bypassing the immutability guards) rather than
+        # the default dict pickle path that restores items through
+        # __setitem__/update.  __init__ rebuilds the _numbers reverse index.
+        return (self.__class__, tuple(self.items()))
+
+    def __repr__(self) -> str:
+        representation = ", ".join([f"{k}={v}" for k, v in self.items()])
 
         if len(representation) > 64:
             representation = representation[:32] + "..." + representation[-32:]
 
-        return "<%s object, enums %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, enums {representation}>"
 
-    def __eq__(self, other):
-        return dict(self) == other
-
-    def __ne__(self, other):
-        return dict(self) != other
-
-    def __lt__(self, other):
-        return dict(self) < other
-
-    def __le__(self, other):
-        return dict(self) <= other
-
-    def __gt__(self, other):
-        return dict(self) > other
-
-    def __ge__(self, other):
-        return dict(self) >= other
-
-    def __hash__(self):
-        return hash(self.items())
-
-    # Python dict protocol (read-only)
-
-    def __getitem__(self, key):
+    # Bidirectional lookup: key can be either a name (str) or a number (int).
+    def __getitem__(self, key: Any) -> Any:
         try:
-            return self.__numbers[key]
+            return self._numbers[key]
 
-        except KeyError:
-            return self.__names[key]
+        except (KeyError, TypeError):
+            return super().__getitem__(key)
 
-    def __len__(self):
-        return len(self.__names)
+    def __contains__(self, key: object) -> bool:
+        return super().__contains__(key) or key in self._numbers
 
-    def __contains__(self, key):
-        return key in self.__names or key in self.__numbers
-
-    def __iter__(self):
-        return iter(self.__names)
-
-    def values(self):
-        return iter(self.__numbers)
-
-    def keys(self):
-        return iter(self.__names)
-
-    def items(self):
-        for name in self.__names:
-            yield name, self.__names[name]
+    def __iter__(self) -> Iterator[Any]:
+        return super().__iter__()
 
     # support merging
 
-    def __add__(self, namedValues):
+    def __add__(self, namedValues: "NamedValues") -> "NamedValues":
         return self.__class__(*tuple(self.items()) + tuple(namedValues.items()))
 
     # XXX clone/subtype?
 
-    def clone(self, *args, **kwargs):
+    def clone(self, *args: Any, **kwargs: Any) -> "NamedValues":
+        """Return a new `NamedValues` merging *args*/*kwargs* into this one."""
         new = self.__class__(*args, **kwargs)
         return self + new
-
-    # legacy protocol
-
-    def getName(self, value):
-        if value in self.__numbers:
-            return self.__numbers[value]
-
-    def getValue(self, name):
-        if name in self.__names:
-            return self.__names[name]
-
-    def getValues(self, *names):
-        try:
-            return [self.__names[name] for name in names]
-
-        except KeyError:
-            raise error.PyAsn1Error(
-                "Unknown bit identifier(s): %s" % (set(names).difference(self.__names),)
-            )

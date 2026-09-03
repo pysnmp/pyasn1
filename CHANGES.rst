@@ -1,5 +1,130 @@
 
+unreleased
+---------------------------------
+
+- Exceptions now carry structured context. ``PyAsn1Error`` and its subclasses
+  accept arbitrary keyword arguments, keep them as ``exc.context``, and render
+  them as ``key=value`` pairs only when the exception is formatted. A caller
+  that needs the shortfall behind a ``SubstrateUnderrunError`` reads
+  ``exc.context['shortBy']`` instead of parsing it out of the message. The
+  mapping can be passed straight to the ``extra`` argument of a ``logging``
+  call.
+- Every raise site in the library was converted to a constant message with the
+  varying parts passed as keywords, mirroring the convention already applied to
+  logging. A regression test enforces this statically, so an interpolated
+  exception message fails the build.
+- Exception messages gained information rather than losing it: sites that
+  previously named only the offending value now also name the ASN.1 type,
+  tag set or field position involved. Formatting a value whose ``repr()``
+  raises no longer masks the original error.
+- The codecs now log through ordinary :mod:`logging` loggers named after their
+  modules (``pyasn1.codec.ber.decoder`` and siblings), guarded with
+  ``Logger.isEnabledFor(logging.DEBUG)``. Debugging is enabled the standard
+  way, ``logging.getLogger('pyasn1').setLevel(logging.DEBUG)``, with no pyasn1
+  API involved. Previously the only way in was ``debug.setLogger()``: raising
+  the level on the ``pyasn1`` logger did nothing at all, because each module
+  held a private switch that only ``setLogger`` could flip.
+- Debug records keep their format arguments instead of being rendered at the
+  call site, so ``record.msg`` stays a template and ``record.args`` holds the
+  values. Structured handlers can group by call site and emit the arguments as
+  fields without parsing the message.
+- Per-module logger names replace the ``encoder``/``decoder`` flags, which
+  could not distinguish the BER codecs from the native ones. Enabling
+  ``pyasn1.codec.ber.decoder`` alone is now possible.
+- ``debug.Debug``, ``debug.setLogger`` and ``debug.registerLoggee`` are
+  deprecated and raise ``DeprecationWarning``. They continue to work: the
+  flags map onto the new loggers, ``registerLoggee`` still serves out-of-tree
+  modules, and the emitted message stream is unchanged. Note that while a
+  ``Debug`` instance is installed, ``setLogger`` drives the ``pyasn1.codec.*``
+  logger levels itself and restores them on ``setLogger(None)``.
+- Importing pyasn1 no longer configures logging for the importing application.
+  Previously ``pyasn1.debug`` built its default ``Printer`` at class-definition
+  time, so merely importing any codec attached a ``StreamHandler`` writing to
+  stderr on the ``pyasn1`` logger and forced that logger to ``DEBUG``. The
+  handler is now built on first use of ``debug.Debug()``, and the package
+  installs only a ``logging.NullHandler``, per the standard library's guidance
+  for libraries.
+- ``debug.Debug(..., loggerName=...)`` no longer mutates the application logger
+  it is pointed at. It previously forced that logger to ``DEBUG`` and attached
+  a fresh ``NullHandler`` on every construction, so handlers accumulated and
+  ``hasHandlers()`` changed answer. pyasn1 now configures only the ``pyasn1``
+  logger it owns; records on a caller-named logger just propagate.
+- Added a regression test asserting that every failure escaping the BER, CER
+  and DER decoders derives from ``PyAsn1Error``, so ``except PyAsn1Error`` is
+  sufficient to contain decoding of hostile input.
+- Documented the debugging procedure under :ref:`pyasn1-debugging`.
+
+- Replaced hand-rolled internal type wrappers with Python standard
+  library base types to reduce boilerplate code
+- Removed legacy type accessors, aliases, deprecated BIT STRING notation,
+  positional constructed-type initialization, and ``sizeSpec`` support.
+- Simplified ``repr()`` for ``Tag``, ``TagSet``, ``SimpleAsn1Type``, and
+  ``ConstructedAsn1Type``: tag classes now use human-readable names
+  (``UNIVERSAL``, ``CONTEXT``, etc.) instead of raw hex; value objects
+  show only the payload; schema objects show only the class name;
+  constructed types include field names in the payload display
+- Fixed E402 import-order violations in test files and reformatted
+  ``ber/encoder.py`` and ``test_univ.py``; all of ``pyasn1/`` and
+  ``tests/`` now passes ``ruff check`` and ``ruff format --check``
+- Added ``docs/source/quickstart.rst`` with copy-pasteable snippets
+  covering schema definition, encode/decode, native conversion,
+  ``repr()`` inspection, constraints, and open types
+- Added ``examples/`` directory with five runnable scripts:
+  ``simple_sequence.py``, ``open_type.py``, ``constraints.py``,
+  ``recursive_sequence.py``, ``round_trip.py``
+- Dropped Python 2 residue throughout: the ``_int2oct``/``_str2octs``/``_null``
+  byte shims in the BER/CER codecs, ``sys.exc_info()`` in favour of bound
+  ``except ... as exc`` handlers, and the ``cond and a or b`` ternary idiom.
+- All exceptions raised while handling another now chain with ``raise ... from``,
+  so the originating error is preserved in tracebacks. The ``B904`` lint rule
+  is enabled to keep it that way.
+- Fixed a bug in ``ObjectIdentifier.prettyIn`` where the "Malformed Object ID"
+  message for a value containing ``-`` interpolated ``sys.exc_info()[1]`` read
+  outside any ``except`` block, rendering a stale exception or ``None``.
+- ``TimeMixIn.FixedOffset`` is deprecated in favour of
+  :py:class:`datetime.timezone`; it now emits a ``DeprecationWarning`` and
+  returns a ``datetime.timezone``. ``TimeMixIn.UTC`` is now
+  ``datetime.timezone.utc``. Note that ``dst()`` on the returned object is
+  ``None`` rather than ``timedelta(0)``, matching the standard library.
+- Comparing a schema object now behaves the same for every ASN.1 type.
+  Previously ``schema == schema`` returned :obj:`True` for ``OctetString``,
+  ``ObjectIdentifier`` and the constructed types, raised ``PyAsn1Error`` for
+  ``Integer``, ``Boolean`` and ``Real``, and raised ``TypeError`` for
+  ``BitString``; ``schema != schema`` raised for all of them. A schema object
+  is now equal to itself and unequal to nothing, and every other comparison
+  raises ``PyAsn1Error``.
+- Fixed ``BitString`` comparison converting the right-hand operand before
+  testing identity, so its identity shortcut could never be taken.
+- ``copy.deepcopy()`` now works on schema objects. ``NoValue.__getattr__``
+  answered the ``__deepcopy__`` protocol probe with ``PyAsn1Error`` instead of
+  ``AttributeError``, so deep-copying any schema object raised.
+- ``NoValue`` no longer derives the set of operations it rejects by scanning
+  ``dir()`` of :class:`str`, :class:`int`, :class:`list` and :class:`dict` at
+  first instantiation. The set is now the explicit ``NoValue.plugMethods``
+  tuple, which no longer sweeps up class machinery (``__init_subclass__``,
+  ``__subclasshook__``, ``__class_getitem__``, ``__dir__``) and no longer
+  varies with the Python version. The ``NoValue.skipMethods`` attribute is
+  gone; ``dir()`` on a schema object works again.
+- ``BitString.__int__`` returns a plain :class:`int` rather than a
+  ``SizedInteger``, clearing a ``DeprecationWarning`` that Python raises for
+  ``__int__`` implementations returning an :class:`int` subclass.
+- ``str()`` on an ``OctetString`` (and on ``Any``) now emits a
+  ``DeprecationWarning``. It still decodes the payload as text using the
+  ``encoding`` codec, but a future major release will return the hexadecimal
+  representation instead -- an ASN.1 OCTET STRING is not text. Use
+  ``.asOctets()`` for the octet stream, or ``.asOctets().decode(encoding)``
+  for text. The character string types in ``pyasn1.type.char`` and the time
+  types in ``pyasn1.type.useful`` model text and are unaffected.
+  ``prettyPrint()``, ``repr()`` and ``asOctets()`` do not warn.
+- Fixed two residual ``cond and a or b`` expressions in the BER codec debug
+  logging that PR #38 missed. Both could take the wrong branch when the
+  left-hand result was falsy: ``Decoder`` fell back to the raw value whenever
+  ``prettyPrint()`` returned an empty string, and ``Encoder`` would call
+  ``prettyPrintType()`` on ``None`` whenever it returned an empty string.
+
+
 Revision 1.0.2, released 2021-11-13
+-----------------------------------
 
 - Release based on 0.4.8 from new repo and ci
 
@@ -396,10 +521,10 @@ Revision 0.1.8, released 22-06-2015
 - When comparing ASN.1 types, by-tag and/or by-constraints matching
   can now be performed with the isSuperTypeOf()/isSameTypeWith() optional
   flags.
-- Constructed types now verify their consistency by invoking 
+- Constructed types now verify their consistency by invoking
   isSameTypeWith(matchTags=True, matchConstraints=False) and
   isSuperTypeOf(matchTags=False, matchConstraints=True) for each of their
-  components rather than isSuperTypeOf() as it used to be. Constriants check 
+  components rather than isSuperTypeOf() as it used to be. Constriants check
   could be enforced to isSameTypeWith() with the strictConstraints=True
   constructed classes attribute.
 - Constructed types can now be initialized with new .setComponents() method
@@ -407,7 +532,7 @@ Revision 0.1.8, released 22-06-2015
   reflect this change.
 - NamedTypes() and NamedValues() made comparable.
 - Test coverage extended to cover pyasn1 types __repr__() function.
-- The abs(Integer()) & abs(Real()) operation now returns respective pyasn1 
+- The abs(Integer()) & abs(Real()) operation now returns respective pyasn1
   type, not a Python type.
 - More Python magic methods implementations added to Integer & Real classes
   (e.g.  __pos__, __neg__, __round__, __floor__, __ceil__, __trunc__)
@@ -447,7 +572,7 @@ Revision 0.1.7
   marker is now detected by both tag and value. Otherwise zero values may
   interfere with end-of-octets marker.
 - Fix to decoder to fail in cases where tagFormat indicates inappropriate
-  format for the type (e.g. BOOLEAN is always PRIMITIVE, SET is always 
+  format for the type (e.g. BOOLEAN is always PRIMITIVE, SET is always
   CONSTRUCTED and OCTET STRING is either of the two)
 - Fix to REAL type encoder to force primitive encoding form encoding.
 - Fix to CHOICE decoder to handle explicitly tagged, indefinite length
@@ -495,7 +620,7 @@ Revision 0.1.4
 - Obsolete __init__.MajorVersionId replaced with __init__.__version__
   which is now in-sync with distutils.
 - Package classifiers updated.
-- The __init__.py's made non-empty (rumors are that they may be optimized 
+- The __init__.py's made non-empty (rumors are that they may be optimized
   out by package managers).
 - Bail out gracefully whenever Python version is older than 2.4.
 - Fix to Real codec exponent encoding (should be in 2's complement form),
@@ -606,7 +731,7 @@ Revision 0.0.13a
 Revision 0.0.12a
 ----------------
 
-- The individual tag/length/value processing methods of 
+- The individual tag/length/value processing methods of
   encoder.AbstractItemEncoder renamed (leading underscore stripped)
   to promote overloading in cases where partial substrate processing
   is required.
@@ -618,7 +743,7 @@ Revision 0.0.11a
 ----------------
 
 - Decoder can now treat values of unknown types as opaque OctetString.
-- Fix to Set/SetOf type decoder to handle uninitialized scalar SetOf 
+- Fix to Set/SetOf type decoder to handle uninitialized scalar SetOf
   components correctly.
 
 Revision 0.0.10a
@@ -665,14 +790,14 @@ Revision 0.0.5a
 ---------------
 
 - Integer BER codec reworked fixing negative values encoding bug.
-- clone() and subtype() methods of Constructed ASN.1 classes now 
+- clone() and subtype() methods of Constructed ASN.1 classes now
   accept optional cloneValueFlag flag which controls original value
-  inheritance. The default is *not* to inherit original value for 
+  inheritance. The default is *not* to inherit original value for
   performance reasons (this may affect backward compatibility).
   Performance penalty may be huge on deeply nested Constructed objects
   re-creation.
 - Base ASN.1 types (pyasn1.type.univ.*) do not have default values
-  anymore. They remain uninitialized acting as ASN.1 types. In 
+  anymore. They remain uninitialized acting as ASN.1 types. In
   this model, initialized ASN.1 types represent either types with
   default value installed or a type instance.
 - Decoders' prototypes are now class instances rather than classes.
@@ -704,7 +829,7 @@ Revision 0.0.3a
 Revision 0.0.2a
 ---------------
 
-* ConstraintsIntersection.isSuperTypeOf() and 
+* ConstraintsIntersection.isSuperTypeOf() and
   ConstraintsIntersection.hasConstraint() implemented
 * Bugfix to NamedValues initialization code
 * +/- operators added to NamedValues objects

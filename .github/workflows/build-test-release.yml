@@ -7,147 +7,203 @@ on:
       - "develop"
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+      # Prerelease tags, so update-semver runs for betas as well.
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
     branches: [main, develop]
+  # main never releases on push (see the publish job's DRY). Cutting an rc or a
+  # GA from main is a deliberate manual act.
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release to cut from main"
+        type: choice
+        options:
+          - prerelease
+          - ga
+        default: prerelease
+
+# Add permissions needed for semantic-release
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v3.0.0
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.10"
+      - uses: pre-commit/action@v3.0.1
 
   review_secrets:
     name: security-detect-secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           submodules: false
           fetch-depth: "0"
-      - name: Trufflehog Actions Scan
-        uses: edplato/trufflehog-actions-scan@v0.9j-beta
-        with:
-          scanArguments: "--max_depth 30 -x .github/workflows/exclude-patterns.txt"
 
   semgrep:
     runs-on: ubuntu-latest
     name: security-sast-semgrep
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Semgrep
         id: semgrep
         uses: returntocorp/semgrep-action@v1
         with:
           publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
 
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Run Ruff
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Run mypy
+        run: uv run mypy
+
+      # Advisory only. ty is pre-1.0 and has no disallow_untyped_defs
+      # equivalent, so mypy above remains the blocking gate. ty catches
+      # things mypy misses, notably Liskov override violations.
+      - name: Run ty (advisory)
+        run: uv run ty check pyasn1
+        continue-on-error: true
+
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Build docs
+        run: uv run sphinx-build -W -b html docs/source docs/build
+
   build:
     name: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: "1.1.11"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
       - name: Build
-        run: |
-          poetry install
-          poetry build
-      - uses: actions/upload-artifact@v2.2.4
+        run: uv build
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist
-      - uses: actions/upload-artifact@v2.2.4
-        with:
-          name: output
-          path: output
 
   run-unit-tests:
     name: test-unit
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.8", "3.9", "3.10", "pypy-3.8"]
-        poetry-version: ["1.1.11"]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     needs:
       - build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
-      - name: run tests
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Run tests
         run: |
-          poetry install
-          poetry run pytest --junitxml=test-results/results.xml --cov=./ --cov-report=xml tests
-      - uses: actions/upload-artifact@v2.2.4
+          uv sync --locked --python ${{ matrix.python }}
+          uv run pytest --junitxml=test-results/results.xml --cov=pyasn1 --cov-report=xml tests
+      - uses: actions/upload-artifact@v7
         with:
           name: unit tests test-results
           path: test-results
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: ${{ matrix.os }}, ${{ matrix.poetry-version }}
+          flags: ${{ matrix.os }}, ${{ matrix.python }}
+
   publish:
     name: Build Release
+    # Semantic release cuts tags from a branch. Now that tag pushes run this
+    # workflow, skip the job on the tags it created itself. A manual dispatch
+    # releases from main only; dispatching any other ref would set DRY false
+    # and cut a release from it.
+    if: >-
+      startsWith(github.ref, 'refs/heads/')
+      && (github.event_name != 'workflow_dispatch' || github.ref_name == 'main')
+    env:
+      # develop keeps auto-publishing beta on push. main only releases when a
+      # human dispatches this workflow; a plain push to main is a dry run.
+      DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
     needs:
-      #- pre-commit
       - review_secrets
       - semgrep
       - build
       - run-unit-tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: false
-          # Very important: semantic-release won't trigger a tagged
-          # build if this is not set false
           persist-credentials: false
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.7"
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: "1.1.11"
+          python-version: "3.10"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
       - name: Build
+        run: uv build
+      # A real merge commit (never squash) is required for rc tags to stay
+      # reachable, otherwise the rc counter restarts and collides.
+      - name: Make main a prerelease branch
+        if: github.event_name == 'workflow_dispatch' && inputs.release_type == 'prerelease'
         run: |
-          poetry install
-          poetry build
+          sed -i 's/^    "main",$/    { "name": "main", "prerelease": "rc" },/' .releaserc.json
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2.6.0
+        uses: cycjimmy/semantic-release-action@v6
         with:
-          semantic_version: 18
+          semantic_version: 24
+          dry_run: ${{ env.DRY }}
           extra_plugins: |
             @semantic-release/exec
             @semantic-release/git
             @google/semantic-release-replace-plugin
         env:
           GITHUB_TOKEN: ${{ secrets.SEMREL_TOKEN }}
-          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          # Don't publish to PyPI here, the tag push will trigger the publish workflow
+          GITHUB_OUTPUT: /tmp/semantic_release_output
 
   update-semver:
-    name: Move Respository semver tags
+    name: Move Repository semver tags
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - uses: haya14busa/action-update-semver@v1

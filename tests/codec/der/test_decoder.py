@@ -5,29 +5,21 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
-
+from pyasn1.codec.der import decoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
 
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
-from pyasn1.codec.der import decoder
-from pyasn1.compat.octets import null
-from pyasn1.error import PyAsn1Error
+_null = b""
 
 
 class BitStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
         assert decoder.decode(bytes((3, 127, 6) + (170,) * 125 + (128,))) == (
             ((1, 0) * 501),
-            null,
+            _null,
         )
 
     def testIndefMode(self):
@@ -49,9 +41,9 @@ class BitStringDecoderTestCase(BaseTestCase):
 
 class OctetStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
-        assert decoder.decode("\004\017Quick brown fox".encode()) == (
-            "Quick brown fox".encode(),
-            "".encode(),
+        assert decoder.decode(b"\004\017Quick brown fox") == (
+            b"Quick brown fox",
+            b"",
         )
 
     def testIndefMode(self):

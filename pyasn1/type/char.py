@@ -4,45 +4,46 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
+"""Character-string ASN.1 types."""
+
+from collections.abc import Iterator
+from typing import Any, Final
 
 from pyasn1 import error
-from pyasn1.type import tag
-from pyasn1.type import univ
+from pyasn1.type import constraint, tag, univ
 
 __all__ = [
+    "BMPString",
+    "GeneralString",
+    "GraphicString",
+    "IA5String",
+    "ISO646String",
     "NumericString",
     "PrintableString",
-    "TeletexString",
     "T61String",
-    "VideotexString",
-    "IA5String",
-    "GraphicString",
-    "VisibleString",
-    "ISO646String",
-    "GeneralString",
-    "UniversalString",
-    "BMPString",
+    "TeletexString",
     "UTF8String",
+    "UniversalString",
+    "VideotexString",
+    "VisibleString",
 ]
 
 NoValue = univ.NoValue
-noValue = univ.noValue
+noValue: Final = univ.noValue
 
 
 class AbstractCharacterString(univ.OctetString):
     """Creates |ASN.1| schema or value object.
 
     |ASN.1| class is based on :class:`~pyasn1.type.base.SimpleAsn1Type`,
-    its objects are immutable and duck-type Python 2 :class:`str` or Python 3
-    :class:`bytes`. When used in octet-stream context, |ASN.1| type assumes
+    its objects are immutable and duck-type Python :class:`bytes`.
+    When used in octet-stream context, |ASN.1| type assumes
     "|encoding|" encoding.
 
     Keyword Args
     ------------
-    value: :class:`unicode`, :class:`str`, :class:`bytes` or |ASN.1| object
-        :class:`unicode` object (Python 2) or :class:`str` (Python 3),
-        alternatively :class:`str` (Python 2) or :class:`bytes` (Python 3)
+    value: :class:`str`, :class:`bytes` or |ASN.1| object
+        :class:`str` or :class:`bytes`
         representing octet-stream of serialised unicode string
         (note `encoding` parameter) or |ASN.1| class instance.
         If `value` is not given, schema object will be created.
@@ -56,8 +57,8 @@ class AbstractCharacterString(univ.OctetString):
         instantiation.
 
     encoding: :py:class:`str`
-        Unicode codec ID to encode/decode :class:`unicode` (Python 2) or
-        :class:`str` (Python 3) the payload when |ASN.1| object is used
+        Unicode codec ID to encode/decode :class:`str`
+        the payload when |ASN.1| object is used
         in octet-stream context.
 
     Raises
@@ -66,55 +67,69 @@ class AbstractCharacterString(univ.OctetString):
         On constraint violation or bad initializer.
     """
 
-    def __str__(self):
-        # `unicode` is Py3 text representation
+    #: The X.680 41 repertoire for this type as a
+    #: :py:class:`~pyasn1.type.constraint.PermittedAlphabetConstraint`, or
+    #: :obj:`None` where X.680 defines the repertoire by external registration
+    #: or by the whole of ISO/IEC 10646.
+    #:
+    #: This is **not** part of the default ``subtypeSpec``: values that decode
+    #: today keep decoding. Attach it explicitly to opt in.
+    #:
+    #: .. code-block:: python
+    #:
+    #:     class StrictPrintable(char.PrintableString):
+    #:         subtypeSpec = char.PrintableString.permittedAlphabet
+    permittedAlphabet: constraint.PermittedAlphabetConstraint | None = None
+
+    def __str__(self) -> str:
         return str(self._value)
 
-    def __bytes__(self):
+    def __bytes__(self) -> bytes:
         try:
             return self._value.encode(self.encoding)
-        except UnicodeEncodeError:
-            exc = sys.exc_info()[1]
+        except UnicodeEncodeError as exc:
             raise error.PyAsn1UnicodeEncodeError(
-                "Can't encode string '%s' with codec "
-                "%s" % (self._value, self.encoding),
+                "Can't encode string with codec",
                 exc,
-            )
+                value=self._value,
+                codec=self.encoding,
+            ) from exc
 
-    def prettyIn(self, value):
+    def prettyIn(self, value: Any) -> str:
         try:
             if isinstance(value, str):
                 return value
             elif isinstance(value, bytes):
                 return value.decode(self.encoding)
-            elif isinstance(value, (tuple, list)):
+            elif isinstance(value, tuple | list):
                 return self.prettyIn(bytes(value))
             elif isinstance(value, univ.OctetString):
                 return value.asOctets().decode(self.encoding)
             else:
                 return str(value)
 
-        except (UnicodeDecodeError, LookupError):
-            exc = sys.exc_info()[1]
+        except (UnicodeDecodeError, LookupError) as exc:
             raise error.PyAsn1UnicodeDecodeError(
-                "Can't decode string '%s' with codec " "%s" % (value, self.encoding),
+                "Can't decode string with codec",
                 exc,
-            )
+                value=value,
+                codec=self.encoding,
+            ) from exc
 
-    def asOctets(self, padding=True):
+    def asOctets(self, padding: bool = True) -> bytes:
         return bytes(self)
 
-    def asNumbers(self, padding=True):
+    def asNumbers(self, padding: bool = True) -> tuple[int, ...]:
         return tuple(bytes(self))
 
     #
     # See OctetString.prettyPrint() for the explanation
     #
 
-    def prettyOut(self, value):
+    def prettyOut(self, value: Any) -> Any:
         return value
 
-    def prettyPrint(self, scope=0):
+    def prettyPrint(self, scope: int = 0) -> str:
         # first see if subclass has its own .prettyOut()
         value = self.prettyOut(self._value)
 
@@ -123,11 +138,11 @@ class AbstractCharacterString(univ.OctetString):
 
         return AbstractCharacterString.__str__(self)
 
-    def __reversed__(self):
+    def __reversed__(self) -> Iterator[str]:
         return reversed(self._value)
 
 
-class NumericString(AbstractCharacterString):
+class NumericString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -138,11 +153,14 @@ class NumericString(AbstractCharacterString):
     )
     encoding = "us-ascii"
 
+    # X.680 41.2, Table 9: digits and SPACE.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(*"0123456789 ")
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class PrintableString(AbstractCharacterString):
+class PrintableString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -153,11 +171,17 @@ class PrintableString(AbstractCharacterString):
     )
     encoding = "us-ascii"
 
+    # X.680 41.4, Table 10. Note the absence of "*" and "@": PrintableString
+    # is narrower than the ASCII graphic set.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '()+,-./:=?"
+    )
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class TeletexString(AbstractCharacterString):
+class TeletexString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -172,14 +196,14 @@ class TeletexString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class T61String(TeletexString):
+class T61String(TeletexString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = TeletexString.__doc__
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class VideotexString(AbstractCharacterString):
+class VideotexString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -194,7 +218,7 @@ class VideotexString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class IA5String(AbstractCharacterString):
+class IA5String(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -205,11 +229,17 @@ class IA5String(AbstractCharacterString):
     )
     encoding = "us-ascii"
 
+    # X.680 41.1, Table 8: registrations 1 (C0 controls) and 6 (ASCII
+    # graphics) plus SPACE and DELETE, i.e. the whole of ISO 646.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *(chr(x) for x in range(0x80))
+    )
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class GraphicString(AbstractCharacterString):
+class GraphicString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -224,7 +254,7 @@ class GraphicString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class VisibleString(AbstractCharacterString):
+class VisibleString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -235,18 +265,24 @@ class VisibleString(AbstractCharacterString):
     )
     encoding = "us-ascii"
 
+    # X.680 41.1, Table 8: registration 6 (ASCII graphics) plus SPACE. No
+    # control characters and no DELETE, unlike IA5String.
+    permittedAlphabet = constraint.PermittedAlphabetConstraint(
+        *(chr(x) for x in range(0x20, 0x7F))
+    )
+
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class ISO646String(VisibleString):
+class ISO646String(VisibleString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = VisibleString.__doc__
 
     # Optimization for faster codec lookup
     typeId = AbstractCharacterString.getTypeId()
 
 
-class GeneralString(AbstractCharacterString):
+class GeneralString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -261,7 +297,7 @@ class GeneralString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class UniversalString(AbstractCharacterString):
+class UniversalString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -276,7 +312,7 @@ class UniversalString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class BMPString(AbstractCharacterString):
+class BMPString(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a
@@ -291,7 +327,7 @@ class BMPString(AbstractCharacterString):
     typeId = AbstractCharacterString.getTypeId()
 
 
-class UTF8String(AbstractCharacterString):
+class UTF8String(AbstractCharacterString):  # noqa: D101 - docstring aliased from the base type below
     __doc__ = AbstractCharacterString.__doc__
 
     #: Set (on class, not on instance) or return a

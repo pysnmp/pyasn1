@@ -6,84 +6,92 @@
 #
 # Original concept and code by Mike C. Fletcher.
 #
-import sys
+"""Value constraint classes used to validate ASN.1 type values."""
+
+from collections.abc import Iterator
+from typing import Any, TypeVar
+
+_SingleValueT = TypeVar("_SingleValueT", bound="SingleValueConstraint")
+_ConstraintSetT = TypeVar("_ConstraintSetT", bound="AbstractConstraintSet")
 
 from pyasn1.type import error
 
 __all__ = [
-    "SingleValueConstraint",
-    "ContainedSubtypeConstraint",
-    "ValueRangeConstraint",
-    "ValueSizeConstraint",
-    "PermittedAlphabetConstraint",
-    "InnerTypeConstraint",
     "ConstraintsExclusion",
     "ConstraintsIntersection",
     "ConstraintsUnion",
+    "ContainedSubtypeConstraint",
+    "InnerTypeConstraint",
+    "PermittedAlphabetConstraint",
+    "SingleValueConstraint",
+    "ValueRangeConstraint",
+    "ValueSizeConstraint",
 ]
 
 
-class AbstractConstraint(object):
-    def __init__(self, *values):
-        self._valueMap = set()
+class AbstractConstraint:
+    def __init__(self, *values: Any) -> None:
+        self._valueMap: set[AbstractConstraint] = set()
         self._setValues(values)
         self.__hash = hash((self.__class__.__name__, self._values))
 
-    def __call__(self, value, idx=None):
+    def __call__(self, value: Any, idx: Any = None) -> None:
         if not self._values:
             return
 
         try:
             self._testValue(value, idx)
 
-        except error.ValueConstraintError:
+        except error.ValueConstraintError as exc:
             raise error.ValueConstraintError(
-                "%s failed at: %r" % (self, sys.exc_info()[1])
-            )
+                "Constraint check failed", constraint=self, cause=exc
+            ) from exc
 
-    def __repr__(self):
-        representation = "%s object" % (self.__class__.__name__)
+    def __repr__(self) -> str:
+        representation = f"{self.__class__.__name__} object"
 
         if self._values:
-            representation += ", consts %s" % ", ".join([repr(x) for x in self._values])
+            representation += ", consts {}".format(
+                ", ".join([repr(x) for x in self._values])
+            )
 
-        return "<%s>" % representation
+        return f"<{representation}>"
 
-    def __eq__(self, other):
-        return self is other and True or self._values == other
+    def __eq__(self, other: object) -> bool:
+        return self is other or self._values == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self._values != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return self._values < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return self._values <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return self._values > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return self._values >= other
 
-    def __bool__(self):
-        return self._values and True or False
+    def __bool__(self) -> bool:
+        return bool(self._values)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.__hash
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = values
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         raise error.ValueConstraintError(value)
 
     # Constraints derivation logic
-    def getValueMap(self):
+    def getValueMap(self) -> "set[AbstractConstraint]":
         return self._valueMap
 
-    def isSuperTypeOf(self, otherConstraint):
+    def isSuperTypeOf(self, otherConstraint: "AbstractConstraint") -> bool:
         # TODO: fix possible comparison of set vs scalars here
         return (
             otherConstraint is self
@@ -92,7 +100,7 @@ class AbstractConstraint(object):
             or self in otherConstraint.getValueMap()
         )
 
-    def isSubTypeOf(self, otherConstraint):
+    def isSubTypeOf(self, otherConstraint: "AbstractConstraint") -> bool:
         return (
             otherConstraint is self
             or not self
@@ -139,38 +147,35 @@ class SingleValueConstraint(AbstractConstraint):
         divisor_of_six = DivisorOfSix(7)
     """
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = values
         self._set = set(values)
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         if value not in self._set:
             raise error.ValueConstraintError(value)
 
     # Constrains can be merged or reduced
 
-    def __contains__(self, item):
+    def __contains__(self, item: Any) -> bool:
         return item in self._set
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return iter(self._set)
 
-    def __sub__(self, constraint):
+    def __sub__(self: _SingleValueT, constraint: Any) -> _SingleValueT:
         return self.__class__(*(self._set.difference(constraint)))
 
-    def __add__(self, constraint):
+    def __add__(self: _SingleValueT, constraint: Any) -> _SingleValueT:
         return self.__class__(*(self._set.union(constraint)))
-
-    def __sub__(self, constraint):
-        return self.__class__(*(self._set.difference(constraint)))
 
 
 class ContainedSubtypeConstraint(AbstractConstraint):
     """Create a ContainedSubtypeConstraint object.
 
     The ContainedSubtypeConstraint satisfies any value that
-    is present in the set of permitted values and also
-    satisfies included constraints.
+    either equals one of the permitted values or satisfies
+    one of the included constraints.
 
     The ContainedSubtypeConstraint object can be applied to
     any ASN.1 type.
@@ -202,12 +207,23 @@ class ContainedSubtypeConstraint(AbstractConstraint):
         divisor_of_eighteen = DivisorOfEighteen(10)
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
+        # ASN.1 INCLUDES combines its operands as a union, so the value only
+        # has to match one of them.
         for constraint in self._values:
             if isinstance(constraint, AbstractConstraint):
-                constraint(value, idx)
-            elif value not in self._set:
-                raise error.ValueConstraintError(value)
+                try:
+                    constraint(value, idx)
+
+                except error.ValueConstraintError:
+                    continue
+
+                return
+
+            elif value == constraint:
+                return
+
+        raise error.ValueConstraintError(value)
 
 
 class ValueRangeConstraint(AbstractConstraint):
@@ -247,20 +263,24 @@ class ValueRangeConstraint(AbstractConstraint):
         teen_year = TeenAgeYears(20)
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         if value < self.start or value > self.stop:
             raise error.ValueConstraintError(value)
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         if len(values) != 2:
             raise error.PyAsn1Error(
-                "%s: bad constraint values" % (self.__class__.__name__,)
+                "Bad constraint values",
+                constraintType=self.__class__.__name__,
+                values=values,
             )
         self.start, self.stop = values
         if self.start > self.stop:
             raise error.PyAsn1Error(
-                "%s: screwed constraint values (start > stop): %s > %s"
-                % (self.__class__.__name__, self.start, self.stop)
+                "Screwed constraint values (start > stop)",
+                constraintType=self.__class__.__name__,
+                start=self.start,
+                stop=self.stop,
             )
         AbstractConstraint._setValues(self, values)
 
@@ -320,7 +340,7 @@ class ValueSizeConstraint(ValueRangeConstraint):
     types).
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         valueSize = len(value)
         if valueSize < self.start or valueSize > self.stop:
             raise error.ValueConstraintError(value)
@@ -402,11 +422,11 @@ class PermittedAlphabetConstraint(SingleValueConstraint):
     `PermittedAlphabetConstraint` level instead.
     """
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = values
         self._set = set(values)
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         if not self._set.issuperset(value):
             raise error.ValueConstraintError(value)
 
@@ -433,15 +453,15 @@ class ComponentPresentConstraint(AbstractConstraint):
         present(None)
     """
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = ("<must be present>",)
 
         if values:
             raise error.PyAsn1Error("No arguments expected")
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         if value is None:
-            raise error.ValueConstraintError("Component is not present:")
+            raise error.ValueConstraintError("Component is not present")
 
 
 class ComponentAbsentConstraint(AbstractConstraint):
@@ -466,15 +486,15 @@ class ComponentAbsentConstraint(AbstractConstraint):
         absent('whatever')
     """
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = ("<must be absent>",)
 
         if values:
             raise error.PyAsn1Error("No arguments expected")
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         if value is not None:
-            raise error.ValueConstraintError("Component is not absent: %r" % value)
+            raise error.ValueConstraintError("Component is not absent", value=value)
 
 
 class WithComponentsConstraint(AbstractConstraint):
@@ -549,34 +569,81 @@ class WithComponentsConstraint(AbstractConstraint):
         descr['name'] = 'John'
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         for field, constraint in self._values:
             constraint(value.get(field))
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         AbstractConstraint._setValues(self, values)
 
 
 # This is a bit kludgy, meaning two op modes within a single constraint
 class InnerTypeConstraint(AbstractConstraint):
-    """Value must satisfy the type and presence constraints"""
+    """Value must satisfy the type and presence constraints.
 
-    def _testValue(self, value, idx):
+    Presence follows X.680 51.8.10.1. A component constrained PRESENT is
+    satisfied if and only if its value is present, one constrained ABSENT if
+    and only if its value is absent, and one constrained OPTIONAL carries no
+    presence constraint at all. An absent component is spelled `None`, as it
+    is for :class:`ComponentPresentConstraint`.
+
+    Per 51.8.9 the value constraint applies to the inner value, so it is
+    checked only where there is one: never under ABSENT, and under OPTIONAL
+    only when the component turns out to be present.
+
+    A component whose presence constraint is empty (`None`) is left
+    unconstrained in its presence. 51.8.10.3 would read it as PRESENT inside
+    a "FullSpecification", but this constraint object does not record which
+    specification form it came from.
+    """
+
+    #: X.680 51.8.10 "PresenceConstraint".
+    presenceConstraints = frozenset(("PRESENT", "ABSENT", "OPTIONAL"))
+
+    def _testValue(self, value: Any, idx: Any) -> None:
         if self.__singleTypeConstraint:
             self.__singleTypeConstraint(value)
+
         elif self.__multipleTypeConstraint:
             if idx not in self.__multipleTypeConstraint:
-                raise error.ValueConstraintError(value)
+                raise error.ValueConstraintError(
+                    "No constraint for this component", idx=idx, value=value
+                )
+
             constraint, status = self.__multipleTypeConstraint[idx]
-            if status == "ABSENT":  # XXX presence is not checked!
-                raise error.ValueConstraintError(value)
+
+            if status == "ABSENT":
+                if value is not None:
+                    raise error.ValueConstraintError(
+                        "Component constrained ABSENT is present",
+                        idx=idx,
+                        value=value,
+                    )
+                # 51.8.9 has no inner value to constrain.
+                return
+
+            if status == "PRESENT" and value is None:
+                raise error.ValueConstraintError(
+                    "Component constrained PRESENT is absent", idx=idx
+                )
+
+            if value is None:
+                # OPTIONAL, or an empty presence constraint, and absent.
+                return
+
             constraint(value)
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self.__multipleTypeConstraint = {}
         self.__singleTypeConstraint = None
         for v in values:
             if isinstance(v, tuple):
+                if v[2] is not None and v[2] not in self.presenceConstraints:
+                    raise error.PyAsn1Error(
+                        "Unknown presence constraint",
+                        status=v[2],
+                        expected=sorted(self.presenceConstraints),
+                    )
                 self.__multipleTypeConstraint[v[0]] = v[1], v[2]
             else:
                 self.__singleTypeConstraint = v
@@ -622,7 +689,7 @@ class ConstraintsExclusion(AbstractConstraint):
     information.
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         for constraint in self._values:
             try:
                 constraint(value, idx)
@@ -632,29 +699,29 @@ class ConstraintsExclusion(AbstractConstraint):
 
             raise error.ValueConstraintError(value)
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         AbstractConstraint._setValues(self, values)
 
 
 class AbstractConstraintSet(AbstractConstraint):
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: Any) -> Any:
         return self._values[idx]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return iter(self._values)
 
-    def __add__(self, value):
+    def __add__(self: _ConstraintSetT, value: Any) -> _ConstraintSetT:
         return self.__class__(*(self._values + (value,)))
 
-    def __radd__(self, value):
+    def __radd__(self: _ConstraintSetT, value: Any) -> _ConstraintSetT:
         return self.__class__(*((value,) + self._values))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._values)
 
     # Constraints inclusion in sets
 
-    def _setValues(self, values):
+    def _setValues(self, values: Any) -> None:
         self._values = values
         for constraint in values:
             if constraint:
@@ -702,7 +769,7 @@ class ConstraintsIntersection(AbstractConstraintSet):
         capital_and_small = CapitalAndSmall('hello')
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         for constraint in self._values:
             constraint(value, idx)
 
@@ -747,7 +814,7 @@ class ConstraintsUnion(AbstractConstraintSet):
         capital_or_small = CapitalOrSmall('hello!')
     """
 
-    def _testValue(self, value, idx):
+    def _testValue(self, value: Any, idx: Any) -> None:
         for constraint in self._values:
             try:
                 constraint(value, idx)
@@ -757,7 +824,7 @@ class ConstraintsUnion(AbstractConstraintSet):
                 return
 
         raise error.ValueConstraintError(
-            'all of %s failed for "%s"' % (self._values, value)
+            "All constraints failed", constraints=self._values, value=value
         )
 
 

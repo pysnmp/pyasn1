@@ -4,22 +4,23 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-import sys
+
+"""Named-field descriptors for constructed ASN.1 types."""
+
+from collections import namedtuple
+from collections.abc import Iterator
+from typing import Any, NoReturn
 
 from pyasn1 import error
-from pyasn1.type import tag
-from pyasn1.type import tagmap
+from pyasn1.type import tag, tagmap
 
-__all__ = ["NamedType", "OptionalNamedType", "DefaultedNamedType", "NamedTypes"]
-
-try:
-    any
-
-except NameError:
-    any = lambda x: bool(filter(bool, x))
+__all__ = ["DefaultedNamedType", "NamedType", "NamedTypes", "OptionalNamedType"]
 
 
-class NamedType(object):
+_NamedTypeBase = namedtuple("_NamedTypeBase", ["name", "asn1Object", "openType"])
+
+
+class NamedType(_NamedTypeBase):
     """Create named field object for a constructed ASN.1 type.
 
     The |NamedType| object represents a single name and ASN.1 type of a constructed ASN.1 type.
@@ -36,84 +37,89 @@ class NamedType(object):
         ASN.1 type object
     """
 
+    __slots__ = ()
+
     isOptional = False
     isDefaulted = False
 
-    def __init__(self, name, asn1Object, openType=None):
-        self.__name = name
-        self.__type = asn1Object
-        self.__nameAndType = name, asn1Object
-        self.__openType = openType
+    def __new__(cls, name: str, asn1Object: Any, openType: Any = None) -> "NamedType":
+        """Construct a *NamedType* from *name*, *asn1Object* and optional *openType*."""
+        return super().__new__(cls, name, asn1Object, openType)
 
-    def __repr__(self):
-        representation = "%s=%r" % (self.name, self.asn1Object)
+    def __repr__(self) -> str:
+        representation = f"{self.name}={self.asn1Object!r}"
 
         if self.openType:
-            representation += ", open type %r" % self.openType
+            representation += f", openType {self.openType!r}"
 
-        return "<%s object, type %s>" % (self.__class__.__name__, representation)
+        return f"<{self.__class__.__name__} object, {representation}>"
 
-    def __eq__(self, other):
-        return self.__nameAndType == other
+    # Iteration, indexing and length intentionally expose only
+    # (name, asn1Object), matching the original 2-tuple duck-type behaviour.
+    # The openType field is accessible only via the .openType property.
+    def __iter__(self) -> Iterator[Any]:
+        yield self.name
+        yield self.asn1Object
 
-    def __ne__(self, other):
-        return self.__nameAndType != other
+    def __getitem__(self, idx: Any) -> Any:
+        if idx == 0:
+            return self.name
+        elif idx == 1:
+            return self.asn1Object
+        else:
+            raise IndexError("tuple index out of range")
 
-    def __lt__(self, other):
-        return self.__nameAndType < other
+    def __len__(self) -> int:
+        return 2
 
-    def __le__(self, other):
-        return self.__nameAndType <= other
+    def __getnewargs__(self) -> tuple[Any, ...]:
+        # Preserve all three fields (including openType) when copying and
+        # pickling.  The namedtuple default round-trips tuple(self), which
+        # only yields the two items exposed by __iter__ and would drop the
+        # openType field.
+        return (self.name, self.asn1Object, self.openType)
 
-    def __gt__(self, other):
-        return self.__nameAndType > other
+    # Equality and hashing intentionally consider only (name, asn1Object),
+    # matching the original implementation where openType was excluded.
+    def __eq__(self, other: object) -> bool:
+        return (self.name, self.asn1Object) == other
 
-    def __ge__(self, other):
-        return self.__nameAndType >= other
+    def __ne__(self, other: object) -> bool:
+        return (self.name, self.asn1Object) != other
 
-    def __hash__(self):
-        return hash(self.__nameAndType)
+    def __lt__(self, other: Any) -> bool:
+        return (self.name, self.asn1Object) < other
 
-    def __getitem__(self, idx):
-        return self.__nameAndType[idx]
+    def __le__(self, other: Any) -> bool:
+        return (self.name, self.asn1Object) <= other
 
-    def __iter__(self):
-        return iter(self.__nameAndType)
+    def __gt__(self, other: Any) -> bool:
+        return (self.name, self.asn1Object) > other
 
-    @property
-    def name(self):
-        return self.__name
+    def __ge__(self, other: Any) -> bool:
+        return (self.name, self.asn1Object) >= other
 
-    @property
-    def asn1Object(self):
-        return self.__type
-
-    @property
-    def openType(self):
-        return self.__openType
-
-    # Backward compatibility
-
-    def getName(self):
-        return self.name
-
-    def getType(self):
-        return self.asn1Object
+    def __hash__(self) -> int:
+        return hash((self.name, self.asn1Object))
 
 
-class OptionalNamedType(NamedType):
-    __doc__ = NamedType.__doc__
+class OptionalNamedType(NamedType):  # noqa: D101 - docstring aliased from the base type below
+    __doc__ = NamedType.__doc__  # type: ignore[assignment]
+
+    __slots__ = ()
 
     isOptional = True
 
 
-class DefaultedNamedType(NamedType):
-    __doc__ = NamedType.__doc__
+class DefaultedNamedType(NamedType):  # noqa: D101 - docstring aliased from the base type below
+    __doc__ = NamedType.__doc__  # type: ignore[assignment]
+
+    __slots__ = ()
 
     isDefaulted = True
 
 
-class NamedTypes(object):
+class NamedTypes:
     """Create a collection of named fields for a constructed ASN.1 type.
 
     The NamedTypes object represents a collection of named fields of a constructed ASN.1 type.
@@ -151,26 +157,24 @@ class NamedTypes(object):
         descr['first-name'] = 'John'
     """
 
-    def __init__(self, *namedTypes, **kwargs):
+    def __init__(self, *namedTypes: Any, **kwargs: Any) -> None:
         self.__namedTypes = namedTypes
         self.__namedTypesLen = len(self.__namedTypes)
         self.__minTagSet = self.__computeMinTagSet()
         self.__nameToPosMap = self.__computeNameToPosMap()
         self.__tagToPosMap = self.__computeTagToPosMap()
         self.__ambiguousTypes = (
-            "terminal" not in kwargs and self.__computeAmbiguousTypes() or {}
+            self.__computeAmbiguousTypes() if "terminal" not in kwargs else {}
         )
         self.__uniqueTagMap = self.__computeTagMaps(unique=True)
         self.__nonUniqueTagMap = self.__computeTagMaps(unique=False)
         self.__hasOptionalOrDefault = any(
-            [
-                True
-                for namedType in self.__namedTypes
-                if namedType.isDefaulted or namedType.isOptional
-            ]
+            True
+            for namedType in self.__namedTypes
+            if namedType.isDefaulted or namedType.isOptional
         )
         self.__hasOpenTypes = any(
-            [True for namedType in self.__namedTypes if namedType.openType]
+            True for namedType in self.__namedTypes if namedType.openType
         )
 
         self.__requiredComponents = frozenset(
@@ -186,72 +190,79 @@ class NamedTypes(object):
             [(namedType.name, namedType.asn1Object) for namedType in self.__namedTypes]
         )
 
-    def __repr__(self):
-        representation = ", ".join(["%r" % x for x in self.__namedTypes])
-        return "<%s object, types %s>" % (self.__class__.__name__, representation)
+    def __repr__(self) -> str:
+        representation = ", ".join([repr(x) for x in self.__namedTypes])
+        return f"<{self.__class__.__name__} object, types {representation}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__namedTypes == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self.__namedTypes != other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return self.__namedTypes < other
 
-    def __le__(self, other):
+    def __le__(self, other: Any) -> bool:
         return self.__namedTypes <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool:
         return self.__namedTypes > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Any) -> bool:
         return self.__namedTypes >= other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.__namedTypes)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: Any) -> Any:
         try:
             return self.__namedTypes[idx]
 
         except TypeError:
             return self.__namedTypes[self.__nameToPosMap[idx]]
 
-    def __contains__(self, key):
+    def __contains__(self, key: Any) -> bool:
         return key in self.__nameToPosMap
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return (x[0] for x in self.__namedTypes)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.__namedTypesLen > 0
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.__namedTypesLen
 
     # Python dict protocol
 
-    def values(self):
+    def values(self) -> tuple[Any, ...]:
+        """Return the ASN.1 type objects of all fields, in field order."""
         return self.__values
 
-    def keys(self):
+    def keys(self) -> frozenset[str]:
+        """Return the field names of all fields."""
         return self.__keys
 
-    def items(self):
+    def items(self) -> tuple[tuple[str, Any], ...]:
+        """Return (name, asn1Object) pairs for all fields, in field order."""
         return self.__items
 
-    def clone(self):
+    def clone(self) -> "NamedTypes":
+        """Return a new *NamedTypes* built from the same *NamedType* objects."""
         return self.__class__(*self.__namedTypes)
 
-    class PostponedError(object):
-        def __init__(self, errorMsg):
+    class PostponedError:
+        """Defer raising an error until the map it stands in for is used."""
+
+        def __init__(self, errorMsg: str, **context: Any) -> None:
             self.__errorMsg = errorMsg
+            self.__context = context
 
-        def __getitem__(self, item):
-            raise error.PyAsn1Error(self.__errorMsg)
+        def __getitem__(self, item: Any) -> NoReturn:
+            raise error.PyAsn1Error(self.__errorMsg, **self.__context)
 
-    def __computeTagToPosMap(self):
+    def __computeTagToPosMap(self) -> Any:
         tagToPosMap = {}
         for idx, namedType in enumerate(self.__namedTypes):
             tagMap = namedType.asn1Object.tagMap
@@ -262,26 +273,30 @@ class NamedTypes(object):
             for _tagSet in tagMap.presentTypes:
                 if _tagSet in tagToPosMap:
                     return NamedTypes.PostponedError(
-                        "Duplicate component tag %s at %s" % (_tagSet, namedType)
+                        "Duplicate component tag",
+                        tagSet=_tagSet,
+                        namedType=namedType,
                     )
                 tagToPosMap[_tagSet] = idx
 
         return tagToPosMap
 
-    def __computeNameToPosMap(self):
+    def __computeNameToPosMap(self) -> Any:
         nameToPosMap = {}
         for idx, namedType in enumerate(self.__namedTypes):
             if namedType.name in nameToPosMap:
                 return NamedTypes.PostponedError(
-                    "Duplicate component name %s at %s" % (namedType.name, namedType)
+                    "Duplicate component name",
+                    name=namedType.name,
+                    namedType=namedType,
                 )
             nameToPosMap[namedType.name] = idx
 
         return nameToPosMap
 
-    def __computeAmbiguousTypes(self):
+    def __computeAmbiguousTypes(self) -> Any:
         ambiguousTypes = {}
-        partialAmbiguousTypes = ()
+        partialAmbiguousTypes: tuple[Any, ...] = ()
         for idx, namedType in reversed(tuple(enumerate(self.__namedTypes))):
             if namedType.isOptional or namedType.isDefaulted:
                 partialAmbiguousTypes = (namedType,) + partialAmbiguousTypes
@@ -290,12 +305,10 @@ class NamedTypes(object):
             if len(partialAmbiguousTypes) == len(self.__namedTypes):
                 ambiguousTypes[idx] = self
             else:
-                ambiguousTypes[idx] = NamedTypes(
-                    *partialAmbiguousTypes, **dict(terminal=True)
-                )
+                ambiguousTypes[idx] = NamedTypes(*partialAmbiguousTypes, terminal=True)
         return ambiguousTypes
 
-    def getTypeByPosition(self, idx):
+    def getTypeByPosition(self, idx: int) -> Any:
         """Return ASN.1 type object by its position in fields set.
 
         Parameters
@@ -316,10 +329,10 @@ class NamedTypes(object):
         try:
             return self.__namedTypes[idx].asn1Object
 
-        except IndexError:
-            raise error.PyAsn1Error("Type position out of range")
+        except IndexError as exc:
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
-    def getPositionByType(self, tagSet):
+    def getPositionByType(self, tagSet: tag.TagSet) -> int:
         """Return field position by its ASN.1 type.
 
         Parameters
@@ -340,10 +353,10 @@ class NamedTypes(object):
         try:
             return self.__tagToPosMap[tagSet]
 
-        except KeyError:
-            raise error.PyAsn1Error("Type %s not found" % (tagSet,))
+        except KeyError as exc:
+            raise error.PyAsn1Error("Type not found", tagSet=tagSet) from exc
 
-    def getNameByPosition(self, idx):
+    def getNameByPosition(self, idx: int) -> str:
         """Return field name by its position in fields set.
 
         Parameters
@@ -364,10 +377,10 @@ class NamedTypes(object):
         try:
             return self.__namedTypes[idx].name
 
-        except IndexError:
-            raise error.PyAsn1Error("Type position out of range")
+        except IndexError as exc:
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
-    def getPositionByName(self, name):
+    def getPositionByName(self, name: str) -> int:
         """Return field position by filed name.
 
         Parameters
@@ -388,10 +401,10 @@ class NamedTypes(object):
         try:
             return self.__nameToPosMap[name]
 
-        except KeyError:
-            raise error.PyAsn1Error("Name %s not found" % (name,))
+        except KeyError as exc:
+            raise error.PyAsn1Error("Name not found", name=name) from exc
 
-    def getTagMapNearPosition(self, idx):
+    def getTagMapNearPosition(self, idx: int) -> Any:
         """Return ASN.1 types that are allowed at or past given field position.
 
         Some ASN.1 serialisation allow for skipping optional and defaulted fields.
@@ -417,10 +430,10 @@ class NamedTypes(object):
         try:
             return self.__ambiguousTypes[idx].tagMap
 
-        except KeyError:
-            raise error.PyAsn1Error("Type position out of range")
+        except KeyError as exc:
+            raise error.PyAsn1Error("Type position out of range", position=idx) from exc
 
-    def getPositionNearType(self, tagSet, idx):
+    def getPositionNearType(self, tagSet: tag.TagSet, idx: int) -> int:
         """Return the closest field position where given ASN.1 type is allowed.
 
         Some ASN.1 serialisation allow for skipping optional and defaulted fields.
@@ -450,10 +463,12 @@ class NamedTypes(object):
         try:
             return idx + self.__ambiguousTypes[idx].getPositionByType(tagSet)
 
-        except KeyError:
-            raise error.PyAsn1Error("Type position out of range")
+        except KeyError as exc:
+            raise error.PyAsn1Error(
+                "Type position out of range", position=idx, tagSet=tagSet
+            ) from exc
 
-    def __computeMinTagSet(self):
+    def __computeMinTagSet(self) -> tag.TagSet:
         minTagSet = None
         for namedType in self.__namedTypes:
             asn1Object = namedType.asn1Object
@@ -470,7 +485,7 @@ class NamedTypes(object):
         return minTagSet or tag.TagSet()
 
     @property
-    def minTagSet(self):
+    def minTagSet(self) -> tag.TagSet:
         """Return the minimal TagSet among ASN.1 type in callee *NamedTypes*.
 
         Some ASN.1 types/serialisation protocols require ASN.1 types to be
@@ -484,7 +499,7 @@ class NamedTypes(object):
         """
         return self.__minTagSet
 
-    def __computeTagMaps(self, unique):
+    def __computeTagMaps(self, unique: bool) -> Any:
         presentTypes = {}
         skipTypes = {}
         defaultType = None
@@ -495,7 +510,10 @@ class NamedTypes(object):
             for tagSet in tagMap:
                 if unique and tagSet in presentTypes:
                     return NamedTypes.PostponedError(
-                        "Non-unique tagSet %s of %s at %s" % (tagSet, namedType, self)
+                        "Non-unique tagSet",
+                        tagSet=tagSet,
+                        namedType=namedType,
+                        namedTypes=self,
                     )
                 presentTypes[tagSet] = namedType.asn1Object
             skipTypes.update(tagMap.skipTypes)
@@ -504,13 +522,13 @@ class NamedTypes(object):
                 defaultType = tagMap.defaultType
             elif tagMap.defaultType is not None:
                 return NamedTypes.PostponedError(
-                    "Duplicate default ASN.1 type at %s" % (self,)
+                    "Duplicate default ASN.1 type", namedTypes=self
                 )
 
         return tagmap.TagMap(presentTypes, skipTypes, defaultType)
 
     @property
-    def tagMap(self):
+    def tagMap(self) -> Any:
         """Return a *TagMap* object from tags and types recursively.
 
         Return a :class:`~pyasn1.type.tagmap.TagMap` object by
@@ -534,7 +552,7 @@ class NamedTypes(object):
         return self.__nonUniqueTagMap
 
     @property
-    def tagMapUnique(self):
+    def tagMapUnique(self) -> Any:
         """Return a *TagMap* object from unique tags and types recursively.
 
         Return a :class:`~pyasn1.type.tagmap.TagMap` object by
@@ -564,17 +582,21 @@ class NamedTypes(object):
         return self.__uniqueTagMap
 
     @property
-    def hasOptionalOrDefault(self):
+    def hasOptionalOrDefault(self) -> bool:
+        """Return `True` if any field is OPTIONAL or DEFAULT."""
         return self.__hasOptionalOrDefault
 
     @property
-    def hasOpenTypes(self):
+    def hasOpenTypes(self) -> bool:
+        """Return `True` if any field carries an *openType*."""
         return self.__hasOpenTypes
 
     @property
-    def namedTypes(self):
+    def namedTypes(self) -> tuple[NamedType, ...]:
+        """Return all *NamedType* objects as a tuple, in field order."""
         return tuple(self.__namedTypes)
 
     @property
-    def requiredComponents(self):
+    def requiredComponents(self) -> frozenset[int]:
+        """Return the positions of fields that are neither OPTIONAL nor DEFAULT."""
         return self.__requiredComponents

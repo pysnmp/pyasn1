@@ -4,14 +4,12 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
+import unittest
 
 suite = unittest.TestLoader().loadTestsFromNames(
     [
+        "tests.codec.test_conformance.suite",
+        "tests.codec.test_error_contract.suite",
         "tests.codec.ber.__main__.suite",
         "tests.codec.cer.__main__.suite",
         "tests.codec.der.__main__.suite",

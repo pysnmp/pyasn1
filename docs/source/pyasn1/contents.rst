@@ -214,6 +214,8 @@ implemented in pyasn1.
    /pyasn1/codec/der/contents
    /pyasn1/codec/native/contents
 
+.. _pyasn1-errors:
+
 Exceptions
 ----------
 
@@ -226,3 +228,13 @@ The exception hierarchy is as follows (ordered from least specific).
    :maxdepth: 2
 
    /pyasn1/error/contents
+
+Debugging
+---------
+
+Codecs can trace their work through the standard :mod:`logging` module.
+
+.. toctree::
+   :maxdepth: 2
+
+   /pyasn1/debug

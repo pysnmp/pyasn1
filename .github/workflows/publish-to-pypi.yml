@@ -1,0 +1,73 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      # Prereleases cut from develop, e.g. v1.2.0-beta.11. The pattern above
+      # is anchored, so without this one the beta tags land on GitHub and
+      # never reach PyPI.
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+# Add permissions needed for publishing
+permissions:
+  contents: read
+
+jobs:
+  # First validate the tag matches the version in the files
+  validate-version:
+    name: Validate Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify version matches tag
+        run: |
+          # Extract version from the tag (e.g., v1.2.3 -> 1.2.3)
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          # Get version from pyproject.toml
+          FILE_VERSION=$(grep -m 1 "version" pyproject.toml | sed -E 's/.*"(.*)"/\1/' | sed -E 's/.*'"'"'(.*)'"'"'/\1/')
+          echo "Tag version: $TAG_VERSION"
+          echo "File version: $FILE_VERSION"
+          # Verify versions match
+          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) does not match version in pyproject.toml ($FILE_VERSION)"
+            exit 1
+          fi
+
+  # Pure-python (py3-none-any) package: one build serves every platform and version
+  build-packages:
+    name: Build package
+    needs: [validate-version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Build package
+        run: uv build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish Release to PyPI
+    needs: [build-packages]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+      - name: Download build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - name: Publish to PyPI
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish

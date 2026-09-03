@@ -5,29 +5,27 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
-
+from pyasn1.codec.cer import decoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
 
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
-from pyasn1.codec.cer import decoder
-from pyasn1.compat.octets import str2octs, null
-from pyasn1.error import PyAsn1Error
+
+def _str2octs(s):
+    return s.encode("iso-8859-1")
+
+
+_null = b""
 
 
 class BooleanDecoderTestCase(BaseTestCase):
     def testTrue(self):
-        assert decoder.decode(bytes((1, 1, 255))) == (1, null)
+        assert decoder.decode(bytes((1, 1, 255))) == (1, _null)
 
     def testFalse(self):
-        assert decoder.decode(bytes((1, 1, 0))) == (0, null)
+        assert decoder.decode(bytes((1, 1, 0))) == (0, _null)
 
     def testEmpty(self):
         try:
@@ -44,12 +42,12 @@ class BooleanDecoderTestCase(BaseTestCase):
 
 class BitStringDecoderTestCase(BaseTestCase):
     def testShortMode(self):
-        assert decoder.decode(bytes((3, 3, 6, 170, 128))) == (((1, 0) * 5), null)
+        assert decoder.decode(bytes((3, 3, 6, 170, 128))) == (((1, 0) * 5), _null)
 
     def testLongMode(self):
         assert decoder.decode(bytes((3, 127, 6) + (170,) * 125 + (128,))) == (
             ((1, 0) * 501),
-            null,
+            _null,
         )
 
     # TODO: test failures on short chunked and long unchunked substrate samples
@@ -79,12 +77,12 @@ class OctetStringDecoderTestCase(BaseTestCase):
                     120,
                 )
             ),
-        ) == (str2octs("Quick brown fox"), null)
+        ) == (_str2octs("Quick brown fox"), _null)
 
     def testLongMode(self):
         assert decoder.decode(
             bytes((36, 128, 4, 130, 3, 232) + (81,) * 1000 + (4, 1, 81, 0, 0))
-        ) == (str2octs("Q" * 1001), null)
+        ) == (_str2octs("Q" * 1001), _null)
 
     # TODO: test failures on short chunked and long unchunked substrate samples
 
@@ -436,7 +434,7 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesChoiceOne(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 1, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 1, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -446,7 +444,7 @@ class SequenceDecoderWithImplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesUnknownId(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 3, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 3, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -477,7 +475,7 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesChoiceOne(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 1, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 1, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )
@@ -487,7 +485,7 @@ class SequenceDecoderWithExplicitlyTaggedSetOfOpenTypesTestCase(BaseTestCase):
 
     def testDecodeOpenTypesUnknownId(self):
         s, r = decoder.decode(
-            bytes((48, 10, 2, 1, 3, 49, 5, 131, 3, 2, 1, 12)),
+            bytes((48, 128, 2, 1, 3, 49, 128, 131, 3, 2, 1, 12, 0, 0, 0, 0)),
             asn1Spec=self.s,
             decodeOpenTypes=True,
         )

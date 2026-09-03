@@ -5,3 +5,10 @@ __pycache__
 *.pyo
 .venv
 dist
+.tox
+pyasn1.egg-info
+.vscode/settings.json
+.coverage
+coverage.xml
+docs/build/
+htmlcov/

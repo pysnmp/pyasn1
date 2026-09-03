@@ -5,17 +5,11 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
-
+import pyasn1.error
+from pyasn1.type import constraint, error
 from tests.base import BaseTestCase
-
-from pyasn1.type import constraint
-from pyasn1.type import error
 
 
 class SingleValueConstraintTestCase(BaseTestCase):
@@ -89,6 +83,55 @@ class ContainedSubtypeConstraintTestCase(BaseTestCase):
             pass
         else:
             assert 0, "constraint check fails"
+
+
+class ContainedSubtypeConstraintUnionTestCase(BaseTestCase):
+    """INCLUDES combines its operands as a union.
+
+    Mirrors the example from the ContainedSubtypeConstraint docstring:
+
+        Divisors-of-18 ::= INTEGER (INCLUDES Divisors-of-6 | 9 | 18)
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.c1 = constraint.ContainedSubtypeConstraint(
+            constraint.SingleValueConstraint(1, 2, 3, 6), 9, 18
+        )
+
+    def testIncludedConstraint(self):
+        for value in (1, 2, 3, 6):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                assert 0, f"rejected {value} permitted by the included constraint"
+
+    def testLiteralValue(self):
+        for value in (9, 18):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                assert 0, f"rejected literal {value}"
+
+    def testBadVal(self):
+        for value in (0, 7, 10, 19):
+            try:
+                self.c1(value)
+            except error.ValueConstraintError:
+                pass
+            else:
+                assert 0, f"accepted {value} permitted by no operand"
+
+    def testLiteralOnly(self):
+        c = constraint.ContainedSubtypeConstraint(9, 18)
+        c(9)
+        c(18)
+        try:
+            c(10)
+        except error.ValueConstraintError:
+            pass
+        else:
+            assert 0, "accepted value permitted by no operand"
 
 
 class ValueRangeConstraintTestCase(BaseTestCase):
@@ -300,6 +343,69 @@ class InnerTypeConstraintTestCase(BaseTestCase):
 
         # Constraints compositions
 
+    def testAbsentSatisfiedByAbsentComponent(self):
+        # X.680 51.8.10.1: a component constrained ABSENT is satisfied if and
+        # only if its value is absent. ABSENT used to raise unconditionally,
+        # rejecting the one case that satisfies it.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "ABSENT"),
+        )
+
+        c(None, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 4, 0)
+
+    def testPresentRejectsAbsentComponent(self):
+        # 51.8.10.1: a component constrained PRESENT is satisfied if and only
+        # if its value is present. Presence was never checked, so an absent
+        # component satisfied the constraint.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "PRESENT"),
+        )
+
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, None, 0)
+
+    def testOptionalConstrainsValueOnlyWhenPresent(self):
+        # 51.8.10.1: OPTIONAL places no constraint on presence. 51.8.9 still
+        # constrains the inner value where there is one. OPTIONAL was not
+        # recognised at all and ran the value constraint against None.
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "OPTIONAL"),
+        )
+
+        c(None, 0)
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 5, 0)
+
+    def testEmptyPresenceConstraintLeavesPresenceFree(self):
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), None),
+        )
+
+        c(None, 0)
+        c(4, 0)
+
+        self.assertRaises(error.ValueConstraintError, c, 5, 0)
+
+    def testUnknownPresenceConstraintRejected(self):
+        # 51.8.10 admits PRESENT, ABSENT, OPTIONAL and empty. Anything else
+        # used to be stored and then quietly behave like PRESENT.
+        self.assertRaises(
+            error.PyAsn1Error,
+            constraint.InnerTypeConstraint,
+            (0, constraint.SingleValueConstraint(4), "MANDATORY"),
+        )
+
+    def testUnconstrainedComponentRejected(self):
+        c = constraint.InnerTypeConstraint(
+            (0, constraint.SingleValueConstraint(4), "PRESENT"),
+        )
+
+        self.assertRaises(error.ValueConstraintError, c, 4, 1)
+
 
 class ConstraintsIntersectionRangeTestCase(BaseTestCase):
     def setUp(self):
@@ -411,6 +517,30 @@ class IndirectDerivationTestCase(BaseTestCase):
     def testBadVal(self):
         assert not self.c2.isSuperTypeOf(self.c1), "isSuperTypeOf failed"
         assert self.c2.isSubTypeOf(self.c1), "isSubTypeOf failed"
+
+
+class ValueConstraintErrorIdentityTestCase(BaseTestCase):
+    """The exception the documentation names must be the one that is raised.
+
+    `pyasn1.type.error` used to declare a second ValueConstraintError that was
+    a sibling of the one in `pyasn1.error`, not the same class, so an
+    ``except pyasn1.error.ValueConstraintError`` handler never fired.
+    """
+
+    def testSameClassAcrossModules(self):
+        self.assertIs(pyasn1.error.ValueConstraintError, error.ValueConstraintError)
+
+    def testDocumentedHandlerCatchesConstraintViolation(self):
+        c = constraint.SingleValueConstraint(1, 2)
+
+        with self.assertRaises(pyasn1.error.ValueConstraintError):
+            c(3)
+
+    def testStillCatchableAsPyAsn1Error(self):
+        c = constraint.SingleValueConstraint(1, 2)
+
+        with self.assertRaises(pyasn1.error.PyAsn1Error):
+            c(3)
 
 
 # TODO: how to apply size constraints to constructed types?

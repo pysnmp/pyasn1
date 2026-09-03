@@ -11,7 +11,7 @@ technology for exchanging structured data in a universally understood,
 hardware agnostic way. Many industrial, security and telephony
 applications heavily rely on ASN.1.
 
-The `pyasn1 <https://pypi.org/project/pyasn1/>`_ library implements
+The `pysnmp-pyasn1 <https://pypi.org/project/pysnmp-pyasn1/>`_ library implements
 ASN.1 support in pure-Python.
 
 What is ASN.1
@@ -88,6 +88,7 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
+   /quickstart
    /pyasn1/contents
 
 Use case
@@ -131,8 +132,8 @@ The PyASN1 software is distributed under 2-clause BSD License.
 Getting help
 ------------
 
-Please, file your `issues <https://github.com/etingof/pyasn1/issues>`_
-and `PRs <https://github.com/etingof/pyasn1/pulls>`_ at GitHub.
+Please, file your `issues <https://github.com/pysnmp/pyasn1/issues>`_
+and `PRs <https://github.com/pysnmp/pyasn1/pulls>`_ at GitHub.
 Alternatively, you could ask for help at
 `Stack Overflow <http://stackoverflow.com/questions/tagged/pyasn1>`_
 or search
@@ -158,4 +159,3 @@ On the other end of the readability spectrum, here is a quick and sweet write up
 
 If you are working with ASN.1, we'd highly recommend reading a proper
 book on the subject.
-

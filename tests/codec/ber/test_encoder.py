@@ -5,22 +5,12 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
-
-from tests.base import BaseTestCase
-
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
-from pyasn1.type import char
 from pyasn1.codec.ber import encoder
 from pyasn1.error import PyAsn1Error
+from pyasn1.type import char, namedtype, opentype, tag, univ
+from tests.base import BaseTestCase
 
 
 class LargeTagEncoderTestCase(BaseTestCase):
@@ -38,6 +28,53 @@ class LargeTagEncoderTestCase(BaseTestCase):
         assert encoder.encode(self.o) == bytes(
             (127, 141, 245, 182, 253, 47, 3, 2, 1, 1)
         )
+
+
+class LengthEncoderTestCase(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.encoder = encoder.AbstractItemEncoder()
+
+    def testShortForm(self):
+        assert self.encoder.encodeLength(127, defMode=True) == (127,)
+
+    def testMaximumLongForm(self):
+        length = 1 << (8 * 125)
+        encoded = self.encoder.encodeLength(length, defMode=True)
+        assert encoded[0] == 0xFE
+        assert len(encoded) == 127
+        assert encoded[1] == 1
+        assert not any(encoded[2:])
+
+    def testLongFormOverflow(self):
+        with self.assertRaises(PyAsn1Error):
+            self.encoder.encodeLength(1 << (8 * 126), defMode=True)
+
+
+class TaggedEncoderDispatchTestCase(BaseTestCase):
+    class TaggedIntegerEncoder(encoder.AbstractItemEncoder):
+        def encodeValue(self, value, asn1Spec, encodeFun, **options):
+            return b"\xff", False, True
+
+    def testCompleteTagSetSelectsCustomEncoder(self):
+        value = univ.Integer(1).subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 7)
+        )
+        tagMap = encoder.tagMap.copy()
+        tagMap[value.tagSet] = self.TaggedIntegerEncoder()
+        encode = encoder.Encoder(tagMap, encoder.typeMap)
+
+        assert encode(value) == bytes((0x87, 1, 0xFF))
+
+    def testAmbiguousBuiltInTagUsesTypeEncoder(self):
+        value = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("value", univ.Integer())
+            )
+        )
+        value["value"] = 1
+
+        assert encoder.encode(value) == bytes((0x30, 3, 2, 1, 1))
 
 
 class IntegerEncoderTestCase(BaseTestCase):
@@ -681,7 +718,9 @@ class ObjectIdentifierWithSchemaEncoderTestCase(BaseTestCase):
 class RealEncoderTestCase(BaseTestCase):
     def testChar(self):
         assert encoder.encode(univ.Real((123, 10, 11))) == bytes(
-            (9, 7, 3, 49, 50, 51, 69, 49, 49)
+            # ISO 6093 NR3 requires the decimal mark: "123.E11", not
+            # "123E11", which declares NR3 and carries NR2-shaped octets.
+            (9, 8, 3, 49, 50, 51, 46, 69, 49, 49)
         )
 
     def testBin1(self):
@@ -701,8 +740,10 @@ class RealEncoderTestCase(BaseTestCase):
             16,
         )
         assert encoder.encode(
-            univ.Real((0.00390625, 2, 0))  # check encbase = 16
-        ) == bytes((9, 3, 160, 254, 1))
+            univ.Real((0.00390625, 2, 0))
+        ) == bytes(  # check encbase = 16
+            (9, 3, 160, 254, 1)
+        )
         encoder.typeMap[univ.Real.typeId].binEncBase = binEncBase
 
     def testBin4(self):
@@ -749,7 +790,9 @@ class RealEncoderTestCase(BaseTestCase):
 class RealEncoderWithSchemaTestCase(BaseTestCase):
     def testChar(self):
         assert encoder.encode((123, 10, 11), asn1Spec=univ.Real()) == bytes(
-            (9, 7, 3, 49, 50, 51, 69, 49, 49)
+            # ISO 6093 NR3 requires the decimal mark: "123.E11", not
+            # "123E11", which declares NR3 and carries NR2-shaped octets.
+            (9, 8, 3, 49, 50, 51, 46, 69, 49, 49)
         )
 
 
@@ -783,9 +826,9 @@ class BMPStringEncoderWithSchemaTestCase(BaseTestCase):
 
 class UTF8StringEncoderTestCase(BaseTestCase):
     def testEncoding(self):
-        assert encoder.encode(char.UTF8String("abc")) == bytes(
-            (12, 3, 97, 98, 99)
-        ), "Incorrect encoding"
+        assert encoder.encode(char.UTF8String("abc")) == bytes((12, 3, 97, 98, 99)), (
+            "Incorrect encoding"
+        )
 
 
 class UTF8StringEncoderWithSchemaTestCase(BaseTestCase):
@@ -1132,7 +1175,7 @@ class SetOfEncoderWithSchemaTestCase(BaseTestCase):
         self.v = ["quick brown"]
 
     def testEmpty(self):
-        s = univ.SetOf()
+        univ.SetOf()
         assert encoder.encode([], asn1Spec=self.s) == bytes((49, 0))
 
     def testDefMode(self):

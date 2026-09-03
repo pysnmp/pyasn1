@@ -3,25 +3,26 @@ Download & Install
 ==================
 
 The *pyasn1* library is a pure-Python package with no external
-dependencies. Considering how much industrial or finance software
-can be stuck with an old platform (think RHEL 5), we struggle to
-maintain its compatibility back to the very pre-historic Python
-(which is 2.4!).
+dependencies. It requires Python 3.10 or later.
 
-The best way to obtain PyASN1 is by running `pip`:
+This project is a maintained fork of the original *pyasn1*, published to
+PyPI as ``pysnmp-pyasn1``. The importable package name remains ``pyasn1``,
+so existing code needs no changes.
+
+The best way to obtain it is by running `pip`:
 
 .. code-block:: bash
 
-   $ virtualenv venv
+   $ python -m venv venv
    $ source venv/bin/activate
-   $ pip install pyasn1
+   $ pip install pysnmp-pyasn1
 
 You may also want to use `pyasn1-modules`:
 
 .. code-block:: bash
 
-   $ pip install pyasn1-modules
+   $ pip install pysnmp-pyasn1-modules
 
 Alternatively, you can download the latest release from
-`GitHub <https://github.com/etingof/pyasn1/releases>`_
-or `PyPI <https://pypi.org/project/pyasn1>`_.
+`GitHub <https://github.com/pysnmp/pyasn1/releases>`_
+or `PyPI <https://pypi.org/project/pysnmp-pyasn1>`_.

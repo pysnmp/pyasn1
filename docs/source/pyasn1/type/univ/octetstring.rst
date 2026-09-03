@@ -15,5 +15,13 @@
 
         The |ASN.1| type models an arbitrary string of octets (eight-bit numbers), not printable text string.
 
+   .. deprecated:: 1.2.0
+
+        Calling :func:`str` on an |ASN.1| object decodes the payload as text
+        using the `encoding` codec. This emits a :exc:`DeprecationWarning`; a
+        future major release will return the hexadecimal representation
+        instead. Use :meth:`~pyasn1.type.univ.OctetString.asOctets` for the
+        octet stream, or ``.asOctets().decode(encoding)`` for text.
+
    .. automethod:: pyasn1.type.univ.OctetString.clone(value=NoValue(), tagSet=TagSet(), subtypeSpec=ConstraintsIntersection(), encoding='iso-8859-1')
    .. automethod:: pyasn1.type.univ.OctetString.subtype(value=NoValue(), implicitTag=Tag(), explicitTag=Tag(),subtypeSpec=ConstraintsIntersection(),encoding='iso-8859-1')

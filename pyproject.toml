@@ -1,10 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "pysnmp-pyasn1"
-version = "1.1.3"
+version = "1.2.0-beta.14"
 description = "ASN.1 types and codecs"
-authors = ["rfaircloth-splunk <rfaircloth@splunk.com>"]
+readme = "README.md"
 license = "BSD-2-Clause"
-repository = "https://github.com/pysnmp/pyasn1"
+requires-python = ">=3.10"
+authors = [
+    {name = "Ryan Faircloth", email = "actual@rfaircloth.com"},
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -14,30 +21,124 @@ classifiers = [
     "Intended Audience :: Telecommunications Industry",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Communications",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-readme = "README.md"
-packages = [
-    { include = "pyasn1" },
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.5",
+    "mypy>=2.3.1",
+    "ty>=0.0.77",
+    "Sphinx>=9.1.0; python_version >= '3.12'",
+    "pre-commit>=4.6.2",
 ]
-include = ["docs", "tests"]
 
-[tool.poetry.dependencies]
-python = "^3.8"
+[tool.hatch.build.targets.wheel]
+packages = ["pyasn1"]
 
-[tool.poetry.dev-dependencies]
-Sphinx = "^4.3.0"
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
-mypy = "^0.910"
-pytest-mypy = "^0.8.1"
-black = "^21.11b0"
-isort = "^5.10.1"
-pyflakes = "^2.4.0"
-autoflake = "^1.4"
-pre-commit = "^2.15.0"
+[tool.ruff]
+target-version = "py310"
+line-length = 88
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF", "G", "LOG", "TRY", "BLE", "RSE", "D"]
+ignore = [
+    "E501",    # line-too-long — existing codebase has long lines
+    "E721",    # type-comparison — existing pattern
+    "E731",    # lambda-assignment — existing codebase style
+    "E741",    # ambiguous-variable-name — ASN.1 naming conventions
+    "E712",    # true-false-comparison — existing pattern
+    "E402",    # module-import-not-at-top — some imports after variable defs
+    "B011",    # assert-false — used in tests
+    "B007",    # unused-loop-control-variable — existing pattern
+    "B905",    # zip-without-explicit-strict — existing pattern
+    "SIM108",  # if-else-block-instead-of-if-exp — readability preference
+    "SIM102",  # collapsible-if — readability preference
+    "SIM105",  # suppressible-exception — existing pattern
+    "SIM101",  # duplicate-isinstance-call — existing pattern
+    "SIM110",  # reimplemented-builtin — existing pattern
+    # Migrated from the former [tool.pylint] config: R0913 was disabled there,
+    # and ASN.1 codecs are inherently branchy, so the complexity family stays off.
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments — was disabled for pylint
+    "PLR0915",  # too-many-statements
+    "PLR0917",  # too-many-positional-arguments
+    "PLR2004",  # magic-value-comparison — ASN.1 tag and length constants
+    "PLC0415",  # import-outside-top-level — deliberate, breaks import cycles
+    "PLW2901",  # redefined-loop-name — existing pattern
+    "RUF005",   # collection-literal-concatenation — style preference
+    "RUF012",   # mutable-class-default — existing pattern
+    "RUF021",   # parenthesize-chained-operators — existing pattern
+    "RUF059",   # unused-unpacked-variable — matches B007 above
+    "PLW0603",  # global-statement — setLogger() intentionally rebinds the module logger
+    "TRY003",   # raise-vanilla-args — message text is part of pyasn1's public
+                # error contract; moving it into exception classes would churn
+                # every raise site and change what callers see
+    "PLW1641",  # eq-without-hash — constructed types are mutable, so deliberately
+                # unhashable; SimpleAsn1Type re-adds __hash__ where it is wanted
+    "D105",     # undocumented-magic-method — dunders are self-describing here
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B", "SIM", "PL", "RUF", "D"]  # relax rules for tests
+# Illustrative scripts, not public API: the numpy docstring convention would
+# bury the ASN.1 point of each example under boilerplate.
+"examples/**" = ["D"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["pyasn1"]
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+no_implicit_optional = true
+strict_equality = true
+disallow_any_generics = true
+no_implicit_reexport = true
+
+# Modules below are fully annotated and must stay that way. Move entries out of
+# this list only to widen coverage, never to relax it.
+[[tool.mypy.overrides]]
+module = [
+    "pyasn1.debug",
+    "pyasn1.error",
+    "pyasn1.codec.*",
+    "pyasn1.type.base",
+    "pyasn1.type.char",
+    "pyasn1.type.constraint",
+    "pyasn1.type.namedtype",
+    "pyasn1.type.namedval",
+    "pyasn1.type.opentype",
+    "pyasn1.type.tag",
+    "pyasn1.type.tagmap",
+    "pyasn1.type.univ",
+    "pyasn1.type.useful",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    # The suite deliberately exercises OctetString.__str__(), whose text
+    # decoding is deprecated. The warning is asserted directly by
+    # OctetStringStrDeprecationTestCase.
+    'ignore:str\(\) on .*decodes the payload as text:DeprecationWarning',
+]
+
+[tool.coverage.run]
+source = ["pyasn1"]
+relative_files = true

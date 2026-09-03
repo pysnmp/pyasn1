@@ -5,20 +5,12 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import unittest
 
-try:
-    import unittest2 as unittest
-
-except ImportError:
-    import unittest
-
-from tests.base import BaseTestCase
-
-from pyasn1.type import tag
-from pyasn1.type import namedtype
-from pyasn1.type import opentype
-from pyasn1.type import univ
 from pyasn1.codec.der import encoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, opentype, tag, univ
+from tests.base import BaseTestCase
 
 
 class OctetStringEncoderTestCase(BaseTestCase):
@@ -127,7 +119,6 @@ class SetWithAlternatingChoiceEncoderTestCase(BaseTestCase):
 
 class SetWithTaggedChoiceEncoderTestCase(BaseTestCase):
     def testWithUntaggedChoice(self):
-
         c = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("premium", univ.Boolean())
@@ -147,7 +138,6 @@ class SetWithTaggedChoiceEncoderTestCase(BaseTestCase):
         assert encoder.encode(s) == bytes((49, 6, 1, 1, 255, 4, 1, 65))
 
     def testWithTaggedChoice(self):
-
         c = univ.Choice(
             componentType=namedtype.NamedTypes(
                 namedtype.NamedType("premium", univ.Boolean())

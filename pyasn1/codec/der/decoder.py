@@ -4,12 +4,20 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+"""DER decoder for ASN.1 types."""
+
+from typing import Final
+
 from pyasn1.codec.cer import decoder
-from pyasn1.type import univ
+from pyasn1.type import char, univ, useful
 
 __all__ = ["decode"]
 
 
+# X.690 10.2: "For bitstring, octetstring and restricted character string
+# types, the constructed form of encoding shall not be used." The parent codec
+# derives every restricted character string decoder from its own
+# OctetStringDecoder, so each needs its own subclass here to be covered.
 class BitStringDecoder(decoder.BitStringDecoder):
     supportConstructedForm = False
 
@@ -18,30 +26,107 @@ class OctetStringDecoder(decoder.OctetStringDecoder):
     supportConstructedForm = False
 
 
+class UTF8StringDecoder(decoder.UTF8StringDecoder):
+    supportConstructedForm = False
+
+
+class NumericStringDecoder(decoder.NumericStringDecoder):
+    supportConstructedForm = False
+
+
+class PrintableStringDecoder(decoder.PrintableStringDecoder):
+    supportConstructedForm = False
+
+
+class TeletexStringDecoder(decoder.TeletexStringDecoder):
+    supportConstructedForm = False
+
+
+class VideotexStringDecoder(decoder.VideotexStringDecoder):
+    supportConstructedForm = False
+
+
+class IA5StringDecoder(decoder.IA5StringDecoder):
+    supportConstructedForm = False
+
+
+class GraphicStringDecoder(decoder.GraphicStringDecoder):
+    supportConstructedForm = False
+
+
+class VisibleStringDecoder(decoder.VisibleStringDecoder):
+    supportConstructedForm = False
+
+
+class GeneralStringDecoder(decoder.GeneralStringDecoder):
+    supportConstructedForm = False
+
+
+class UniversalStringDecoder(decoder.UniversalStringDecoder):
+    supportConstructedForm = False
+
+
+class BMPStringDecoder(decoder.BMPStringDecoder):
+    supportConstructedForm = False
+
+
+class ObjectDescriptorDecoder(decoder.ObjectDescriptorDecoder):
+    supportConstructedForm = False
+
+
+class GeneralizedTimeDecoder(decoder.GeneralizedTimeDecoder):
+    supportConstructedForm = False
+
+
+class UTCTimeDecoder(decoder.UTCTimeDecoder):
+    supportConstructedForm = False
+
+
 # TODO: prohibit non-canonical encoding
 RealDecoder = decoder.RealDecoder
 
-tagMap = decoder.tagMap.copy()
+tagMap: Final = decoder.tagMap.copy()
 tagMap.update(
     {
         univ.BitString.tagSet: BitStringDecoder(),
         univ.OctetString.tagSet: OctetStringDecoder(),
         univ.Real.tagSet: RealDecoder(),
+        char.UTF8String.tagSet: UTF8StringDecoder(),
+        char.NumericString.tagSet: NumericStringDecoder(),
+        char.PrintableString.tagSet: PrintableStringDecoder(),
+        char.TeletexString.tagSet: TeletexStringDecoder(),
+        char.VideotexString.tagSet: VideotexStringDecoder(),
+        char.IA5String.tagSet: IA5StringDecoder(),
+        char.GraphicString.tagSet: GraphicStringDecoder(),
+        char.VisibleString.tagSet: VisibleStringDecoder(),
+        char.GeneralString.tagSet: GeneralStringDecoder(),
+        char.UniversalString.tagSet: UniversalStringDecoder(),
+        char.BMPString.tagSet: BMPStringDecoder(),
+        useful.ObjectDescriptor.tagSet: ObjectDescriptorDecoder(),
+        useful.GeneralizedTime.tagSet: GeneralizedTimeDecoder(),
+        useful.UTCTime.tagSet: UTCTimeDecoder(),
     }
 )
 
-typeMap = decoder.typeMap.copy()
+typeMap: Final = decoder.typeMap.copy()
 
-# Put in non-ambiguous types for faster codec lookup
+# Put in non-ambiguous types for faster codec lookup.
+# This map starts as a copy of the parent codec's, so an entry already
+# exists for every type overridden above. The override has to win: guarding
+# on absence would leave the parent's laxer decoder in place.
 for typeDecoder in tagMap.values():
     if typeDecoder.protoComponent is not None:
         typeId = typeDecoder.protoComponent.__class__.typeId
-        if typeId is not None and typeId not in typeMap:
+        if typeId is not None:
             typeMap[typeId] = typeDecoder
 
 
 class Decoder(decoder.Decoder):
     supportIndefLength = False
+
+    # X.690 10.1: the definite form throughout, so the CER rule that pushes
+    # constructed encodings onto the indefinite form does not carry over.
+    requireIndefLengthForConstructed = False
 
 
 #: Turns DER octet stream into an ASN.1 object.
@@ -94,4 +179,4 @@ class Decoder(decoder.Decoder):
 #:    SequenceOf:
 #:     1 2 3
 #:
-decode = Decoder(tagMap, typeMap)
+decode: Final = Decoder(tagMap, typeMap)

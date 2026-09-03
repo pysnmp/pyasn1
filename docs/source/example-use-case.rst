@@ -50,7 +50,7 @@ tool:
 Though it may not work out as, as it stands now, asn1ate does not support
 all ASN.1 language constructs.
 
-Alternatively, you could check out the `pyasn1-modules <https://github.com/etingof/pyasn1-modules>`_
+Alternatively, you could check out the `pyasn1-modules <https://github.com/pysnmp/pyasn1-modules>`_
 package to see if it already has the ASN.1 spec you are looking for compiled and shipped
 there. Then just install the package, import the data structure you need and use it:
 
@@ -190,4 +190,3 @@ wire representation:
 
     with open('.ssh/id_rsa.new', 'w') as key_file:
         key_file.write(b64_serialisation)
-
