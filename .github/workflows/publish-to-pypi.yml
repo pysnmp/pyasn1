@@ -4,9 +4,9 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-      # Prereleases cut from develop, e.g. v1.2.0-beta.11. The pattern above
-      # is anchored, so without this one the beta tags land on GitHub and
-      # never reach PyPI.
+      # Prereleases cut from next, e.g. v1.2.0-rc.1. The pattern above is
+      # anchored, so without this one the rc tags land on GitHub and never
+      # reach PyPI.
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 
 # Add permissions needed for publishing
