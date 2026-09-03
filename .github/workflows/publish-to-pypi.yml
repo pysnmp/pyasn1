@@ -59,15 +59,17 @@ jobs:
     name: Publish Release to PyPI
     needs: [build-packages]
     runs-on: ubuntu-latest
+    # Trusted Publishing: PyPI mints a short-lived token from this job's OIDC
+    # identity, which is scoped to repo + workflow + environment. No API token.
+    environment: release
+    permissions:
+      id-token: write
     steps:
-      - name: Install UV
-        uses: astral-sh/setup-uv@v7
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
+      # Emits PEP 740 attestations by default under Trusted Publishing.
       - name: Publish to PyPI
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: uv publish
+        uses: pypa/gh-action-pypi-publish@release/v1
