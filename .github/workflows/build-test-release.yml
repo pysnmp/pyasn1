@@ -151,8 +151,12 @@ jobs:
   publish:
     name: Build Release
     # Semantic release cuts tags from a branch. Now that tag pushes run this
-    # workflow, skip the job on the tags it created itself.
-    if: startsWith(github.ref, 'refs/heads/')
+    # workflow, skip the job on the tags it created itself. A manual dispatch
+    # releases from main only; dispatching any other ref would set DRY false
+    # and cut a release from it.
+    if: >-
+      startsWith(github.ref, 'refs/heads/')
+      && (github.event_name != 'workflow_dispatch' || github.ref_name == 'main')
     env:
       # develop keeps auto-publishing beta on push. main only releases when a
       # human dispatches this workflow; a plain push to main is a dry run.
