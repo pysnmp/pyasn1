@@ -11,6 +11,17 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
     branches: [main, develop]
+  # main never releases on push (see the publish job's DRY). Cutting an rc or a
+  # GA from main is a deliberate manual act.
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release to cut from main"
+        type: choice
+        options:
+          - prerelease
+          - ga
+        default: prerelease
 
 # Add permissions needed for semantic-release
 permissions:
@@ -140,8 +151,16 @@ jobs:
   publish:
     name: Build Release
     # Semantic release cuts tags from a branch. Now that tag pushes run this
-    # workflow, skip the job on the tags it created itself.
-    if: startsWith(github.ref, 'refs/heads/')
+    # workflow, skip the job on the tags it created itself. A manual dispatch
+    # releases from main only; dispatching any other ref would set DRY false
+    # and cut a release from it.
+    if: >-
+      startsWith(github.ref, 'refs/heads/')
+      && (github.event_name != 'workflow_dispatch' || github.ref_name == 'main')
+    env:
+      # develop keeps auto-publishing beta on push. main only releases when a
+      # human dispatches this workflow; a plain push to main is a dry run.
+      DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
     needs:
       - review_secrets
       - semgrep
@@ -161,10 +180,17 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Build
         run: uv build
+      # A real merge commit (never squash) is required for rc tags to stay
+      # reachable, otherwise the rc counter restarts and collides.
+      - name: Make main a prerelease branch
+        if: github.event_name == 'workflow_dispatch' && inputs.release_type == 'prerelease'
+        run: |
+          sed -i 's/^    "main",$/    { "name": "main", "prerelease": "rc" },/' .releaserc.json
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v6
         with:
           semantic_version: 24
+          dry_run: ${{ env.DRY }}
           extra_plugins: |
             @semantic-release/exec
             @semantic-release/git
