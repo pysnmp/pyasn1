@@ -4,24 +4,16 @@ on:
   push:
     branches:
       - "main"
-      - "develop"
+      - "next"
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-      # Prerelease tags, so update-semver runs for betas as well.
+      # Prerelease tags, so update-semver runs for rcs as well.
       - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
-    branches: [main, develop]
-  # main never releases on push (see the publish job's DRY). Cutting an rc or a
-  # GA from main is a deliberate manual act.
+    branches: [main, next]
+  # main never releases on push (see the publish job's DRY). Cutting the GA
+  # release from main is a deliberate manual act; rcs come from next.
   workflow_dispatch:
-    inputs:
-      release_type:
-        description: "Release to cut from main"
-        type: choice
-        options:
-          - prerelease
-          - ga
-        default: prerelease
 
 # Add permissions needed for semantic-release
 permissions:
@@ -158,7 +150,7 @@ jobs:
       startsWith(github.ref, 'refs/heads/')
       && (github.event_name != 'workflow_dispatch' || github.ref_name == 'main')
     env:
-      # develop keeps auto-publishing beta on push. main only releases when a
+      # next keeps auto-publishing rc on push. main only releases when a
       # human dispatches this workflow; a plain push to main is a dry run.
       DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
     needs:
@@ -180,12 +172,6 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Build
         run: uv build
-      # A real merge commit (never squash) is required for rc tags to stay
-      # reachable, otherwise the rc counter restarts and collides.
-      - name: Make main a prerelease branch
-        if: github.event_name == 'workflow_dispatch' && inputs.release_type == 'prerelease'
-        run: |
-          sed -i 's/^    "main",$/    { "name": "main", "prerelease": "rc" },/' .releaserc.json
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v6
         with:

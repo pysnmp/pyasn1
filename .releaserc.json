@@ -3,9 +3,8 @@
     "+([0-9])?(.{+([0-9]),x}).x",
     "main",
     {
-      "channel": "beta",
-      "name": "develop",
-      "prerelease": "beta"
+      "name": "next",
+      "prerelease": "rc"
     }
   ],
   "plugins": [
