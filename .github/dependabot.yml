@@ -1,11 +1,19 @@
 version: 2
 updates:
+  # Python dependency updates require a Python version that Dependabot
+  # supports. Re-enable them when the modern project metadata reaches main.
+  # Keep GitHub Actions versions up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
   # Keep Python dependencies in pyproject.toml / uv.lock up to date
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "daily"
-    target-branch: "develop"
+    target-branch: "main"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
@@ -13,13 +21,6 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-
-  # Keep GitHub Actions versions up to date
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    target-branch: "develop"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
