@@ -871,7 +871,9 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
         asn1Object.clear()
 
         if asn1Spec.typeId in (univ.Sequence.typeId, univ.Set.typeId):
-            namedTypes = asn1Spec.componentType
+            # Read the schema off the clone, not the spec: a recursively
+            # defined componentType is re-resolved by clone().
+            namedTypes = asn1Object.componentType
 
             isSetType = asn1Spec.typeId == univ.Set.typeId
             isDeterministic = not isSetType and not namedTypes.hasOptionalOrDefault
@@ -1032,7 +1034,9 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
             asn1Object = asn1Spec.clone()
             asn1Object.clear()
 
-            componentType = asn1Spec.componentType
+            # Read the schema off the clone, not the spec: a recursively
+            # defined componentType is re-resolved by clone().
+            componentType = asn1Object.componentType
 
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug(
@@ -1264,7 +1268,9 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
             asn1Object = asn1Spec.clone()
             asn1Object.clear()
 
-            componentType = asn1Spec.componentType
+            # Read the schema off the clone, not the spec: a recursively
+            # defined componentType is re-resolved by clone().
+            componentType = asn1Object.componentType
 
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug(

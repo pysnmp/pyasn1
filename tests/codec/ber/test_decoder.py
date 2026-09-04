@@ -3884,6 +3884,69 @@ class ResourceExhaustionGuardTestCase(BaseTestCase):
             assert False, "Over-long length field accepted"
 
 
+class LateBoundComponentTypeDecoderTestCase(BaseTestCase):
+    """Recursive schemas bind componentType after the fact (see issue #111)."""
+
+    @staticmethod
+    def _ldapFilterSpec():
+        # Modelled on RFC 4511 Filter, the canonical recursive schema: And
+        # holds Filters, so its componentType can only be assigned once every
+        # participating class exists.
+        class AttributeValueAssertion(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("attributeDesc", univ.OctetString()),
+                namedtype.NamedType("assertionValue", univ.OctetString()),
+            )
+
+        class EqualityMatch(AttributeValueAssertion):
+            tagSet = AttributeValueAssertion.tagSet.tagImplicitly(
+                tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 3)
+            )
+
+        class And(univ.SetOf):
+            tagSet = univ.SetOf.tagSet.tagImplicitly(
+                tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 0)
+            )
+
+        class NestedFilter(univ.Choice):
+            pass
+
+        class Filter(univ.Choice):
+            pass
+
+        Filter.componentType = namedtype.NamedTypes(namedtype.NamedType("and", And()))
+        NestedFilter.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("equalityMatch", EqualityMatch())
+        )
+        And.componentType = NestedFilter()
+
+        return Filter
+
+    def testDefMode(self):
+        asn1Object, rest = decoder.decode(
+            bytes.fromhex("a00ea30c040375696404057573657231"),
+            asn1Spec=self._ldapFilterSpec()(),
+        )
+
+        assert rest == _null
+        # Before the fix the nested components were silently dropped: the
+        # decode succeeded but yielded only the first OCTET STRING.
+        equalityMatch = asn1Object["and"][0]["equalityMatch"]
+        assert equalityMatch["attributeDesc"] == _str2octs("uid")
+        assert equalityMatch["assertionValue"] == _str2octs("user1")
+
+    def testIndefMode(self):
+        asn1Object, rest = decoder.decode(
+            bytes.fromhex("a080a38004037569640405757365723100000000"),
+            asn1Spec=self._ldapFilterSpec()(),
+        )
+
+        assert rest == _null
+        equalityMatch = asn1Object["and"][0]["equalityMatch"]
+        assert equalityMatch["attributeDesc"] == _str2octs("uid")
+        assert equalityMatch["assertionValue"] == _str2octs("user1")
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
