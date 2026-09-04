@@ -267,10 +267,16 @@ class SetEncoder(encoder.SequenceEncoder):
                 compsMap[id(component)] = namedType
                 comps.append((component, asn1Spec[idx]))
 
+        omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
+
         for comp, compType in sorted(comps, key=self._componentSortKey):
             namedType = compsMap[id(comp)]
 
-            if namedType:
+            # Every component reaching here is present -- absent OPTIONAL and
+            # DEFAULT ones were skipped above -- so an empty encoding is the
+            # component's value, not a sign of absence. X.690 11.5 lets DER
+            # and CER omit only a component equal to its DEFAULT value.
+            if namedType and omitEmptyOptionals:
                 options.update(ifNotEmpty=namedType.isOptional)
 
             chunk = encodeFun(comp, compType, **options)
@@ -287,7 +293,14 @@ class SetEncoder(encoder.SequenceEncoder):
 
 
 class SequenceEncoder(encoder.SequenceEncoder):
-    omitEmptyOptionals = True
+    # Formerly True, to drop OPTIONAL components that the encoder had itself
+    # instantiated while walking the object. Absence is now detected directly
+    # (see valuesNotInstantiating), so emptiness no longer stands in for it --
+    # and X.690 gives no licence to omit a component that is present. 11.5
+    # restricts DER and CER to omitting a component equal to its DEFAULT
+    # value, which says nothing about an OPTIONAL one whose encoding happens
+    # to have empty contents.
+    omitEmptyOptionals = False
 
 
 tagMap: Final = encoder.tagMap.copy()
