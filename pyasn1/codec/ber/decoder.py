@@ -9,7 +9,7 @@
 import decimal
 import logging
 import re
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from pyasn1 import debug, error
 from pyasn1.codec.ber import eoo
@@ -93,7 +93,33 @@ class AbstractSimpleDecoder(AbstractDecoder):
 
 
 class ExplicitTagDecoder(AbstractSimpleDecoder):
+    """Decode a non-universal constructed tag guessed to be an explicit tag.
+
+    Nothing on the wire distinguishes IMPLICIT from EXPLICIT tagging, so
+    without an `asn1Spec` the decoder has to guess. The guess is refutable
+    though: X.690 8.14.2 makes the contents octets of an explicitly tagged
+    value the complete encoding of exactly one value, so content holding
+    more than one encoding can only be an implicit tag over a constructed
+    type. Both entry points fall back to that reading rather than dropping
+    the components that do not fit.
+    """
+
     protoComponent = univ.Any("")
+
+    @staticmethod
+    def _decodeAsConstructed(
+        substrate: bytes, tagSet: Any, decodeFun: Any, **options: Any
+    ) -> tuple[Any, bytes]:
+        """Decode *substrate* as the content of an implicitly tagged type."""
+        # Reuses the universal constructed decoder so the container type is
+        # guessed exactly as it would be for an untagged SEQUENCE.
+        constructedDecoder = cast(
+            "UniversalConstructedTypeDecoder", tagMap[univ.Sequence.tagSet]
+        )
+
+        return constructedDecoder._decodeComponents(
+            substrate, tagSet=tagSet, decodeFun=decodeFun, **options
+        )
 
     def valueDecoder(
         self,
@@ -115,13 +141,26 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
 
         head, tail = substrate[:length], substrate[length:]
 
-        value, _ = decodeFun(head, asn1Spec, tagSet, length, **options)
+        value, trailing = decodeFun(head, asn1Spec, tagSet, length, **options)
 
-        if LOG.isEnabledFor(logging.DEBUG):
-            LOG.debug(
-                "explicit tag container carries trailing payload (will be lost!)",
-                extra={"trailing": _},
+        if trailing:
+            # X.690 8.14.2: the contents octets of an explicitly tagged value
+            # are the complete encoding of exactly one value. Anything left
+            # over refutes the explicit-tag guess this codec was chosen on,
+            # so read the content as an implicit tag over a constructed type
+            # rather than discarding the remaining components.
+            if LOG.isEnabledFor(logging.DEBUG):
+                LOG.debug(
+                    "explicit tag guess refuted by trailing payload, "
+                    "decoding as an implicitly tagged constructed value",
+                    extra={"trailing": trailing},
+                )
+
+            asn1Object, _ = self._decodeAsConstructed(
+                head, tagSet, decodeFun, **options
             )
+
+            return asn1Object, tail
 
         return value, tail
 
@@ -143,14 +182,28 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
                 length,
             )
 
+        originalSubstrate = substrate
+
         value, substrate = decodeFun(substrate, asn1Spec, tagSet, length, **options)
 
         eooMarker, substrate = decodeFun(substrate, allowEoo=True, **options)
 
         if eooMarker is eoo.endOfOctets:
             return value, substrate
-        else:
-            raise error.PyAsn1Error("Missing end-of-octets terminator")
+
+        # Content beyond the first value refutes the explicit-tag guess
+        # (X.690 8.14.2); read it as an implicitly tagged constructed value.
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug(
+                "explicit tag guess refuted by a missing end-of-octets "
+                "terminator, decoding as an implicitly tagged constructed value"
+            )
+
+        # allowEoo lets _decodeComponents recognise the terminator that closes
+        # this indefinite-length container rather than choking on it.
+        return self._decodeAsConstructed(
+            originalSubstrate, tagSet, decodeFun, **dict(options, allowEoo=True)
+        )
 
 
 explicitTagDecoder: Final = ExplicitTagDecoder()

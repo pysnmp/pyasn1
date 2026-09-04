@@ -3947,6 +3947,65 @@ class LateBoundComponentTypeDecoderTestCase(BaseTestCase):
         assert equalityMatch["assertionValue"] == _str2octs("user1")
 
 
+class SchemalessTaggedConstructedDecoderTestCase(BaseTestCase):
+    """A refuted explicit-tag guess must not drop components (issue #116)."""
+
+    # [0] IMPLICIT holding two SEQUENCEs:
+    #   a0 13  30 07 16 05 "first"  30 08 16 06 "second"
+    twoComponents = bytes.fromhex("a013300716056669727374300816067365636f6e64")
+    twoComponentsIndef = bytes.fromhex("a080300716056669727374300816067365636f6e640000")
+    # The same tag holding a single SEQUENCE stays an explicit-tag reading.
+    oneComponent = bytes.fromhex("a009300716056669727374")
+    oneComponentIndef = bytes.fromhex("a0803007160566697273740000")
+
+    def testDefModeKeepsAllComponents(self):
+        asn1Object, rest = decoder.decode(self.twoComponents)
+
+        assert rest == _null
+        assert len(asn1Object) == 2, f"Components dropped: {asn1Object!r}"
+        assert asn1Object[0][0] == char.IA5String("first")
+        assert asn1Object[1][0] == char.IA5String("second")
+
+    def testIndefModeKeepsAllComponents(self):
+        asn1Object, rest = decoder.decode(self.twoComponentsIndef)
+
+        assert rest == _null
+        assert len(asn1Object) == 2, f"Components dropped: {asn1Object!r}"
+        assert asn1Object[0][0] == char.IA5String("first")
+        assert asn1Object[1][0] == char.IA5String("second")
+
+    def testDefModeSingleComponentUnwrapsAsExplicitTag(self):
+        # One inner encoding is consistent with X.690 8.14.2, so the explicit
+        # tag reading stands and the tag is unwrapped as before.
+        asn1Object, rest = decoder.decode(self.oneComponent)
+
+        assert rest == _null
+        assert len(asn1Object) == 1
+        assert asn1Object[0] == char.IA5String("first")
+
+    def testIndefModeSingleComponentUnwrapsAsExplicitTag(self):
+        asn1Object, rest = decoder.decode(self.oneComponentIndef)
+
+        assert rest == _null
+        assert len(asn1Object) == 1
+        assert asn1Object[0] == char.IA5String("first")
+
+    def testNestedInSequenceKeepsAllComponents(self):
+        # The originally reported shape: the tagged value sits inside an
+        # outer SEQUENCE, so the loss showed up with rest == b''.
+        substrate = bytes((0x30, len(self.twoComponents))) + self.twoComponents
+
+        asn1Object, rest = decoder.decode(substrate)
+
+        assert rest == _null
+        assert len(asn1Object[0]) == 2, f"Components dropped: {asn1Object!r}"
+
+    def testRoundTripsThroughEncoder(self):
+        asn1Object, _ = decoder.decode(self.twoComponents)
+
+        assert encoder.encode(asn1Object) == self.twoComponents
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
