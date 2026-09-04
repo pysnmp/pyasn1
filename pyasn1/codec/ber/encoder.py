@@ -606,9 +606,19 @@ class SequenceEncoder(AbstractItemEncoder):
 
             namedTypes = value.componentType
 
-            for idx, component in enumerate(value.values()):
+            # Iterating values() would instantiate absent OPTIONAL and DEFAULT
+            # components, so encoding would alter the object it is given.
+            for idx, component in enumerate(value.valuesNotInstantiating()):
                 if namedTypes:
                     namedType = namedTypes[idx]
+
+                    if component is univ.noValue:
+                        if namedType.isOptional or namedType.isDefaulted:
+                            continue
+
+                        # A mandatory component that was never set: encode the
+                        # schema object, as instantiating on access used to.
+                        component = namedType.asn1Object
 
                     if namedType.isOptional and not component.isValue:
                         if LOG.isEnabledFor(logging.DEBUG):

@@ -2618,6 +2618,17 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             yield self[idx]
 
+    def valuesNotInstantiating(self) -> typing.Any:
+        """Return an iterator over the component values, leaving absent ones absent.
+
+        Unlike :meth:`values`, an absent component is reported as
+        :obj:`~pyasn1.type.univ.noValue` rather than being instantiated on
+        access. Encoders iterate this way so that encoding an object does not
+        alter which of its components are present.
+        """
+        for idx in range(self._componentTypeLen or len(self._dynamicNames)):
+            yield self.getComponentByPosition(idx, instantiate=False)
+
     def keys(self) -> typing.Any:
         """Return an iterator over the component names."""
         return iter(self)
