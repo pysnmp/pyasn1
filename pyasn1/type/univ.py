@@ -2392,15 +2392,23 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         Default action is to verify |ASN.1| object against constraints imposed
         by `subtypeSpec`.
 
-        Raises
-        ------
-        :py:class:`~pyasn1.error.PyAsn1tError` on any inconsistencies found
+        Returns
+        -------
+        :
+            :obj:`False` if the object is consistent, otherwise the
+            :class:`~pyasn1.error.PyAsn1Error` describing the inconsistency,
+            which callers raise. Never a bare :obj:`True`: the encoders and
+            decoders raise whatever this returns.
         """
         if self.componentType is noValue or not self.subtypeSpec:
             return False
 
         if self._componentValues is noValue:
-            return True
+            # A schema object carries no components at all, so the constraints
+            # cannot be satisfied and there is no constraint failure to report.
+            return error.PyAsn1Error(
+                "Component values are not set", asn1Object=self.__class__.__name__
+            )
 
         mapping = {}
 
@@ -3085,15 +3093,23 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         Default action is to verify |ASN.1| object against constraints imposed
         by `subtypeSpec`.
 
-        Raises
-        ------
-        :py:class:`~pyasn1.error.PyAsn1tError` on any inconsistencies found
+        Returns
+        -------
+        :
+            :obj:`False` if the object is consistent, otherwise the
+            :class:`~pyasn1.error.PyAsn1Error` describing the inconsistency,
+            which callers raise. Never a bare :obj:`True`: the encoders and
+            decoders raise whatever this returns.
         """
         if self.componentType is noValue or not self.subtypeSpec:
             return False
 
         if self._componentValues is noValue:
-            return True
+            # A schema object carries no components at all, so the constraints
+            # cannot be satisfied and there is no constraint failure to report.
+            return error.PyAsn1Error(
+                "Component values are not set", asn1Object=self.__class__.__name__
+            )
 
         mapping = {}
 

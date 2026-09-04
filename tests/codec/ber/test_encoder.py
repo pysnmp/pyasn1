@@ -10,7 +10,7 @@ import unittest
 
 from pyasn1.codec.ber import decoder, encoder
 from pyasn1.error import PyAsn1Error
-from pyasn1.type import char, namedtype, opentype, tag, univ
+from pyasn1.type import char, constraint, namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
 
 
@@ -3035,6 +3035,46 @@ class LongObjectIdentifierEncoderTestCase(BaseTestCase):
         oid = univ.ObjectIdentifier(arcs)
 
         assert decoder.decode(encoder.encode(oid))[0] == oid
+
+
+class InconsistentValueEncoderTestCase(BaseTestCase):
+    """An inconsistent object raises PyAsn1Error, not TypeError (issue #118)."""
+
+    def testSequenceOfSchemaRaisesPyAsn1Error(self):
+        s = univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+        try:
+            encoder.encode(s)
+
+        except PyAsn1Error:
+            pass
+
+        except TypeError as exc:
+            assert False, f"Bare True was raised: {exc}"
+
+        else:
+            assert False, "Inconsistent object encoded"
+
+    def testConstraintFailureKeepsItsDetail(self):
+        s = univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        ).clone()
+
+        for value in (1, 2, 3):
+            s.append(univ.Integer(value))
+
+        try:
+            encoder.encode(s)
+
+        except PyAsn1Error as exc:
+            assert "constraint" in repr(exc).lower(), f"Detail lost: {exc!r}"
+
+        else:
+            assert False, "Over-long object encoded"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
