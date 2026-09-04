@@ -8,6 +8,7 @@
 
 import decimal
 import math
+import sys
 import typing
 import warnings
 from collections.abc import Iterator
@@ -1738,22 +1739,37 @@ class Real(base.SimpleAsn1Type):
             return 0.0
 
         if base == 10:
+            # A decimal exponent past the top of the double range can only
+            # overflow, so refuse it up front rather than rendering the
+            # mantissa first. Otherwise the value is out of reach anyway and
+            # this keeps a hostile encoding from driving the conversion below.
+            if exponent > sys.float_info.max_10_exp:
+                raise OverflowError("Real value too large to convert to float")
+
             # One correctly rounded decimal-to-binary conversion. Evaluating
             # mantissa * 10 ** exponent instead rounds twice, and near the
             # bottom of the double range 10 ** exponent underflows to zero
             # before the multiplication can recover the value.
-            return float(f"{mantissa}E{exponent}")
+            try:
+                return float(f"{mantissa}E{exponent}")
+
+            except ValueError as exc:
+                # A mantissa wider than sys.get_int_max_str_digits() cannot be
+                # rendered as decimal (Python 3.11+). Report it as the numeric
+                # overflow it is instead of leaking ValueError to the caller.
+                raise OverflowError(
+                    "Real mantissa too large to convert to float"
+                ) from exc
 
         if base == 2:
             # ldexp scales by a power of two exactly and reaches into the
-            # subnormals, where 2 ** exponent has already underflowed.
-            try:
-                return math.ldexp(mantissa, exponent)
+            # subnormals, where 2 ** exponent has already underflowed. A
+            # mantissa or result outside the double range raises OverflowError
+            # here; falling back to mantissa * pow(base, exponent) would only
+            # materialise an arbitrarily large integer to reach the same end.
+            return math.ldexp(mantissa, exponent)
 
-            except OverflowError:
-                return float(mantissa * pow(base, exponent))
-
-        return float(mantissa * pow(base, exponent))
+        raise error.PyAsn1Error("Prohibited base for Real value", base=base)
 
     def __abs__(self) -> typing.Any:
         return self.clone(abs(float(self)))

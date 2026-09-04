@@ -5,9 +5,10 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import timeit
 import unittest
 
-from pyasn1.codec.ber import encoder
+from pyasn1.codec.ber import decoder, encoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
@@ -3011,6 +3012,29 @@ class AnyEncoderWithSchemaTestCase(BaseTestCase):
         assert encoder.encode(self.v, asn1Spec=s) == bytes(
             (132, 5, 4, 3, 102, 111, 120)
         )
+
+
+class LongObjectIdentifierEncoderTestCase(BaseTestCase):
+    """Encoding cost must stay linear in the arc count (see issue #110)."""
+
+    def testLongOidEncodesInLinearTime(self):
+        def elapsed(arcs):
+            oid = univ.ObjectIdentifier((1, 3) + (1,) * arcs)
+            return min(timeit.repeat(lambda: encoder.encode(oid), repeat=3, number=1))
+
+        small = elapsed(1 << 14)
+        large = elapsed(1 << 15)
+
+        # Linear growth doubles the time; quadratic quadruples it.
+        assert large < small * 3, (
+            f"OID encoding scales worse than linearly: {small:.4f}s -> {large:.4f}s"
+        )
+
+    def testLongOidRoundTrips(self):
+        arcs = (1, 3) + tuple(range(1, 4096))
+        oid = univ.ObjectIdentifier(arcs)
+
+        assert decoder.decode(encoder.encode(oid))[0] == oid
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
