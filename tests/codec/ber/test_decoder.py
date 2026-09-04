@@ -4144,6 +4144,127 @@ class IndefiniteLengthAnyCaptureTestCase(BaseTestCase):
         ) == (s, _null)
 
 
+class OptionalBeforeConstructedDecoderTestCase(BaseTestCase):
+    """OPTIONAL followed by a constructed component (see issue #120)."""
+
+    @staticmethod
+    def _legalSpec():
+        # X.680 25.6: the tags of an OPTIONAL component and of everything that
+        # may follow it must be distinct. [2] against [3]/[4] satisfies that.
+        class Lists(univ.Choice):
+            pass
+
+        Lists.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "first",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                ),
+            ),
+            namedtype.NamedType(
+                "second",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+                ),
+            ),
+        )
+
+        class Obj(univ.Sequence):
+            pass
+
+        Obj.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "counter",
+                univ.Integer().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                ),
+            ),
+            namedtype.OptionalNamedType(
+                "opt",
+                univ.OctetString().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+            namedtype.NamedType("lists", Lists()),
+        )
+
+        return Obj
+
+    def testOptionalPresentBeforeConstructed(self):
+        # 30 0c 81 01 02 82 02 "xy" a3 03 02 01 01
+        substrate = bytes.fromhex("300c81010282027879a303020101")
+
+        asn1Object, rest = decoder.decode(substrate, asn1Spec=self._legalSpec()())
+
+        assert rest == _null
+        assert asn1Object["counter"] == 2
+        assert asn1Object["opt"] == _str2octs("xy")
+        assert asn1Object["lists"]["first"][0] == 1
+        assert asn1Object.prettyPrint()
+
+    def testOptionalAbsentBeforeConstructed(self):
+        substrate = bytes.fromhex("3008810102a303020101")
+
+        asn1Object, rest = decoder.decode(substrate, asn1Spec=self._legalSpec()())
+
+        assert rest == _null
+        assert asn1Object["counter"] == 2
+        assert asn1Object["lists"]["first"][0] == 1
+        assert asn1Object.prettyPrint()
+
+    def testAmbiguousSchemaIsReportedAsSuch(self):
+        # The reported schema: the OPTIONAL component carries [2] and so does
+        # one alternative of the mandatory Choice that follows it, which X.680
+        # 25.6 forbids. The decoder must name that rather than failing further
+        # in with a message about the tag format of whichever component it
+        # happened to pick.
+        class Lists(univ.Choice):
+            pass
+
+        Lists.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "clashing",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+        )
+
+        class Obj(univ.Sequence):
+            pass
+
+        Obj.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "counter",
+                univ.Integer().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                ),
+            ),
+            namedtype.OptionalNamedType(
+                "opt",
+                univ.OctetString().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+            namedtype.NamedType("lists", Lists()),
+        )
+
+        substrate = bytes.fromhex("3008810102820278790000")[:10]
+
+        try:
+            decoder.decode(substrate, asn1Spec=Obj())
+
+        except PyAsn1Error as exc:
+            assert "Duplicate component tag" in str(exc), f"Unexpected error {exc!r}"
+            assert exc.context["tagSet"] == tag.TagSet(
+                tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2),
+                tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2),
+            )
+
+        else:
+            assert False, "Ambiguous schema accepted"
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
