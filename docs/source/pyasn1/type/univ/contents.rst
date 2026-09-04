@@ -24,6 +24,7 @@ and constructed.
    /pyasn1/type/univ/octetstring
    /pyasn1/type/univ/null
    /pyasn1/type/univ/objectidentifier
+   /pyasn1/type/univ/relativeoid
    /pyasn1/type/univ/real
    /pyasn1/type/univ/enumerated
    /pyasn1/type/univ/any

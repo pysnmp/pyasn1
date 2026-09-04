@@ -644,6 +644,72 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         return self._createComponent(asn1Spec, tagSet, tuple(oid), **options), tail
 
 
+class RelativeOIDDecoder(AbstractSimpleDecoder):
+    protoComponent = univ.RelativeOID(())
+
+    def valueDecoder(
+        self,
+        substrate: bytes,
+        asn1Spec: Any,
+        tagSet: Any = None,
+        length: Any = None,
+        state: Any = None,
+        decodeFun: Any = None,
+        substrateFun: Any = None,
+        **options: Any,
+    ) -> tuple[Any, bytes]:
+        if tagSet[0].tagFormat != tag.tagFormatSimple:
+            raise error.PyAsn1Error("Simple tag format expected")
+
+        head, tail = substrate[:length], substrate[length:]
+        if not head:
+            raise error.PyAsn1Error("Empty substrate")
+
+        # X.690 8.20.2: the contents octets are the sub-identifiers of the
+        # arcs, encoded exactly as for an OBJECT IDENTIFIER (8.19.2) but
+        # without the first-two-arc combining that 8.19.4 applies there.
+        #
+        # Accumulated in a list: repeated tuple concatenation is quadratic in
+        # the arc count.
+        oid: list[int] = []
+        index = 0
+        substrateLen = len(head)
+        while index < substrateLen:
+            subId = head[index]
+            index += 1
+            if subId < 128:
+                oid.append(subId)
+            elif subId > 128:
+                # Construct subid from a number of octets
+                nextSubId = subId
+                subId = 0
+                continuationOctets = 0
+                while nextSubId >= 128:
+                    continuationOctets += 1
+                    if continuationOctets > MAX_OID_ARC_CONTINUATION_OCTETS:
+                        raise error.PyAsn1Error(
+                            "OID arc exceeds maximum continuation octets",
+                            limit=MAX_OID_ARC_CONTINUATION_OCTETS,
+                            position=index,
+                        )
+                    subId = (subId << 7) + (nextSubId & 0x7F)
+                    if index >= substrateLen:
+                        raise error.SubstrateUnderrunError(
+                            "Short substrate for sub-OID", oid=tuple(oid)
+                        )
+                    nextSubId = head[index]
+                    index += 1
+                oid.append((subId << 7) + nextSubId)
+            elif subId == 128:
+                # ASN.1 spec forbids leading zeros (0x80) in OID
+                # encoding, tolerating it opens a vulnerability. See
+                # https://www.esat.kuleuven.be/cosic/publications/article-1432.pdf
+                # page 7
+                raise error.PyAsn1Error("Invalid octet 0x80 in RELATIVE-OID encoding")
+
+        return self._createComponent(asn1Spec, tagSet, tuple(oid), **options), tail
+
+
 #: The four values X.690 8.5.9 encodes as a single contents octet with
 #: bits 8 to 7 set to 01. Every other value in that range is reserved.
 _SPECIAL_REAL_VALUES = {
@@ -1717,6 +1783,7 @@ tagMap: Final[dict[tag.TagSet, AbstractDecoder]] = {
     univ.OctetString.tagSet: OctetStringDecoder(),
     univ.Null.tagSet: NullDecoder(),
     univ.ObjectIdentifier.tagSet: ObjectIdentifierDecoder(),
+    univ.RelativeOID.tagSet: RelativeOIDDecoder(),
     univ.Enumerated.tagSet: IntegerDecoder(),
     univ.Real.tagSet: RealDecoder(),
     univ.Sequence.tagSet: SequenceOrSequenceOfDecoder(),  # conflicts with SequenceOf

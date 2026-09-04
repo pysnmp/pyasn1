@@ -1406,6 +1406,98 @@ class NamedBitStringTestCase(BaseTestCase):
             assert self.PKIFailureInfo(name).asOctets() == b"\x01", name
 
 
+class RelativeOIDTestCase(BaseTestCase):
+    """X.690 8.20: RELATIVE-OID, universal tag 13.
+
+    8.20.2 encodes the contents octets as the sub-identifiers of the arcs, in
+    order, each in the same base-128 continuation form as an OBJECT IDENTIFIER
+    (8.19.2). What it does *not* do is combine the first two arcs the way
+    8.19.4 requires there, because a RELATIVE-OID has no distinguished leading
+    arcs -- X.680 33 defines it relative to an object identifier the context
+    supplies.
+    """
+
+    def testWorkedExampleFromTheStandard(self):
+        # X.690 8.20.5: the RELATIVE-OID { 8571 3 2 } encodes as
+        # 0d 04 c2 7b 03 02.
+        value = univ.RelativeOID((8571, 3, 2))
+
+        for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("0d04c27b0302"), encode
+
+    def testUniversalTagIsThirteen(self):
+        substrate = der_encoder.encode(univ.RelativeOID((5, 6)))
+
+        assert substrate[0] == 0x0D
+
+    def testFirstArcIsNotCombined(self):
+        # The same arcs as an OBJECT IDENTIFIER encode differently: 8.19.4
+        # folds { 1 3 } into the single octet 0x2b, 8.20.2 does not.
+        assert der_encoder.encode(univ.RelativeOID((1, 3))) == bytes.fromhex("0d020103")
+        assert der_encoder.encode(univ.ObjectIdentifier((1, 3))) == bytes.fromhex(
+            "0601 2b"
+        )
+
+    def testArcsBeyondTheObjectIdentifierFirstArcRange(self):
+        # A leading arc of 99 is illegal for an OBJECT IDENTIFIER and fine
+        # here, which is the point of the type.
+        value = univ.RelativeOID((99, 1))
+
+        assert der_decoder.decode(
+            der_encoder.encode(value), asn1Spec=univ.RelativeOID()
+        ) == (value, b"")
+
+    def testRoundTrip(self):
+        for arcs in ((0,), (5, 6), (5, 6, 7), (8571, 3, 2), (128, 129), (1 << 40,)):
+            value = univ.RelativeOID(arcs)
+
+            decoded, rest = der_decoder.decode(
+                der_encoder.encode(value), asn1Spec=univ.RelativeOID()
+            )
+
+            assert rest == b""
+            assert decoded == value
+
+    def testSchemalessDecodingRecoversTheType(self):
+        decoded, rest = der_decoder.decode(bytes.fromhex("0d04c27b0302"))
+
+        assert rest == b""
+        assert isinstance(decoded, univ.RelativeOID)
+        assert decoded == (8571, 3, 2)
+
+    def testLeadingZeroOctetRejected(self):
+        # 8.19.2 forbids a padded sub-identifier; 8.20.2 inherits the form.
+        self.assertRaises(
+            error.PyAsn1Error, der_decoder.decode, bytes.fromhex("0d028001")
+        )
+
+    def testEmptyContentsRejected(self):
+        self.assertRaises(error.PyAsn1Error, der_decoder.decode, bytes.fromhex("0d00"))
+
+    def testArcContinuationOctetsAreBounded(self):
+        # The RELATIVE-OID decoder shares the OBJECT IDENTIFIER sub-identifier
+        # form and so must share its bound (see issue #110).
+        limit = ber_decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        payload = b"\x81" * (limit + 1) + b"\x01"
+        substrate = b"\x0d" + bytes((len(payload),)) + payload
+
+        try:
+            der_decoder.decode(substrate)
+
+        except error.PyAsn1Error as exc:
+            assert exc.context["limit"] == limit
+
+        else:
+            assert False, "Over-long RELATIVE-OID arc accepted"
+
+    def testConstructedFormRejected(self):
+        # 8.20.1: the encoding shall be primitive.
+        self.assertRaises(
+            error.PyAsn1Error, der_decoder.decode, bytes.fromhex("2d020506")
+        )
+
+
 class BitStringTestCase(BaseTestCase):
     """X.690 8.6."""
 

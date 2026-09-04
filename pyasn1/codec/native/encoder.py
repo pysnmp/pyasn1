@@ -58,6 +58,11 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
         return str(value)
 
 
+class RelativeOIDEncoder(AbstractItemEncoder):
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
+        return str(value)
+
+
 class RealEncoder(AbstractItemEncoder):
     def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         return float(value)
@@ -143,6 +148,7 @@ tagMap: Final[dict[tag.TagSet, AbstractItemEncoder]] = {
     univ.OctetString.tagSet: OctetStringEncoder(),
     univ.Null.tagSet: NullEncoder(),
     univ.ObjectIdentifier.tagSet: ObjectIdentifierEncoder(),
+    univ.RelativeOID.tagSet: RelativeOIDEncoder(),
     univ.Enumerated.tagSet: IntegerEncoder(),
     univ.Real.tagSet: RealEncoder(),
     # Sequence & Set have same tags as SequenceOf & SetOf
@@ -176,6 +182,7 @@ typeMap: Final[dict[int, AbstractItemEncoder]] = {
     univ.OctetString.typeId: OctetStringEncoder(),
     univ.Null.typeId: NullEncoder(),
     univ.ObjectIdentifier.typeId: ObjectIdentifierEncoder(),
+    univ.RelativeOID.typeId: RelativeOIDEncoder(),
     univ.Enumerated.typeId: IntegerEncoder(),
     univ.Real.typeId: RealEncoder(),
     # Sequence & Set have same tags as SequenceOf & SetOf
