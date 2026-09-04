@@ -4070,6 +4070,80 @@ class MalformedBitStringDecoderTestCase(BaseTestCase):
         assert not escapes, f"Non-PyAsn1Error escapes: {escapes[:10]}"
 
 
+class IndefiniteLengthAnyCaptureTestCase(BaseTestCase):
+    """An untagged ANY keeps the EOO closing what it captures (issue #114)."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class Inner(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.OctetString())
+            )
+
+        class Outer(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.NamedType(
+                    "blob",
+                    univ.Any(),
+                    openType=opentype.OpenType("id", {1: Inner()}),
+                ),
+            )
+
+        self.Inner = Inner
+        self.Outer = Outer
+
+        inner = Inner()
+        inner["x"] = "abc"
+
+        value = Outer()
+        value["id"] = 1
+        value["blob"] = univ.Any(encoder.encode(inner, defMode=False))
+
+        self.substrate = encoder.encode(value, defMode=False)
+
+    def testCapturedAnyIsAWellFormedEncoding(self):
+        asn1Object, rest = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        assert rest == _null
+        # 30 80 04 03 "abc" 00 00 -- the trailing EOO closes the indefinite
+        # length header the capture starts with.
+        assert bytes(asn1Object["blob"]) == bytes.fromhex("308004036162630000")
+
+    def testCapturedAnyDecodesOnItsOwn(self):
+        asn1Object, _ = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        inner, rest = decoder.decode(bytes(asn1Object["blob"]), asn1Spec=self.Inner())
+
+        assert rest == _null
+        assert inner["x"] == _str2octs("abc")
+
+    def testOpenTypeDecodingSucceeds(self):
+        asn1Object, rest = decoder.decode(
+            self.substrate, asn1Spec=self.Outer(), decodeOpenTypes=True
+        )
+
+        assert rest == _null
+        assert asn1Object["blob"]["x"] == _str2octs("abc")
+
+    def testRoundTripsThroughEncoder(self):
+        asn1Object, _ = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        assert encoder.encode(asn1Object, defMode=False) == self.substrate
+
+    def testTaggedAnyStillHoldsContentsOnly(self):
+        # A tagged ANY holds the contents octets of its own tag, and the EOO
+        # closes that tag rather than anything inside it, so it stays out.
+        s = univ.Any("\004\003fox").subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
+
+        assert decoder.decode(
+            bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s
+        ) == (s, _null)
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

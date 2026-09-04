@@ -42,6 +42,10 @@ MAX_TAG_OCTETS: Final = 20
 MAX_LENGTH_OCTETS: Final = 8
 
 
+#: X.690 8.1.5 end-of-contents octets, closing an indefinite-length encoding.
+_END_OF_OCTETS: Final = b"\x00\x00"
+
+
 class AbstractDecoder:
     protoComponent: Any = None
 
@@ -1622,6 +1626,18 @@ class AnyDecoder(AbstractSimpleDecoder):
                 substrate, asn1Spec, substrateFun=substrateFun, allowEoo=True, **options
             )
             if component is eoo.endOfOctets:
+                if not isTagged:
+                    # X.690 8.1.5: the end-of-contents octets are part of the
+                    # indefinite-length encoding they terminate. An untagged
+                    # ANY captures the complete encoding, header included, so
+                    # dropping them would leave an indefinite-length header
+                    # with nothing closing it -- a capture that cannot be
+                    # decoded on its own.
+                    #
+                    # A tagged ANY holds only the contents octets of its own
+                    # tag, and these close that tag rather than anything
+                    # inside it, so there they are correctly left out.
+                    header += _END_OF_OCTETS
                 break
 
             header += component
