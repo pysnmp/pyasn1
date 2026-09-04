@@ -4,6 +4,7 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import itertools
 import sys
 import timeit
 import unittest
@@ -4004,6 +4005,69 @@ class SchemalessTaggedConstructedDecoderTestCase(BaseTestCase):
         asn1Object, _ = decoder.decode(self.twoComponents)
 
         assert encoder.encode(asn1Object) == self.twoComponents
+
+
+class MalformedBitStringDecoderTestCase(BaseTestCase):
+    """Malformed BIT STRING input stays inside PyAsn1Error (issue #121)."""
+
+    def testEmptySegmentIndefiniteLength(self):
+        # The reported substrate: an indefinite-length BIT STRING whose only
+        # segment carries no contents octets at all.
+        try:
+            decoder.decode(bytes.fromhex("0380600000"))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Empty BIT STRING segment accepted"
+
+    def testEmptySegmentDefiniteLength(self):
+        try:
+            decoder.decode(bytes.fromhex("23026000"))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Empty BIT STRING segment accepted"
+
+    def testWellFormedBitStringStillDecodes(self):
+        asn1Object, rest = decoder.decode(bytes.fromhex("030200ff"))
+
+        assert rest == _null
+        assert asn1Object == univ.BitString(hexValue="ff")
+
+    def testEmptyBitStringStillDecodes(self):
+        # X.690 8.6.2.3: an empty bitstring is a single zero initial octet.
+        asn1Object, rest = decoder.decode(bytes.fromhex("030100"))
+
+        assert rest == _null
+        assert asn1Object == univ.BitString(())
+
+    def testMalformedSubstratesRaisePyAsn1Error(self):
+        # Every decoder failure on untrusted input must be a PyAsn1Error
+        # subclass, so a caller wrapping decode() the documented way cannot be
+        # surprised by IndexError, ValueError or TypeError.
+        alphabet = (0x00, 0x01, 0x02, 0x07, 0x08, 0x23, 0x60, 0x80, 0x03, 0xFF)
+
+        escapes = []
+
+        for size in range(5):
+            for body in itertools.product(alphabet, repeat=size):
+                for tagOctet in (0x03, 0x23):
+                    substrate = bytes((tagOctet, *body))
+
+                    try:
+                        decoder.decode(substrate)
+
+                    except PyAsn1Error:
+                        pass
+
+                    except Exception as exc:  # noqa: BLE001
+                        escapes.append((substrate.hex(), type(exc).__name__))
+
+        assert not escapes, f"Non-PyAsn1Error escapes: {escapes[:10]}"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

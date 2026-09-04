@@ -353,6 +353,12 @@ class BitStringDecoder(AbstractSimpleDecoder):
                 head, self.protoComponent, substrateFun=substrateFun, **options
             )
 
+            if not component:
+                # X.690 8.6.2.2: every BIT STRING encoding starts with the
+                # initial octet giving the number of unused bits, so a segment
+                # with no contents octets at all cannot be well formed.
+                raise error.PyAsn1Error("Empty BIT STRING segment")
+
             trailingBits = component[0]
             if trailingBits > 7:
                 raise error.PyAsn1Error(
@@ -407,6 +413,12 @@ class BitStringDecoder(AbstractSimpleDecoder):
             )
             if component is eoo.endOfOctets:
                 break
+
+            if not component:
+                # X.690 8.6.2.2: every BIT STRING encoding starts with the
+                # initial octet giving the number of unused bits, so a segment
+                # with no contents octets at all cannot be well formed.
+                raise error.PyAsn1Error("Empty BIT STRING segment")
 
             trailingBits = component[0]
             if trailingBits > 7:
