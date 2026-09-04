@@ -27,7 +27,7 @@ from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
 from pyasn1.codec.native import encoder as native_encoder
-from pyasn1.type import char, constraint, namedtype, tag, univ, useful
+from pyasn1.type import char, constraint, namedtype, opentype, tag, univ, useful
 from tests.base import BaseTestCase
 
 
@@ -1837,6 +1837,124 @@ class EncoderPurityTestCase(BaseTestCase):
 
         assert native_encoder.encode(value) == {"number": 7}
         assert der_encoder.encode(value) == bytes.fromhex("020107")
+
+
+class PresentButEmptyOptionalTestCase(BaseTestCase):
+    """A present OPTIONAL component is encoded even if empty (see issue #119).
+
+    X.690 11.5 restricts DER and CER to omitting a component whose value
+    equals its DEFAULT value. Nothing licenses omitting an OPTIONAL component
+    that is present, and 'present with empty contents' is a different abstract
+    value from 'absent' -- a SEQUENCE all of whose components are DEFAULT and
+    equal to their defaults encodes as ``30 00``, which is a value, not a
+    space.
+    """
+
+    @staticmethod
+    def _innerType():
+        return univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.DefaultedNamedType("m", univ.Integer(1))
+            )
+        )
+
+    def _sequenceValue(self):
+        inner = self._innerType()
+
+        outer = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.OptionalNamedType("opt", inner),
+            )
+        )
+
+        value = outer.clone()
+        value["id"] = 7
+        value["opt"] = inner.clone()
+        value["opt"]["m"] = 1  # equals the default, so the inner encodes 30 00
+
+        return outer, value
+
+    def testSequenceKeepsAPresentEmptyOptional(self):
+        _, value = self._sequenceValue()
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("30050201073000"), encode
+
+    def testSetKeepsAPresentEmptyOptional(self):
+        inner = self._innerType()
+
+        outer = univ.Set(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.OptionalNamedType("opt", inner),
+            )
+        )
+
+        value = outer.clone()
+        value["id"] = 7
+        value["opt"] = inner.clone()
+        value["opt"]["m"] = 1
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("31050201073000"), encode
+
+    def testAbsentOptionalIsStillOmitted(self):
+        outer, _ = self._sequenceValue()
+
+        value = outer.clone()
+        value["id"] = 7
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("3003020107"), encode
+
+        # X.690 9.1: CER uses the indefinite length form for constructed types.
+        assert cer_encoder.encode(value) == bytes.fromhex("30800201070000")
+
+    def testDefaultEqualToItsDefaultIsStillOmitted(self):
+        # X.690 11.5, the rule that does apply here.
+        inner = self._innerType()
+
+        value = inner.clone()
+        value["m"] = 1
+
+        assert der_encoder.encode(value) == bytes.fromhex("3000")
+
+    def testOpenTypeRoundTripPreservesTheEmptySequence(self):
+        # The reported case: the empty SEQUENCE is the open-type value of an
+        # OPTIONAL ANY, and re-encoding after decodeOpenTypes dropped it.
+        oid = univ.ObjectIdentifier((1, 2, 410, 200046, 1, 2))
+
+        inner = self._innerType()
+
+        algorithmIdentifier = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("algorithm", univ.ObjectIdentifier()),
+                namedtype.OptionalNamedType(
+                    "parameters",
+                    univ.Any(),
+                    openType=opentype.OpenType("algorithm", {oid: inner}),
+                ),
+            )
+        )
+
+        parameters = inner.clone()
+        parameters["m"] = 1
+
+        value = algorithmIdentifier.clone()
+        value["algorithm"] = oid
+        value["parameters"] = univ.Any(der_encoder.encode(parameters))
+
+        substrate = der_encoder.encode(value)
+
+        assert substrate == bytes.fromhex("300c06082a831a8c9a6e01023000")
+
+        decoded, rest = der_decoder.decode(
+            substrate, asn1Spec=algorithmIdentifier.clone(), decodeOpenTypes=True
+        )
+
+        assert rest == b""
+        assert der_encoder.encode(decoded) == substrate
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
