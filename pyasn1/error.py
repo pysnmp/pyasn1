@@ -172,3 +172,35 @@ class PyAsn1UnicodeEncodeError(PyAsn1UnicodeError, UnicodeEncodeError):
     from :class:`UnicodeEncodeError` to help the caller catching
     unicode-related errors.
     """
+
+
+def inconsistencyError(inconsistency: Any, asn1Object: Any) -> BaseException:
+    """Normalise an ``isInconsistent`` result into an exception to raise.
+
+    :attr:`~pyasn1.type.base.ConstructedAsn1Type.isInconsistent` returns the
+    error describing the inconsistency, so callers can ``raise`` it directly
+    and keep the diagnostic detail. A subclass may still follow the older
+    convention of returning a bare :obj:`True`; raising that yields
+    ``TypeError: exceptions must derive from BaseException``, hiding the ASN.1
+    problem behind a Python one.
+
+    Parameters
+    ----------
+    inconsistency:
+        Whatever ``isInconsistent`` returned. Only truthy values reach here.
+
+    asn1Object:
+        The object found to be inconsistent, named in the fallback message.
+
+    Returns
+    -------
+    : :class:`BaseException`
+        `inconsistency` itself when it is already an exception, otherwise a
+        generic :class:`PyAsn1Error` naming `asn1Object`.
+    """
+    if isinstance(inconsistency, BaseException):
+        return inconsistency
+
+    return PyAsn1Error(
+        "ASN.1 object is inconsistent", asn1Object=asn1Object.__class__.__name__
+    )

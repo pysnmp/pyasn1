@@ -214,7 +214,7 @@ class SetEncoder(encoder.SequenceEncoder):
             # instance of ASN.1 schema
             inconsistency = value.isInconsistent
             if inconsistency:
-                raise inconsistency
+                raise error.inconsistencyError(inconsistency, value)
 
             namedTypes = value.componentType
 

@@ -12,7 +12,12 @@ import timeit
 import unittest
 import warnings
 
-from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
+from pyasn1.error import (
+    PyAsn1Error,
+    PyAsn1UnicodeDecodeError,
+    PyAsn1UnicodeEncodeError,
+    inconsistencyError,
+)
 from pyasn1.type import char, constraint, error, namedtype, namedval, tag, univ, useful
 from tests.base import BaseTestCase
 
@@ -2583,6 +2588,77 @@ class LateBoundComponentTypeTestCase(BaseTestCase):
         s = pickle.loads(pickle.dumps(univ.SequenceOf(componentType=univ.Sequence())))
 
         assert s.clone().componentType is s.componentType
+
+
+class IsInconsistentContractTestCase(BaseTestCase):
+    """isInconsistent returns an exception, never a bare True (issue #118)."""
+
+    @staticmethod
+    def _sequenceOf():
+        return univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+    @staticmethod
+    def _sequence():
+        return univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("a", univ.Integer())
+            ),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+    def testSequenceOfSchemaReportsAnException(self):
+        inconsistency = self._sequenceOf().isInconsistent
+
+        assert isinstance(inconsistency, PyAsn1Error), (
+            f"isInconsistent returned {inconsistency!r}"
+        )
+
+    def testSequenceSchemaReportsAnException(self):
+        inconsistency = self._sequence().isInconsistent
+
+        assert isinstance(inconsistency, PyAsn1Error), (
+            f"isInconsistent returned {inconsistency!r}"
+        )
+
+    def testConsistentObjectReportsFalse(self):
+        s = self._sequenceOf().clone()
+        s.append(univ.Integer(1))
+
+        assert s.isInconsistent is False
+
+    def testUnconstrainedObjectReportsFalse(self):
+        assert univ.SequenceOf(componentType=univ.Integer()).isInconsistent is False
+
+    def testConstraintFailureKeepsItsDetail(self):
+        # A genuine constraint failure must still surface the constraint that
+        # rejected the value, not a generic message.
+        s = self._sequenceOf().clone()
+        for value in (1, 2, 3):
+            s.append(univ.Integer(value))
+
+        inconsistency = s.isInconsistent
+
+        assert isinstance(inconsistency, error.ValueConstraintError)
+
+
+class InconsistencyErrorTestCase(BaseTestCase):
+    """error.inconsistencyError normalises whatever isInconsistent returns."""
+
+    def testExceptionIsPassedThrough(self):
+        exc = error.ValueConstraintError("Constraint check failed")
+
+        assert inconsistencyError(exc, univ.Sequence()) is exc
+
+    def testBareTrueBecomesPyAsn1Error(self):
+        # A subclass following the older convention must not turn into
+        # "TypeError: exceptions must derive from BaseException".
+        normalized = inconsistencyError(True, univ.Sequence())
+
+        assert isinstance(normalized, PyAsn1Error)
+        assert normalized.context["asn1Object"] == "Sequence"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

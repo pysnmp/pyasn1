@@ -817,7 +817,7 @@ class UniversalConstructedTypeDecoder(AbstractConstructedDecoder):
         """Raise an ASN.1 constraint error for an inconsistent decoded value."""
         inconsistency = asn1Object.isInconsistent
         if inconsistency:
-            raise inconsistency
+            raise error.inconsistencyError(inconsistency, asn1Object)
 
     def _getComponentTagMap(self, asn1Object: Any, idx: int) -> Any:
         raise NotImplementedError

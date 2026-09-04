@@ -604,7 +604,7 @@ class SequenceEncoder(AbstractItemEncoder):
             # instance of ASN.1 schema
             inconsistency = value.isInconsistent
             if inconsistency:
-                raise inconsistency
+                raise error.inconsistencyError(inconsistency, value)
 
             namedTypes = value.componentType
 
@@ -744,7 +744,7 @@ class SequenceOfEncoder(AbstractItemEncoder):
         if asn1Spec is None:
             inconsistency = value.isInconsistent
             if inconsistency:
-                raise inconsistency
+                raise error.inconsistencyError(inconsistency, value)
 
         else:
             asn1Spec = asn1Spec.componentType

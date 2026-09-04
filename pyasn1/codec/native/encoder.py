@@ -69,7 +69,7 @@ class SetEncoder(AbstractItemEncoder):
     def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
-            raise inconsistency
+            raise error.inconsistencyError(inconsistency, value)
 
         namedTypes = value.componentType
         substrate = self.protoDict()
@@ -109,7 +109,7 @@ class SequenceOfEncoder(AbstractItemEncoder):
     def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
         inconsistency = value.isInconsistent
         if inconsistency:
-            raise inconsistency
+            raise error.inconsistencyError(inconsistency, value)
         return [encodeFun(x, **options) for x in value]
 
 
