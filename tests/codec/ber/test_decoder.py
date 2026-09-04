@@ -3796,6 +3796,14 @@ class ErrorOnDecodingTestCase(BaseTestCase):
 class ResourceExhaustionGuardTestCase(BaseTestCase):
     """Bounds on unbounded-by-spec BER constructs (see issue #110)."""
 
+    #: Arc counts differ by this factor across the scaling checks below.
+    SCALING_SPAN = 32
+
+    #: Growth allowed across that span. Linear work lands near 32x and
+    #: quadratic work near 1000x; 150 sits far enough from both that host
+    #: noise cannot reach it while a regression cannot hide under it.
+    SCALING_LIMIT = 150
+
     @staticmethod
     def _oidSubstrate(continuationOctets):
         # 06 <len> 2b <0x81 * n> 01 -- arc 1.3 followed by one arc encoded
@@ -3825,20 +3833,31 @@ class ResourceExhaustionGuardTestCase(BaseTestCase):
 
     def testLongOidDecodesInLinearTime(self):
         # Repeated tuple concatenation made this quadratic in the arc count.
-        def elapsed(arcs):
+        #
+        # Comparing two adjacent doublings cannot tell linear from quadratic
+        # reliably: at a few milliseconds per sample the measurement noise on
+        # a shared runner is larger than the 2x-versus-4x signal. Spanning a
+        # 32x range instead puts linear near 32x and quadratic near 1000x, so
+        # a threshold between them holds regardless of how noisy the host is.
+        def elapsed(arcs, repeat):
             payload = b"\x2b" + b"\x01" * arcs
             substrate = b"\x06\x83" + len(payload).to_bytes(3, "big") + payload
-            best = min(
-                timeit.repeat(lambda: decoder.decode(substrate), repeat=3, number=1)
+            return min(
+                timeit.repeat(
+                    lambda: decoder.decode(substrate), repeat=repeat, number=1
+                )
             )
-            return best
 
-        small = elapsed(1 << 14)
-        large = elapsed(1 << 15)
+        # The large sample is timed once: against a 150x threshold a single
+        # reading is ample, and it keeps a regression failing in seconds
+        # rather than grinding through repeats of quadratic work.
+        small = elapsed(1 << 12, repeat=3)
+        large = elapsed(1 << 17, repeat=1)
 
-        # Linear growth doubles the time; quadratic quadruples it.
-        assert large < small * 3, (
-            f"OID decoding scales worse than linearly: {small:.4f}s -> {large:.4f}s"
+        assert large < small * self.SCALING_LIMIT, (
+            f"OID decoding scales worse than linearly over a "
+            f"{self.SCALING_SPAN}x range: {small:.4f}s -> {large:.4f}s "
+            f"(ratio {large / small:.1f}, limit {self.SCALING_LIMIT})"
         )
 
     def testLongFormTagBeyondOctetLimitRejected(self):
