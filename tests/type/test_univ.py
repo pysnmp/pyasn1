@@ -2452,6 +2452,139 @@ class RealFloatConversionGuardTestCase(BaseTestCase):
         assert float(univ.Real((1, 10, sys.float_info.max_10_exp))) == 1e308
 
 
+class LateBoundComponentTypeTestCase(BaseTestCase):
+    """clone()/subtype() re-resolve a late-bound componentType (issue #111)."""
+
+    def testSequenceLateBoundComponentType(self):
+        class LateSequence(univ.Sequence):
+            pass
+
+        s = LateSequence()
+
+        LateSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+
+        # The existing instance keeps the schema it was built with.
+        assert len(s.componentType) == 0
+        assert "name" not in s
+
+        # Clones resolve the schema the class has since acquired.
+        s = s.clone()
+        s["name"] = "abc"
+
+        assert s["name"] == _str2octs("abc")
+        assert len(s.componentType) == 1
+
+    def testChoiceLateBoundComponentType(self):
+        class LateChoice(univ.Choice):
+            pass
+
+        s = LateChoice()
+
+        LateChoice.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("number", univ.Integer())
+        )
+
+        assert len(s.componentType) == 0
+
+        s = s.clone()
+        s["number"] = 123
+
+        assert s["number"] == 123
+        assert s.getName() == "number"
+
+    def testSubtypeResolvesLateBoundComponentType(self):
+        class LateSequence(univ.Sequence):
+            pass
+
+        s = LateSequence()
+
+        LateSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+
+        s = s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 5)
+        )
+
+        assert len(s.componentType) == 1
+
+    def testExplicitEmptyComponentTypeIsPreserved(self):
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        # An empty componentType the caller asked for is a deliberate override,
+        # not an unresolved placeholder, and must survive cloning.
+        s = ParentSequence(componentType=namedtype.NamedTypes())
+
+        assert len(s.componentType) == 0
+        assert len(s.clone().componentType) == 0
+        assert len(s.clone().clone().componentType) == 0
+        assert (
+            len(
+                s.subtype(
+                    implicitTag=tag.Tag(
+                        tag.tagClassContext, tag.tagFormatConstructed, 5
+                    )
+                ).componentType
+            )
+            == 0
+        )
+
+    def testUnpickledObjectKeepsItsSnapshot(self):
+        # Objects pickled by a release predating the explicitness flag carry
+        # no such attribute and must conservatively keep their snapshot.
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        s = ParentSequence(componentType=namedtype.NamedTypes())
+
+        del s.__dict__["_componentTypeExplicit"]
+
+        assert len(s.clone().componentType) == 0
+
+    def testInheritedComponentTypeSnapshotIsStable(self):
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        class ChildSequence(ParentSequence):
+            pass
+
+        s = ChildSequence()
+
+        ParentSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString()),
+            namedtype.NamedType("age", univ.Integer()),
+        )
+
+        # A schema that was already resolved is not re-resolved.
+        assert len(s.componentType) == 1
+        assert "age" not in s
+
+    def testSequenceOfNoValueComponentTypeIsPreserved(self):
+        s = univ.SequenceOf(componentType=univ.noValue)
+
+        assert s.clone().componentType is univ.noValue
+
+        s = s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 7)
+        )
+
+        assert s.componentType is univ.noValue
+
+    def testCloneAfterPickleKeepsComponentType(self):
+        s = pickle.loads(pickle.dumps(univ.SequenceOf(componentType=univ.Sequence())))
+
+        assert s.clone().componentType is s.componentType
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

@@ -123,6 +123,30 @@ class AnyDecoderTestCase(BaseTestCase):
         assert decoder.decode("fox", asn1Spec=univ.Any()) == univ.Any("fox")
 
 
+class LateBoundComponentTypeTestCase(BaseTestCase):
+    """The native codec resolves componentType off the clone (issue #111)."""
+
+    def testSequenceOfLateBoundComponentType(self):
+        class Inner(univ.Sequence):
+            pass
+
+        class Outer(univ.SequenceOf):
+            pass
+
+        # The spec object is built before either componentType is assigned,
+        # so it captures placeholders that clone() has to re-resolve.
+        spec = Outer()
+
+        Inner.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+        Outer.componentType = Inner()
+
+        asn1Object = decoder.decode([{"name": "abc"}], asn1Spec=spec)
+
+        assert asn1Object[0]["name"] == univ.OctetString("abc")
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

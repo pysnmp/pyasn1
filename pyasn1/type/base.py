@@ -656,6 +656,11 @@ class ConstructedAsn1Type(Asn1Type):
             ...
 
     def __init__(self, **kwargs: Any) -> None:
+        # Whether componentType was supplied by the caller rather than picked
+        # up from the class. Only a class-derived placeholder may be discarded
+        # on clone(); see _cloneInitializers().
+        self._componentTypeExplicit = "componentType" in kwargs
+
         readOnly = {"componentType": self.componentType}
 
         readOnly.update(kwargs)
@@ -728,6 +733,57 @@ class ConstructedAsn1Type(Asn1Type):
     def _cloneComponentValues(self, myClone: Any, cloneValueFlag: Any) -> None:
         pass
 
+    @staticmethod
+    def _isComponentTypePlaceholder(componentType: Any) -> bool:
+        """Tell an unset *componentType* from a schema that is genuinely empty."""
+        if componentType is None:
+            return True
+
+        if componentType is noValue or isinstance(componentType, Asn1Item):
+            return False
+
+        return not componentType
+
+    def _cloneInitializers(self) -> dict[str, Any]:
+        """Return the initializers for a clone, re-resolving a late binding.
+
+        A recursively defined schema is necessarily built in two steps: the
+        class is declared, instances of it are referenced from sibling types,
+        and only then is its ``componentType`` assigned. Instances created in
+        between captured the placeholder that stood in for the schema. Leaving
+        that snapshot in place makes every clone of them decode against an
+        empty schema, silently discarding components.
+
+        A placeholder that came from the class is therefore dropped here so
+        the new instance resolves ``componentType`` afresh. One the caller
+        supplied explicitly is always preserved, placeholder or not.
+        """
+        initializers = self.readOnly.copy()
+
+        componentType = initializers.get("componentType")
+
+        # Objects unpickled from a release predating the explicitness flag
+        # carry no such attribute; treat them as explicit so their frozen
+        # snapshot survives.
+        if self._isComponentTypePlaceholder(componentType) and not getattr(
+            self, "_componentTypeExplicit", True
+        ):
+            del initializers["componentType"]
+
+        elif (
+            isinstance(componentType, ConstructedAsn1Type)
+            and not getattr(componentType, "_componentTypeExplicit", True)
+            and self._isComponentTypePlaceholder(componentType.componentType)
+            and componentType.componentType is not type(componentType).componentType
+            and not self._isComponentTypePlaceholder(type(componentType).componentType)
+        ):
+            # The component schema object is itself an instance that captured
+            # a placeholder later completed on its class. Re-clone it so the
+            # resolved schema guides decoding of the components.
+            initializers["componentType"] = componentType.clone()
+
+        return initializers
+
     def clone(self, **kwargs: Any) -> Any:
         """Create a modified version of |ASN.1| schema object.
 
@@ -753,7 +809,7 @@ class ConstructedAsn1Type(Asn1Type):
         """
         cloneValueFlag = kwargs.pop("cloneValueFlag", False)
 
-        initializers = self.readOnly.copy()
+        initializers = self._cloneInitializers()
         initializers.update(kwargs)
 
         clone = self.__class__(**initializers)
@@ -804,7 +860,7 @@ class ConstructedAsn1Type(Asn1Type):
         Due to the mutable nature of the |ASN.1| object, even if no arguments
         are supplied, a new |ASN.1| object will be created and returned.
         """
-        initializers = self.readOnly.copy()
+        initializers = self._cloneInitializers()
 
         cloneValueFlag = kwargs.pop("cloneValueFlag", False)
 
