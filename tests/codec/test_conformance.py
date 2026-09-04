@@ -1251,6 +1251,81 @@ class IntegerMinimalEncodingTestCase(BaseTestCase):
             )
 
 
+class TaggedIntegerMinimalEncodingTestCase(BaseTestCase):
+    """X.690 8.3.2 binds the contents octets, which an IMPLICIT tag does not touch.
+
+    X.690 8.14.3: implicit tagging replaces the tag octets and leaves the
+    contents octets alone. So a tagged INTEGER must carry exactly the contents
+    of the untagged one -- including the leading zero octet that keeps a
+    positive value with bit 8 set from reading as negative.
+
+    Reported (pyasn1/pyasn1#87) as a spurious leading ``00`` on a 32-octet
+    positive value, with ``82 20 ff...ff`` given as the expected encoding.
+    That encoding denotes -1: 8.3.2 requires the ``00``, and dropping it would
+    change the value rather than shorten it.
+    """
+
+    class TaggedInteger(univ.Integer):
+        tagSet = univ.Integer.tagSet.tagImplicitly(
+            tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0x02)
+        )
+
+    def testContentsOctetsMatchTheUntaggedEncoding(self):
+        # The untagged encoding is already pinned as minimal over this range by
+        # IntegerMinimalEncodingTestCase, so equality here carries minimality
+        # onto the tagged path without re-deriving it.
+        values = list(range(-70000, 70000, 13))
+        values += [0, 1, 127, 128, 255, 256, 65535, -1, -128, -129, -32768]
+        values += [0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, 1 << 256, -(1 << 256)]
+
+        for value in values:
+            for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+                # Strip the identifier octet from each; the length and contents
+                # octets that follow must be identical.
+                tagged = encode(self.TaggedInteger(value))[1:]
+                untagged = encode(univ.Integer(value))[1:]
+
+                assert tagged == untagged, (
+                    f"{value}: tagged {tagged.hex()} != untagged {untagged.hex()}"
+                )
+
+    def testPositiveValueWithBitEightSetKeepsItsLeadingZero(self):
+        # The reported case. 82 21 00 ff... , not 82 20 ff... .
+        value = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+        substrate = der_encoder.encode(self.TaggedInteger(value))
+
+        assert substrate == bytes.fromhex("822100" + "ff" * 32)
+
+    def testTheReportedExpectationDenotesMinusOne(self):
+        # 82 20 ff...ff does not shorten the value, it changes it. Under BER,
+        # which tolerates non-minimal contents, it reads as -1.
+        substrate = bytes.fromhex("8220" + "ff" * 32)
+
+        decoded, rest = ber_decoder.decode(substrate, asn1Spec=self.TaggedInteger())
+
+        assert rest == b""
+        assert decoded == -1
+
+    def testTheReportedExpectationIsRejectedUnderDer(self):
+        # And under DER it is not even well formed: 32 octets of ff is a
+        # non-minimal encoding of -1, which 8.3.2 a) forbids outright.
+        self.assertRaises(
+            error.PyAsn1Error,
+            der_decoder.decode,
+            bytes.fromhex("8220" + "ff" * 32),
+            asn1Spec=self.TaggedInteger(),
+        )
+
+    def testTaggedValuesRoundTrip(self):
+        for value in (-32769, -129, -128, -1, 0, 127, 128, 255, 32767, 1 << 256):
+            substrate = der_encoder.encode(self.TaggedInteger(value))
+
+            assert (
+                der_decoder.decode(substrate, asn1Spec=self.TaggedInteger())[0] == value
+            )
+
+
 class BitStringTestCase(BaseTestCase):
     """X.690 8.6."""
 
