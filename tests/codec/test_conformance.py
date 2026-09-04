@@ -26,6 +26,7 @@ from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
+from pyasn1.codec.native import encoder as native_encoder
 from pyasn1.type import char, constraint, namedtype, tag, univ, useful
 from tests.base import BaseTestCase
 
@@ -1732,6 +1733,110 @@ class TagFormTestCase(BaseTestCase):
             substrate = der_encoder.encode(asn1Object)
 
             assert substrate[0] & 0x1F != 0x1F, f"tag {tagId} took the long form"
+
+
+class EncoderPurityTestCase(BaseTestCase):
+    """Encoding must not alter the object being encoded (see issue #112).
+
+    X.690 11.5 requires DER and CER to omit a component equal to its DEFAULT
+    value, and BER permits it, so an absent DEFAULT component contributes
+    nothing to the octets either way. Materialising one while encoding is
+    therefore pure side effect: it changes which components the caller's
+    object reports as present, and does so silently.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        self.s = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString()),
+                namedtype.DefaultedNamedType("age", univ.Integer(33)),
+                namedtype.OptionalNamedType("nick", univ.OctetString()),
+            )
+        )
+
+    def _value(self):
+        value = self.s.clone()
+        value["name"] = "abc"
+        return value
+
+    @staticmethod
+    def _presence(value):
+        return [
+            value.getComponentByPosition(idx, instantiate=False) is not univ.noValue
+            for idx in range(3)
+        ]
+
+    def testBerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        ber_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testCerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        cer_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testDerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        der_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testNativeEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        native_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testEncodingIsUnchanged(self):
+        # X.690 11.5: the absent DEFAULT component is omitted, as before.
+        assert ber_encoder.encode(self._value()) == bytes.fromhex("30050403616263")
+        assert der_encoder.encode(self._value()) == bytes.fromhex("30050403616263")
+
+    def testRepeatedEncodingIsStable(self):
+        value = self._value()
+
+        for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+            assert encode(value) == encode(value)
+
+    def testNativeEncodingCarriesDefaultValue(self):
+        # The native codec produces a Python mapping rather than octets, so a
+        # DEFAULT component belongs in the output even when absent.
+        assert native_encoder.encode(self._value()) == {"name": b"abc", "age": 33}
+
+    def testExplicitlySetDefaultValueStillOmitted(self):
+        # X.690 11.5 applies to the value, not to how it was set.
+        value = self._value()
+        value["age"] = 33
+
+        assert der_encoder.encode(value) == bytes.fromhex("30050403616263")
+
+    def testNonDefaultValueIsEncoded(self):
+        value = self._value()
+        value["age"] = 34
+
+        assert der_encoder.encode(value) == bytes.fromhex("30080403616263020122")
+
+    def testChoiceEncodesOnlyTheSetAlternative(self):
+        c = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("number", univ.Integer()),
+                namedtype.NamedType("string", univ.OctetString()),
+            )
+        )
+        value = c.clone()
+        value["number"] = 7
+
+        assert native_encoder.encode(value) == {"number": 7}
+        assert der_encoder.encode(value) == bytes.fromhex("020107")
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

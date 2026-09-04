@@ -74,10 +74,30 @@ class SetEncoder(AbstractItemEncoder):
         namedTypes = value.componentType
         substrate = self.protoDict()
 
-        for idx, (key, subValue) in enumerate(value.items()):
-            if namedTypes and namedTypes[idx].isOptional and not value[idx].isValue:
-                continue
+        # Iterating items() would instantiate absent OPTIONAL and DEFAULT
+        # components, so encoding would alter the object it is given.
+        for idx, subValue in enumerate(value.valuesNotInstantiating()):
+            if namedTypes:
+                namedType = namedTypes[idx]
+                key = namedType.name
+
+                if subValue is univ.noValue:
+                    if namedType.isOptional:
+                        continue
+
+                    # A DEFAULT component carries its default value into the
+                    # native mapping; a mandatory one keeps its former
+                    # behaviour of encoding the schema object.
+                    subValue = namedType.asn1Object
+
+                elif namedType.isOptional and not subValue.isValue:
+                    continue
+
+            else:
+                key = value.getNameByPosition(idx)
+
             substrate[key] = encodeFun(subValue, **options)
+
         return substrate
 
 
@@ -94,7 +114,21 @@ class SequenceOfEncoder(AbstractItemEncoder):
 
 
 class ChoiceEncoder(SequenceEncoder):
-    pass
+    def encode(self, value: Any, encodeFun: Callable[..., Any], **options: Any) -> Any:
+        # A Choice holds exactly one alternative, so the inherited
+        # position-wise walk -- which substitutes a schema object for every
+        # unset position -- does not apply: items() already yields only the
+        # alternative that is set.
+        inconsistency = value.isInconsistent
+        if inconsistency:
+            raise inconsistency
+
+        substrate = self.protoDict()
+
+        for key, subValue in value.items():
+            substrate[key] = encodeFun(subValue, **options)
+
+        return substrate
 
 
 class AnyEncoder(AbstractItemEncoder):
