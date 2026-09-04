@@ -391,6 +391,49 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
         return tuple(octets), False, False
 
 
+class RelativeOIDEncoder(AbstractItemEncoder):
+    supportIndefLenMode = False
+
+    def encodeValue(
+        self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
+    ) -> tuple[Any, bool, bool]:
+        if asn1Spec is not None:
+            value = asn1Spec.clone(value)
+
+        # X.690 8.20.2: a RELATIVE-OID is just the sequence of its arcs, with
+        # none of the first-two-arc combining that 8.19.4 applies to an OBJECT
+        # IDENTIFIER.
+        #
+        # Accumulated in a list: repeated tuple concatenation is quadratic in
+        # the arc count, which turns a large RELATIVE-OID into a CPU
+        # exhaustion vector.
+        octets: list[int] = []
+
+        for subOid in value.asTuple():
+            if 0 <= subOid <= 127:
+                # Optimize for the common case
+                octets.append(subOid)
+
+            elif subOid > 127:
+                # Pack large Sub-Object IDs
+                res: list[int] = [subOid & 0x7F]
+                subOid >>= 7
+
+                while subOid:
+                    res.append(0x80 | (subOid & 0x7F))
+                    subOid >>= 7
+
+                # Add packed Sub-Object ID to resulted RELATIVE-OID
+                octets.extend(reversed(res))
+
+            else:
+                raise error.PyAsn1Error(
+                    "Negative RELATIVE-OID arc", arc=subOid, value=value
+                )
+
+        return tuple(octets), False, False
+
+
 class RealEncoder(AbstractItemEncoder):
     supportIndefLenMode = False
     binEncBase = 2  # set to None to choose encoding base automatically
@@ -823,6 +866,7 @@ tagMap: Final[dict[tag.TagSet, AbstractItemEncoder]] = {
     univ.OctetString.tagSet: OctetStringEncoder(),
     univ.Null.tagSet: NullEncoder(),
     univ.ObjectIdentifier.tagSet: ObjectIdentifierEncoder(),
+    univ.RelativeOID.tagSet: RelativeOIDEncoder(),
     univ.Enumerated.tagSet: IntegerEncoder(),
     univ.Real.tagSet: RealEncoder(),
     # Sequence & Set have same tags as SequenceOf & SetOf
@@ -855,6 +899,7 @@ typeMap: Final[dict[int, AbstractItemEncoder]] = {
     univ.OctetString.typeId: OctetStringEncoder(),
     univ.Null.typeId: NullEncoder(),
     univ.ObjectIdentifier.typeId: ObjectIdentifierEncoder(),
+    univ.RelativeOID.typeId: RelativeOIDEncoder(),
     univ.Enumerated.typeId: IntegerEncoder(),
     univ.Real.typeId: RealEncoder(),
     # Sequence & Set have same tags as SequenceOf & SetOf

@@ -2763,6 +2763,104 @@ class ChoiceReadDoesNotSelectTestCase(BaseTestCase):
         assert "name" not in s
 
 
+class RelativeOID(BaseTestCase):
+    """X.680 33: RELATIVE-OID, arcs relative to a context-supplied OID."""
+
+    def testStr(self):
+        assert str(univ.RelativeOID("5.6")) == "5.6"
+
+    def testRepr(self):
+        assert "5.6" in repr(univ.RelativeOID("5.6"))
+
+    def testEq(self):
+        assert univ.RelativeOID((1, 3, 6)) == (1, 3, 6)
+
+    def testAdd(self):
+        assert univ.RelativeOID((1, 3)) + (6,) == (1, 3, 6)
+
+    def testRadd(self):
+        assert (1,) + univ.RelativeOID((3, 6)) == (1, 3, 6)
+
+    def testLen(self):
+        assert len(univ.RelativeOID((1, 3))) == 2
+
+    def testPrefix(self):
+        o = univ.RelativeOID("1.3.6")
+        assert o.isPrefixOf((1, 3, 6))
+        assert o.isPrefixOf((1, 3, 6, 1))
+        assert not o.isPrefixOf((1, 3))
+
+    def testInput1(self):
+        assert univ.RelativeOID("1.3.6") == (1, 3, 6)
+
+    def testInput2(self):
+        assert univ.RelativeOID((1, 3, 6)) == (1, 3, 6)
+
+    def testInput3(self):
+        assert univ.RelativeOID(univ.RelativeOID("1.3") + (6,)) == (1, 3, 6)
+
+    def testUnicode(self):
+        assert univ.RelativeOID("1.3.6") == (1, 3, 6)
+
+    def testTag(self):
+        # X.680 33 gives RELATIVE-OID universal tag 13.
+        assert univ.RelativeOID().tagSet == tag.TagSet(
+            (),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x0D),
+        )
+
+    def testContains(self):
+        s = univ.RelativeOID("1.3.6.1234.99999")
+        assert 1234 in s
+        assert 4321 not in s
+
+    def testIndex(self):
+        assert univ.RelativeOID("1.3.6").index(6) == 2
+
+    def testSlice(self):
+        assert univ.RelativeOID("1.3.6.1")[1:3] == (3, 6)
+
+    def testMalformedString(self):
+        # A hyphen is the ASN.1 comment marker, never part of an arc.
+        try:
+            univ.RelativeOID("1.3.-6")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Malformed RELATIVE-OID accepted"
+
+    def testNonIntegerArc(self):
+        try:
+            univ.RelativeOID("1.3.abc")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Non-integer arc accepted"
+
+    def testNegativeArc(self):
+        try:
+            univ.RelativeOID((1, 3, -6))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Negative arc accepted"
+
+    def testNoFirstTwoArcRestriction(self):
+        # Unlike ObjectIdentifier, whose first arc is 0..2 (X.690 8.19.4),
+        # a RELATIVE-OID has no distinguished leading arcs at all.
+        assert univ.RelativeOID((99, 1)) == (99, 1)
+
+    def testIsSuperTypeOfObjectIdentifierIsFalse(self):
+        # Distinct universal tags, so the two must not be interchangeable.
+        assert not univ.RelativeOID().isSameTypeWith(univ.ObjectIdentifier())
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

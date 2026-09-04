@@ -105,6 +105,7 @@ tagMap: Final[dict[tag.TagSet, Any]] = {
     univ.OctetString.tagSet: AbstractScalarDecoder(),
     univ.Null.tagSet: AbstractScalarDecoder(),
     univ.ObjectIdentifier.tagSet: AbstractScalarDecoder(),
+    univ.RelativeOID.tagSet: AbstractScalarDecoder(),
     univ.Enumerated.tagSet: AbstractScalarDecoder(),
     univ.Real.tagSet: AbstractScalarDecoder(),
     univ.Sequence.tagSet: SequenceOrSetDecoder(),  # conflicts with SequenceOf
@@ -136,6 +137,7 @@ typeMap: Final[dict[int, Any]] = {
     univ.OctetString.typeId: AbstractScalarDecoder(),
     univ.Null.typeId: AbstractScalarDecoder(),
     univ.ObjectIdentifier.typeId: AbstractScalarDecoder(),
+    univ.RelativeOID.typeId: AbstractScalarDecoder(),
     univ.Enumerated.typeId: AbstractScalarDecoder(),
     univ.Real.typeId: AbstractScalarDecoder(),
     # ambiguous base types

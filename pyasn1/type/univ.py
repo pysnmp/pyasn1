@@ -42,6 +42,7 @@ __all__ = [
     "ObjectIdentifier",
     "OctetString",
     "Real",
+    "RelativeOID",
     "Sequence",
     "SequenceAndSetBase",
     "SequenceOf",
@@ -1417,6 +1418,206 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         -------
         : :class:`str`
             Dotted-decimal string, e.g. '2.6.7'.
+        """
+        return ".".join([str(x) for x in value])
+
+
+class RelativeOID(base.SimpleAsn1Type):
+    """Create |ASN.1| schema or value object.
+
+    |ASN.1| class is based on :class:`~pyasn1.type.base.SimpleAsn1Type`, its
+    objects are immutable and duck-type Python :class:`tuple` objects
+    (tuple of non-negative integers).
+
+    A RELATIVE-OID names arcs relative to some object identifier supplied by
+    the context, so unlike :class:`ObjectIdentifier` it has no first two arcs
+    to combine and its arcs are subject to no range restriction.
+
+    Keyword Args
+    ------------
+    value: :class:`tuple`, :class:`str` or |ASN.1| object
+        Python sequence of :class:`int` or :class:`str` literal or |ASN.1| object.
+        If `value` is not given, schema object will be created.
+
+    tagSet: :py:class:`~pyasn1.type.tag.TagSet`
+        Object representing non-default ASN.1 tag(s)
+
+    subtypeSpec: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection`
+        Object representing non-default ASN.1 subtype constraint(s). Constraints
+        verification for |ASN.1| type occurs automatically on object
+        instantiation.
+
+    Raises
+    ------
+    ~pyasn1.error.ValueConstraintError, ~pyasn1.error.PyAsn1Error
+        On constraint violation or bad initializer.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        class RelOID(RelativeOID):
+            '''
+            ASN.1 specification:
+
+            id-pad-null RELATIVE-OID ::= { 0 }
+            id-pad-once RELATIVE-OID ::= { 5 6 }
+            id-pad-twice RELATIVE-OID ::= { 5 6 7 }
+            '''
+        id_pad_null = RelOID('0')
+        id_pad_once = RelOID('5.6')
+        id_pad_twice = id_pad_once + (7,)
+    """
+
+    #: Set (on class, not on instance) or return a
+    #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
+    #: associated with |ASN.1| type.
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x0D))
+
+    #: Set (on class, not on instance) or return a
+    #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
+    #: imposing constraints on |ASN.1| type initialization values.
+    subtypeSpec = constraint.ConstraintsIntersection()
+
+    # Optimization for faster codec lookup
+    typeId = base.SimpleAsn1Type.getTypeId()
+
+    def __add__(self, other: typing.Any) -> typing.Any:
+        return self.clone(self._value + other)
+
+    def __radd__(self, other: typing.Any) -> typing.Any:
+        return self.clone(other + self._value)
+
+    def asTuple(self) -> tuple[int, ...]:
+        """Get |ASN.1| value as a tuple of integer sub-identifiers."""
+        return self._value
+
+    # Sequence object protocol
+
+    def __len__(self) -> int:
+        return len(self._value)
+
+    def __getitem__(self, i: typing.Any) -> typing.Any:
+        if i.__class__ is slice:
+            return self.clone(self._value[i])
+        else:
+            return self._value[i]
+
+    def __iter__(self) -> Iterator[typing.Any]:
+        return iter(self._value)
+
+    def __contains__(self, value: object) -> bool:
+        return value in self._value
+
+    def index(self, suboid: typing.Any) -> int:
+        """Return the position of the first occurrence of `suboid`.
+
+        Parameters
+        ----------
+        suboid: :class:`int`
+            Sub-identifier value to look up.
+
+        Returns
+        -------
+        : :class:`int`
+            Zero-based position of `suboid` within this |ASN.1| object.
+
+        Raises
+        ------
+        ValueError
+            If `suboid` is not present.
+        """
+        return self._value.index(suboid)
+
+    def isPrefixOf(self, other: typing.Any) -> bool:
+        """Indicate if this |ASN.1| object is a prefix of other |ASN.1| object.
+
+        Parameters
+        ----------
+        other: |ASN.1| object
+            |ASN.1| object
+
+        Returns
+        -------
+        : :class:`bool`
+            :obj:`True` if this |ASN.1| object is a parent (e.g. prefix) of the other |ASN.1| object
+            or :obj:`False` otherwise.
+        """
+        length = len(self)
+        if length <= len(other):
+            if self._value[:length] == other[:length]:
+                return True
+        return False
+
+    def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into a tuple of non-negative integers.
+
+        Parameters
+        ----------
+        value: :class:`tuple`, :class:`str` or |ASN.1| object
+            A dotted-decimal string like '5.6', an iterable of non-negative
+            integers, or another |ASN.1| RelativeOID.
+
+        Returns
+        -------
+        : :class:`tuple`
+            The coerced tuple of sub-identifiers.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` is malformed (e.g. contains a hyphen, a
+            non-integer, or a negative sub-identifier).
+        """
+        if isinstance(value, RelativeOID):
+            return tuple(value)
+        elif isinstance(value, str):
+            if "-" in value:
+                raise error.PyAsn1Error(
+                    "Malformed RELATIVE-OID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
+                )
+            try:
+                return tuple([int(subOid) for subOid in value.split(".") if subOid])
+            except ValueError as exc:
+                raise error.PyAsn1Error(
+                    "Malformed RELATIVE-OID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
+                    cause=exc,
+                ) from exc
+
+        try:
+            tupleOfInts = tuple([int(subOid) for subOid in value if subOid >= 0])
+
+        except (ValueError, TypeError) as exc:
+            raise error.PyAsn1Error(
+                "Malformed RELATIVE-OID",
+                value=value,
+                asn1Type=self.__class__.__name__,
+                cause=exc,
+            ) from exc
+
+        if len(tupleOfInts) == len(value):
+            return tupleOfInts
+
+        raise error.PyAsn1Error(
+            "Malformed RELATIVE-OID", value=value, asn1Type=self.__class__.__name__
+        )
+
+    def prettyOut(self, value: typing.Any) -> typing.Any:
+        """Return the dotted-decimal text representation of `value`.
+
+        Parameters
+        ----------
+        value: :class:`tuple`
+            Sequence of integer sub-identifiers.
+
+        Returns
+        -------
+        : :class:`str`
+            Dotted-decimal string, e.g. '5.6'.
         """
         return ".".join([str(x) for x in value])
 
