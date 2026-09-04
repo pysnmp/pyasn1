@@ -2661,6 +2661,108 @@ class InconsistencyErrorTestCase(BaseTestCase):
         assert normalized.context["asn1Object"] == "Sequence"
 
 
+class ChoiceReadDoesNotSelectTestCase(BaseTestCase):
+    """Reading an alternative must not deselect another (issue #122)."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        self.s = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType(
+                    "foo",
+                    univ.OctetString().subtype(
+                        implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0)
+                    ),
+                ),
+                namedtype.NamedType(
+                    "bar",
+                    univ.OctetString().subtype(
+                        implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                    ),
+                ),
+            )
+        )
+
+    def _selected(self):
+        s = self.s.clone()
+        s["bar"] = "xyz"
+        return s
+
+    def testReadingAnotherAlternativeKeepsTheValue(self):
+        s = self._selected()
+
+        s["foo"]
+
+        assert s["bar"] == _str2octs("xyz"), "Reading 'foo' dropped 'bar'"
+
+    def testReadingAnotherAlternativeKeepsTheSelection(self):
+        s = self._selected()
+
+        s["foo"]
+
+        assert s.getName() == "bar"
+        assert s.getComponent() == _str2octs("xyz")
+
+    def testRepeatedReadsAreStable(self):
+        s = self._selected()
+
+        for _ in range(3):
+            assert not s["foo"].isValue
+            assert s["bar"] == _str2octs("xyz")
+
+    def testReadingAnotherAlternativeYieldsASchemaObject(self):
+        s = self._selected()
+
+        assert not s["foo"].isValue
+
+    def testAssignmentStillSwitchesAlternatives(self):
+        s = self._selected()
+
+        s["foo"] = "abc"
+
+        assert s.getName() == "foo"
+        assert s["foo"] == _str2octs("abc")
+        # X.680 29.1: a CHOICE holds exactly one alternative.
+        assert not s["bar"].isValue
+
+    def testEncodingIsUnaffectedByReads(self):
+        from pyasn1.codec.der import encoder as der_encoder
+
+        s = self._selected()
+        expected = der_encoder.encode(s)
+
+        s["foo"]
+
+        assert der_encoder.encode(s) == expected
+
+    def testInnerSetComponentByTypeStillSelects(self):
+        # setComponentByType(innerFlag=True) navigates by reading the
+        # component and then assigns into it; that write must still select.
+        inner = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("sex", univ.Integer())
+            )
+        )
+        outer = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString()),
+                namedtype.NamedType("nested", inner),
+            )
+        )
+
+        s = outer.clone()
+        s.setComponentByType(univ.OctetString.tagSet, "abc")
+
+        assert s.getName() == "name"
+
+        s.setComponentByType(univ.Integer.tagSet, 123, innerFlag=True)
+
+        assert s.getName() == "nested"
+        assert list(s) == ["nested"]
+        assert "name" not in s
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

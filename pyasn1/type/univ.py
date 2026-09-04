@@ -3325,14 +3325,22 @@ class Set(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base t
                     idx, value, verifyConstraints, matchTags, matchConstraints
                 )
             else:
-                componentType = self.getComponentByPosition(idx)
-                return componentType.setComponentByType(
+                component = self.getComponentByPosition(idx)
+                component.setComponentByType(
                     tagSet,
                     value,
                     verifyConstraints,
                     matchTags,
                     matchConstraints,
                     innerFlag=innerFlag,
+                )
+
+                # Assigning into the component read above is a write to this
+                # object too, so record it. Reading a component no longer
+                # selects it on a Choice (see Choice.setComponentByPosition),
+                # which is what this used to rely on.
+                return self.setComponentByPosition(
+                    idx, component, verifyConstraints, matchTags, matchConstraints
                 )
         else:  # set outer component by inner tagSet
             return self.setComponentByPosition(
@@ -3589,12 +3597,24 @@ class Choice(Set):
         self
         """
         oldIdx = self._currentIdx
+
         Set.setComponentByPosition(
             self, idx, value, verifyConstraints, matchTags, matchConstraints
         )
+
+        if value is noValue and oldIdx is not None and oldIdx != idx:
+            # No value was supplied, so this is the schema object being
+            # instantiated -- which is what reading an alternative does. X.680
+            # 29.1 makes a CHOICE value exactly one of its alternatives, and
+            # reading one does not choose it, so the selected alternative and
+            # its value both stay put.
+            return self
+
         self._currentIdx = idx
+
         if oldIdx is not None and oldIdx != idx:
             self._componentValues[oldIdx] = noValue
+
         return self
 
     @property
