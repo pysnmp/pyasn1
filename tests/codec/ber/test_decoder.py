@@ -5,6 +5,7 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import timeit
 import unittest
 
 from pyasn1.codec.ber import decoder, encoder, eoo
@@ -3789,6 +3790,98 @@ class ErrorOnDecodingTestCase(BaseTestCase):
         assert rest == bytes((131, 3, 2, 1, 12)), (
             f"Unexpected rest of substrate after raw dump {rest!r}"
         )
+
+
+class ResourceExhaustionGuardTestCase(BaseTestCase):
+    """Bounds on unbounded-by-spec BER constructs (see issue #110)."""
+
+    @staticmethod
+    def _oidSubstrate(continuationOctets):
+        # 06 <len> 2b <0x81 * n> 01 -- arc 1.3 followed by one arc encoded
+        # across `continuationOctets` continuation octets plus a final octet.
+        payload = b"\x2b" + b"\x81" * continuationOctets + b"\x01"
+        return b"\x06" + bytes((len(payload),)) + payload
+
+    def testOidArcAtContinuationLimitDecodes(self):
+        limit = decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        asn1Object, rest = decoder.decode(self._oidSubstrate(limit))
+
+        assert rest == _null
+        assert len(asn1Object) == 3, f"Unexpected OID {asn1Object!r}"
+
+    def testOidArcBeyondContinuationLimitRejected(self):
+        limit = decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        try:
+            decoder.decode(self._oidSubstrate(limit + 1))
+
+        except PyAsn1Error as exc:
+            assert exc.context["limit"] == limit
+
+        else:
+            assert False, "Over-long OID arc accepted"
+
+    def testLongOidDecodesInLinearTime(self):
+        # Repeated tuple concatenation made this quadratic in the arc count.
+        def elapsed(arcs):
+            payload = b"\x2b" + b"\x01" * arcs
+            substrate = b"\x06\x83" + len(payload).to_bytes(3, "big") + payload
+            best = min(
+                timeit.repeat(lambda: decoder.decode(substrate), repeat=3, number=1)
+            )
+            return best
+
+        small = elapsed(1 << 14)
+        large = elapsed(1 << 15)
+
+        # Linear growth doubles the time; quadratic quadruples it.
+        assert large < small * 3, (
+            f"OID decoding scales worse than linearly: {small:.4f}s -> {large:.4f}s"
+        )
+
+    def testLongFormTagBeyondOctetLimitRejected(self):
+        limit = decoder.MAX_TAG_OCTETS
+
+        # 0x1f selects the high-tag-number form of X.690 8.1.2.4.
+        substrate = b"\x1f" + b"\xff" * (limit + 1) + b"\x01\x00"
+
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context.get("limit") == limit, f"Unexpected error {exc!r}"
+
+        else:
+            assert False, "Over-long tag number accepted"
+
+    def testLongFormTagAtOctetLimitIsNotRejectedForLength(self):
+        limit = decoder.MAX_TAG_OCTETS
+
+        substrate = b"\x1f" + b"\xff" * (limit - 1) + b"\x01\x00"
+
+        # The tag itself is within bounds; decoding fails later, if at all,
+        # for reasons unrelated to the octet cap.
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context.get("limit") != limit, f"Tag wrongly capped: {exc!r}"
+
+    def testLengthBeyondOctetLimitRejected(self):
+        limit = decoder.MAX_LENGTH_OCTETS
+
+        # INTEGER with a long-form length claiming `limit + 1` length octets.
+        substrate = b"\x02" + bytes((0x80 | (limit + 1),)) + b"\x01" * (limit + 1)
+
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context["limit"] == limit, f"Unexpected error {exc!r}"
+
+        else:
+            assert False, "Over-long length field accepted"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

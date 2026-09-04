@@ -24,6 +24,23 @@ noValue: Final = base.noValue
 # GHSA-jr27-m4p2-rc6r in mainline pyasn1, ported here).
 MAX_NESTING_DEPTH: Final = 100
 
+# X.690 8.19.2 does not bound the number of octets making up a single OBJECT
+# IDENTIFIER subidentifier, so a short substrate can encode an arc with an
+# arbitrary number of bits. 20 continuation octets carry 140 bits of arc,
+# which no registered OID comes close to using.
+# (CVE-2026-23490 / GHSA-x5q7-9jj9-jw8m in mainline pyasn1, ported here.)
+MAX_OID_ARC_CONTINUATION_OCTETS: Final = 20
+
+# X.690 8.1.2.4.2 likewise leaves the high-tag-number form unbounded. The same
+# 140-bit ceiling applies; real tag numbers are orders of magnitude smaller.
+# (CVE-2026-59884 / GHSA-9j8v-p6qm-c2xq in mainline pyasn1, ported here.)
+MAX_TAG_OCTETS: Final = 20
+
+# X.690 8.1.3.5 permits up to 126 subsequent length octets. 8 octets already
+# describe a 2**64-octet value, which no substrate can satisfy, so longer
+# length fields are rejected rather than accumulated into a huge integer.
+MAX_LENGTH_OCTETS: Final = 8
+
 
 class AbstractDecoder:
     protoComponent: Any = None
@@ -505,27 +522,37 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
         if not head:
             raise error.PyAsn1Error("Empty substrate")
 
-        oid: tuple[int, ...] = ()
+        # Accumulated in a list: repeated tuple concatenation is quadratic in
+        # the arc count, which turns a large OID into a CPU exhaustion vector.
+        oid: list[int] = []
         index = 0
         substrateLen = len(head)
         while index < substrateLen:
             subId = head[index]
             index += 1
             if subId < 128:
-                oid += (subId,)
+                oid.append(subId)
             elif subId > 128:
                 # Construct subid from a number of octets
                 nextSubId = subId
                 subId = 0
+                continuationOctets = 0
                 while nextSubId >= 128:
+                    continuationOctets += 1
+                    if continuationOctets > MAX_OID_ARC_CONTINUATION_OCTETS:
+                        raise error.PyAsn1Error(
+                            "OID arc exceeds maximum continuation octets",
+                            limit=MAX_OID_ARC_CONTINUATION_OCTETS,
+                            position=index,
+                        )
                     subId = (subId << 7) + (nextSubId & 0x7F)
                     if index >= substrateLen:
                         raise error.SubstrateUnderrunError(
-                            "Short substrate for sub-OID", oid=oid
+                            "Short substrate for sub-OID", oid=tuple(oid)
                         )
                     nextSubId = head[index]
                     index += 1
-                oid += ((subId << 7) + nextSubId,)
+                oid.append((subId << 7) + nextSubId)
             elif subId == 128:
                 # ASN.1 spec forbids leading zeros (0x80) in OID
                 # encoding, tolerating it opens a vulnerability. See
@@ -535,15 +562,17 @@ class ObjectIdentifierDecoder(AbstractSimpleDecoder):
 
         # Decode two leading arcs
         if 0 <= oid[0] <= 39:
-            oid = (0,) + oid
+            oid.insert(0, 0)
         elif 40 <= oid[0] <= 79:
-            oid = (1, oid[0] - 40) + oid[1:]
+            oid[0] -= 40
+            oid.insert(0, 1)
         elif oid[0] >= 80:
-            oid = (2, oid[0] - 80) + oid[1:]
+            oid[0] -= 80
+            oid.insert(0, 2)
         else:
             raise error.PyAsn1Error("Malformed first OID octet", octet=head[0])
 
-        return self._createComponent(asn1Spec, tagSet, oid, **options), tail
+        return self._createComponent(asn1Spec, tagSet, tuple(oid), **options), tail
 
 
 #: The four values X.690 8.5.9 encodes as a single contents octet with
@@ -1800,6 +1829,11 @@ class Decoder:
                                         "Non-minimal tag number encoding"
                                     )
                                 lengthOctetIdx += 1
+                                if lengthOctetIdx > MAX_TAG_OCTETS:
+                                    raise error.PyAsn1Error(
+                                        "Tag number exceeds maximum octets",
+                                        limit=MAX_TAG_OCTETS,
+                                    )
                                 tagId <<= 7
                                 tagId |= integerTag & 0x7F
                                 if not integerTag & 0x80:
@@ -1878,10 +1912,18 @@ class Decoder:
                         )
 
                     size = firstOctet & 0x7F
+                    if size > MAX_LENGTH_OCTETS:
+                        # X.690 8.1.3.5 allows up to 126 length octets, but a
+                        # value longer than 2**64 octets can never be supplied.
+                        # Reject rather than accumulate an unbounded integer.
+                        raise error.PyAsn1Error(
+                            "Length field exceeds maximum octets",
+                            limit=MAX_LENGTH_OCTETS,
+                            actualSize=size,
+                            tagSet=tagSet,
+                        )
                     # encoded in size bytes
                     encodedLength = substrate[1 : size + 1]
-                    # missing check on maximum size, which shouldn't be a
-                    # problem, we can handle more than is possible
                     if len(encodedLength) != size:
                         raise error.SubstrateUnderrunError(
                             "Short substrate for length octets",

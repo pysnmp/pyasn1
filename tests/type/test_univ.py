@@ -8,6 +8,7 @@ import copy
 import math
 import pickle
 import sys
+import timeit
 import unittest
 import warnings
 
@@ -2388,6 +2389,67 @@ class ChoicePicklingTestCase(unittest.TestCase):
         new_asn1 = pickle.loads(serialised)
         assert new_asn1
         assert new_asn1["name"] == _str2octs("test")
+
+
+class RealFloatConversionGuardTestCase(BaseTestCase):
+    """float() on a Real must not run away on hostile values (see #110)."""
+
+    def testBase10ExponentBeyondDoubleRangeOverflows(self):
+        real = univ.Real((1, 10, sys.float_info.max_10_exp + 1))
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Out-of-range base 10 exponent silently accepted"
+
+    def testBase10ExponentBeyondDoubleRangePrettyPrints(self):
+        real = univ.Real((1, 10, sys.float_info.max_10_exp + 1))
+
+        assert real.prettyPrint() == "<overflow>"
+
+    def testBase10MantissaBeyondDigitLimitOverflows(self):
+        # Wider than sys.get_int_max_str_digits(), so the decimal rendering
+        # used for the conversion raises ValueError.
+        real = univ.Real((10 ** (sys.get_int_max_str_digits() + 1), 10, 0))
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Unrenderable base 10 mantissa silently accepted"
+
+    def testBase2ExponentBeyondDoubleRangeOverflows(self):
+        real = univ.Real((1, 2, 1 << 30))
+
+        started = timeit.default_timer()
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Out-of-range base 2 exponent silently accepted"
+
+        # A pow(2, 2**30) fallback would take far longer than this.
+        elapsed = timeit.default_timer() - started
+        assert elapsed < 1.0, f"Base 2 overflow took {elapsed:.3f}s"
+
+    def testBase2RemainsExact(self):
+        assert float(univ.Real((3, 2, -2))) == 0.75
+        assert float(univ.Real((1, 2, -1074))) == 5e-324
+
+    def testBase10RemainsExact(self):
+        assert float(univ.Real((314159, 10, -5))) == 3.14159
+        assert float(univ.Real((1, 10, sys.float_info.max_10_exp))) == 1e308
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

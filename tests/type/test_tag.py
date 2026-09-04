@@ -189,6 +189,23 @@ class TagStdlibIntegrationTestCase(TagTestCaseBase):
         assert "Tag" in repr(self.t1)
 
 
+class HugeTagIdReprTestCase(BaseTestCase):
+    """repr() must survive a tag ID decoded from a hostile substrate (#110)."""
+
+    def testReprOfHugeTagId(self):
+        # Wider than sys.get_int_max_str_digits(), so str() on it raises.
+        tagId = 1 << 100000
+
+        rendering = repr(tag.Tag(tag.tagClassContext, tag.tagFormatSimple, tagId))
+
+        assert hex(tagId) in rendering, f"Unexpected rendering {rendering!r}"
+
+    def testReprOfOrdinaryTagIdStaysDecimal(self):
+        rendering = repr(tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 12))
+
+        assert ":12]" in rendering, f"Unexpected rendering {rendering!r}"
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

@@ -363,30 +363,32 @@ class ObjectIdentifierEncoder(AbstractItemEncoder):
         else:
             raise error.PyAsn1Error("Impossible first/second arcs", value=value)
 
-        octets: tuple[int, ...] = ()
+        # Accumulated in a list: repeated tuple concatenation is quadratic in
+        # the arc count, which turns a large OID into a CPU exhaustion vector.
+        octets: list[int] = []
 
         # Cycle through subIds
         for subOid in oid:
             if 0 <= subOid <= 127:
                 # Optimize for the common case
-                octets += (subOid,)
+                octets.append(subOid)
 
             elif subOid > 127:
                 # Pack large Sub-Object IDs
-                res: tuple[int, ...] = (subOid & 0x7F,)
+                res: list[int] = [subOid & 0x7F]
                 subOid >>= 7
 
                 while subOid:
-                    res = (0x80 | (subOid & 0x7F),) + res
+                    res.append(0x80 | (subOid & 0x7F))
                     subOid >>= 7
 
                 # Add packed Sub-Object ID to resulted Object ID
-                octets += res
+                octets.extend(reversed(res))
 
             else:
                 raise error.PyAsn1Error("Negative OID arc", arc=subOid, value=value)
 
-        return octets, False, False
+        return tuple(octets), False, False
 
 
 class RealEncoder(AbstractItemEncoder):

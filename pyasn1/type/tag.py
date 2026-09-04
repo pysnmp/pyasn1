@@ -62,6 +62,19 @@ _TAG_FORMAT_NAMES: Final = {
 }
 
 
+def _tagIdToStr(tagId: int) -> str:
+    """Render *tagId* for display, falling back to hex for huge values.
+
+    Decimal rendering of a tag ID decoded from a hostile substrate can exceed
+    ``sys.get_int_max_str_digits()`` (Python 3.11+) and raise :exc:`ValueError`
+    from inside ``repr()``. Hexadecimal conversion carries no such limit.
+    """
+    try:
+        return str(tagId)
+    except ValueError:
+        return hex(tagId)
+
+
 def _tagClassName(tagClass: int) -> str:
     """Return a human-readable name for ASN.1 tag class *tagClass*."""
     return _TAG_CLASS_NAMES.get(tagClass, f"0x{tagClass:02x}")
@@ -105,7 +118,7 @@ class Tag(_TagBase):
         return super().__new__(cls, tagClass, tagFormat, tagId)
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} object, tag [{_tagClassName(self.tagClass)}:{_tagFormatName(self.tagFormat)}:{self.tagId}]>"
+        return f"<{self.__class__.__name__} object, tag [{_tagClassName(self.tagClass)}:{_tagFormatName(self.tagFormat)}:{_tagIdToStr(self.tagId)}]>"
 
     # Equality and hashing intentionally consider only (tagClass, tagId),
     # matching the original implementation.  tagFormat is excluded so that
