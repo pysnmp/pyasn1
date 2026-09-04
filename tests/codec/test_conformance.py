@@ -27,7 +27,16 @@ from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
 from pyasn1.codec.native import encoder as native_encoder
-from pyasn1.type import char, constraint, namedtype, opentype, tag, univ, useful
+from pyasn1.type import (
+    char,
+    constraint,
+    namedtype,
+    namedval,
+    opentype,
+    tag,
+    univ,
+    useful,
+)
 from tests.base import BaseTestCase
 
 
@@ -1325,6 +1334,76 @@ class TaggedIntegerMinimalEncodingTestCase(BaseTestCase):
             assert (
                 der_decoder.decode(substrate, asn1Spec=self.TaggedInteger())[0] == value
             )
+
+
+class NamedBitStringTestCase(BaseTestCase):
+    """X.690 8.6.2: bit 0 of a BIT STRING goes in bit 8 of the first octet.
+
+    X.680 22.2 numbers the named bits from zero, and 8.6.2.1 lays them out
+    "commencing with bit 8" of the first contents octet, so named bit `n`
+    occupies position `n` counting from the left. Bit 0 alone is therefore
+    ``80``, bit 1 alone ``40``, bit 2 alone ``20``.
+
+    Reported (pyasn1/pyasn1#74) as distinct named bits collapsing onto the
+    same octets. They do so under `asOctets()`, which reads the bits as one
+    integer and pads on the left, but not in the encoding -- the codecs align
+    the value first. See the note on `BitString.asOctets`.
+    """
+
+    class PKIFailureInfo(univ.BitString):
+        namedValues = namedval.NamedValues(
+            ("badAlg", 0), ("badMessageCheck", 1), ("badRequest", 2), ("badTime", 3)
+        )
+
+    def testEachNamedBitEncodesToItsOwnPosition(self):
+        for name, expected in (
+            ("badAlg", "03020780"),
+            ("badMessageCheck", "03020640"),
+            ("badRequest", "03020520"),
+            ("badTime", "03020410"),
+        ):
+            for encode in (ber_encoder.encode, der_encoder.encode):
+                substrate = encode(self.PKIFailureInfo(name))
+
+                assert substrate == bytes.fromhex(expected), (
+                    f"{name}: {substrate.hex()} != {expected}"
+                )
+
+    def testDistinctNamedBitsEncodeDistinctly(self):
+        substrates = {
+            name: der_encoder.encode(self.PKIFailureInfo(name))
+            for name in ("badAlg", "badMessageCheck", "badRequest", "badTime")
+        }
+
+        assert len(set(substrates.values())) == len(substrates), substrates
+
+    def testNamedBitsRoundTrip(self):
+        for name in ("badAlg", "badMessageCheck", "badRequest", "badTime"):
+            value = self.PKIFailureInfo(name)
+            substrate = der_encoder.encode(value)
+
+            decoded, rest = der_decoder.decode(
+                substrate, asn1Spec=self.PKIFailureInfo()
+            )
+
+            assert rest == b""
+            assert decoded == value
+            assert tuple(decoded) == tuple(value)
+
+    def testUnusedBitCountMatchesTheNamedBitPosition(self):
+        # 8.6.2.2: the initial octet counts the unused trailing bits.
+        for position, name in enumerate(
+            ("badAlg", "badMessageCheck", "badRequest", "badTime")
+        ):
+            contents = der_encoder.encode(self.PKIFailureInfo(name))[2:]
+
+            assert contents[0] == 7 - position, name
+
+    def testAsOctetsIsTheIntegerViewNotTheWireLayout(self):
+        # Pins the documented behaviour that the report tripped over: these
+        # collapse under asOctets() while their encodings stay distinct.
+        for name in ("badAlg", "badMessageCheck", "badRequest", "badTime"):
+            assert self.PKIFailureInfo(name).asOctets() == b"\x01", name
 
 
 class BitStringTestCase(BaseTestCase):

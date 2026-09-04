@@ -603,14 +603,25 @@ class BitString(base.SimpleAsn1Type):
 
         If |ASN.1| object length is not a multiple of 8, result
         will be left-padded with zeros.
+
+        See :meth:`asOctets` on why this is not the X.690 contents octets.
         """
         return tuple(self.asOctets())
 
     def asOctets(self) -> bytes:
-        """Get |ASN.1| value as a sequence of octets.
+        r"""Get |ASN.1| value as a sequence of octets.
 
-        If |ASN.1| object length is not a multiple of 8, result
-        will be left-padded with zeros.
+        The bits are read as a single integer, so a value shorter than a
+        multiple of 8 is left-padded with zeros: ``BitString((1,))``,
+        ``BitString((0, 1))`` and ``BitString((0, 0, 1))`` all give
+        ``b''``.
+
+        This is deliberately *not* the X.690 8.6.2 contents octets, which
+        place bit 0 in bit 8 of the first octet and pad on the right --
+        ``80``, ``40`` and ``20`` for those three values. Use the codecs for
+        that; they align the value before serialising it. To go the other
+        way, :meth:`fromOctetString` and the `hexValue` initializer both read
+        the X.690 layout, so they are not inverses of this method.
         """
         return _int_to_bytes(self._value, length=len(self))
 
