@@ -1283,10 +1283,18 @@ class TaggedIntegerMinimalEncodingTestCase(BaseTestCase):
     def testContentsOctetsMatchTheUntaggedEncoding(self):
         # The untagged encoding is already pinned as minimal over this range by
         # IntegerMinimalEncodingTestCase, so equality here carries minimality
-        # onto the tagged path without re-deriving it.
-        values = list(range(-70000, 70000, 13))
+        # onto the tagged path without re-deriving it. That makes this a check
+        # that tagging leaves the contents octets alone, which needs the octet
+        # boundaries and a spread of values, not an exhaustive sweep.
+        values = list(range(-70000, 70000, 331))
         values += [0, 1, 127, 128, 255, 256, 65535, -1, -128, -129, -32768]
         values += [0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, 1 << 256, -(1 << 256)]
+
+        # Every octet boundary and the values either side of it, where the
+        # leading-zero and leading-sign rules of 8.3.2 actually bite.
+        for width in range(1, 9):
+            edge = 1 << (8 * width - 1)
+            values += [edge - 1, edge, edge + 1, -edge - 1, -edge, -edge + 1]
 
         for value in values:
             for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
