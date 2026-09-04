@@ -508,13 +508,24 @@ class NamedTypes:
             if isinstance(tagMap, NamedTypes.PostponedError):
                 return tagMap
             for tagSet in tagMap:
-                if unique and tagSet in presentTypes:
-                    return NamedTypes.PostponedError(
-                        "Non-unique tagSet",
-                        tagSet=tagSet,
-                        namedType=namedType,
-                        namedTypes=self,
-                    )
+                if tagSet in presentTypes:
+                    if unique:
+                        return NamedTypes.PostponedError(
+                            "Non-unique tagSet",
+                            tagSet=tagSet,
+                            namedType=namedType,
+                            namedTypes=self,
+                        )
+
+                    # X.680 25.6 requires the tags of a sequence to be
+                    # distinct, so reaching here means the schema is
+                    # ambiguous. X.690 8.9.1 still has the components encoded
+                    # "in the order of their definition", so the earliest
+                    # component that accepts the tag is the only defensible
+                    # candidate; overwriting with a later one picked
+                    # arbitrarily by declaration order.
+                    continue
+
                 presentTypes[tagSet] = namedType.asn1Object
             skipTypes.update(tagMap.skipTypes)
 
