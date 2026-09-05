@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pysnmp-pyasn1"
-version = "1.3.0-rc.2"
+version = "1.3.0-rc.3"
 description = "ASN.1 types and codecs"
 readme = "README.md"
 license = "BSD-2-Clause"
@@ -133,6 +133,9 @@ disallow_incomplete_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "no_debug_records: skip the autouse fixture that runs pyasn1 at DEBUG (see tests/conftest.py)",
+]
 filterwarnings = [
     # The suite deliberately exercises OctetString.__str__(), whose text
     # decoding is deprecated. The warning is asserted directly by

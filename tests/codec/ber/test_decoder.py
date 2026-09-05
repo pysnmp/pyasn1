@@ -9,6 +9,8 @@ import sys
 import timeit
 import unittest
 
+import pytest
+
 from pyasn1.codec.ber import decoder, encoder, eoo
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import char, constraint, namedtype, opentype, tag, univ
@@ -4102,6 +4104,8 @@ class ExplicitTagSubstrateFunDecoderTestCase(BaseTestCase):
         assert captured == bytes.fromhex("616263")
 
 
+# Decodes in bulk; see the no_debug_records marker in tests/conftest.py.
+@pytest.mark.no_debug_records
 class MalformedBitStringDecoderTestCase(BaseTestCase):
     """Malformed BIT STRING input stays inside PyAsn1Error (issue #121)."""
 
