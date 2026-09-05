@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sequence type &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Choice type" href="choice.html" />
+    <link rel="prev" title="Set type" href="set.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+  <li><a href="contents.html">Universal types</a><ul>
+      <li>Previous: <a href="set.html" title="previous chapter">Set type</a></li>
+      <li>Next: <a href="choice.html" title="next chapter">Choice type</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="univ-sequence"></span><section id="asn-1-type">
+<h1>Sequence type<a class="headerlink" href="#asn-1-type" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.type.univ.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">componentType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedTypes()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagSet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tagSet()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.Sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Create Sequence schema or value object.</p>
+<p>Sequence class is based on <a class="reference internal" href="../base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type" title="pyasn1.type.base.ConstructedAsn1Type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstructedAsn1Type</span></code></a>,
+its objects are mutable and duck-type Python <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>componentType</strong> (<a class="reference internal" href="../namedtype/namedtype.html#pyasn1.type.namedtype.NamedType" title="pyasn1.type.namedtype.NamedType"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedType</span></code></a>) – Object holding named ASN.1 types allowed within this collection</p></li>
+<li><p><strong>tagSet</strong> (<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>) – Object representing non-default ASN.1 tag(s)</p></li>
+<li><p><strong>subtypeSpec</strong> (<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a>) – Object representing non-default ASN.1 subtype constraint(s).  Constraints
+verification for Sequence type can only occur on explicit
+<cite>.isInconsistent</cite> call.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Description</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>  <span class="c1">#  Set is similar</span>
+<span class="w">    </span><span class="sd">'''</span>
+<span class="sd">    ASN.1 specification:</span>
+
+<span class="sd">    Description ::= SEQUENCE {</span>
+<span class="sd">        surname    IA5String,</span>
+<span class="sd">        first-name IA5String OPTIONAL,</span>
+<span class="sd">        age        INTEGER DEFAULT 40</span>
+<span class="sd">    }</span>
+<span class="sd">    '''</span>
+    <span class="n">componentType</span> <span class="o">=</span> <span class="n">NamedTypes</span><span class="p">(</span>
+        <span class="n">NamedType</span><span class="p">(</span><span class="s1">'surname'</span><span class="p">,</span> <span class="n">IA5String</span><span class="p">()),</span>
+        <span class="n">OptionalNamedType</span><span class="p">(</span><span class="s1">'first-name'</span><span class="p">,</span> <span class="n">IA5String</span><span class="p">()),</span>
+        <span class="n">DefaultedNamedType</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+    <span class="p">)</span>
+
+<span class="n">descr</span> <span class="o">=</span> <span class="n">Description</span><span class="p">()</span>
+<span class="n">descr</span><span class="p">[</span><span class="s1">'surname'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Smith'</span>
+<span class="n">descr</span><span class="p">[</span><span class="s1">'first-name'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'John'</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Sequence type models a collection of named ASN.1 components.
+Ordering of the components <strong>is</strong> preserved upon de/serialisation.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">componentType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedTypes()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagSet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tagSet()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.Sequence.clone" title="Link to this definition">¶</a></dt>
+<dd><p>Create a modified version of Sequence schema object.</p>
+<p>The <cite>clone()</cite> method accepts the same set arguments as Sequence
+class takes on instantiation except that all arguments
+of the <cite>clone()</cite> method are optional.</p>
+<p>Whatever arguments are supplied, they are used to create a copy
+of <cite>self</cite> taking precedence over the ones used to instantiate <cite>self</cite>.</p>
+<p>Possible values of <cite>self</cite> are never copied over thus <cite>clone()</cite> can
+only create a new schema object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new instance of Sequence type/value</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to the mutable nature of the Sequence object, even if no arguments
+are supplied, a new Sequence object will be created and returned.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.subtype">
+<span class="sig-name descname"><span class="pre">subtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">componentType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedTypes()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implicitTag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Tag()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicitTag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Tag()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.Sequence.subtype" title="Link to this definition">¶</a></dt>
+<dd><p>Create a specialization of Sequence schema object.</p>
+<p>The <cite>subtype()</cite> method accepts the same set arguments as Sequence
+class takes on instantiation except that all parameters
+of the <cite>subtype()</cite> method are optional.</p>
+<p>With the exception of the arguments described below, the rest of
+supplied arguments they are used to create a copy of <cite>self</cite> taking
+precedence over the ones used to instantiate <cite>self</cite>.</p>
+<p>The following arguments to <cite>subtype()</cite> create a ASN.1 subtype out of
+Sequence type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Other Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>implicitTag</strong> (<a class="reference internal" href="../tag/tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Implicitly apply given ASN.1 tag object to <cite>self</cite>’s
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>, then use the result as
+new object’s ASN.1 tag(s).</p></li>
+<li><p><strong>explicitTag</strong> (<a class="reference internal" href="../tag/tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Explicitly apply given ASN.1 tag object to <cite>self</cite>’s
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>, then use the result as
+new object’s ASN.1 tag(s).</p></li>
+<li><p><strong>subtypeSpec</strong> (<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a>) – Add ASN.1 constraints object to one of the <cite>self</cite>’s, then
+use the result as new object’s ASN.1 constraints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new instance of Sequence type/value</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to the mutable nature of the Sequence object, even if no arguments
+are supplied, a new Sequence object will be created and returned.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.tagSet">
+<span class="sig-name descname"><span class="pre">tagSet</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TagSet</span> <span class="pre">object,</span> <span class="pre">tags</span> <span class="pre">UNIVERSAL:16&gt;</span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.tagSet" title="Link to this definition">¶</a></dt>
+<dd><p>Set (on class, not on instance) or return a
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a> object representing ASN.1 tag(s)
+associated with Sequence type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.subtypeSpec">
+<span class="sig-name descname"><span class="pre">subtypeSpec</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ConstraintsIntersection</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.subtypeSpec" title="Link to this definition">¶</a></dt>
+<dd><p>Set (on class, not on instance) or return a
+<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a> object
+imposing constraints on Sequence type initialization values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.componentType">
+<span class="sig-name descname"><span class="pre">componentType</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;NamedTypes</span> <span class="pre">object,</span> <span class="pre">types</span> <span class="pre">&gt;</span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.componentType" title="Link to this definition">¶</a></dt>
+<dd><p>Default collection of ASN.1 types of component (e.g. <a class="reference internal" href="../namedtype/namedtype.html#pyasn1.type.namedtype.NamedType" title="pyasn1.type.namedtype.NamedType"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedType</span></code></a>)
+object imposing size constraint on Sequence objects</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.clear" title="Link to this definition">¶</a></dt>
+<dd><p>Remove all components and become an empty Sequence value object.</p>
+<p>Has the same effect on Sequence object as it does on <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>
+built-in.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.effectiveTagSet">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">effectiveTagSet</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><span class="pre">TagSet</span></a></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.effectiveTagSet" title="Link to this definition">¶</a></dt>
+<dd><p>For Sequence type is equivalent to <em>tagSet</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.getComponentByName">
+<span class="sig-name descname"><span class="pre">getComponentByName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;NoValue</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instantiate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.getComponentByName" title="Link to this definition">¶</a></dt>
+<dd><p>Return Sequence type component by name.</p>
+<p>Equivalent to Python <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> subscription operation (e.g. <cite>[]</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Sequence type component name</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#object" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – If set and requested component is a schema object, return the <cite>default</cite>
+object instead of the requested component.</p></li>
+<li><p><strong>instantiate</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), inner component will be automatically
+instantiated.
+If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> either existing component or the <code class="xref py py-class docutils literal notranslate"><span class="pre">NoValue</span></code>
+object will be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> – Instantiate Sequence component type or return existing
+component value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.getComponentByPosition">
+<span class="sig-name descname"><span class="pre">getComponentByPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;NoValue</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instantiate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.getComponentByPosition" title="Link to this definition">¶</a></dt>
+<dd><p>Return Sequence type component by index.</p>
+<p>Equivalent to Python sequence subscription operation (e.g. <cite>[]</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Component index (zero-based). Must either refer to an existing
+component or (if <em>componentType</em> is set) new ASN.1 schema object gets
+instantiated.</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#object" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – If set and requested component is a schema object, return the <cite>default</cite>
+object instead of the requested component.</p></li>
+<li><p><strong>instantiate</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), inner component will be automatically
+instantiated.
+If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> either existing component or the <code class="xref py py-class docutils literal notranslate"><span class="pre">NoValue</span></code>
+object will be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> – a PyASN1 object</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># can also be Set</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MySequence</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+    <span class="n">componentType</span> <span class="o">=</span> <span class="n">NamedTypes</span><span class="p">(</span>
+        <span class="n">NamedType</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="n">OctetString</span><span class="p">())</span>
+    <span class="p">)</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">MySequence</span><span class="p">()</span>
+
+<span class="c1"># returns component #0 with `.isValue` property False</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># returns None</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">s</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="c1"># returns noValue</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># sets component #0 to OctetString() ASN.1 schema</span>
+<span class="c1"># object and returns it</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># sets component #0 to ASN.1 value object</span>
+<span class="n">s</span><span class="o">.</span><span class="n">setComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'ABCD'</span><span class="p">)</span>
+
+<span class="c1"># returns OctetString('ABCD') value object</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">s</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="c1"># returns noValue</span>
+<span class="n">s</span><span class="o">.</span><span class="n">getComponentByPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.isInconsistent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">isInconsistent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.isInconsistent" title="Link to this definition">¶</a></dt>
+<dd><p>Run necessary checks to ensure Sequence object consistency.</p>
+<p>Default action is to verify Sequence object against constraints imposed
+by <cite>subtypeSpec</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> if the object is consistent, otherwise the
+<a class="reference internal" href="../../error/contents.html#pyasn1.error.PyAsn1Error" title="pyasn1.error.PyAsn1Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Error</span></code></a> describing the inconsistency,
+which callers raise. Never a bare <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>: the encoders and
+decoders raise whatever this returns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.isSameTypeWith">
+<span class="sig-name descname"><span class="pre">isSameTypeWith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.isSameTypeWith" title="Link to this definition">¶</a></dt>
+<dd><p>Examine Sequence type for equality with other ASN.1 type.</p>
+<p>ASN.1 tags (<a class="reference internal" href="../tag/tag.html#module-pyasn1.type.tag" title="pyasn1.type.tag"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tag</span></code></a>) and constraints
+(<code class="xref py py-mod docutils literal notranslate"><span class="pre">constraint</span></code>) are examined when carrying
+out ASN.1 types comparison.</p>
+<p>Python class inheritance relationship is NOT considered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>a pyasn1 type object</em>) – Class instance representing ASN.1 type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if <em>other</em> is Sequence type,
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.isSuperTypeOf">
+<span class="sig-name descname"><span class="pre">isSuperTypeOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.isSuperTypeOf" title="Link to this definition">¶</a></dt>
+<dd><p>Examine Sequence type for subtype relationship with other ASN.1 type.</p>
+<p>ASN.1 tags (<a class="reference internal" href="../tag/tag.html#module-pyasn1.type.tag" title="pyasn1.type.tag"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tag</span></code></a>) and constraints
+(<code class="xref py py-mod docutils literal notranslate"><span class="pre">constraint</span></code>) are examined when carrying
+out ASN.1 types comparison.</p>
+<p>Python class inheritance relationship is NOT considered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>a pyasn1 type object</em>) – Class instance representing ASN.1 type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if <em>other</em> is a subtype of Sequence type,
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.isValue">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">isValue</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.isValue" title="Link to this definition">¶</a></dt>
+<dd><p>Indicate that Sequence object represents ASN.1 value.</p>
+<p>If <em>isValue</em> is <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> then this object represents just ASN.1 schema.</p>
+<p>If <em>isValue</em> is <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then, in addition to its ASN.1 schema features,
+this object can also be used like a Python built-in object (e.g.
+<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> if object represents just ASN.1 schema.
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if object represents ASN.1 schema and can be used as a
+normal value.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is an important distinction between PyASN1 schema and value objects.
+The PyASN1 schema objects can only participate in ASN.1 schema-related
+operations (e.g. defining or testing the structure of the data). Most
+obvious uses of ASN.1 schema is to guide serialisation codecs whilst
+encoding/decoding serialised ASN.1 contents.</p>
+<p>The PyASN1 value objects can <strong>additionally</strong> participate in many operations
+involving regular Python objects (e.g. arithmetic, comprehension etc).</p>
+<p>It is sufficient for Sequence objects to have all non-optional and non-defaulted
+components being value objects to be considered as a value objects as a whole.
+In other words, even having one or more optional components not turned into
+value objects, Sequence object is still considered as a value object. Defaulted
+components are normally value objects by default.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Remove all components and become a Sequence schema object.</p>
+<p>See <a class="reference internal" href="#pyasn1.type.univ.Sequence.isValue" title="pyasn1.type.univ.Sequence.isValue"><code class="xref py py-meth docutils literal notranslate"><span class="pre">isValue()</span></code></a> property for more information on the
+distinction between value and schema objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.setComponentByName">
+<span class="sig-name descname"><span class="pre">setComponentByName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;NoValue</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verifyConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.setComponentByName" title="Link to this definition">¶</a></dt>
+<dd><p>Assign Sequence type component by name.</p>
+<p>Equivalent to Python <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> item assignment operation (e.g. <cite>[]</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Sequence type component name</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#object" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative) – A Python value to initialize Sequence component with (if <em>componentType</em> is set)
+or ASN.1 value object to assign to Sequence component.
+If <cite>value</cite> is not given, schema object will be set as a component.</p></li>
+<li><p><strong>verifyConstraints</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip constraints validation</p></li>
+<li><p><strong>matchTags</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip component tags matching</p></li>
+<li><p><strong>matchConstraints</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip component constraints matching</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>self</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.setComponentByPosition">
+<span class="sig-name descname"><span class="pre">setComponentByPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;NoValue</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verifyConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.setComponentByPosition" title="Link to this definition">¶</a></dt>
+<dd><p>Assign Sequence type component by position.</p>
+<p>Equivalent to Python sequence item assignment operation (e.g. <cite>[]</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Component index (zero-based). Must either refer to existing
+component (if <em>componentType</em> is set) or to N+1 component
+otherwise. In the latter case a new component of given ASN.1
+type gets instantiated and appended to Sequence sequence.</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#object" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative) – A Python value to initialize Sequence component with (if <em>componentType</em> is set)
+or ASN.1 value object to assign to Sequence component.
+If <cite>value</cite> is not given, schema object will be set as a component.</p></li>
+<li><p><strong>verifyConstraints</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip constraints validation</p></li>
+<li><p><strong>matchTags</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip component tags matching</p></li>
+<li><p><strong>matchConstraints</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, skip component constraints matching</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>self</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.Sequence.tagMap">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tagMap</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../tag/tagmap.html#pyasn1.type.tagmap.TagMap" title="pyasn1.type.tagmap.TagMap"><span class="pre">TagMap</span></a></span><a class="headerlink" href="#pyasn1.type.univ.Sequence.tagMap" title="Link to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="../tag/tagmap.html#pyasn1.type.tagmap.TagMap" title="pyasn1.type.tagmap.TagMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagMap</span></code></a> object mapping ASN.1 tags to ASN.1 objects within callee object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

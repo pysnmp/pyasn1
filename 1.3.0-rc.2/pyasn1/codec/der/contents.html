@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Distinguished Encoding Rules &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Native Python types" href="../native/contents.html" />
+    <link rel="prev" title="Canonical Encoding Rules" href="../cer/contents.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+      <li>Previous: <a href="../cer/contents.html" title="previous chapter">Canonical Encoding Rules</a></li>
+      <li>Next: <a href="../native/contents.html" title="next chapter">Native Python types</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="distinguished-encoding-rules">
+<h1>Distinguished Encoding Rules<a class="headerlink" href="#distinguished-encoding-rules" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyasn1.codec.der.encoder.encode">
+<span class="sig-prename descclassname"><span class="pre">pyasn1.codec.der.encoder.</span></span><span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asn1Spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.codec.der.encoder.encode" title="Link to this definition">¶</a></dt>
+<dd><p>Turns ASN.1 object into DER octet stream.</p>
+<p>Takes any ASN.1 object (e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative)
+walks all its components recursively and produces a DER octet stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (either a Python or pyasn1 object (e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative)) – A Python or pyasn1 object to encode. If Python object is given, <cite>asnSpec</cite>
+parameter is required to guide the encoding process.</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>asn1Spec</strong> – Optional ASN.1 schema or value object e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bytes" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> (Python 3) or <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (Python 2) – Given ASN.1 object encoded into BER octet-stream</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../error/contents.html#pyasn1.error.PyAsn1Error" title="pyasn1.error.PyAsn1Error"><strong>PyAsn1Error</strong></a> – On encoding errors</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Encode Python value into DER with ASN.1 schema</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">SequenceOf</span><span class="p">(</span><span class="n">componentType</span><span class="o">=</span><span class="n">Integer</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">encode</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">asn1Spec</span><span class="o">=</span><span class="n">seq</span><span class="p">)</span>
+<span class="go">b'0\t\x02\x01\x01\x02\x01\x02\x02\x01\x03'</span>
+</pre></div>
+</div>
+<p>Encode ASN.1 value object into DER</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">SequenceOf</span><span class="p">(</span><span class="n">componentType</span><span class="o">=</span><span class="n">Integer</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">encode</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+<span class="go">b'0\t\x02\x01\x01\x02\x01\x02\x02\x01\x03'</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyasn1.codec.der.decoder.decode">
+<span class="sig-prename descclassname"><span class="pre">pyasn1.codec.der.decoder.</span></span><span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">substrate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asn1Spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.codec.der.decoder.decode" title="Link to this definition">¶</a></dt>
+<dd><p>Turns DER octet stream into an ASN.1 object.</p>
+<p>Takes DER octet-stream and decode it into an ASN.1 object
+(e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative) which
+may be a scalar or an arbitrary nested structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>substrate</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bytes" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> (Python 3) or <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (Python 2)) – DER octet-stream</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>asn1Spec</strong> (any pyasn1 type object e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative) – A pyasn1 type object to act as a template guiding the decoder. Depending on the ASN.1 structure
+being decoded, <em>asn1Spec</em> may or may not be required. Most common reason for
+it to require is that ASN.1 structure is encoded in <em>IMPLICIT</em> tagging mode.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> – A tuple of pyasn1 object recovered from DER substrate (<code class="xref py py-class docutils literal notranslate"><span class="pre">PyAsn1Item</span></code> derivative)
+and the unprocessed trailing portion of the <em>substrate</em> (may be empty)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../error/contents.html#pyasn1.error.PyAsn1Error" title="pyasn1.error.PyAsn1Error"><strong>PyAsn1Error</strong></a><strong>, </strong><a class="reference internal" href="../../error/contents.html#pyasn1.error.SubstrateUnderrunError" title="pyasn1.error.SubstrateUnderrunError"><strong>SubstrateUnderrunError</strong></a> – On decoding errors</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Decode DER serialisation without ASN.1 schema</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">decode</span><span class="p">(</span><span class="sa">b</span><span class="s1">'0</span><span class="se">\t\x02\x01\x01\x02\x01\x02\x02\x01\x03</span><span class="s1">'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">SequenceOf:</span>
+<span class="go"> 1 2 3</span>
+</pre></div>
+</div>
+<p>Decode DER serialisation with ASN.1 schema</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">SequenceOf</span><span class="p">(</span><span class="n">componentType</span><span class="o">=</span><span class="n">Integer</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">decode</span><span class="p">(</span><span class="sa">b</span><span class="s1">'0</span><span class="se">\t\x02\x01\x01\x02\x01\x02\x02\x01\x03</span><span class="s1">'</span><span class="p">,</span> <span class="n">asn1Spec</span><span class="o">=</span><span class="n">seq</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">SequenceOf:</span>
+<span class="go"> 1 2 3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

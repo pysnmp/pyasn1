@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tag set &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Tag-&gt;type map" href="tagmap.html" />
+    <link rel="prev" title="Solitary tag" href="tag.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+  <li><a href="contents.html">Tags</a><ul>
+      <li>Previous: <a href="tag.html" title="previous chapter">Solitary tag</a></li>
+      <li>Next: <a href="tagmap.html" title="next chapter">Tag-&gt;type map</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tag-set">
+<span id="tag-tagset"></span><h1>Tag set<a class="headerlink" href="#tag-set" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.type.tag.</span></span><span class="sig-name descname"><span class="pre">TagSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseTag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><span class="pre">Tag</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">superTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><span class="pre">Tag</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.tag.TagSet" title="Link to this definition">¶</a></dt>
+<dd><p>Create a collection of ASN.1 tags.</p>
+<p>Represents a combination of <a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a> objects
+that can be attached to a ASN.1 type to make types distinguishable
+from each other.</p>
+<p><em>TagSet</em> objects are immutable and duck-type Python <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> objects
+holding arbitrary number of <a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>baseTag</strong> (<a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Base <em>Tag</em> object. This tag survives IMPLICIT tagging.</p></li>
+<li><p><strong>*superTags</strong> (<a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Additional <em>Tag</em> objects taking part in subtyping.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">OrderNumber</span><span class="p">(</span><span class="n">NumericString</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''</span>
+<span class="sd">    ASN.1 specification</span>
+
+<span class="sd">    Order-number ::=</span>
+<span class="sd">        [APPLICATION 5] IMPLICIT NumericString</span>
+<span class="sd">    '''</span>
+    <span class="n">tagSet</span> <span class="o">=</span> <span class="n">NumericString</span><span class="o">.</span><span class="n">tagSet</span><span class="o">.</span><span class="n">tagImplicitly</span><span class="p">(</span>
+        <span class="n">Tag</span><span class="p">(</span><span class="n">tagClassApplication</span><span class="p">,</span> <span class="n">tagFormatSimple</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">orderNumber</span> <span class="o">=</span> <span class="n">OrderNumber</span><span class="p">(</span><span class="s1">'1234'</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <em>TagSet</em> objects are normally used by all ASN.1 type
+objects both simple (like <a class="reference internal" href="../univ/integer.html#univ-integer"><span class="std std-ref">Integer</span></a>)
+and constructed (e.g. <a class="reference internal" href="../univ/sequence.html#univ-sequence"><span class="std std-ref">Sequence</span></a>).</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet.baseTag">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">baseTag</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></span><a class="headerlink" href="#pyasn1.type.tag.TagSet.baseTag" title="Link to this definition">¶</a></dt>
+<dd><p>Return base ASN.1 tag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a> – Base tag of this <em>TagSet</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet.superTags">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">superTags</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><span class="pre">Tag</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pyasn1.type.tag.TagSet.superTags" title="Link to this definition">¶</a></dt>
+<dd><p>Return ASN.1 tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> – Tuple of <a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a> objects that this <em>TagSet</em> contains</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet.tagExplicitly">
+<span class="sig-name descname"><span class="pre">tagExplicitly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">superTag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><span class="pre">Tag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><span class="pre">TagSet</span></a></span></span><a class="headerlink" href="#pyasn1.type.tag.TagSet.tagExplicitly" title="Link to this definition">¶</a></dt>
+<dd><p>Return explicitly tagged <em>TagSet</em>.</p>
+<p>Create a new <em>TagSet</em> representing callee <em>TagSet</em> explicitly tagged
+with passed tag(s). With explicit tagging mode, new tags are appended
+to existing tag(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>superTag</strong> (<a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – <em>Tag</em> object to tag this <em>TagSet</em></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a> – New <em>TagSet</em> object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet.tagImplicitly">
+<span class="sig-name descname"><span class="pre">tagImplicitly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">superTag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><span class="pre">Tag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><span class="pre">TagSet</span></a></span></span><a class="headerlink" href="#pyasn1.type.tag.TagSet.tagImplicitly" title="Link to this definition">¶</a></dt>
+<dd><p>Return implicitly tagged <em>TagSet</em>.</p>
+<p>Create a new <em>TagSet</em> representing callee <em>TagSet</em> implicitly tagged
+with passed tag(s). With implicit tagging mode, new tag(s) replace the
+last existing tag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>superTag</strong> (<a class="reference internal" href="tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – <em>Tag</em> object to tag this <em>TagSet</em></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a> – New <em>TagSet</em> object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.tag.TagSet.isSuperTagSetOf">
+<span class="sig-name descname"><span class="pre">isSuperTagSetOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tagSet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><span class="pre">TagSet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pyasn1.type.tag.TagSet.isSuperTagSetOf" title="Link to this definition">¶</a></dt>
+<dd><p>Test type relationship against given <em>TagSet</em>.</p>
+<p>The callee is considered to be a supertype of given <em>TagSet</em>
+tag-wise if all tags in <em>TagSet</em> are present in the callee and
+they are in the same order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tagSet</strong> (<a class="reference internal" href="#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>) – <em>TagSet</em> object to evaluate against the callee</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if callee is a supertype of <em>tagSet</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

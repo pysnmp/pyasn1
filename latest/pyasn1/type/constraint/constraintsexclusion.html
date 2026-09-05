@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Constraints exclusion &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Fields of constructed types" href="../namedtype/contents.html" />
+    <link rel="prev" title="Constraints union" href="constraintsunion.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+  <li><a href="contents.html">Constraints</a><ul>
+      <li>Previous: <a href="constraintsunion.html" title="previous chapter">Constraints union</a></li>
+      <li>Next: <a href="../namedtype/contents.html" title="next chapter">Fields of constructed types</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="constrain-constraintsexclusion"></span><section id="constraints-exclusion">
+<h1>Constraints exclusion<a class="headerlink" href="#constraints-exclusion" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.type.constraint.ConstraintsExclusion">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.type.constraint.</span></span><span class="sig-name descname"><span class="pre">ConstraintsExclusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.constraint.ConstraintsExclusion" title="Link to this definition">¶</a></dt>
+<dd><p>Create a ConstraintsExclusion logic operator object.</p>
+<p>The ConstraintsExclusion logic operator succeeds when the
+value does <em>not</em> satisfy the operand constraint.</p>
+<p>The ConstraintsExclusion object can be applied to
+any constraint and logic operator object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*constraints</strong> – Constraint or logic operator objects.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LuckyNumber</span><span class="p">(</span><span class="n">Integer</span><span class="p">):</span>
+    <span class="n">subtypeSpec</span> <span class="o">=</span> <span class="n">ConstraintsExclusion</span><span class="p">(</span>
+        <span class="n">SingleValueConstraint</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="c1"># this will succeed</span>
+<span class="n">luckyNumber</span> <span class="o">=</span> <span class="n">LuckyNumber</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># this will raise ValueConstraintError</span>
+<span class="n">luckyNumber</span> <span class="o">=</span> <span class="n">LuckyNumber</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <cite>FROM … EXCEPT …</cite> ASN.1 clause should be modeled by combining
+constraint objects into one. See <cite>PermittedAlphabetConstraint</cite> for more
+information.</p>
+</div>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

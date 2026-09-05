@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tags &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Solitary tag" href="tag.html" />
+    <link rel="prev" title="UTCTime type" href="../useful/utctime.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+      <li>Previous: <a href="../useful/utctime.html" title="previous chapter">UTCTime type</a></li>
+      <li>Next: <a href="tag.html" title="next chapter">Solitary tag</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tags">
+<span id="type-tag"></span><h1>Tags<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h1>
+<p>ASN.1 types formally differ from each other by carrying distinct
+tags. A tag is essentially an integer exhibiting certain inner
+structure.</p>
+<p>Individual tags are usually combined into a collection known as
+<em>TagSet</em>. Tags and tag sets in pyasn1 are immutable objects assigned
+to ASN.1 types as the <em>tagSet</em> attribute.</p>
+<p>Tags can be appended to one another (in EXPLICIT tagging mode)
+or overridden (IMPLICIT tagging mode) ultimately creating a new
+ASN.1 subtype.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Counter64</span><span class="p">(</span><span class="n">Integer</span><span class="p">):</span>
+<span class="w">   </span><span class="sd">"""</span>
+<span class="sd">   ASN.1 specification:</span>
+
+<span class="sd">   Counter64 ::=</span>
+<span class="sd">       [APPLICATION 6]</span>
+<span class="sd">           IMPLICIT INTEGER</span>
+<span class="sd">   """</span>
+   <span class="n">tagSet</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="n">tagSet</span><span class="o">.</span><span class="n">tagImplicitly</span><span class="p">(</span>
+       <span class="n">Tag</span><span class="p">(</span><span class="n">tagClassApplication</span><span class="p">,</span> <span class="n">tagFormatSimple</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+   <span class="p">)</span>
+
+<span class="c1"># alternatively</span>
+<span class="n">counter64</span> <span class="o">=</span> <span class="n">Integer</span><span class="p">()</span><span class="o">.</span><span class="n">subtype</span><span class="p">(</span>
+    <span class="n">implicitTag</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="n">tagClassApplication</span><span class="p">,</span> <span class="n">tagFormatSimple</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>ASN.1 types can be related to each other via the <em>.isSameTypeWith()</em>,
+<em>.isSuperTypeOf()</em> and <em>.isSubTypeOf()</em> methods. Internally, the <em>.tagSet</em>
+of the types are compared along with the value constraints
+(e.g. <em>.subtypeSpec</em>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">Counter64</span><span class="p">()</span><span class="o">.</span><span class="n">isSubTypeOf</span><span class="p">(</span><span class="n">Integer</span><span class="p">())</span> <span class="o">==</span> <span class="kc">True</span>
+<span class="k">assert</span> <span class="n">Counter64</span><span class="p">()</span><span class="o">.</span><span class="n">isSameTypeWith</span><span class="p">(</span><span class="n">Integer</span><span class="p">())</span> <span class="o">==</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tag.html">Solitary tag</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagClassApplication"><code class="docutils literal notranslate"><span class="pre">tagClassApplication</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagClassContext"><code class="docutils literal notranslate"><span class="pre">tagClassContext</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagClassPrivate"><code class="docutils literal notranslate"><span class="pre">tagClassPrivate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagClassUniversal"><code class="docutils literal notranslate"><span class="pre">tagClassUniversal</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagFormatConstructed"><code class="docutils literal notranslate"><span class="pre">tagFormatConstructed</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.tagFormatSimple"><code class="docutils literal notranslate"><span class="pre">tagFormatSimple</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tag.html#pyasn1.type.tag.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tagset.html">Tag set</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tagset.html#pyasn1.type.tag.TagSet"><code class="docutils literal notranslate"><span class="pre">TagSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tagmap.html">Tag-&gt;type map</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tagmap.html#pyasn1.type.tagmap.TagMap"><code class="docutils literal notranslate"><span class="pre">TagMap</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

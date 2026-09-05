@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BitString type &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../../_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="OctetString type" href="octetstring.html" />
+    <link rel="prev" title="Boolean type" href="boolean.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../contents.html">
+    <img class="logo" src="../../../_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../contents.html">Library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../contents.html#asn-1-types">ASN.1 types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#serialisation-codecs">Serialisation codecs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contents.html#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download &amp; Install</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../contents.html">Documentation overview</a><ul>
+  <li><a href="../../contents.html">Library documentation</a><ul>
+  <li><a href="contents.html">Universal types</a><ul>
+      <li>Previous: <a href="boolean.html" title="previous chapter">Boolean type</a></li>
+      <li>Next: <a href="octetstring.html" title="next chapter">OctetString type</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="univ-bitstring"></span><section id="asn-1-type">
+<h1>BitString type<a class="headerlink" href="#asn-1-type" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.type.univ.</span></span><span class="sig-name descname"><span class="pre">BitString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagSet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TagSet()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namedValues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedValues()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.BitString" title="Link to this definition">¶</a></dt>
+<dd><p>Create BitString schema or value object.</p>
+<p>BitString class is based on <a class="reference internal" href="../base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type" title="pyasn1.type.base.SimpleAsn1Type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleAsn1Type</span></code></a>, its
+objects are immutable and duck-type both Python <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> (as a tuple
+of bits) and <a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or BitString object) – Python <a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> literal representing binary
+or hexadecimal number or sequence of integer bits or BitString object.
+If <cite>value</cite> is not given, schema object will be created.</p></li>
+<li><p><strong>tagSet</strong> (<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>) – Object representing non-default ASN.1 tag(s)</p></li>
+<li><p><strong>subtypeSpec</strong> (<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a>) – Object representing non-default ASN.1 subtype constraint(s). Constraints
+verification for BitString type occurs automatically on object
+instantiation.</p></li>
+<li><p><strong>namedValues</strong> (<a class="reference internal" href="../namedval/namedval.html#pyasn1.type.namedval.NamedValues" title="pyasn1.type.namedval.NamedValues"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedValues</span></code></a>) – Object representing non-default symbolic aliases for numbers</p></li>
+<li><p><strong>binValue</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Binary string initializer to use instead of the <em>value</em>.
+Example: ‘10110011’.</p></li>
+<li><p><strong>hexValue</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Hexadecimal string initializer to use instead of the <em>value</em>.
+Example: ‘DEADBEEF’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../error/contents.html#pyasn1.error.ValueConstraintError" title="pyasn1.error.ValueConstraintError"><strong>ValueConstraintError</strong></a><strong>, </strong><a class="reference internal" href="../../error/contents.html#pyasn1.error.PyAsn1Error" title="pyasn1.error.PyAsn1Error"><strong>PyAsn1Error</strong></a> – On constraint violation or bad initializer.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Rights</span><span class="p">(</span><span class="n">BitString</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''</span>
+<span class="sd">    ASN.1 specification:</span>
+
+<span class="sd">    Rights ::= BIT STRING { user-read(0), user-write(1),</span>
+<span class="sd">                            group-read(2), group-write(3),</span>
+<span class="sd">                            other-read(4), other-write(5) }</span>
+
+<span class="sd">    group1 Rights ::= { group-read, group-write }</span>
+<span class="sd">    group2 Rights ::= '0011'B</span>
+<span class="sd">    group3 Rights ::= '3'H</span>
+<span class="sd">    '''</span>
+    <span class="n">namedValues</span> <span class="o">=</span> <span class="n">NamedValues</span><span class="p">(</span>
+        <span class="p">(</span><span class="s1">'user-read'</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">'user-write'</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'group-read'</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">'group-write'</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'other-read'</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s1">'other-write'</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">group1</span> <span class="o">=</span> <span class="n">Rights</span><span class="p">((</span><span class="s1">'group-read'</span><span class="p">,</span> <span class="s1">'group-write'</span><span class="p">))</span>
+<span class="n">group2</span> <span class="o">=</span> <span class="n">Rights</span><span class="p">(</span><span class="s1">'0011'</span><span class="p">)</span>
+<span class="n">group3</span> <span class="o">=</span> <span class="n">Rights</span><span class="p">(</span><span class="mh">0x3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The BitString type models an arbitrary sequence of bits.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagSet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TagSet()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namedValues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedValues()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.BitString.clone" title="Link to this definition">¶</a></dt>
+<dd><p>Create a modified version of BitString schema or value object.</p>
+<p>The <cite>clone()</cite> method accepts the same set arguments as BitString
+class takes on instantiation except that all arguments
+of the <cite>clone()</cite> method are optional.</p>
+<p>Whatever arguments are supplied, they are used to create a copy
+of <cite>self</cite> taking precedence over the ones used to instantiate <cite>self</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to the immutable nature of the BitString object, if no arguments
+are supplied, no new BitString object will be created and <cite>self</cite> will
+be returned instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.subtype">
+<span class="sig-name descname"><span class="pre">subtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implicitTag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Tag()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicitTag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Tag()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtypeSpec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstraintsIntersection()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namedValues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NamedValues()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NoValue()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.type.univ.BitString.subtype" title="Link to this definition">¶</a></dt>
+<dd><p>Create a specialization of BitString schema or value object.</p>
+<p>The subtype relationship between ASN.1 types has no correlation with
+subtype relationship between Python types. ASN.1 type is mainly identified
+by its tag(s) (<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>) and value range
+constraints (<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a>).
+These ASN.1 type properties are implemented as BitString attributes.</p>
+<p>The <cite>subtype()</cite> method accepts the same set arguments as BitString
+class takes on instantiation except that all parameters
+of the <cite>subtype()</cite> method are optional.</p>
+<p>With the exception of the arguments described below, the rest of
+supplied arguments they are used to create a copy of <cite>self</cite> taking
+precedence over the ones used to instantiate <cite>self</cite>.</p>
+<p>The following arguments to <cite>subtype()</cite> create a ASN.1 subtype out of
+BitString type:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Other Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>implicitTag</strong> (<a class="reference internal" href="../tag/tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Implicitly apply given ASN.1 tag object to <cite>self</cite>’s
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>, then use the result as
+new object’s ASN.1 tag(s).</p></li>
+<li><p><strong>explicitTag</strong> (<a class="reference internal" href="../tag/tag.html#pyasn1.type.tag.Tag" title="pyasn1.type.tag.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a>) – Explicitly apply given ASN.1 tag object to <cite>self</cite>’s
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a>, then use the result as
+new object’s ASN.1 tag(s).</p></li>
+<li><p><strong>subtypeSpec</strong> (<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a>) – Add ASN.1 constraints object to one of the <cite>self</cite>’s, then
+use the result as new object’s ASN.1 constraints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new instance of BitString schema or value object</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to the immutable nature of the BitString object, if no arguments
+are supplied, no new BitString object will be created and <cite>self</cite> will
+be returned instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.tagSet">
+<span class="sig-name descname"><span class="pre">tagSet</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TagSet</span> <span class="pre">object,</span> <span class="pre">tags</span> <span class="pre">UNIVERSAL:3&gt;</span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.tagSet" title="Link to this definition">¶</a></dt>
+<dd><p>Set (on class, not on instance) or return a
+<a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a> object representing ASN.1 tag(s)
+associated with BitString type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.subtypeSpec">
+<span class="sig-name descname"><span class="pre">subtypeSpec</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ConstraintsIntersection</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.subtypeSpec" title="Link to this definition">¶</a></dt>
+<dd><p>Set (on class, not on instance) or return a
+<a class="reference internal" href="../constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection" title="pyasn1.type.constraint.ConstraintsIntersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstraintsIntersection</span></code></a> object
+imposing constraints on BitString type initialization values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.asNumbers">
+<span class="sig-name descname"><span class="pre">asNumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#tuple" title="(in Python v3.4)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.asNumbers" title="Link to this definition">¶</a></dt>
+<dd><p>Get BitString value as a sequence of 8-bit integers.</p>
+<p>If BitString object length is not a multiple of 8, result
+will be left-padded with zeros.</p>
+<p>See <a class="reference internal" href="#pyasn1.type.univ.BitString.asOctets" title="pyasn1.type.univ.BitString.asOctets"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asOctets()</span></code></a> on why this is not the X.690 contents octets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.asOctets">
+<span class="sig-name descname"><span class="pre">asOctets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bytes" title="(in Python v3.4)"><span class="pre">bytes</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.asOctets" title="Link to this definition">¶</a></dt>
+<dd><p>Get BitString value as a sequence of octets.</p>
+<p>The bits are read as a single integer, so a value shorter than a
+multiple of 8 is left-padded with zeros: <code class="docutils literal notranslate"><span class="pre">BitString((1,))</span></code>,
+<code class="docutils literal notranslate"><span class="pre">BitString((0,</span> <span class="pre">1))</span></code> and <code class="docutils literal notranslate"><span class="pre">BitString((0,</span> <span class="pre">0,</span> <span class="pre">1))</span></code> all give
+<code class="docutils literal notranslate"><span class="pre">b''</span></code>.</p>
+<p>This is deliberately <em>not</em> the X.690 8.6.2 contents octets, which
+place bit 0 in bit 8 of the first octet and pad on the right –
+<code class="docutils literal notranslate"><span class="pre">80</span></code>, <code class="docutils literal notranslate"><span class="pre">40</span></code> and <code class="docutils literal notranslate"><span class="pre">20</span></code> for those three values. Use the codecs for
+that; they align the value before serialising it. To go the other
+way, <a class="reference internal" href="#pyasn1.type.univ.BitString.fromOctetString" title="pyasn1.type.univ.BitString.fromOctetString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fromOctetString()</span></code></a> and the <cite>hexValue</cite> initializer both read
+the X.690 layout, so they are not inverses of this method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.asInteger">
+<span class="sig-name descname"><span class="pre">asInteger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.asInteger" title="Link to this definition">¶</a></dt>
+<dd><p>Get BitString value as a single integer value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.asBinary">
+<span class="sig-name descname"><span class="pre">asBinary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.asBinary" title="Link to this definition">¶</a></dt>
+<dd><p>Get BitString value as a text string of bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.fromHexString">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fromHexString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalFormat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.fromHexString" title="Link to this definition">¶</a></dt>
+<dd><p>Create a BitString object initialized from the hex string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Text string like ‘DEADBEEF’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.fromBinaryString">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fromBinaryString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalFormat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.fromBinaryString" title="Link to this definition">¶</a></dt>
+<dd><p>Create a BitString object initialized from a string of ‘0’ and ‘1’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Text string like ‘1010111’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.fromOctetString">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fromOctetString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bytes" title="(in Python v3.4)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalFormat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.fromOctetString" title="Link to this definition">¶</a></dt>
+<dd><p>Create a BitString object initialized from a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (Py2) or <a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bytes" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> (Py3)) – Text string like ‘\\x01\\xff’ (Py2) or b’\\x01\\xff’ (Py3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.effectiveTagSet">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">effectiveTagSet</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../tag/tagset.html#pyasn1.type.tag.TagSet" title="pyasn1.type.tag.TagSet"><span class="pre">TagSet</span></a></span><a class="headerlink" href="#pyasn1.type.univ.BitString.effectiveTagSet" title="Link to this definition">¶</a></dt>
+<dd><p>For BitString type is equivalent to <em>tagSet</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.isSameTypeWith">
+<span class="sig-name descname"><span class="pre">isSameTypeWith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.isSameTypeWith" title="Link to this definition">¶</a></dt>
+<dd><p>Examine BitString type for equality with other ASN.1 type.</p>
+<p>ASN.1 tags (<a class="reference internal" href="../tag/tag.html#module-pyasn1.type.tag" title="pyasn1.type.tag"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tag</span></code></a>) and constraints
+(<code class="xref py py-mod docutils literal notranslate"><span class="pre">constraint</span></code>) are examined when carrying
+out ASN.1 types comparison.</p>
+<p>Python class inheritance relationship is NOT considered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>a pyasn1 type object</em>) – Class instance representing ASN.1 type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if <em>other</em> is BitString type,
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.isSuperTypeOf">
+<span class="sig-name descname"><span class="pre">isSuperTypeOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchTags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matchConstraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pyasn1.type.univ.BitString.isSuperTypeOf" title="Link to this definition">¶</a></dt>
+<dd><p>Examine BitString type for subtype relationship with other ASN.1 type.</p>
+<p>ASN.1 tags (<a class="reference internal" href="../tag/tag.html#module-pyasn1.type.tag" title="pyasn1.type.tag"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tag</span></code></a>) and constraints
+(<code class="xref py py-mod docutils literal notranslate"><span class="pre">constraint</span></code>) are examined when carrying
+out ASN.1 types comparison.</p>
+<p>Python class inheritance relationship is NOT considered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>a pyasn1 type object</em>) – Class instance representing ASN.1 type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if <em>other</em> is a subtype of BitString type,
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.isValue">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">isValue</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><span class="pre">bool</span></a></span><a class="headerlink" href="#pyasn1.type.univ.BitString.isValue" title="Link to this definition">¶</a></dt>
+<dd><p>Indicate that BitString object represents ASN.1 value.</p>
+<p>If <em>isValue</em> is <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> then this object represents just
+ASN.1 schema.</p>
+<p>If <em>isValue</em> is <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then, in addition to its ASN.1 schema
+features, this object can also be used like a Python built-in object
+(e.g. <a class="reference external" href="https://docs.python.org/3.4/library/functions.html#int" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#str" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.4/library/stdtypes.html#dict" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.4/library/functions.html#bool" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> – <a class="reference external" href="https://docs.python.org/3.4/library/constants.html#False" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> if object represents just ASN.1 schema.
+<a class="reference external" href="https://docs.python.org/3.4/library/constants.html#True" title="(in Python v3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if object represents ASN.1 schema and can be used as a normal value.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is an important distinction between PyASN1 schema and value objects.
+The PyASN1 schema objects can only participate in ASN.1 schema-related
+operations (e.g. defining or testing the structure of the data). Most
+obvious uses of ASN.1 schema is to guide serialisation codecs whilst
+encoding/decoding serialised ASN.1 contents.</p>
+<p>The PyASN1 value objects can <strong>additionally</strong> participate in many operations
+involving regular Python objects (e.g. arithmetic, comprehension etc).</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.type.univ.BitString.tagMap">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tagMap</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../tag/tagmap.html#pyasn1.type.tagmap.TagMap" title="pyasn1.type.tagmap.TagMap"><span class="pre">TagMap</span></a></span><a class="headerlink" href="#pyasn1.type.univ.BitString.tagMap" title="Link to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="../tag/tagmap.html#pyasn1.type.tagmap.TagMap" title="pyasn1.type.tagmap.TagMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagMap</span></code></a> object mapping ASN.1 tags to ASN.1 objects within callee object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

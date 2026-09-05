@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Changelog &#8212; ASN.1 types and codecs 1.3.0rc2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=f6a572b4" />
+    <script src="_static/documentation_options.js?v=3a8ff4e9"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Historical changelog" href="changelog-history.html" />
+    <link rel="prev" title="Download &amp; Install" href="download.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="contents.html">
+    <img class="logo" src="_static/logo.svg" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyasn1/contents.html">Library documentation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example-use-case.html">Example use case</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="download.html">Download &amp; Install</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id2">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id35">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog-history.html">Historical changelog</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="contents.html">Documentation overview</a><ul>
+      <li>Previous: <a href="download.html" title="previous chapter">Download &amp; Install</a></li>
+      <li>Next: <a href="changelog-history.html" title="next chapter">Historical changelog</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<p>Generated from the commit history at release time. The narrative history
+through 1.3.0 is in <a class="reference external" href="https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst">CHANGES.rst</a>.</p>
+</section>
+<section id="rc-2-2026-09-05">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.1...v1.3.0-rc.2">1.3.0-rc.2</a> (2026-09-05)<a class="headerlink" href="#rc-2-2026-09-05" title="Link to this heading">¶</a></h1>
+<section id="bug-fixes">
+<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>keep the BER decoder’s substrateFun path inside PyAsn1Error (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/26c12316a2d240817a2aacc71d0c0920f9f67dfc">26c1231</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/140">#140</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/142">#142</a></p></li>
+</ul>
+</section>
+</section>
+<section id="rc-1-2026-09-05">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0-rc.1">1.3.0-rc.1</a> (2026-09-05)<a class="headerlink" href="#rc-1-2026-09-05" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>Bug Fixes<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>encode a present OPTIONAL component even when it is empty (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/69f4b80e9f195018f0d84929b3b3265a7344c531">69f4b80</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/119">#119</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/112">#112</a></p></li>
+<li><p>encoder must not instantiate absent DEFAULT components (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/2e7abff0d7110695c669cfa0c43d85d44e31a89a">2e7abff</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/112">#112</a></p></li>
+<li><p>isInconsistent must report an exception, not a bare True (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a16a043b71a1f816a824e9911b51be1462a69b3a">a16a043</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/118">#118</a></p></li>
+<li><p>keep all components when an explicit-tag guess is refuted (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/09b986217624990eeb226806eb75834b58a59418">09b9862</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/116">#116</a> <a class="reference external" href="https://github.com/pyasn1/pyasn1/issues/59">pyasn1/pyasn1#59</a></p></li>
+<li><p>keep the EOO when capturing an untagged Any (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c396c799fef37bc700b80c9ba796da65d9bb7ae2">c396c79</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/114">#114</a> <a class="reference external" href="https://github.com/pyasn1/pyasn1/issues/66">pyasn1/pyasn1#66</a></p></li>
+<li><p>malformed BIT STRING must raise PyAsn1Error, not IndexError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6738bec819e60d4109b8a53fb3457423fb97c237">6738bec</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/121">#121</a></p></li>
+<li><p>re-resolve late-bound componentType on clone and subtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6e6226968321085c4e3af2036ad8e2dfcae6b37b">6e62269</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/111">#111</a> <a class="reference external" href="https://github.com/pyasn1/pyasn1/issues/124">pyasn1/pyasn1#124</a> <a class="reference external" href="https://github.com/etingof/pyasn1/issues/19">etingof/pyasn1#19</a> <a class="reference external" href="https://github.com/etingof/pyasn1/issues/20">etingof/pyasn1#20</a></p></li>
+<li><p>reading a Choice alternative must not deselect another (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6e5b40a2672675d3dc187858c1896c2e005bfd48">6e5b40a</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/122">#122</a></p></li>
+<li><p>report an ambiguous SEQUENCE schema instead of guessing a component (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a389f1ed693eb7224a0aef35e4d857c92c0d466c">a389f1e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/120">#120</a> <a class="reference external" href="https://github.com/pyasn1/pyasn1/issues/84">pyasn1/pyasn1#84</a></p></li>
+<li><p><strong>security:</strong> bound OID arcs, tag numbers and Real conversion (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0ff4c73303f553362bf9bf98389f6e899e986f41">0ff4c73</a>), closes <a class="reference external" href="https://github.com/Hi/issues/tag-number">Hi#tag-number</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/110">#110</a></p></li>
+</ul>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>add univ.RelativeOID (X.680 RELATIVE-OID, universal tag 13) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/9e274a0bda1b0d945b8f7bebc52240d52f9234d1">9e274a0</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/117">#117</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/110">#110</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0">1.2.0</a> (2026-09-03)<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h1>
+<section id="id3">
+<h2>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
+<li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
+<li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
+<li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
+<li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
+<li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
+<li><p>ci for build (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dbd35ebd7656a2951f7babe9e59666139e439664">dbd35eb</a>)</p></li>
+<li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
+<li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
+<li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
+<li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
+<li><p>cleanup imports (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f92083a04c312f9efed6aad0188b324c66c3e5a">3f92083</a>)</p></li>
+<li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
+<li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
+<li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
+<li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
+<li><p><strong>decoder:</strong> reject encodings clause 8 makes structurally impossible (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dfcec5937508b00b59d2652c6c62fcf0f0d5ca29">dfcec59</a>)</p></li>
+<li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
+<li><p>import and flake8 reported issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/eafee061ee715d5ee1cccdff8cd66b98a147e246">eafee06</a>)</p></li>
+<li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
+<li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
+<li><p><strong>real:</strong> decode NOT-A-NUMBER and minus zero per X.690 8.5.9 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c29d30a4ec341fd816a6d317c0da60b65416b72d">c29d30a</a>)</p></li>
+<li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
+<li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
+<li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
+<li><p><strong>type:</strong> render BitString as bits rather than a decimal integer (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/861089c280bfab7139742d38507499512da6e381">861089c</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/98">#98</a></p></li>
+<li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
+<li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
+<li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>Features<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
+<li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
+<li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
+<li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
+<li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.namedtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7ea6a2f635d97072f9e185ab02ba677b39122a05">7ea6a2f</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.univ, completing the codebase (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/08feeb152256165f9740ef040802abc19ed16472">08feeb1</a>)</p></li>
+<li><p><strong>typing:</strong> annotate tag, constraint, namedval and opentype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4750ec56cc0ca455b04467a4a67c98dbd6004b48">4750ec5</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="rc-1-2026-09-03">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0-rc.1">1.2.0-rc.1</a> (2026-09-03)<a class="headerlink" href="#rc-1-2026-09-03" title="Link to this heading">¶</a></h1>
+<section id="id5">
+<h2>Bug Fixes<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
+<li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
+<li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
+<li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
+<li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
+<li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
+<li><p>ci for build (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dbd35ebd7656a2951f7babe9e59666139e439664">dbd35eb</a>)</p></li>
+<li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
+<li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
+<li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
+<li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
+<li><p>cleanup imports (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f92083a04c312f9efed6aad0188b324c66c3e5a">3f92083</a>)</p></li>
+<li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
+<li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
+<li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
+<li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
+<li><p><strong>decoder:</strong> reject encodings clause 8 makes structurally impossible (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dfcec5937508b00b59d2652c6c62fcf0f0d5ca29">dfcec59</a>)</p></li>
+<li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
+<li><p>import and flake8 reported issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/eafee061ee715d5ee1cccdff8cd66b98a147e246">eafee06</a>)</p></li>
+<li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
+<li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
+<li><p><strong>real:</strong> decode NOT-A-NUMBER and minus zero per X.690 8.5.9 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c29d30a4ec341fd816a6d317c0da60b65416b72d">c29d30a</a>)</p></li>
+<li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
+<li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
+<li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
+<li><p><strong>type:</strong> render BitString as bits rather than a decimal integer (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/861089c280bfab7139742d38507499512da6e381">861089c</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/98">#98</a></p></li>
+<li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
+<li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
+<li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>Features<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
+<li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
+<li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
+<li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
+<li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.namedtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7ea6a2f635d97072f9e185ab02ba677b39122a05">7ea6a2f</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.univ, completing the codebase (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/08feeb152256165f9740ef040802abc19ed16472">08feeb1</a>)</p></li>
+<li><p><strong>typing:</strong> annotate tag, constraint, namedval and opentype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4750ec56cc0ca455b04467a4a67c98dbd6004b48">4750ec5</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-14-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.13...v1.2.0-beta.14">1.2.0-beta.14</a> (2026-09-02)<a class="headerlink" href="#beta-14-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id7">
+<h2>Bug Fixes<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
+<li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
+<li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
+<li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
+</ul>
+</section>
+<section id="id8">
+<h2>Features<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
+</ul>
+</section>
+</section>
+<section id="beta-13-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.12...v1.2.0-beta.13">1.2.0-beta.13</a> (2026-09-02)<a class="headerlink" href="#beta-13-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id9">
+<h2>Bug Fixes<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
+<li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
+<li><p><strong>type:</strong> render BitString as bits rather than a decimal integer (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/861089c280bfab7139742d38507499512da6e381">861089c</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/98">#98</a></p></li>
+</ul>
+</section>
+</section>
+<section id="beta-12-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.11...v1.2.0-beta.12">1.2.0-beta.12</a> (2026-09-02)<a class="headerlink" href="#beta-12-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id10">
+<h2>Bug Fixes<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
+<li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
+</ul>
+</section>
+</section>
+<section id="beta-11-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.10...v1.2.0-beta.11">1.2.0-beta.11</a> (2026-09-02)<a class="headerlink" href="#beta-11-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id11">
+<h2>Bug Fixes<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-10-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.9...v1.2.0-beta.10">1.2.0-beta.10</a> (2026-09-02)<a class="headerlink" href="#beta-10-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id12">
+<h2>Bug Fixes<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-9-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.8...v1.2.0-beta.9">1.2.0-beta.9</a> (2026-09-02)<a class="headerlink" href="#beta-9-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id13">
+<h2>Bug Fixes<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-8-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.7...v1.2.0-beta.8">1.2.0-beta.8</a> (2026-09-02)<a class="headerlink" href="#beta-8-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id14">
+<h2>Bug Fixes<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
+<li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
+<li><p><strong>decoder:</strong> reject encodings clause 8 makes structurally impossible (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dfcec5937508b00b59d2652c6c62fcf0f0d5ca29">dfcec59</a>)</p></li>
+<li><p><strong>real:</strong> decode NOT-A-NUMBER and minus zero per X.690 8.5.9 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c29d30a4ec341fd816a6d317c0da60b65416b72d">c29d30a</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-7-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.6...v1.2.0-beta.7">1.2.0-beta.7</a> (2026-09-02)<a class="headerlink" href="#beta-7-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id15">
+<h2>Bug Fixes<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
+</ul>
+</section>
+</section>
+<section id="beta-6-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.5...v1.2.0-beta.6">1.2.0-beta.6</a> (2026-09-02)<a class="headerlink" href="#beta-6-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id16">
+<h2>Features<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-5-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.4...v1.2.0-beta.5">1.2.0-beta.5</a> (2026-09-02)<a class="headerlink" href="#beta-5-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id17">
+<h2>Bug Fixes<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-4-2026-09-01">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.3...v1.2.0-beta.4">1.2.0-beta.4</a> (2026-09-01)<a class="headerlink" href="#beta-4-2026-09-01" title="Link to this heading">¶</a></h1>
+<section id="id18">
+<h2>Bug Fixes<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
+<li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-3-2026-09-01">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.2...v1.2.0-beta.3">1.2.0-beta.3</a> (2026-09-01)<a class="headerlink" href="#beta-3-2026-09-01" title="Link to this heading">¶</a></h1>
+<section id="id19">
+<h2>Bug Fixes<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
+<li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
+</ul>
+</section>
+<section id="id20">
+<h2>Features<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.namedtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7ea6a2f635d97072f9e185ab02ba677b39122a05">7ea6a2f</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.univ, completing the codebase (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/08feeb152256165f9740ef040802abc19ed16472">08feeb1</a>)</p></li>
+<li><p><strong>typing:</strong> annotate tag, constraint, namedval and opentype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4750ec56cc0ca455b04467a4a67c98dbd6004b48">4750ec5</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-2-2026-09-01">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.1...v1.2.0-beta.2">1.2.0-beta.2</a> (2026-09-01)<a class="headerlink" href="#beta-2-2026-09-01" title="Link to this heading">¶</a></h1>
+<section id="id21">
+<h2>Features<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-1-2026-09-01">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.8...v1.2.0-beta.1">1.2.0-beta.1</a> (2026-09-01)<a class="headerlink" href="#beta-1-2026-09-01" title="Link to this heading">¶</a></h1>
+<section id="id22">
+<h2>Features<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
+</ul>
+</section>
+<section id="beta-8-2026-09-01">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.7...v1.1.4-beta.8">1.1.4-beta.8</a> (2026-09-01)<a class="headerlink" href="#beta-8-2026-09-01" title="Link to this heading">¶</a></h2>
+<section id="id23">
+<h3>Bug Fixes<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-7-2026-09-01">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.6...v1.1.4-beta.7">1.1.4-beta.7</a> (2026-09-01)<a class="headerlink" href="#beta-7-2026-09-01" title="Link to this heading">¶</a></h2>
+<section id="id24">
+<h3>Bug Fixes<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-6-2026-09-01">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.5...v1.1.4-beta.6">1.1.4-beta.6</a> (2026-09-01)<a class="headerlink" href="#beta-6-2026-09-01" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h3>Bug Fixes<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-5-2026-09-01">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.4...v1.1.4-beta.5">1.1.4-beta.5</a> (2026-09-01)<a class="headerlink" href="#beta-5-2026-09-01" title="Link to this heading">¶</a></h2>
+<section id="id26">
+<h3>Bug Fixes<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-4-2025-05-20">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.3...v1.1.4-beta.4">1.1.4-beta.4</a> (2025-05-20)<a class="headerlink" href="#beta-4-2025-05-20" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h3>Bug Fixes<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-3-2025-05-20">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.2...v1.1.4-beta.3">1.1.4-beta.3</a> (2025-05-20)<a class="headerlink" href="#beta-3-2025-05-20" title="Link to this heading">¶</a></h2>
+<section id="id28">
+<h3>Bug Fixes<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id29">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.2...v1.1.3">1.1.3</a> (2023-02-21)<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
+<section id="id30">
+<h3>Bug Fixes<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>bring back missing ints2octs and ensureString (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/bc81772d2048a00bc327691771123ca6f0e867c4">bc81772</a>)</p></li>
+<li><p>bring back missing ints2octs and ensureString (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c92da9958eb238baede01c1f8317ab6cae3318a4">c92da99</a>)</p></li>
+<li><p>CI (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ad8f44488468ce7fe21b1daae738c496ca249cc7">ad8f444</a>)</p></li>
+<li><p>delete agreements from CI (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/525381a93f67f9eb14d6f9d30fd2f143bb0f77ad">525381a</a>)</p></li>
+<li><p>ints2octes issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/70762756eb00354fad54a518fa29c3fdcf903dec">7076275</a>)</p></li>
+<li><p>make codecov not required (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1b9e9490f81ff6180b6c811a45bd46d82f18f68f">1b9e949</a>)</p></li>
+<li><p>run pre-commit and update pre-commit workflow (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7bdab3303a83f50cd088cfc0582c26fb5ba33850">7bdab33</a>)</p></li>
+<li><p>upgrade pre-commit version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c388965c509138e760af95eacc7c13d3738649c7">c388965</a>)</p></li>
+<li><p>upgrade semantic release (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/51b93381f1c119c330cd7279ddf6b59da1955357">51b9338</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id31">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.1...v1.1.2">1.1.2</a> (2021-11-24)<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h2>
+<section id="id32">
+<h3>Bug Fixes<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>cleanup old code (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c92b584ba8380430f6cfa7fc265119f87d40705e">c92b584</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id33">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.0...v1.1.1">1.1.1</a> (2021-11-24)<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h3>Bug Fixes<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>remove shadow (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/57a2495606a1d9b4b8a7c599176096de4484d863">57a2495</a>)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="id35">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.3...v1.1.0">1.1.0</a> (2021-11-24)<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h1>
+<section id="id36">
+<h2>Bug Fixes<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>format issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b935c31188693a2e268d0fee4231ff8361fb45af">b935c31</a>)</p></li>
+<li><p>remove dead code (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f21cc6e7d4e4d868f08f8ff394303f3008ef996">3f21cc6</a>)</p></li>
+</ul>
+</section>
+<section id="id37">
+<h2>Features<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>format with black (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1824a3a80885040d288e3ddbd6b6cdba9aec71b2">1824a3a</a>)</p></li>
+</ul>
+</section>
+<section id="id38">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.2...v1.0.3">1.0.3</a> (2021-11-17)<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h2>
+<section id="id39">
+<h3>Bug Fixes<a class="headerlink" href="#id39" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>bump (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ec35ee198b80f285df472c3b4059bb59ca056d7f">ec35ee1</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id40">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.1...v1.0.2">1.0.2</a> (2021-11-13)<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h2>
+<section id="id41">
+<h3>Bug Fixes<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>bump version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a6d7a5eff6b5b4875ada2abc2c3d928d1f0d9fae">a6d7a5e</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id42">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.0...v1.0.1">1.0.1</a> (2021-11-13)<a class="headerlink" href="#id42" title="Link to this heading">¶</a></h2>
+<section id="id43">
+<h3>Bug Fixes<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>bump (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/970e15d47e33906020735242eea6bb2ad1f53af0">970e15d</a>)
+<strong>Full Changelog</strong>: https://github.com/pysnmp/pyasn1/compare/0.4.8…v1.0.0</p></li>
+</ul>
+</section>
+</section>
+<section id="id44">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.11...v0.4.12">0.4.12</a> (2021-11-13)<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h2>
+<section id="id45">
+<h3>Bug Fixes<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update doc links (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/9cabd9b0a273a3f5afaeb36387f6bb4cf92a7802">9cabd9b</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id46">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.10...v0.4.11">0.4.11</a> (2021-11-13)<a class="headerlink" href="#id46" title="Link to this heading">¶</a></h2>
+<section id="id47">
+<h3>Bug Fixes<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>correct badges (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4cbde5679aa15835372a9cec6c9ccd7503168229">4cbde56</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id48">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.9...v0.4.10">0.4.10</a> (2021-11-13)<a class="headerlink" href="#id48" title="Link to this heading">¶</a></h2>
+<section id="id49">
+<h3>Bug Fixes<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>correct readme ref (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/732a4a69a54e018dc3ef0493b7d07af23aeb8cc4">732a4a6</a>)</p></li>
+<li><p>update classifiers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b3fa5d6aff60d2b677c99d46d29b4dabf06b69ef">b3fa5d6</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id50">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.8...v0.4.9">0.4.9</a> (2021-11-13)<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h2>
+<section id="id51">
+<h3>Bug Fixes<a class="headerlink" href="#id51" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>update gitignore (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c8f0be6885a3984032325d449838370052f9cfd4">c8f0be6</a>)</p></li>
+</ul>
+</section>
+<section id="reverts">
+<h3>Reverts<a class="headerlink" href="#reverts" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>change (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a6ac7b5ad860b84e919cd691405a2726a7aec569">a6ac7b5</a>)</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
