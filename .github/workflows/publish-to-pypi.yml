@@ -59,15 +59,23 @@ jobs:
     name: Publish Release to PyPI
     needs: [build-packages]
     runs-on: ubuntu-latest
+    # PyPI Trusted Publishing matches the OIDC claim against owner, repository,
+    # workflow filename and environment. All four must agree with the publisher
+    # registered at https://pypi.org/manage/project/pysnmp-pyasn1/settings/publishing/
+    environment:
+      name: release
+      url: https://pypi.org/p/pysnmp-pyasn1
+    permissions:
+      # id-token mints the OIDC token that stands in for the API token.
+      contents: read
+      id-token: write
     steps:
-      - name: Install UV
-        uses: astral-sh/setup-uv@v7
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
+      # Publishes with a short-lived OIDC credential and, because it runs under
+      # Trusted Publishing, attaches PEP 740 attestations by default.
       - name: Publish to PyPI
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: uv publish
+        uses: pypa/gh-action-pypi-publish@release/v1
