@@ -283,6 +283,11 @@ class BitStringDecoder(AbstractSimpleDecoder):
                 head, self.protoComponent, substrateFun=substrateFun, **options
             )
 
+            if not component:
+                raise error.PyAsn1Error(
+                    "Empty BIT STRING segment"
+                )
+
             trailingBits = component[0]
             if trailingBits > 7:
                 raise error.PyAsn1Error(
@@ -337,6 +342,11 @@ class BitStringDecoder(AbstractSimpleDecoder):
             )
             if component is eoo.endOfOctets:
                 break
+
+            if not component:
+                raise error.PyAsn1Error(
+                    "Empty BIT STRING segment"
+                )
 
             trailingBits = component[0]
             if trailingBits > 7:
