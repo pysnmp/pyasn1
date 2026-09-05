@@ -3,6 +3,14 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+# [1.3.0-rc.3](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.2...v1.3.0-rc.3) (2026-09-05)
+
+
+### Bug Fixes
+
+* **docs:** give each published version an index.html ([c038329](https://github.com/pysnmp/pyasn1/commit/c03832908a0d115d9a26b31f4fee23f132b02537))
+* **tests:** stop bulk decoding tests from exhausting runner memory ([9963994](https://github.com/pysnmp/pyasn1/commit/9963994c7778a8073258f0ce83d3d5c347d60794))
+
 # [1.3.0-rc.2](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2026-09-05)
 
 
