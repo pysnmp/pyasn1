@@ -187,6 +187,39 @@ jobs:
           # Don't publish to PyPI here, the tag push will trigger the publish workflow
           GITHUB_OUTPUT: /tmp/semantic_release_output
 
+      # A push to main is a dry run: semantic-release works out the version that
+      # a dispatch would cut but tags nothing, and its prepare step (which is
+      # what normally builds) never runs. Build that version as a .devN instead
+      # and keep it as an artifact, so the GA candidate can be installed and
+      # exercised before anyone dispatches the real release.
+      - name: Build dev preview
+        id: preview
+        if: env.DRY == 'true'
+        run: |
+          set -euo pipefail
+          # Step outputs are redirected above, so read the version from there.
+          version=$(sed -n 's/^new_release_version=//p' /tmp/semantic_release_output | head -1)
+          if [ -z "$version" ]; then
+            echo "No release would be cut from this commit; nothing to preview."
+            exit 0
+          fi
+          preview="${version}.dev${{ github.run_number }}"
+          echo "Building preview ${preview}"
+          sed -i -E "s/^version ?=.*/version = \"${preview}\"/" pyproject.toml
+          sed -i -E "s/^__version__ ?=.*/__version__ = \"${preview}\"/" pyasn1/__init__.py
+          rm -rf dist
+          uv lock
+          uv build
+          echo "preview=${preview}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload dev preview
+        if: env.DRY == 'true' && steps.preview.outputs.preview != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist-preview-${{ steps.preview.outputs.preview }}
+          path: dist/
+          retention-days: 14
+
   update-semver:
     name: Move Repository semver tags
     if: startsWith(github.ref, 'refs/tags/v')
