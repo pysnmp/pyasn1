@@ -110,14 +110,14 @@ Download & Install
 Changes
 -------
 
-All changes and release history is maintained in changelog.  There you
-could also download the latest unreleased pyasn1 tarball containing
-the latest fixes and improvements.
+The changelog is generated from the commit history at release time. The
+narrative history of the project through 1.3.0 is kept separately.
 
 .. toctree::
    :maxdepth: 1
 
    /changelog
+   /changelog-history
 
 License
 -------
