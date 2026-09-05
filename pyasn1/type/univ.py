@@ -2384,7 +2384,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             return False
 
         if self._componentValues is noValue:
-            return True
+            return False
 
         mapping = {}
 
