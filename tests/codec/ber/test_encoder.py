@@ -5,11 +5,12 @@
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import sys
+import timeit
 import unittest
 
-from pyasn1.codec.ber import encoder
+from pyasn1.codec.ber import decoder, encoder
 from pyasn1.error import PyAsn1Error
-from pyasn1.type import char, namedtype, opentype, tag, univ
+from pyasn1.type import char, constraint, namedtype, opentype, tag, univ
 from tests.base import BaseTestCase
 
 
@@ -3011,6 +3012,88 @@ class AnyEncoderWithSchemaTestCase(BaseTestCase):
         assert encoder.encode(self.v, asn1Spec=s) == bytes(
             (132, 5, 4, 3, 102, 111, 120)
         )
+
+
+class LongObjectIdentifierEncoderTestCase(BaseTestCase):
+    """Encoding cost must stay linear in the arc count (see issue #110)."""
+
+    #: Arc counts differ by this factor across the scaling check below.
+    SCALING_SPAN = 32
+
+    #: Growth allowed across that span. Linear work lands near 32x and
+    #: quadratic work near 1000x; 150 sits far enough from both that host
+    #: noise cannot reach it while a regression cannot hide under it.
+    SCALING_LIMIT = 150
+
+    def testLongOidEncodesInLinearTime(self):
+        # Comparing two adjacent doublings cannot tell linear from quadratic
+        # reliably: at a few milliseconds per sample the measurement noise on
+        # a shared runner is larger than the 2x-versus-4x signal. Spanning a
+        # 32x range instead puts linear near 32x and quadratic near 1000x, so
+        # a threshold between them holds regardless of how noisy the host is.
+        def elapsed(arcs, repeat):
+            oid = univ.ObjectIdentifier((1, 3) + (1,) * arcs)
+            return min(
+                timeit.repeat(lambda: encoder.encode(oid), repeat=repeat, number=1)
+            )
+
+        # The large sample is timed once: against a 150x threshold a single
+        # reading is ample, and it keeps a regression failing in seconds
+        # rather than grinding through repeats of quadratic work.
+        small = elapsed(1 << 12, repeat=3)
+        large = elapsed(1 << 17, repeat=1)
+
+        assert large < small * self.SCALING_LIMIT, (
+            f"OID encoding scales worse than linearly over a "
+            f"{self.SCALING_SPAN}x range: {small:.4f}s -> {large:.4f}s "
+            f"(ratio {large / small:.1f}, limit {self.SCALING_LIMIT})"
+        )
+
+    def testLongOidRoundTrips(self):
+        arcs = (1, 3) + tuple(range(1, 4096))
+        oid = univ.ObjectIdentifier(arcs)
+
+        assert decoder.decode(encoder.encode(oid))[0] == oid
+
+
+class InconsistentValueEncoderTestCase(BaseTestCase):
+    """An inconsistent object raises PyAsn1Error, not TypeError (issue #118)."""
+
+    def testSequenceOfSchemaRaisesPyAsn1Error(self):
+        s = univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+        try:
+            encoder.encode(s)
+
+        except PyAsn1Error:
+            pass
+
+        except TypeError as exc:
+            assert False, f"Bare True was raised: {exc}"
+
+        else:
+            assert False, "Inconsistent object encoded"
+
+    def testConstraintFailureKeepsItsDetail(self):
+        s = univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        ).clone()
+
+        for value in (1, 2, 3):
+            s.append(univ.Integer(value))
+
+        try:
+            encoder.encode(s)
+
+        except PyAsn1Error as exc:
+            assert "constraint" in repr(exc).lower(), f"Detail lost: {exc!r}"
+
+        else:
+            assert False, "Over-long object encoded"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

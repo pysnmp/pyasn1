@@ -178,6 +178,7 @@ jobs:
           semantic_version: 24
           dry_run: ${{ env.DRY }}
           extra_plugins: |
+            @semantic-release/changelog
             @semantic-release/exec
             @semantic-release/git
             @google/semantic-release-replace-plugin

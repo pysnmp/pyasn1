@@ -1,6 +1,57 @@
 
-unreleased
----------------------------------
+.. note::
+
+   This file records the narrative history of the project through 1.3.0.
+   From 1.3.0-rc.2 onward the per-release changelog is generated from the
+   commit history at release time and published as ``CHANGELOG.md``.
+
+Revision 1.3.0-rc.1, released 2026-09-05
+----------------------------------------
+
+- Bounded the resources the decoder will commit to a single field, closing
+  the resource-exhaustion gaps this fork carried since branching at 0.4.8.
+  Sub-identifier decoding caps the continuation octets per arc
+  (``MAX_OID_ARC_CONTINUATION_OCTETS``), because X.690 8.19.2 leaves the
+  octets per subidentifier unbounded (CVE-2026-23490). High-tag-number form
+  decoding caps the tag octets (``MAX_TAG_OCTETS``) and ``Tag.__repr__``
+  renders a huge tag ID as hex rather than raising ``ValueError`` from the
+  interpreter's integer-to-string limit (CVE-2026-59884). ``Real.__float__``
+  rejects a base 10 exponent past ``sys.float_info.max_10_exp`` and a mantissa
+  too wide to render, and drops the base 2 ``pow()`` fallback that could
+  materialise an arbitrarily large integer (CVE-2026-59886). Long-form length
+  octets are capped at ``MAX_LENGTH_OCTETS``: X.690 8.1.3.5 permits up to 126,
+  but a value longer than 2\ :sup:`64` octets can never be supplied.
+  CVE-2026-30922 (decoder recursion) was already covered by
+  ``MAX_NESTING_DEPTH`` and is unchanged.
+- OID decoding and encoding accumulate into a list instead of repeatedly
+  concatenating tuples, which was quadratic in the arc count
+  (CVE-2026-59885).
+- ``componentType`` is re-resolved on ``clone()`` and ``subtype()``, so a
+  late-bound recursive schema no longer decodes valid input into a
+  "TagSet not in asn1Spec" failure.
+- The encoder no longer instantiates absent ``DEFAULT`` components, which
+  mutated the object being encoded and changed its later equality.
+- A present but empty ``OPTIONAL`` component is encoded rather than dropped.
+- A refuted explicit-tag guess keeps every component instead of silently
+  discarding all but the first. X.690 8.14.2 makes the contents octets of an
+  explicitly tagged value the complete encoding of exactly one value, so
+  trailing content refutes the guess and is read as an implicit tag over a
+  constructed type.
+- The end-of-octets marker is preserved when capturing an indefinite-length
+  untagged ``Any``, so the captured substrate round-trips.
+- ``isInconsistent`` reports an exception rather than a bare :obj:`True`.
+- A malformed BIT STRING raises ``PyAsn1Error`` instead of ``IndexError``.
+- Reading one ``Choice`` alternative no longer deselects another.
+- An ambiguous ``SEQUENCE`` schema is reported instead of guessing a
+  component.
+- Added ``univ.RelativeOID`` for X.680 RELATIVE-OID (universal tag 13), with
+  BER/CER/DER and native codec support.
+- Documented that ``BitString.asOctets()`` is the integer view rather than
+  the wire layout, and pinned minimal INTEGER encoding on the implicitly
+  tagged path.
+
+Revision 1.2.0, released 2026-09-03
+-----------------------------------
 
 - Exceptions now carry structured context. ``PyAsn1Error`` and its subclasses
   accept arbitrary keyword arguments, keep them as ``exc.context``, and render
@@ -121,7 +172,55 @@ unreleased
   left-hand result was falsy: ``Decoder`` fell back to the raw value whenever
   ``prettyPrint()`` returned an empty string, and ``Encoder`` would call
   ``prettyPrintType()`` on ``None`` whenever it returned an empty string.
+- The CER and DER codecs enforce the canonical forms X.690 requires rather
+  than accepting whatever BER would allow: minimal length and tag identifier
+  forms, the string encoding forms of 9.1, 9.2 and 10.2, minimal INTEGER
+  encodings per 8.3.2, canonical REAL per 11.3, canonical ``GeneralizedTime``
+  and ``UTCTime``, and zero unused bits in BIT STRING per 11.2.1. The strict
+  decoders are installed on the schema-guided path too, and the BER decoder
+  rejects encodings that clause 8 makes structurally impossible.
+- REAL handling was corrected throughout: the decimal form is held to its
+  declared ISO 6093 form, the base 10 mantissa is kept exact and integral,
+  and NOT-A-NUMBER and minus zero decode per X.690 8.5.9. The CER encoder
+  budgets the BIT STRING unused-bits octet when segmenting.
+- Time types render as timestamps and their conversion was corrected.
+- ``pyasn1.type.char`` ships opt-in per-type permitted alphabets (X.680 41).
+- ``InnerTypeConstraint`` checks component presence, ``BitString`` renders as
+  bits rather than a decimal integer, and ``pyasn1.type`` no longer shadows
+  ``pyasn1.error.ValueConstraintError``.
+- The codebase is fully annotated and ships a ``py.typed`` marker, with mypy
+  enforced in CI.
+- The test suite asserts X.690 conformance against known-good encodings
+  instead of round-tripping values through the codecs.
+- Tooling consolidated on uv and ruff; pylint was dropped.
 
+Revision 1.1.3, released 2023-02-21
+-----------------------------------
+
+- Restored the ``ints2octs`` and ``ensureString`` helpers dropped by the 1.1.2
+  cleanup.
+- Upgraded semantic-release and pre-commit, and made codecov non-blocking.
+
+Revision 1.1.2, released 2021-11-24
+-----------------------------------
+
+- Removed dead code left behind by the Python 2 drop.
+
+Revision 1.1.1, released 2021-11-24
+-----------------------------------
+
+- Removed a shadowed name.
+
+Revision 1.1.0, released 2021-11-24
+-----------------------------------
+
+- Dropped Python 2.7 support.
+- Formatted the codebase with black and removed dead code.
+
+Revision 1.0.3, released 2021-11-17
+-----------------------------------
+
+- Release plumbing only; no library changes.
 
 Revision 1.0.2, released 2021-11-13
 -----------------------------------

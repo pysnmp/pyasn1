@@ -4,7 +4,9 @@
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
+import itertools
 import sys
+import timeit
 import unittest
 
 from pyasn1.codec.ber import decoder, encoder, eoo
@@ -3789,6 +3791,573 @@ class ErrorOnDecodingTestCase(BaseTestCase):
         assert rest == bytes((131, 3, 2, 1, 12)), (
             f"Unexpected rest of substrate after raw dump {rest!r}"
         )
+
+
+class ResourceExhaustionGuardTestCase(BaseTestCase):
+    """Bounds on unbounded-by-spec BER constructs (see issue #110)."""
+
+    #: Arc counts differ by this factor across the scaling checks below.
+    SCALING_SPAN = 32
+
+    #: Growth allowed across that span. Linear work lands near 32x and
+    #: quadratic work near 1000x; 150 sits far enough from both that host
+    #: noise cannot reach it while a regression cannot hide under it.
+    SCALING_LIMIT = 150
+
+    @staticmethod
+    def _oidSubstrate(continuationOctets):
+        # 06 <len> 2b <0x81 * n> 01 -- arc 1.3 followed by one arc encoded
+        # across `continuationOctets` continuation octets plus a final octet.
+        payload = b"\x2b" + b"\x81" * continuationOctets + b"\x01"
+        return b"\x06" + bytes((len(payload),)) + payload
+
+    def testOidArcAtContinuationLimitDecodes(self):
+        limit = decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        asn1Object, rest = decoder.decode(self._oidSubstrate(limit))
+
+        assert rest == _null
+        assert len(asn1Object) == 3, f"Unexpected OID {asn1Object!r}"
+
+    def testOidArcBeyondContinuationLimitRejected(self):
+        limit = decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        try:
+            decoder.decode(self._oidSubstrate(limit + 1))
+
+        except PyAsn1Error as exc:
+            assert exc.context["limit"] == limit
+
+        else:
+            assert False, "Over-long OID arc accepted"
+
+    def testLongOidDecodesInLinearTime(self):
+        # Repeated tuple concatenation made this quadratic in the arc count.
+        #
+        # Comparing two adjacent doublings cannot tell linear from quadratic
+        # reliably: at a few milliseconds per sample the measurement noise on
+        # a shared runner is larger than the 2x-versus-4x signal. Spanning a
+        # 32x range instead puts linear near 32x and quadratic near 1000x, so
+        # a threshold between them holds regardless of how noisy the host is.
+        def elapsed(arcs, repeat):
+            payload = b"\x2b" + b"\x01" * arcs
+            substrate = b"\x06\x83" + len(payload).to_bytes(3, "big") + payload
+            return min(
+                timeit.repeat(
+                    lambda: decoder.decode(substrate), repeat=repeat, number=1
+                )
+            )
+
+        # The large sample is timed once: against a 150x threshold a single
+        # reading is ample, and it keeps a regression failing in seconds
+        # rather than grinding through repeats of quadratic work.
+        small = elapsed(1 << 12, repeat=3)
+        large = elapsed(1 << 17, repeat=1)
+
+        assert large < small * self.SCALING_LIMIT, (
+            f"OID decoding scales worse than linearly over a "
+            f"{self.SCALING_SPAN}x range: {small:.4f}s -> {large:.4f}s "
+            f"(ratio {large / small:.1f}, limit {self.SCALING_LIMIT})"
+        )
+
+    def testLongFormTagBeyondOctetLimitRejected(self):
+        limit = decoder.MAX_TAG_OCTETS
+
+        # 0x1f selects the high-tag-number form of X.690 8.1.2.4.
+        substrate = b"\x1f" + b"\xff" * (limit + 1) + b"\x01\x00"
+
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context.get("limit") == limit, f"Unexpected error {exc!r}"
+
+        else:
+            assert False, "Over-long tag number accepted"
+
+    def testLongFormTagAtOctetLimitIsNotRejectedForLength(self):
+        limit = decoder.MAX_TAG_OCTETS
+
+        substrate = b"\x1f" + b"\xff" * (limit - 1) + b"\x01\x00"
+
+        # The tag itself is within bounds; decoding fails later, if at all,
+        # for reasons unrelated to the octet cap.
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context.get("limit") != limit, f"Tag wrongly capped: {exc!r}"
+
+    def testLengthBeyondOctetLimitRejected(self):
+        limit = decoder.MAX_LENGTH_OCTETS
+
+        # INTEGER with a long-form length claiming `limit + 1` length octets.
+        substrate = b"\x02" + bytes((0x80 | (limit + 1),)) + b"\x01" * (limit + 1)
+
+        try:
+            decoder.decode(substrate)
+
+        except PyAsn1Error as exc:
+            assert exc.context["limit"] == limit, f"Unexpected error {exc!r}"
+
+        else:
+            assert False, "Over-long length field accepted"
+
+
+class LateBoundComponentTypeDecoderTestCase(BaseTestCase):
+    """Recursive schemas bind componentType after the fact (see issue #111)."""
+
+    @staticmethod
+    def _ldapFilterSpec():
+        # Modelled on RFC 4511 Filter, the canonical recursive schema: And
+        # holds Filters, so its componentType can only be assigned once every
+        # participating class exists.
+        class AttributeValueAssertion(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("attributeDesc", univ.OctetString()),
+                namedtype.NamedType("assertionValue", univ.OctetString()),
+            )
+
+        class EqualityMatch(AttributeValueAssertion):
+            tagSet = AttributeValueAssertion.tagSet.tagImplicitly(
+                tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 3)
+            )
+
+        class And(univ.SetOf):
+            tagSet = univ.SetOf.tagSet.tagImplicitly(
+                tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 0)
+            )
+
+        class NestedFilter(univ.Choice):
+            pass
+
+        class Filter(univ.Choice):
+            pass
+
+        Filter.componentType = namedtype.NamedTypes(namedtype.NamedType("and", And()))
+        NestedFilter.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("equalityMatch", EqualityMatch())
+        )
+        And.componentType = NestedFilter()
+
+        return Filter
+
+    def testDefMode(self):
+        asn1Object, rest = decoder.decode(
+            bytes.fromhex("a00ea30c040375696404057573657231"),
+            asn1Spec=self._ldapFilterSpec()(),
+        )
+
+        assert rest == _null
+        # Before the fix the nested components were silently dropped: the
+        # decode succeeded but yielded only the first OCTET STRING.
+        equalityMatch = asn1Object["and"][0]["equalityMatch"]
+        assert equalityMatch["attributeDesc"] == _str2octs("uid")
+        assert equalityMatch["assertionValue"] == _str2octs("user1")
+
+    def testIndefMode(self):
+        asn1Object, rest = decoder.decode(
+            bytes.fromhex("a080a38004037569640405757365723100000000"),
+            asn1Spec=self._ldapFilterSpec()(),
+        )
+
+        assert rest == _null
+        equalityMatch = asn1Object["and"][0]["equalityMatch"]
+        assert equalityMatch["attributeDesc"] == _str2octs("uid")
+        assert equalityMatch["assertionValue"] == _str2octs("user1")
+
+
+class SchemalessTaggedConstructedDecoderTestCase(BaseTestCase):
+    """A refuted explicit-tag guess must not drop components (issue #116)."""
+
+    # [0] IMPLICIT holding two SEQUENCEs:
+    #   a0 13  30 07 16 05 "first"  30 08 16 06 "second"
+    twoComponents = bytes.fromhex("a013300716056669727374300816067365636f6e64")
+    twoComponentsIndef = bytes.fromhex("a080300716056669727374300816067365636f6e640000")
+    # The same tag holding a single SEQUENCE stays an explicit-tag reading.
+    oneComponent = bytes.fromhex("a009300716056669727374")
+    oneComponentIndef = bytes.fromhex("a0803007160566697273740000")
+
+    def testDefModeKeepsAllComponents(self):
+        asn1Object, rest = decoder.decode(self.twoComponents)
+
+        assert rest == _null
+        assert len(asn1Object) == 2, f"Components dropped: {asn1Object!r}"
+        assert asn1Object[0][0] == char.IA5String("first")
+        assert asn1Object[1][0] == char.IA5String("second")
+
+    def testIndefModeKeepsAllComponents(self):
+        asn1Object, rest = decoder.decode(self.twoComponentsIndef)
+
+        assert rest == _null
+        assert len(asn1Object) == 2, f"Components dropped: {asn1Object!r}"
+        assert asn1Object[0][0] == char.IA5String("first")
+        assert asn1Object[1][0] == char.IA5String("second")
+
+    def testDefModeSingleComponentUnwrapsAsExplicitTag(self):
+        # One inner encoding is consistent with X.690 8.14.2, so the explicit
+        # tag reading stands and the tag is unwrapped as before.
+        asn1Object, rest = decoder.decode(self.oneComponent)
+
+        assert rest == _null
+        assert len(asn1Object) == 1
+        assert asn1Object[0] == char.IA5String("first")
+
+    def testIndefModeSingleComponentUnwrapsAsExplicitTag(self):
+        asn1Object, rest = decoder.decode(self.oneComponentIndef)
+
+        assert rest == _null
+        assert len(asn1Object) == 1
+        assert asn1Object[0] == char.IA5String("first")
+
+    def testNestedInSequenceKeepsAllComponents(self):
+        # The originally reported shape: the tagged value sits inside an
+        # outer SEQUENCE, so the loss showed up with rest == b''.
+        substrate = bytes((0x30, len(self.twoComponents))) + self.twoComponents
+
+        asn1Object, rest = decoder.decode(substrate)
+
+        assert rest == _null
+        assert len(asn1Object[0]) == 2, f"Components dropped: {asn1Object!r}"
+
+    def testRoundTripsThroughEncoder(self):
+        asn1Object, _ = decoder.decode(self.twoComponents)
+
+        assert encoder.encode(asn1Object) == self.twoComponents
+
+
+class ExplicitTagSubstrateFunDecoderTestCase(BaseTestCase):
+    """substrateFun over a guessed explicit tag stays in PyAsn1Error (issue #140)."""
+
+    # [0] EXPLICIT SEQUENCE { INTEGER 1 }, definite and indefinite length.
+    substrate = bytes.fromhex("a0053003020101")
+    substrateIndef = bytes.fromhex("a08030030201010000")
+
+    constructedSpecs = (
+        univ.Sequence(),
+        univ.SequenceOf(componentType=univ.Integer()),
+        univ.Set(),
+        univ.Choice(),
+    )
+
+    @staticmethod
+    def _capture(asn1Object, substrate, length):
+        return asn1Object, substrate[:length]
+
+    def testDefModeConstructedSpecIsNotCoerced(self):
+        for asn1Spec in self.constructedSpecs:
+            asn1Object, _ = decoder.decode(
+                self.substrate, asn1Spec=asn1Spec, substrateFun=self._capture
+            )
+
+            assert asn1Object is asn1Spec, f"Spec replaced: {asn1Object!r}"
+
+    def testIndefModeConstructedSpecIsNotCoerced(self):
+        for asn1Spec in self.constructedSpecs:
+            asn1Object, _ = decoder.decode(
+                self.substrateIndef, asn1Spec=asn1Spec, substrateFun=self._capture
+            )
+
+            assert asn1Object is asn1Spec, f"Spec replaced: {asn1Object!r}"
+
+    def testSimpleSpecIsNotCoerced(self):
+        # A simple spec used to be cloned with an empty string, which the
+        # Integer constraint rejected as a PyAsn1Error of its own.
+        asn1Spec = univ.Integer()
+
+        asn1Object, _ = decoder.decode(
+            self.substrate, asn1Spec=asn1Spec, substrateFun=self._capture
+        )
+
+        assert asn1Object is asn1Spec
+
+    def testSchemalessDecodeStillYieldsAny(self):
+        asn1Object, _ = decoder.decode(self.substrate, substrateFun=self._capture)
+
+        assert isinstance(asn1Object, univ.Any)
+        assert asn1Object.tagSet[-1] == tag.Tag(
+            tag.tagClassContext, tag.tagFormatConstructed, 0
+        )
+
+    def testSubstrateReachesTheCallback(self):
+        _, captured = decoder.decode(
+            self.substrate, asn1Spec=univ.Sequence(), substrateFun=self._capture
+        )
+
+        assert captured == self.substrate[2:]
+
+    def testDebugLoggingSurvivesAValuelessResult(self):
+        # The decoder's own debug record used to call prettyPrint() on the
+        # schema object handed back by substrateFun. The suite runs with
+        # debug records enabled, so any spec reaches that line.
+        asn1Spec = univ.OctetString()
+
+        asn1Object, captured = decoder.decode(
+            bytes.fromhex("0403616263"),
+            asn1Spec=asn1Spec,
+            substrateFun=self._capture,
+        )
+
+        assert asn1Object is asn1Spec
+        assert captured == bytes.fromhex("616263")
+
+
+class MalformedBitStringDecoderTestCase(BaseTestCase):
+    """Malformed BIT STRING input stays inside PyAsn1Error (issue #121)."""
+
+    def testEmptySegmentIndefiniteLength(self):
+        # The reported substrate: an indefinite-length BIT STRING whose only
+        # segment carries no contents octets at all.
+        try:
+            decoder.decode(bytes.fromhex("0380600000"))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Empty BIT STRING segment accepted"
+
+    def testEmptySegmentDefiniteLength(self):
+        try:
+            decoder.decode(bytes.fromhex("23026000"))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Empty BIT STRING segment accepted"
+
+    def testWellFormedBitStringStillDecodes(self):
+        asn1Object, rest = decoder.decode(bytes.fromhex("030200ff"))
+
+        assert rest == _null
+        assert asn1Object == univ.BitString(hexValue="ff")
+
+    def testEmptyBitStringStillDecodes(self):
+        # X.690 8.6.2.3: an empty bitstring is a single zero initial octet.
+        asn1Object, rest = decoder.decode(bytes.fromhex("030100"))
+
+        assert rest == _null
+        assert asn1Object == univ.BitString(())
+
+    def testMalformedSubstratesRaisePyAsn1Error(self):
+        # Every decoder failure on untrusted input must be a PyAsn1Error
+        # subclass, so a caller wrapping decode() the documented way cannot be
+        # surprised by IndexError, ValueError or TypeError.
+        alphabet = (0x00, 0x01, 0x02, 0x07, 0x08, 0x23, 0x60, 0x80, 0x03, 0xFF)
+
+        escapes = []
+
+        for size in range(5):
+            for body in itertools.product(alphabet, repeat=size):
+                for tagOctet in (0x03, 0x23):
+                    substrate = bytes((tagOctet, *body))
+
+                    try:
+                        decoder.decode(substrate)
+
+                    except PyAsn1Error:
+                        pass
+
+                    except Exception as exc:  # noqa: BLE001
+                        escapes.append((substrate.hex(), type(exc).__name__))
+
+        assert not escapes, f"Non-PyAsn1Error escapes: {escapes[:10]}"
+
+
+class IndefiniteLengthAnyCaptureTestCase(BaseTestCase):
+    """An untagged ANY keeps the EOO closing what it captures (issue #114)."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class Inner(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.OctetString())
+            )
+
+        class Outer(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.NamedType(
+                    "blob",
+                    univ.Any(),
+                    openType=opentype.OpenType("id", {1: Inner()}),
+                ),
+            )
+
+        self.Inner = Inner
+        self.Outer = Outer
+
+        inner = Inner()
+        inner["x"] = "abc"
+
+        value = Outer()
+        value["id"] = 1
+        value["blob"] = univ.Any(encoder.encode(inner, defMode=False))
+
+        self.substrate = encoder.encode(value, defMode=False)
+
+    def testCapturedAnyIsAWellFormedEncoding(self):
+        asn1Object, rest = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        assert rest == _null
+        # 30 80 04 03 "abc" 00 00 -- the trailing EOO closes the indefinite
+        # length header the capture starts with.
+        assert bytes(asn1Object["blob"]) == bytes.fromhex("308004036162630000")
+
+    def testCapturedAnyDecodesOnItsOwn(self):
+        asn1Object, _ = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        inner, rest = decoder.decode(bytes(asn1Object["blob"]), asn1Spec=self.Inner())
+
+        assert rest == _null
+        assert inner["x"] == _str2octs("abc")
+
+    def testOpenTypeDecodingSucceeds(self):
+        asn1Object, rest = decoder.decode(
+            self.substrate, asn1Spec=self.Outer(), decodeOpenTypes=True
+        )
+
+        assert rest == _null
+        assert asn1Object["blob"]["x"] == _str2octs("abc")
+
+    def testRoundTripsThroughEncoder(self):
+        asn1Object, _ = decoder.decode(self.substrate, asn1Spec=self.Outer())
+
+        assert encoder.encode(asn1Object, defMode=False) == self.substrate
+
+    def testTaggedAnyStillHoldsContentsOnly(self):
+        # A tagged ANY holds the contents octets of its own tag, and the EOO
+        # closes that tag rather than anything inside it, so it stays out.
+        s = univ.Any("\004\003fox").subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+        )
+
+        assert decoder.decode(
+            bytes((164, 128, 4, 3, 102, 111, 120, 0, 0)), asn1Spec=s
+        ) == (s, _null)
+
+
+class OptionalBeforeConstructedDecoderTestCase(BaseTestCase):
+    """OPTIONAL followed by a constructed component (see issue #120)."""
+
+    @staticmethod
+    def _legalSpec():
+        # X.680 25.6: the tags of an OPTIONAL component and of everything that
+        # may follow it must be distinct. [2] against [3]/[4] satisfies that.
+        class Lists(univ.Choice):
+            pass
+
+        Lists.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "first",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+                ),
+            ),
+            namedtype.NamedType(
+                "second",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4)
+                ),
+            ),
+        )
+
+        class Obj(univ.Sequence):
+            pass
+
+        Obj.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "counter",
+                univ.Integer().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                ),
+            ),
+            namedtype.OptionalNamedType(
+                "opt",
+                univ.OctetString().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+            namedtype.NamedType("lists", Lists()),
+        )
+
+        return Obj
+
+    def testOptionalPresentBeforeConstructed(self):
+        # 30 0c 81 01 02 82 02 "xy" a3 03 02 01 01
+        substrate = bytes.fromhex("300c81010282027879a303020101")
+
+        asn1Object, rest = decoder.decode(substrate, asn1Spec=self._legalSpec()())
+
+        assert rest == _null
+        assert asn1Object["counter"] == 2
+        assert asn1Object["opt"] == _str2octs("xy")
+        assert asn1Object["lists"]["first"][0] == 1
+        assert asn1Object.prettyPrint()
+
+    def testOptionalAbsentBeforeConstructed(self):
+        substrate = bytes.fromhex("3008810102a303020101")
+
+        asn1Object, rest = decoder.decode(substrate, asn1Spec=self._legalSpec()())
+
+        assert rest == _null
+        assert asn1Object["counter"] == 2
+        assert asn1Object["lists"]["first"][0] == 1
+        assert asn1Object.prettyPrint()
+
+    def testAmbiguousSchemaIsReportedAsSuch(self):
+        # The reported schema: the OPTIONAL component carries [2] and so does
+        # one alternative of the mandatory Choice that follows it, which X.680
+        # 25.6 forbids. The decoder must name that rather than failing further
+        # in with a message about the tag format of whichever component it
+        # happened to pick.
+        class Lists(univ.Choice):
+            pass
+
+        Lists.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "clashing",
+                univ.SequenceOf(componentType=univ.Integer()).subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+        )
+
+        class Obj(univ.Sequence):
+            pass
+
+        Obj.componentType = namedtype.NamedTypes(
+            namedtype.NamedType(
+                "counter",
+                univ.Integer().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                ),
+            ),
+            namedtype.OptionalNamedType(
+                "opt",
+                univ.OctetString().subtype(
+                    implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2)
+                ),
+            ),
+            namedtype.NamedType("lists", Lists()),
+        )
+
+        substrate = bytes.fromhex("3008810102820278790000")[:10]
+
+        try:
+            decoder.decode(substrate, asn1Spec=Obj())
+
+        except PyAsn1Error as exc:
+            assert "Duplicate component tag" in str(exc), f"Unexpected error {exc!r}"
+            assert exc.context["tagSet"] == tag.TagSet(
+                tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2),
+                tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2),
+            )
+
+        else:
+            assert False, "Ambiguous schema accepted"
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

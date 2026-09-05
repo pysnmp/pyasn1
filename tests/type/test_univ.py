@@ -8,10 +8,16 @@ import copy
 import math
 import pickle
 import sys
+import timeit
 import unittest
 import warnings
 
-from pyasn1.error import PyAsn1Error, PyAsn1UnicodeDecodeError, PyAsn1UnicodeEncodeError
+from pyasn1.error import (
+    PyAsn1Error,
+    PyAsn1UnicodeDecodeError,
+    PyAsn1UnicodeEncodeError,
+    inconsistencyError,
+)
 from pyasn1.type import char, constraint, error, namedtype, namedval, tag, univ, useful
 from tests.base import BaseTestCase
 
@@ -2388,6 +2394,471 @@ class ChoicePicklingTestCase(unittest.TestCase):
         new_asn1 = pickle.loads(serialised)
         assert new_asn1
         assert new_asn1["name"] == _str2octs("test")
+
+
+class RealFloatConversionGuardTestCase(BaseTestCase):
+    """float() on a Real must not run away on hostile values (see #110)."""
+
+    def testBase10ExponentBeyondDoubleRangeOverflows(self):
+        real = univ.Real((1, 10, sys.float_info.max_10_exp + 1))
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Out-of-range base 10 exponent silently accepted"
+
+    def testBase10ExponentBeyondDoubleRangePrettyPrints(self):
+        real = univ.Real((1, 10, sys.float_info.max_10_exp + 1))
+
+        assert real.prettyPrint() == "<overflow>"
+
+    def testBase10MantissaBeyondDigitLimitOverflows(self):
+        # Wider than sys.get_int_max_str_digits(), so the decimal rendering
+        # used for the conversion raises ValueError.
+        real = univ.Real((10 ** (sys.get_int_max_str_digits() + 1), 10, 0))
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Unrenderable base 10 mantissa silently accepted"
+
+    def testBase2ExponentBeyondDoubleRangeOverflows(self):
+        real = univ.Real((1, 2, 1 << 30))
+
+        started = timeit.default_timer()
+
+        try:
+            float(real)
+
+        except OverflowError:
+            pass
+
+        else:
+            assert False, "Out-of-range base 2 exponent silently accepted"
+
+        # A pow(2, 2**30) fallback would take far longer than this.
+        elapsed = timeit.default_timer() - started
+        assert elapsed < 1.0, f"Base 2 overflow took {elapsed:.3f}s"
+
+    def testBase2RemainsExact(self):
+        assert float(univ.Real((3, 2, -2))) == 0.75
+        assert float(univ.Real((1, 2, -1074))) == 5e-324
+
+    def testBase10RemainsExact(self):
+        assert float(univ.Real((314159, 10, -5))) == 3.14159
+        assert float(univ.Real((1, 10, sys.float_info.max_10_exp))) == 1e308
+
+
+class LateBoundComponentTypeTestCase(BaseTestCase):
+    """clone()/subtype() re-resolve a late-bound componentType (issue #111)."""
+
+    def testSequenceLateBoundComponentType(self):
+        class LateSequence(univ.Sequence):
+            pass
+
+        s = LateSequence()
+
+        LateSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+
+        # The existing instance keeps the schema it was built with.
+        assert len(s.componentType) == 0
+        assert "name" not in s
+
+        # Clones resolve the schema the class has since acquired.
+        s = s.clone()
+        s["name"] = "abc"
+
+        assert s["name"] == _str2octs("abc")
+        assert len(s.componentType) == 1
+
+    def testChoiceLateBoundComponentType(self):
+        class LateChoice(univ.Choice):
+            pass
+
+        s = LateChoice()
+
+        LateChoice.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("number", univ.Integer())
+        )
+
+        assert len(s.componentType) == 0
+
+        s = s.clone()
+        s["number"] = 123
+
+        assert s["number"] == 123
+        assert s.getName() == "number"
+
+    def testSubtypeResolvesLateBoundComponentType(self):
+        class LateSequence(univ.Sequence):
+            pass
+
+        s = LateSequence()
+
+        LateSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+
+        s = s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 5)
+        )
+
+        assert len(s.componentType) == 1
+
+    def testExplicitEmptyComponentTypeIsPreserved(self):
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        # An empty componentType the caller asked for is a deliberate override,
+        # not an unresolved placeholder, and must survive cloning.
+        s = ParentSequence(componentType=namedtype.NamedTypes())
+
+        assert len(s.componentType) == 0
+        assert len(s.clone().componentType) == 0
+        assert len(s.clone().clone().componentType) == 0
+        assert (
+            len(
+                s.subtype(
+                    implicitTag=tag.Tag(
+                        tag.tagClassContext, tag.tagFormatConstructed, 5
+                    )
+                ).componentType
+            )
+            == 0
+        )
+
+    def testUnpickledObjectKeepsItsSnapshot(self):
+        # Objects pickled by a release predating the explicitness flag carry
+        # no such attribute and must conservatively keep their snapshot.
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        s = ParentSequence(componentType=namedtype.NamedTypes())
+
+        del s.__dict__["_componentTypeExplicit"]
+
+        assert len(s.clone().componentType) == 0
+
+    def testInheritedComponentTypeSnapshotIsStable(self):
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString())
+            )
+
+        class ChildSequence(ParentSequence):
+            pass
+
+        s = ChildSequence()
+
+        ParentSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString()),
+            namedtype.NamedType("age", univ.Integer()),
+        )
+
+        # A schema that was already resolved is not re-resolved.
+        assert len(s.componentType) == 1
+        assert "age" not in s
+
+    def testSequenceOfNoValueComponentTypeIsPreserved(self):
+        s = univ.SequenceOf(componentType=univ.noValue)
+
+        assert s.clone().componentType is univ.noValue
+
+        s = s.subtype(
+            implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatConstructed, 7)
+        )
+
+        assert s.componentType is univ.noValue
+
+    def testCloneAfterPickleKeepsComponentType(self):
+        s = pickle.loads(pickle.dumps(univ.SequenceOf(componentType=univ.Sequence())))
+
+        assert s.clone().componentType is s.componentType
+
+
+class IsInconsistentContractTestCase(BaseTestCase):
+    """isInconsistent returns an exception, never a bare True (issue #118)."""
+
+    @staticmethod
+    def _sequenceOf():
+        return univ.SequenceOf(
+            componentType=univ.Integer(),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+    @staticmethod
+    def _sequence():
+        return univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("a", univ.Integer())
+            ),
+            subtypeSpec=constraint.ValueSizeConstraint(1, 2),
+        )
+
+    def testSequenceOfSchemaReportsAnException(self):
+        inconsistency = self._sequenceOf().isInconsistent
+
+        assert isinstance(inconsistency, PyAsn1Error), (
+            f"isInconsistent returned {inconsistency!r}"
+        )
+
+    def testSequenceSchemaReportsAnException(self):
+        inconsistency = self._sequence().isInconsistent
+
+        assert isinstance(inconsistency, PyAsn1Error), (
+            f"isInconsistent returned {inconsistency!r}"
+        )
+
+    def testConsistentObjectReportsFalse(self):
+        s = self._sequenceOf().clone()
+        s.append(univ.Integer(1))
+
+        assert s.isInconsistent is False
+
+    def testUnconstrainedObjectReportsFalse(self):
+        assert univ.SequenceOf(componentType=univ.Integer()).isInconsistent is False
+
+    def testConstraintFailureKeepsItsDetail(self):
+        # A genuine constraint failure must still surface the constraint that
+        # rejected the value, not a generic message.
+        s = self._sequenceOf().clone()
+        for value in (1, 2, 3):
+            s.append(univ.Integer(value))
+
+        inconsistency = s.isInconsistent
+
+        assert isinstance(inconsistency, error.ValueConstraintError)
+
+
+class InconsistencyErrorTestCase(BaseTestCase):
+    """error.inconsistencyError normalises whatever isInconsistent returns."""
+
+    def testExceptionIsPassedThrough(self):
+        exc = error.ValueConstraintError("Constraint check failed")
+
+        assert inconsistencyError(exc, univ.Sequence()) is exc
+
+    def testBareTrueBecomesPyAsn1Error(self):
+        # A subclass following the older convention must not turn into
+        # "TypeError: exceptions must derive from BaseException".
+        normalized = inconsistencyError(True, univ.Sequence())
+
+        assert isinstance(normalized, PyAsn1Error)
+        assert normalized.context["asn1Object"] == "Sequence"
+
+
+class ChoiceReadDoesNotSelectTestCase(BaseTestCase):
+    """Reading an alternative must not deselect another (issue #122)."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        self.s = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType(
+                    "foo",
+                    univ.OctetString().subtype(
+                        implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0)
+                    ),
+                ),
+                namedtype.NamedType(
+                    "bar",
+                    univ.OctetString().subtype(
+                        implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+                    ),
+                ),
+            )
+        )
+
+    def _selected(self):
+        s = self.s.clone()
+        s["bar"] = "xyz"
+        return s
+
+    def testReadingAnotherAlternativeKeepsTheValue(self):
+        s = self._selected()
+
+        s["foo"]
+
+        assert s["bar"] == _str2octs("xyz"), "Reading 'foo' dropped 'bar'"
+
+    def testReadingAnotherAlternativeKeepsTheSelection(self):
+        s = self._selected()
+
+        s["foo"]
+
+        assert s.getName() == "bar"
+        assert s.getComponent() == _str2octs("xyz")
+
+    def testRepeatedReadsAreStable(self):
+        s = self._selected()
+
+        for _ in range(3):
+            assert not s["foo"].isValue
+            assert s["bar"] == _str2octs("xyz")
+
+    def testReadingAnotherAlternativeYieldsASchemaObject(self):
+        s = self._selected()
+
+        assert not s["foo"].isValue
+
+    def testAssignmentStillSwitchesAlternatives(self):
+        s = self._selected()
+
+        s["foo"] = "abc"
+
+        assert s.getName() == "foo"
+        assert s["foo"] == _str2octs("abc")
+        # X.680 29.1: a CHOICE holds exactly one alternative.
+        assert not s["bar"].isValue
+
+    def testEncodingIsUnaffectedByReads(self):
+        from pyasn1.codec.der import encoder as der_encoder
+
+        s = self._selected()
+        expected = der_encoder.encode(s)
+
+        s["foo"]
+
+        assert der_encoder.encode(s) == expected
+
+    def testInnerSetComponentByTypeStillSelects(self):
+        # setComponentByType(innerFlag=True) navigates by reading the
+        # component and then assigns into it; that write must still select.
+        inner = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("sex", univ.Integer())
+            )
+        )
+        outer = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString()),
+                namedtype.NamedType("nested", inner),
+            )
+        )
+
+        s = outer.clone()
+        s.setComponentByType(univ.OctetString.tagSet, "abc")
+
+        assert s.getName() == "name"
+
+        s.setComponentByType(univ.Integer.tagSet, 123, innerFlag=True)
+
+        assert s.getName() == "nested"
+        assert list(s) == ["nested"]
+        assert "name" not in s
+
+
+class RelativeOID(BaseTestCase):
+    """X.680 33: RELATIVE-OID, arcs relative to a context-supplied OID."""
+
+    def testStr(self):
+        assert str(univ.RelativeOID("5.6")) == "5.6"
+
+    def testRepr(self):
+        assert "5.6" in repr(univ.RelativeOID("5.6"))
+
+    def testEq(self):
+        assert univ.RelativeOID((1, 3, 6)) == (1, 3, 6)
+
+    def testAdd(self):
+        assert univ.RelativeOID((1, 3)) + (6,) == (1, 3, 6)
+
+    def testRadd(self):
+        assert (1,) + univ.RelativeOID((3, 6)) == (1, 3, 6)
+
+    def testLen(self):
+        assert len(univ.RelativeOID((1, 3))) == 2
+
+    def testPrefix(self):
+        o = univ.RelativeOID("1.3.6")
+        assert o.isPrefixOf((1, 3, 6))
+        assert o.isPrefixOf((1, 3, 6, 1))
+        assert not o.isPrefixOf((1, 3))
+
+    def testInput1(self):
+        assert univ.RelativeOID("1.3.6") == (1, 3, 6)
+
+    def testInput2(self):
+        assert univ.RelativeOID((1, 3, 6)) == (1, 3, 6)
+
+    def testInput3(self):
+        assert univ.RelativeOID(univ.RelativeOID("1.3") + (6,)) == (1, 3, 6)
+
+    def testUnicode(self):
+        assert univ.RelativeOID("1.3.6") == (1, 3, 6)
+
+    def testTag(self):
+        # X.680 33 gives RELATIVE-OID universal tag 13.
+        assert univ.RelativeOID().tagSet == tag.TagSet(
+            (),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x0D),
+        )
+
+    def testContains(self):
+        s = univ.RelativeOID("1.3.6.1234.99999")
+        assert 1234 in s
+        assert 4321 not in s
+
+    def testIndex(self):
+        assert univ.RelativeOID("1.3.6").index(6) == 2
+
+    def testSlice(self):
+        assert univ.RelativeOID("1.3.6.1")[1:3] == (3, 6)
+
+    def testMalformedString(self):
+        # A hyphen is the ASN.1 comment marker, never part of an arc.
+        try:
+            univ.RelativeOID("1.3.-6")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Malformed RELATIVE-OID accepted"
+
+    def testNonIntegerArc(self):
+        try:
+            univ.RelativeOID("1.3.abc")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Non-integer arc accepted"
+
+    def testNegativeArc(self):
+        try:
+            univ.RelativeOID((1, 3, -6))
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "Negative arc accepted"
+
+    def testNoFirstTwoArcRestriction(self):
+        # Unlike ObjectIdentifier, whose first arc is 0..2 (X.690 8.19.4),
+        # a RELATIVE-OID has no distinguished leading arcs at all.
+        assert univ.RelativeOID((99, 1)) == (99, 1)
+
+    def testIsSuperTypeOfObjectIdentifierIsFalse(self):
+        # Distinct universal tags, so the two must not be interchangeable.
+        assert not univ.RelativeOID().isSameTypeWith(univ.ObjectIdentifier())
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

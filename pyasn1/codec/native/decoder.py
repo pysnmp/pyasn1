@@ -49,7 +49,7 @@ class SequenceOrSetDecoder:
     ) -> Any:
         asn1Value = asn1Spec.clone()
 
-        componentsTypes = asn1Spec.componentType
+        componentsTypes = asn1Value.componentType
 
         for field in asn1Value:
             if field in pyObject:
@@ -71,7 +71,7 @@ class SequenceOfOrSetOfDecoder:
         asn1Value = asn1Spec.clone()
 
         for pyValue in pyObject:
-            asn1Value.append(decodeFun(pyValue, asn1Spec.componentType), **options)
+            asn1Value.append(decodeFun(pyValue, asn1Value.componentType), **options)
 
         return asn1Value
 
@@ -86,7 +86,7 @@ class ChoiceDecoder:
     ) -> Any:
         asn1Value = asn1Spec.clone()
 
-        componentsTypes = asn1Spec.componentType
+        componentsTypes = asn1Value.componentType
 
         for field in pyObject:
             if field in componentsTypes:
@@ -105,6 +105,7 @@ tagMap: Final[dict[tag.TagSet, Any]] = {
     univ.OctetString.tagSet: AbstractScalarDecoder(),
     univ.Null.tagSet: AbstractScalarDecoder(),
     univ.ObjectIdentifier.tagSet: AbstractScalarDecoder(),
+    univ.RelativeOID.tagSet: AbstractScalarDecoder(),
     univ.Enumerated.tagSet: AbstractScalarDecoder(),
     univ.Real.tagSet: AbstractScalarDecoder(),
     univ.Sequence.tagSet: SequenceOrSetDecoder(),  # conflicts with SequenceOf
@@ -136,6 +137,7 @@ typeMap: Final[dict[int, Any]] = {
     univ.OctetString.typeId: AbstractScalarDecoder(),
     univ.Null.typeId: AbstractScalarDecoder(),
     univ.ObjectIdentifier.typeId: AbstractScalarDecoder(),
+    univ.RelativeOID.typeId: AbstractScalarDecoder(),
     univ.Enumerated.typeId: AbstractScalarDecoder(),
     univ.Real.typeId: AbstractScalarDecoder(),
     # ambiguous base types

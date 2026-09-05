@@ -26,7 +26,17 @@ from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.cer import encoder as cer_encoder
 from pyasn1.codec.der import decoder as der_decoder
 from pyasn1.codec.der import encoder as der_encoder
-from pyasn1.type import char, constraint, namedtype, tag, univ, useful
+from pyasn1.codec.native import encoder as native_encoder
+from pyasn1.type import (
+    char,
+    constraint,
+    namedtype,
+    namedval,
+    opentype,
+    tag,
+    univ,
+    useful,
+)
 from tests.base import BaseTestCase
 
 
@@ -1251,6 +1261,251 @@ class IntegerMinimalEncodingTestCase(BaseTestCase):
             )
 
 
+class TaggedIntegerMinimalEncodingTestCase(BaseTestCase):
+    """X.690 8.3.2 binds the contents octets, which an IMPLICIT tag does not touch.
+
+    X.690 8.14.3: implicit tagging replaces the tag octets and leaves the
+    contents octets alone. So a tagged INTEGER must carry exactly the contents
+    of the untagged one -- including the leading zero octet that keeps a
+    positive value with bit 8 set from reading as negative.
+
+    Reported (pyasn1/pyasn1#87) as a spurious leading ``00`` on a 32-octet
+    positive value, with ``82 20 ff...ff`` given as the expected encoding.
+    That encoding denotes -1: 8.3.2 requires the ``00``, and dropping it would
+    change the value rather than shorten it.
+    """
+
+    class TaggedInteger(univ.Integer):
+        tagSet = univ.Integer.tagSet.tagImplicitly(
+            tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0x02)
+        )
+
+    def testContentsOctetsMatchTheUntaggedEncoding(self):
+        # The untagged encoding is already pinned as minimal over this range by
+        # IntegerMinimalEncodingTestCase, so equality here carries minimality
+        # onto the tagged path without re-deriving it. That makes this a check
+        # that tagging leaves the contents octets alone, which needs the octet
+        # boundaries and a spread of values, not an exhaustive sweep.
+        values = list(range(-70000, 70000, 331))
+        values += [0, 1, 127, 128, 255, 256, 65535, -1, -128, -129, -32768]
+        values += [0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, 1 << 256, -(1 << 256)]
+
+        # Every octet boundary and the values either side of it, where the
+        # leading-zero and leading-sign rules of 8.3.2 actually bite.
+        for width in range(1, 9):
+            edge = 1 << (8 * width - 1)
+            values += [edge - 1, edge, edge + 1, -edge - 1, -edge, -edge + 1]
+
+        for value in values:
+            for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+                # Strip the identifier octet from each; the length and contents
+                # octets that follow must be identical.
+                tagged = encode(self.TaggedInteger(value))[1:]
+                untagged = encode(univ.Integer(value))[1:]
+
+                assert tagged == untagged, (
+                    f"{value}: tagged {tagged.hex()} != untagged {untagged.hex()}"
+                )
+
+    def testPositiveValueWithBitEightSetKeepsItsLeadingZero(self):
+        # The reported case. 82 21 00 ff... , not 82 20 ff... .
+        value = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+        substrate = der_encoder.encode(self.TaggedInteger(value))
+
+        assert substrate == bytes.fromhex("822100" + "ff" * 32)
+
+    def testTheReportedExpectationDenotesMinusOne(self):
+        # 82 20 ff...ff does not shorten the value, it changes it. Under BER,
+        # which tolerates non-minimal contents, it reads as -1.
+        substrate = bytes.fromhex("8220" + "ff" * 32)
+
+        decoded, rest = ber_decoder.decode(substrate, asn1Spec=self.TaggedInteger())
+
+        assert rest == b""
+        assert decoded == -1
+
+    def testTheReportedExpectationIsRejectedUnderDer(self):
+        # And under DER it is not even well formed: 32 octets of ff is a
+        # non-minimal encoding of -1, which 8.3.2 a) forbids outright.
+        self.assertRaises(
+            error.PyAsn1Error,
+            der_decoder.decode,
+            bytes.fromhex("8220" + "ff" * 32),
+            asn1Spec=self.TaggedInteger(),
+        )
+
+    def testTaggedValuesRoundTrip(self):
+        for value in (-32769, -129, -128, -1, 0, 127, 128, 255, 32767, 1 << 256):
+            substrate = der_encoder.encode(self.TaggedInteger(value))
+
+            assert (
+                der_decoder.decode(substrate, asn1Spec=self.TaggedInteger())[0] == value
+            )
+
+
+class NamedBitStringTestCase(BaseTestCase):
+    """X.690 8.6.2: bit 0 of a BIT STRING goes in bit 8 of the first octet.
+
+    X.680 22.2 numbers the named bits from zero, and 8.6.2.1 lays them out
+    "commencing with bit 8" of the first contents octet, so named bit `n`
+    occupies position `n` counting from the left. Bit 0 alone is therefore
+    ``80``, bit 1 alone ``40``, bit 2 alone ``20``.
+
+    Reported (pyasn1/pyasn1#74) as distinct named bits collapsing onto the
+    same octets. They do so under `asOctets()`, which reads the bits as one
+    integer and pads on the left, but not in the encoding -- the codecs align
+    the value first. See the note on `BitString.asOctets`.
+    """
+
+    class PKIFailureInfo(univ.BitString):
+        namedValues = namedval.NamedValues(
+            ("badAlg", 0), ("badMessageCheck", 1), ("badRequest", 2), ("badTime", 3)
+        )
+
+    def testEachNamedBitEncodesToItsOwnPosition(self):
+        for name, expected in (
+            ("badAlg", "03020780"),
+            ("badMessageCheck", "03020640"),
+            ("badRequest", "03020520"),
+            ("badTime", "03020410"),
+        ):
+            for encode in (ber_encoder.encode, der_encoder.encode):
+                substrate = encode(self.PKIFailureInfo(name))
+
+                assert substrate == bytes.fromhex(expected), (
+                    f"{name}: {substrate.hex()} != {expected}"
+                )
+
+    def testDistinctNamedBitsEncodeDistinctly(self):
+        substrates = {
+            name: der_encoder.encode(self.PKIFailureInfo(name))
+            for name in ("badAlg", "badMessageCheck", "badRequest", "badTime")
+        }
+
+        assert len(set(substrates.values())) == len(substrates), substrates
+
+    def testNamedBitsRoundTrip(self):
+        for name in ("badAlg", "badMessageCheck", "badRequest", "badTime"):
+            value = self.PKIFailureInfo(name)
+            substrate = der_encoder.encode(value)
+
+            decoded, rest = der_decoder.decode(
+                substrate, asn1Spec=self.PKIFailureInfo()
+            )
+
+            assert rest == b""
+            assert decoded == value
+            assert tuple(decoded) == tuple(value)
+
+    def testUnusedBitCountMatchesTheNamedBitPosition(self):
+        # 8.6.2.2: the initial octet counts the unused trailing bits.
+        for position, name in enumerate(
+            ("badAlg", "badMessageCheck", "badRequest", "badTime")
+        ):
+            contents = der_encoder.encode(self.PKIFailureInfo(name))[2:]
+
+            assert contents[0] == 7 - position, name
+
+    def testAsOctetsIsTheIntegerViewNotTheWireLayout(self):
+        # Pins the documented behaviour that the report tripped over: these
+        # collapse under asOctets() while their encodings stay distinct.
+        for name in ("badAlg", "badMessageCheck", "badRequest", "badTime"):
+            assert self.PKIFailureInfo(name).asOctets() == b"\x01", name
+
+
+class RelativeOIDTestCase(BaseTestCase):
+    """X.690 8.20: RELATIVE-OID, universal tag 13.
+
+    8.20.2 encodes the contents octets as the sub-identifiers of the arcs, in
+    order, each in the same base-128 continuation form as an OBJECT IDENTIFIER
+    (8.19.2). What it does *not* do is combine the first two arcs the way
+    8.19.4 requires there, because a RELATIVE-OID has no distinguished leading
+    arcs -- X.680 33 defines it relative to an object identifier the context
+    supplies.
+    """
+
+    def testWorkedExampleFromTheStandard(self):
+        # X.690 8.20.5: the RELATIVE-OID { 8571 3 2 } encodes as
+        # 0d 04 c2 7b 03 02.
+        value = univ.RelativeOID((8571, 3, 2))
+
+        for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("0d04c27b0302"), encode
+
+    def testUniversalTagIsThirteen(self):
+        substrate = der_encoder.encode(univ.RelativeOID((5, 6)))
+
+        assert substrate[0] == 0x0D
+
+    def testFirstArcIsNotCombined(self):
+        # The same arcs as an OBJECT IDENTIFIER encode differently: 8.19.4
+        # folds { 1 3 } into the single octet 0x2b, 8.20.2 does not.
+        assert der_encoder.encode(univ.RelativeOID((1, 3))) == bytes.fromhex("0d020103")
+        assert der_encoder.encode(univ.ObjectIdentifier((1, 3))) == bytes.fromhex(
+            "0601 2b"
+        )
+
+    def testArcsBeyondTheObjectIdentifierFirstArcRange(self):
+        # A leading arc of 99 is illegal for an OBJECT IDENTIFIER and fine
+        # here, which is the point of the type.
+        value = univ.RelativeOID((99, 1))
+
+        assert der_decoder.decode(
+            der_encoder.encode(value), asn1Spec=univ.RelativeOID()
+        ) == (value, b"")
+
+    def testRoundTrip(self):
+        for arcs in ((0,), (5, 6), (5, 6, 7), (8571, 3, 2), (128, 129), (1 << 40,)):
+            value = univ.RelativeOID(arcs)
+
+            decoded, rest = der_decoder.decode(
+                der_encoder.encode(value), asn1Spec=univ.RelativeOID()
+            )
+
+            assert rest == b""
+            assert decoded == value
+
+    def testSchemalessDecodingRecoversTheType(self):
+        decoded, rest = der_decoder.decode(bytes.fromhex("0d04c27b0302"))
+
+        assert rest == b""
+        assert isinstance(decoded, univ.RelativeOID)
+        assert decoded == (8571, 3, 2)
+
+    def testLeadingZeroOctetRejected(self):
+        # 8.19.2 forbids a padded sub-identifier; 8.20.2 inherits the form.
+        self.assertRaises(
+            error.PyAsn1Error, der_decoder.decode, bytes.fromhex("0d028001")
+        )
+
+    def testEmptyContentsRejected(self):
+        self.assertRaises(error.PyAsn1Error, der_decoder.decode, bytes.fromhex("0d00"))
+
+    def testArcContinuationOctetsAreBounded(self):
+        # The RELATIVE-OID decoder shares the OBJECT IDENTIFIER sub-identifier
+        # form and so must share its bound (see issue #110).
+        limit = ber_decoder.MAX_OID_ARC_CONTINUATION_OCTETS
+
+        payload = b"\x81" * (limit + 1) + b"\x01"
+        substrate = b"\x0d" + bytes((len(payload),)) + payload
+
+        try:
+            der_decoder.decode(substrate)
+
+        except error.PyAsn1Error as exc:
+            assert exc.context["limit"] == limit
+
+        else:
+            assert False, "Over-long RELATIVE-OID arc accepted"
+
+    def testConstructedFormRejected(self):
+        # 8.20.1: the encoding shall be primitive.
+        self.assertRaises(
+            error.PyAsn1Error, der_decoder.decode, bytes.fromhex("2d020506")
+        )
+
+
 class BitStringTestCase(BaseTestCase):
     """X.690 8.6."""
 
@@ -1657,6 +1912,228 @@ class TagFormTestCase(BaseTestCase):
             substrate = der_encoder.encode(asn1Object)
 
             assert substrate[0] & 0x1F != 0x1F, f"tag {tagId} took the long form"
+
+
+class EncoderPurityTestCase(BaseTestCase):
+    """Encoding must not alter the object being encoded (see issue #112).
+
+    X.690 11.5 requires DER and CER to omit a component equal to its DEFAULT
+    value, and BER permits it, so an absent DEFAULT component contributes
+    nothing to the octets either way. Materialising one while encoding is
+    therefore pure side effect: it changes which components the caller's
+    object reports as present, and does so silently.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        self.s = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("name", univ.OctetString()),
+                namedtype.DefaultedNamedType("age", univ.Integer(33)),
+                namedtype.OptionalNamedType("nick", univ.OctetString()),
+            )
+        )
+
+    def _value(self):
+        value = self.s.clone()
+        value["name"] = "abc"
+        return value
+
+    @staticmethod
+    def _presence(value):
+        return [
+            value.getComponentByPosition(idx, instantiate=False) is not univ.noValue
+            for idx in range(3)
+        ]
+
+    def testBerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        ber_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testCerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        cer_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testDerEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        der_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testNativeEncodeLeavesComponentsAbsent(self):
+        value = self._value()
+
+        native_encoder.encode(value)
+
+        assert self._presence(value) == [True, False, False]
+
+    def testEncodingIsUnchanged(self):
+        # X.690 11.5: the absent DEFAULT component is omitted, as before.
+        assert ber_encoder.encode(self._value()) == bytes.fromhex("30050403616263")
+        assert der_encoder.encode(self._value()) == bytes.fromhex("30050403616263")
+
+    def testRepeatedEncodingIsStable(self):
+        value = self._value()
+
+        for encode in (ber_encoder.encode, cer_encoder.encode, der_encoder.encode):
+            assert encode(value) == encode(value)
+
+    def testNativeEncodingCarriesDefaultValue(self):
+        # The native codec produces a Python mapping rather than octets, so a
+        # DEFAULT component belongs in the output even when absent.
+        assert native_encoder.encode(self._value()) == {"name": b"abc", "age": 33}
+
+    def testExplicitlySetDefaultValueStillOmitted(self):
+        # X.690 11.5 applies to the value, not to how it was set.
+        value = self._value()
+        value["age"] = 33
+
+        assert der_encoder.encode(value) == bytes.fromhex("30050403616263")
+
+    def testNonDefaultValueIsEncoded(self):
+        value = self._value()
+        value["age"] = 34
+
+        assert der_encoder.encode(value) == bytes.fromhex("30080403616263020122")
+
+    def testChoiceEncodesOnlyTheSetAlternative(self):
+        c = univ.Choice(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("number", univ.Integer()),
+                namedtype.NamedType("string", univ.OctetString()),
+            )
+        )
+        value = c.clone()
+        value["number"] = 7
+
+        assert native_encoder.encode(value) == {"number": 7}
+        assert der_encoder.encode(value) == bytes.fromhex("020107")
+
+
+class PresentButEmptyOptionalTestCase(BaseTestCase):
+    """A present OPTIONAL component is encoded even if empty (see issue #119).
+
+    X.690 11.5 restricts DER and CER to omitting a component whose value
+    equals its DEFAULT value. Nothing licenses omitting an OPTIONAL component
+    that is present, and 'present with empty contents' is a different abstract
+    value from 'absent' -- a SEQUENCE all of whose components are DEFAULT and
+    equal to their defaults encodes as ``30 00``, which is a value, not a
+    space.
+    """
+
+    @staticmethod
+    def _innerType():
+        return univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.DefaultedNamedType("m", univ.Integer(1))
+            )
+        )
+
+    def _sequenceValue(self):
+        inner = self._innerType()
+
+        outer = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.OptionalNamedType("opt", inner),
+            )
+        )
+
+        value = outer.clone()
+        value["id"] = 7
+        value["opt"] = inner.clone()
+        value["opt"]["m"] = 1  # equals the default, so the inner encodes 30 00
+
+        return outer, value
+
+    def testSequenceKeepsAPresentEmptyOptional(self):
+        _, value = self._sequenceValue()
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("30050201073000"), encode
+
+    def testSetKeepsAPresentEmptyOptional(self):
+        inner = self._innerType()
+
+        outer = univ.Set(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("id", univ.Integer()),
+                namedtype.OptionalNamedType("opt", inner),
+            )
+        )
+
+        value = outer.clone()
+        value["id"] = 7
+        value["opt"] = inner.clone()
+        value["opt"]["m"] = 1
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("31050201073000"), encode
+
+    def testAbsentOptionalIsStillOmitted(self):
+        outer, _ = self._sequenceValue()
+
+        value = outer.clone()
+        value["id"] = 7
+
+        for encode in (ber_encoder.encode, der_encoder.encode):
+            assert encode(value) == bytes.fromhex("3003020107"), encode
+
+        # X.690 9.1: CER uses the indefinite length form for constructed types.
+        assert cer_encoder.encode(value) == bytes.fromhex("30800201070000")
+
+    def testDefaultEqualToItsDefaultIsStillOmitted(self):
+        # X.690 11.5, the rule that does apply here.
+        inner = self._innerType()
+
+        value = inner.clone()
+        value["m"] = 1
+
+        assert der_encoder.encode(value) == bytes.fromhex("3000")
+
+    def testOpenTypeRoundTripPreservesTheEmptySequence(self):
+        # The reported case: the empty SEQUENCE is the open-type value of an
+        # OPTIONAL ANY, and re-encoding after decodeOpenTypes dropped it.
+        oid = univ.ObjectIdentifier((1, 2, 410, 200046, 1, 2))
+
+        inner = self._innerType()
+
+        algorithmIdentifier = univ.Sequence(
+            componentType=namedtype.NamedTypes(
+                namedtype.NamedType("algorithm", univ.ObjectIdentifier()),
+                namedtype.OptionalNamedType(
+                    "parameters",
+                    univ.Any(),
+                    openType=opentype.OpenType("algorithm", {oid: inner}),
+                ),
+            )
+        )
+
+        parameters = inner.clone()
+        parameters["m"] = 1
+
+        value = algorithmIdentifier.clone()
+        value["algorithm"] = oid
+        value["parameters"] = univ.Any(der_encoder.encode(parameters))
+
+        substrate = der_encoder.encode(value)
+
+        assert substrate == bytes.fromhex("300c06082a831a8c9a6e01023000")
+
+        decoded, rest = der_decoder.decode(
+            substrate, asn1Spec=algorithmIdentifier.clone(), decodeOpenTypes=True
+        )
+
+        assert rest == b""
+        assert der_encoder.encode(decoded) == substrate
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

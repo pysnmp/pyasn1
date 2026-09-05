@@ -8,6 +8,7 @@
 
 import decimal
 import math
+import sys
 import typing
 import warnings
 from collections.abc import Iterator
@@ -41,6 +42,7 @@ __all__ = [
     "ObjectIdentifier",
     "OctetString",
     "Real",
+    "RelativeOID",
     "Sequence",
     "SequenceAndSetBase",
     "SequenceOf",
@@ -602,14 +604,25 @@ class BitString(base.SimpleAsn1Type):
 
         If |ASN.1| object length is not a multiple of 8, result
         will be left-padded with zeros.
+
+        See :meth:`asOctets` on why this is not the X.690 contents octets.
         """
         return tuple(self.asOctets())
 
     def asOctets(self) -> bytes:
-        """Get |ASN.1| value as a sequence of octets.
+        r"""Get |ASN.1| value as a sequence of octets.
 
-        If |ASN.1| object length is not a multiple of 8, result
-        will be left-padded with zeros.
+        The bits are read as a single integer, so a value shorter than a
+        multiple of 8 is left-padded with zeros: ``BitString((1,))``,
+        ``BitString((0, 1))`` and ``BitString((0, 0, 1))`` all give
+        ``b''``.
+
+        This is deliberately *not* the X.690 8.6.2 contents octets, which
+        place bit 0 in bit 8 of the first octet and pad on the right --
+        ``80``, ``40`` and ``20`` for those three values. Use the codecs for
+        that; they align the value before serialising it. To go the other
+        way, :meth:`fromOctetString` and the `hexValue` initializer both read
+        the X.690 layout, so they are not inverses of this method.
         """
         return _int_to_bytes(self._value, length=len(self))
 
@@ -1409,6 +1422,206 @@ class ObjectIdentifier(base.SimpleAsn1Type):
         return ".".join([str(x) for x in value])
 
 
+class RelativeOID(base.SimpleAsn1Type):
+    """Create |ASN.1| schema or value object.
+
+    |ASN.1| class is based on :class:`~pyasn1.type.base.SimpleAsn1Type`, its
+    objects are immutable and duck-type Python :class:`tuple` objects
+    (tuple of non-negative integers).
+
+    A RELATIVE-OID names arcs relative to some object identifier supplied by
+    the context, so unlike :class:`ObjectIdentifier` it has no first two arcs
+    to combine and its arcs are subject to no range restriction.
+
+    Keyword Args
+    ------------
+    value: :class:`tuple`, :class:`str` or |ASN.1| object
+        Python sequence of :class:`int` or :class:`str` literal or |ASN.1| object.
+        If `value` is not given, schema object will be created.
+
+    tagSet: :py:class:`~pyasn1.type.tag.TagSet`
+        Object representing non-default ASN.1 tag(s)
+
+    subtypeSpec: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection`
+        Object representing non-default ASN.1 subtype constraint(s). Constraints
+        verification for |ASN.1| type occurs automatically on object
+        instantiation.
+
+    Raises
+    ------
+    ~pyasn1.error.ValueConstraintError, ~pyasn1.error.PyAsn1Error
+        On constraint violation or bad initializer.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        class RelOID(RelativeOID):
+            '''
+            ASN.1 specification:
+
+            id-pad-null RELATIVE-OID ::= { 0 }
+            id-pad-once RELATIVE-OID ::= { 5 6 }
+            id-pad-twice RELATIVE-OID ::= { 5 6 7 }
+            '''
+        id_pad_null = RelOID('0')
+        id_pad_once = RelOID('5.6')
+        id_pad_twice = id_pad_once + (7,)
+    """
+
+    #: Set (on class, not on instance) or return a
+    #: :py:class:`~pyasn1.type.tag.TagSet` object representing ASN.1 tag(s)
+    #: associated with |ASN.1| type.
+    tagSet = tag.initTagSet(tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 0x0D))
+
+    #: Set (on class, not on instance) or return a
+    #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
+    #: imposing constraints on |ASN.1| type initialization values.
+    subtypeSpec = constraint.ConstraintsIntersection()
+
+    # Optimization for faster codec lookup
+    typeId = base.SimpleAsn1Type.getTypeId()
+
+    def __add__(self, other: typing.Any) -> typing.Any:
+        return self.clone(self._value + other)
+
+    def __radd__(self, other: typing.Any) -> typing.Any:
+        return self.clone(other + self._value)
+
+    def asTuple(self) -> tuple[int, ...]:
+        """Get |ASN.1| value as a tuple of integer sub-identifiers."""
+        return self._value
+
+    # Sequence object protocol
+
+    def __len__(self) -> int:
+        return len(self._value)
+
+    def __getitem__(self, i: typing.Any) -> typing.Any:
+        if i.__class__ is slice:
+            return self.clone(self._value[i])
+        else:
+            return self._value[i]
+
+    def __iter__(self) -> Iterator[typing.Any]:
+        return iter(self._value)
+
+    def __contains__(self, value: object) -> bool:
+        return value in self._value
+
+    def index(self, suboid: typing.Any) -> int:
+        """Return the position of the first occurrence of `suboid`.
+
+        Parameters
+        ----------
+        suboid: :class:`int`
+            Sub-identifier value to look up.
+
+        Returns
+        -------
+        : :class:`int`
+            Zero-based position of `suboid` within this |ASN.1| object.
+
+        Raises
+        ------
+        ValueError
+            If `suboid` is not present.
+        """
+        return self._value.index(suboid)
+
+    def isPrefixOf(self, other: typing.Any) -> bool:
+        """Indicate if this |ASN.1| object is a prefix of other |ASN.1| object.
+
+        Parameters
+        ----------
+        other: |ASN.1| object
+            |ASN.1| object
+
+        Returns
+        -------
+        : :class:`bool`
+            :obj:`True` if this |ASN.1| object is a parent (e.g. prefix) of the other |ASN.1| object
+            or :obj:`False` otherwise.
+        """
+        length = len(self)
+        if length <= len(other):
+            if self._value[:length] == other[:length]:
+                return True
+        return False
+
+    def prettyIn(self, value: typing.Any) -> typing.Any:
+        """Convert an initializer value into a tuple of non-negative integers.
+
+        Parameters
+        ----------
+        value: :class:`tuple`, :class:`str` or |ASN.1| object
+            A dotted-decimal string like '5.6', an iterable of non-negative
+            integers, or another |ASN.1| RelativeOID.
+
+        Returns
+        -------
+        : :class:`tuple`
+            The coerced tuple of sub-identifiers.
+
+        Raises
+        ------
+        ~pyasn1.error.PyAsn1Error
+            If `value` is malformed (e.g. contains a hyphen, a
+            non-integer, or a negative sub-identifier).
+        """
+        if isinstance(value, RelativeOID):
+            return tuple(value)
+        elif isinstance(value, str):
+            if "-" in value:
+                raise error.PyAsn1Error(
+                    "Malformed RELATIVE-OID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
+                )
+            try:
+                return tuple([int(subOid) for subOid in value.split(".") if subOid])
+            except ValueError as exc:
+                raise error.PyAsn1Error(
+                    "Malformed RELATIVE-OID",
+                    value=value,
+                    asn1Type=self.__class__.__name__,
+                    cause=exc,
+                ) from exc
+
+        try:
+            tupleOfInts = tuple([int(subOid) for subOid in value if subOid >= 0])
+
+        except (ValueError, TypeError) as exc:
+            raise error.PyAsn1Error(
+                "Malformed RELATIVE-OID",
+                value=value,
+                asn1Type=self.__class__.__name__,
+                cause=exc,
+            ) from exc
+
+        if len(tupleOfInts) == len(value):
+            return tupleOfInts
+
+        raise error.PyAsn1Error(
+            "Malformed RELATIVE-OID", value=value, asn1Type=self.__class__.__name__
+        )
+
+    def prettyOut(self, value: typing.Any) -> typing.Any:
+        """Return the dotted-decimal text representation of `value`.
+
+        Parameters
+        ----------
+        value: :class:`tuple`
+            Sequence of integer sub-identifiers.
+
+        Returns
+        -------
+        : :class:`str`
+            Dotted-decimal string, e.g. '5.6'.
+        """
+        return ".".join([str(x) for x in value])
+
+
 class Real(base.SimpleAsn1Type):
     """Create |ASN.1| schema or value object.
 
@@ -1738,22 +1951,37 @@ class Real(base.SimpleAsn1Type):
             return 0.0
 
         if base == 10:
+            # A decimal exponent past the top of the double range can only
+            # overflow, so refuse it up front rather than rendering the
+            # mantissa first. Otherwise the value is out of reach anyway and
+            # this keeps a hostile encoding from driving the conversion below.
+            if exponent > sys.float_info.max_10_exp:
+                raise OverflowError("Real value too large to convert to float")
+
             # One correctly rounded decimal-to-binary conversion. Evaluating
             # mantissa * 10 ** exponent instead rounds twice, and near the
             # bottom of the double range 10 ** exponent underflows to zero
             # before the multiplication can recover the value.
-            return float(f"{mantissa}E{exponent}")
+            try:
+                return float(f"{mantissa}E{exponent}")
+
+            except ValueError as exc:
+                # A mantissa wider than sys.get_int_max_str_digits() cannot be
+                # rendered as decimal (Python 3.11+). Report it as the numeric
+                # overflow it is instead of leaking ValueError to the caller.
+                raise OverflowError(
+                    "Real mantissa too large to convert to float"
+                ) from exc
 
         if base == 2:
             # ldexp scales by a power of two exactly and reaches into the
-            # subnormals, where 2 ** exponent has already underflowed.
-            try:
-                return math.ldexp(mantissa, exponent)
+            # subnormals, where 2 ** exponent has already underflowed. A
+            # mantissa or result outside the double range raises OverflowError
+            # here; falling back to mantissa * pow(base, exponent) would only
+            # materialise an arbitrarily large integer to reach the same end.
+            return math.ldexp(mantissa, exponent)
 
-            except OverflowError:
-                return float(mantissa * pow(base, exponent))
-
-        return float(mantissa * pow(base, exponent))
+        raise error.PyAsn1Error("Prohibited base for Real value", base=base)
 
     def __abs__(self) -> typing.Any:
         return self.clone(abs(float(self)))
@@ -2376,15 +2604,23 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
         Default action is to verify |ASN.1| object against constraints imposed
         by `subtypeSpec`.
 
-        Raises
-        ------
-        :py:class:`~pyasn1.error.PyAsn1tError` on any inconsistencies found
+        Returns
+        -------
+        :
+            :obj:`False` if the object is consistent, otherwise the
+            :class:`~pyasn1.error.PyAsn1Error` describing the inconsistency,
+            which callers raise. Never a bare :obj:`True`: the encoders and
+            decoders raise whatever this returns.
         """
         if self.componentType is noValue or not self.subtypeSpec:
             return False
 
         if self._componentValues is noValue:
-            return True
+            # A schema object carries no components at all, so the constraints
+            # cannot be satisfied and there is no constraint failure to report.
+            return error.PyAsn1Error(
+                "Component values are not set", asn1Object=self.__class__.__name__
+            )
 
         mapping = {}
 
@@ -2617,6 +2853,17 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         """Return an iterator over the component values."""
         for idx in range(self._componentTypeLen or len(self._dynamicNames)):
             yield self[idx]
+
+    def valuesNotInstantiating(self) -> typing.Any:
+        """Return an iterator over the component values, leaving absent ones absent.
+
+        Unlike :meth:`values`, an absent component is reported as
+        :obj:`~pyasn1.type.univ.noValue` rather than being instantiated on
+        access. Encoders iterate this way so that encoding an object does not
+        alter which of its components are present.
+        """
+        for idx in range(self._componentTypeLen or len(self._dynamicNames)):
+            yield self.getComponentByPosition(idx, instantiate=False)
 
     def keys(self) -> typing.Any:
         """Return an iterator over the component names."""
@@ -3058,15 +3305,23 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         Default action is to verify |ASN.1| object against constraints imposed
         by `subtypeSpec`.
 
-        Raises
-        ------
-        :py:class:`~pyasn1.error.PyAsn1tError` on any inconsistencies found
+        Returns
+        -------
+        :
+            :obj:`False` if the object is consistent, otherwise the
+            :class:`~pyasn1.error.PyAsn1Error` describing the inconsistency,
+            which callers raise. Never a bare :obj:`True`: the encoders and
+            decoders raise whatever this returns.
         """
         if self.componentType is noValue or not self.subtypeSpec:
             return False
 
         if self._componentValues is noValue:
-            return True
+            # A schema object carries no components at all, so the constraints
+            # cannot be satisfied and there is no constraint failure to report.
+            return error.PyAsn1Error(
+                "Component values are not set", asn1Object=self.__class__.__name__
+            )
 
         mapping = {}
 
@@ -3282,14 +3537,22 @@ class Set(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base t
                     idx, value, verifyConstraints, matchTags, matchConstraints
                 )
             else:
-                componentType = self.getComponentByPosition(idx)
-                return componentType.setComponentByType(
+                component = self.getComponentByPosition(idx)
+                component.setComponentByType(
                     tagSet,
                     value,
                     verifyConstraints,
                     matchTags,
                     matchConstraints,
                     innerFlag=innerFlag,
+                )
+
+                # Assigning into the component read above is a write to this
+                # object too, so record it. Reading a component no longer
+                # selects it on a Choice (see Choice.setComponentByPosition),
+                # which is what this used to rely on.
+                return self.setComponentByPosition(
+                    idx, component, verifyConstraints, matchTags, matchConstraints
                 )
         else:  # set outer component by inner tagSet
             return self.setComponentByPosition(
@@ -3546,12 +3809,24 @@ class Choice(Set):
         self
         """
         oldIdx = self._currentIdx
+
         Set.setComponentByPosition(
             self, idx, value, verifyConstraints, matchTags, matchConstraints
         )
+
+        if value is noValue and oldIdx is not None and oldIdx != idx:
+            # No value was supplied, so this is the schema object being
+            # instantiated -- which is what reading an alternative does. X.680
+            # 29.1 makes a CHOICE value exactly one of its alternatives, and
+            # reading one does not choose it, so the selected alternative and
+            # its value both stay put.
+            return self
+
         self._currentIdx = idx
+
         if oldIdx is not None and oldIdx != idx:
             self._componentValues[oldIdx] = noValue
+
         return self
 
     @property
