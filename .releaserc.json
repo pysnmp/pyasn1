@@ -50,6 +50,13 @@
     ],
     "@semantic-release/release-notes-generator",
     [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "# Changelog\n\nGenerated from the commit history at release time. The narrative history\nthrough 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst)."
+      }
+    ],
+    [
       "@semantic-release/exec",
       {
         "prepareCmd": "./.github/workflows/sr-prepare.sh ${nextRelease.version}",
@@ -60,6 +67,7 @@
       "@semantic-release/git",
       {
         "assets": [
+          "CHANGELOG.md",
           "NOTICE",
           "pyproject.toml",
           "pyasn1/__init__.py",

@@ -33,6 +33,9 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    # CHANGELOG.md is generated at release time, so the changelog page is
+    # Markdown and needs myst-parser to render.
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -41,7 +44,12 @@ templates_path = [".templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
+
+# semantic-release writes each release as an H1 followed directly by H3
+# section headings ("### Bug Fixes"). The jump is inherent to the generated
+# format, so the docs build must not treat it as an error.
+suppress_warnings = ["myst.header"]
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
