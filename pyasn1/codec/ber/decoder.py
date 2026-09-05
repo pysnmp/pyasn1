@@ -138,7 +138,7 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
     ) -> tuple[Any, bytes]:
         if substrateFun:
             return substrateFun(
-                self._createComponent(asn1Spec, tagSet, "", **options),
+                self._createComponent(asn1Spec, tagSet, noValue, **options),
                 substrate,
                 length,
             )
@@ -181,7 +181,7 @@ class ExplicitTagDecoder(AbstractSimpleDecoder):
     ) -> tuple[Any, bytes]:
         if substrateFun:
             return substrateFun(
-                self._createComponent(asn1Spec, tagSet, "", **options),
+                self._createComponent(asn1Spec, tagSet, noValue, **options),
                 substrate,
                 length,
             )
@@ -2331,8 +2331,15 @@ class Decoder:
                         extra={
                             "codec": concreteDecoder.__class__.__name__,
                             "valueType": value.__class__.__name__,
+                            # A substrateFun that captures raw octets is handed
+                            # the bare schema object, which has no value to
+                            # render; prettyPrint() would raise on it.
                             "value": value.prettyPrint()
-                            if isinstance(value, base.Asn1Type)
+                            if isinstance(
+                                value,
+                                (base.SimpleAsn1Type, base.ConstructedAsn1Type),
+                            )
+                            and value.isValue
                             else value,
                             "substrate": substrate,
                         },
