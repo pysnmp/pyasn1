@@ -3,6 +3,13 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+# [1.3.0-rc.2](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2026-09-05)
+
+
+### Bug Fixes
+
+* keep the BER decoder's substrateFun path inside PyAsn1Error ([26c1231](https://github.com/pysnmp/pyasn1/commit/26c12316a2d240817a2aacc71d0c0920f9f67dfc)), closes [#140](https://github.com/pysnmp/pyasn1/issues/140) [#142](https://github.com/pysnmp/pyasn1/issues/142)
+
 # [1.3.0-rc.1](https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0-rc.1) (2026-09-05)
 
 

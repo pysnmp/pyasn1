@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pysnmp-pyasn1"
-version = "1.3.0-rc.1"
+version = "1.3.0-rc.2"
 description = "ASN.1 types and codecs"
 readme = "README.md"
 license = "BSD-2-Clause"
