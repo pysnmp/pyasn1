@@ -3,7 +3,7 @@
 
 import logging
 
-__version__ = "1.3.0"
+__version__ = "2.0.0"
 
 # Libraries must not configure logging for the application that imports them.
 # A NullHandler keeps pyasn1's records silent until the application opts in,
