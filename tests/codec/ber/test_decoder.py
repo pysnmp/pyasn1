@@ -4026,6 +4026,82 @@ class SchemalessTaggedConstructedDecoderTestCase(BaseTestCase):
         assert encoder.encode(asn1Object) == self.twoComponents
 
 
+class ExplicitTagSubstrateFunDecoderTestCase(BaseTestCase):
+    """substrateFun over a guessed explicit tag stays in PyAsn1Error (issue #140)."""
+
+    # [0] EXPLICIT SEQUENCE { INTEGER 1 }, definite and indefinite length.
+    substrate = bytes.fromhex("a0053003020101")
+    substrateIndef = bytes.fromhex("a08030030201010000")
+
+    constructedSpecs = (
+        univ.Sequence(),
+        univ.SequenceOf(componentType=univ.Integer()),
+        univ.Set(),
+        univ.Choice(),
+    )
+
+    @staticmethod
+    def _capture(asn1Object, substrate, length):
+        return asn1Object, substrate[:length]
+
+    def testDefModeConstructedSpecIsNotCoerced(self):
+        for asn1Spec in self.constructedSpecs:
+            asn1Object, _ = decoder.decode(
+                self.substrate, asn1Spec=asn1Spec, substrateFun=self._capture
+            )
+
+            assert asn1Object is asn1Spec, f"Spec replaced: {asn1Object!r}"
+
+    def testIndefModeConstructedSpecIsNotCoerced(self):
+        for asn1Spec in self.constructedSpecs:
+            asn1Object, _ = decoder.decode(
+                self.substrateIndef, asn1Spec=asn1Spec, substrateFun=self._capture
+            )
+
+            assert asn1Object is asn1Spec, f"Spec replaced: {asn1Object!r}"
+
+    def testSimpleSpecIsNotCoerced(self):
+        # A simple spec used to be cloned with an empty string, which the
+        # Integer constraint rejected as a PyAsn1Error of its own.
+        asn1Spec = univ.Integer()
+
+        asn1Object, _ = decoder.decode(
+            self.substrate, asn1Spec=asn1Spec, substrateFun=self._capture
+        )
+
+        assert asn1Object is asn1Spec
+
+    def testSchemalessDecodeStillYieldsAny(self):
+        asn1Object, _ = decoder.decode(self.substrate, substrateFun=self._capture)
+
+        assert isinstance(asn1Object, univ.Any)
+        assert asn1Object.tagSet[-1] == tag.Tag(
+            tag.tagClassContext, tag.tagFormatConstructed, 0
+        )
+
+    def testSubstrateReachesTheCallback(self):
+        _, captured = decoder.decode(
+            self.substrate, asn1Spec=univ.Sequence(), substrateFun=self._capture
+        )
+
+        assert captured == self.substrate[2:]
+
+    def testDebugLoggingSurvivesAValuelessResult(self):
+        # The decoder's own debug record used to call prettyPrint() on the
+        # schema object handed back by substrateFun. The suite runs with
+        # debug records enabled, so any spec reaches that line.
+        asn1Spec = univ.OctetString()
+
+        asn1Object, captured = decoder.decode(
+            bytes.fromhex("0403616263"),
+            asn1Spec=asn1Spec,
+            substrateFun=self._capture,
+        )
+
+        assert asn1Object is asn1Spec
+        assert captured == bytes.fromhex("616263")
+
+
 class MalformedBitStringDecoderTestCase(BaseTestCase):
     """Malformed BIT STRING input stays inside PyAsn1Error (issue #121)."""
 
