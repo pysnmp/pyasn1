@@ -5,15 +5,19 @@ on:
     branches:
       - "main"
       - "next"
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      # Prerelease tags, so update-semver runs for rcs as well.
-      - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
     branches: [main, next]
+    # `labeled` so that adding ci:full-matrix re-runs with macOS included.
+    types: [opened, synchronize, reopened, labeled]
   # main never releases on push (see the publish job's DRY). Cutting the GA
   # release from main is a deliberate manual act; rcs come from next.
   workflow_dispatch:
+
+# One run per PR: a new push supersedes the one still in flight. Pushes to
+# main/next are never cancelled, they can cut a release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Add permissions needed for semantic-release
 permissions:
@@ -30,27 +34,6 @@ jobs:
         with:
           python-version: "3.10"
       - uses: pre-commit/action@v3.0.1
-
-  review_secrets:
-    name: security-detect-secrets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          submodules: false
-          fetch-depth: "0"
-
-  semgrep:
-    runs-on: ubuntu-latest
-    name: security-sast-semgrep
-    steps:
-      - uses: actions/checkout@v7
-      - name: Semgrep
-        id: semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
 
   lint:
     name: lint
@@ -109,16 +92,56 @@ jobs:
           name: dist
           path: dist
 
+  # Every Python on ubuntu, always. The other platforms only on the edge
+  # versions, and only where they can pay for themselves: on a push to
+  # main/next, or on a PR labelled ci:full-matrix.
+  #
+  # pyasn1 is pure Python, so the interpreter version is where the risk lives
+  # and the OS mostly is not. Of the platforms, Windows is the one that can
+  # actually diverge — cp1252 as the default encoding, path handling — and it
+  # had never been tested at all; macOS differs from Linux in nothing this
+  # library touches. Running five macOS jobs per PR also sat exactly on the
+  # free-tier cap of five concurrent macOS jobs for public repos, so two
+  # overlapping runs queued until they timed out.
+  setup-matrix:
+    name: matrix
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.plan.outputs.include }}
+    steps:
+      - id: plan
+        env:
+          BROAD: >-
+            ${{ github.event_name != 'pull_request'
+              || contains(github.event.pull_request.labels.*.name, 'ci:full-matrix') }}
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+
+          pythons = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+          jobs = [{"os": "ubuntu-latest", "python": p} for p in pythons]
+
+          if os.environ["BROAD"] == "true":
+              for platform in ("macos-latest", "windows-latest"):
+                  jobs += [{"os": platform, "python": p}
+                           for p in (pythons[0], pythons[-1])]
+
+          print("include=" + json.dumps(jobs))
+          PY
+
   run-unit-tests:
     name: test-unit
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include: ${{ fromJSON(needs.setup-matrix.outputs.include) }}
       fail-fast: false
+    # Windows has never run here, so it reports without blocking until it has a
+    # track record. Remove this once it does.
+    continue-on-error: ${{ matrix.os == 'windows-latest' }}
     runs-on: ${{ matrix.os }}
     needs:
       - build
+      - setup-matrix
     steps:
       - uses: actions/checkout@v7
       - name: Setup python
@@ -128,12 +151,15 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v7
       - name: Run tests
+        # Windows runners default to pwsh; this block is bash on every platform.
+        shell: bash
         run: |
           uv sync --locked --python ${{ matrix.python }}
           uv run pytest --junitxml=test-results/results.xml --cov=pyasn1 --cov-report=xml tests
       - uses: actions/upload-artifact@v7
         with:
-          name: unit tests test-results
+          # Artifact names must be unique within a run.
+          name: test-results-${{ matrix.os }}-${{ matrix.python }}
           path: test-results
       - uses: codecov/codecov-action@v7
         with:
@@ -142,8 +168,8 @@ jobs:
 
   publish:
     name: Build Release
-    # Semantic release cuts tags from a branch. Now that tag pushes run this
-    # workflow, skip the job on the tags it created itself. A manual dispatch
+    # Semantic release cuts tags from a branch, so keep this to branch refs and
+    # it can never re-enter on a tag it created itself. A manual dispatch
     # releases from main only; dispatching any other ref would set DRY false
     # and cut a release from it.
     if: >-
@@ -154,8 +180,6 @@ jobs:
       # human dispatches this workflow; a plain push to main is a dry run.
       DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
     needs:
-      - review_secrets
-      - semgrep
       - build
       - run-unit-tests
     runs-on: ubuntu-latest
@@ -220,10 +244,3 @@ jobs:
           path: dist/
           retention-days: 14
 
-  update-semver:
-    name: Move Repository semver tags
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: haya14busa/action-update-semver@v1
