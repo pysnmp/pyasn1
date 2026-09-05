@@ -197,6 +197,7 @@ jobs:
       - name: Build
         run: uv build
       - name: Semantic Release
+        id: semrel
         uses: cycjimmy/semantic-release-action@v6
         with:
           semantic_version: 24
@@ -208,8 +209,6 @@ jobs:
             @google/semantic-release-replace-plugin
         env:
           GITHUB_TOKEN: ${{ secrets.SEMREL_TOKEN }}
-          # Don't publish to PyPI here, the tag push will trigger the publish workflow
-          GITHUB_OUTPUT: /tmp/semantic_release_output
 
       # A push to main is a dry run: semantic-release works out the version that
       # a dispatch would cut but tags nothing, and its prepare step (which is
@@ -219,10 +218,11 @@ jobs:
       - name: Build dev preview
         id: preview
         if: env.DRY == 'true'
+        env:
+          VERSION: ${{ steps.semrel.outputs.new_release_version }}
         run: |
           set -euo pipefail
-          # Step outputs are redirected above, so read the version from there.
-          version=$(sed -n 's/^new_release_version=//p' /tmp/semantic_release_output | head -1)
+          version="$VERSION"
           if [ -z "$version" ]; then
             echo "No release would be cut from this commit; nothing to preview."
             exit 0
