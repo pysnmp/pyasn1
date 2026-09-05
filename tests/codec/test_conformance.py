@@ -18,6 +18,8 @@ Each test cites the X.690 clause it enforces.
 import sys
 import unittest
 
+import pytest
+
 from pyasn1 import error
 from pyasn1.codec.ber import decoder as ber_decoder
 from pyasn1.codec.ber import encoder as ber_encoder
@@ -1212,6 +1214,8 @@ class SpecialRealValueTestCase(BaseTestCase):
         assert minusZero.isMinusZero
 
 
+# Decodes in bulk; see the no_debug_records marker in tests/conftest.py.
+@pytest.mark.no_debug_records
 class IntegerMinimalEncodingTestCase(BaseTestCase):
     """X.690 8.3.2: given more than one contents octet, the bits of the first
     octet and bit 8 of the second shall not all be ones, nor all be zero.

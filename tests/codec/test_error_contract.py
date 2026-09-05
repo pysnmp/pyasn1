@@ -9,11 +9,19 @@ import random
 import sys
 import unittest
 
+import pytest
+
 from pyasn1 import error
 from pyasn1.codec.ber import decoder as ber_decoder
 from pyasn1.codec.cer import decoder as cer_decoder
 from pyasn1.codec.der import decoder as der_decoder
 from tests.base import BaseTestCase
+
+#: Substrates from the sweep that the debug-enabled slice below re-runs. The
+#: sweep itself decodes ~206k times, and a debug record per decoding step is
+#: retained by pytest's logging plugin for the whole test, so it opts out of
+#: that fixture and this slice keeps the coverage.
+DEBUG_SAMPLE = 500
 
 
 def malformedSubstrates():
@@ -27,6 +35,7 @@ def malformedSubstrates():
         yield bytes(rnd.randrange(256) for _ in range(rnd.randrange(1, 40)))
 
 
+@pytest.mark.no_debug_records
 class DecoderErrorContractTestCase(BaseTestCase):
     """Callers guard decoding with ``except PyAsn1Error``.
 
@@ -55,6 +64,26 @@ class DecoderErrorContractTestCase(BaseTestCase):
                     )
 
         assert not leaks, f"non-PyAsn1Error escaped a decoder: {leaks!r}"
+
+
+class DebugRenderingOverMalformedInputTestCase(BaseTestCase):
+    """Decoding hostile octets must not break the debug records themselves.
+
+    The sweep above opts out of the autouse fixture, so this bounded slice keeps
+    the malformed-input paths covered by it: a debug record whose format string
+    disagrees with its lazy arguments raises only when something renders it.
+    """
+
+    def testDebugRecordsRenderWhileDecodingMalformedInput(self):
+        substrates = list(itertools.islice(malformedSubstrates(), DEBUG_SAMPLE))
+
+        for decode in (ber_decoder.decode, cer_decoder.decode, der_decoder.decode):
+            for substrate in substrates:
+                try:
+                    decode(substrate)
+
+                except error.PyAsn1Error:
+                    continue
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
