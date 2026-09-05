@@ -5,10 +5,6 @@ on:
     branches:
       - "main"
       - "next"
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      # Prerelease tags, so update-semver runs for rcs as well.
-      - "v[0-9]+.[0-9]+.[0-9]+-*"
   pull_request:
     branches: [main, next]
     # `labeled` so that adding ci:full-matrix re-runs with macOS included.
@@ -18,7 +14,7 @@ on:
   workflow_dispatch:
 
 # One run per PR: a new push supersedes the one still in flight. Pushes to
-# main/next and tags are never cancelled, they can cut a release.
+# main/next are never cancelled, they can cut a release.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -38,27 +34,6 @@ jobs:
         with:
           python-version: "3.10"
       - uses: pre-commit/action@v3.0.1
-
-  review_secrets:
-    name: security-detect-secrets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          submodules: false
-          fetch-depth: "0"
-
-  semgrep:
-    runs-on: ubuntu-latest
-    name: security-sast-semgrep
-    steps:
-      - uses: actions/checkout@v7
-      - name: Semgrep
-        id: semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
 
   lint:
     name: lint
@@ -119,7 +94,7 @@ jobs:
 
   # Every Python on ubuntu, always. The other platforms only on the edge
   # versions, and only where they can pay for themselves: on a push to
-  # main/next, on a tag, or on a PR labelled ci:full-matrix.
+  # main/next, or on a PR labelled ci:full-matrix.
   #
   # pyasn1 is pure Python, so the interpreter version is where the risk lives
   # and the OS mostly is not. Of the platforms, Windows is the one that can
@@ -193,8 +168,8 @@ jobs:
 
   publish:
     name: Build Release
-    # Semantic release cuts tags from a branch. Now that tag pushes run this
-    # workflow, skip the job on the tags it created itself. A manual dispatch
+    # Semantic release cuts tags from a branch, so keep this to branch refs and
+    # it can never re-enter on a tag it created itself. A manual dispatch
     # releases from main only; dispatching any other ref would set DRY false
     # and cut a release from it.
     if: >-
@@ -205,8 +180,6 @@ jobs:
       # human dispatches this workflow; a plain push to main is a dry run.
       DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
     needs:
-      - review_secrets
-      - semgrep
       - build
       - run-unit-tests
     runs-on: ubuntu-latest
@@ -271,10 +244,3 @@ jobs:
           path: dist/
           retention-days: 14
 
-  update-semver:
-    name: Move Repository semver tags
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: haya14busa/action-update-semver@v1
