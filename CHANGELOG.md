@@ -3,6 +3,30 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+# [1.3.0](https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0) (2026-09-05)
+
+
+### Bug Fixes
+
+* **docs:** give each published version an index.html ([c038329](https://github.com/pysnmp/pyasn1/commit/c03832908a0d115d9a26b31f4fee23f132b02537))
+* encode a present OPTIONAL component even when it is empty ([69f4b80](https://github.com/pysnmp/pyasn1/commit/69f4b80e9f195018f0d84929b3b3265a7344c531)), closes [#119](https://github.com/pysnmp/pyasn1/issues/119) [#112](https://github.com/pysnmp/pyasn1/issues/112)
+* encoder must not instantiate absent DEFAULT components ([2e7abff](https://github.com/pysnmp/pyasn1/commit/2e7abff0d7110695c669cfa0c43d85d44e31a89a)), closes [#112](https://github.com/pysnmp/pyasn1/issues/112)
+* isInconsistent must report an exception, not a bare True ([a16a043](https://github.com/pysnmp/pyasn1/commit/a16a043b71a1f816a824e9911b51be1462a69b3a)), closes [#118](https://github.com/pysnmp/pyasn1/issues/118)
+* keep all components when an explicit-tag guess is refuted ([09b9862](https://github.com/pysnmp/pyasn1/commit/09b986217624990eeb226806eb75834b58a59418)), closes [#116](https://github.com/pysnmp/pyasn1/issues/116) [pyasn1/pyasn1#59](https://github.com/pyasn1/pyasn1/issues/59)
+* keep the BER decoder's substrateFun path inside PyAsn1Error ([26c1231](https://github.com/pysnmp/pyasn1/commit/26c12316a2d240817a2aacc71d0c0920f9f67dfc)), closes [#140](https://github.com/pysnmp/pyasn1/issues/140) [#142](https://github.com/pysnmp/pyasn1/issues/142)
+* keep the EOO when capturing an untagged Any ([c396c79](https://github.com/pysnmp/pyasn1/commit/c396c799fef37bc700b80c9ba796da65d9bb7ae2)), closes [#114](https://github.com/pysnmp/pyasn1/issues/114) [pyasn1/pyasn1#66](https://github.com/pyasn1/pyasn1/issues/66)
+* malformed BIT STRING must raise PyAsn1Error, not IndexError ([6738bec](https://github.com/pysnmp/pyasn1/commit/6738bec819e60d4109b8a53fb3457423fb97c237)), closes [#121](https://github.com/pysnmp/pyasn1/issues/121)
+* re-resolve late-bound componentType on clone and subtype ([6e62269](https://github.com/pysnmp/pyasn1/commit/6e6226968321085c4e3af2036ad8e2dfcae6b37b)), closes [#111](https://github.com/pysnmp/pyasn1/issues/111) [pyasn1/pyasn1#124](https://github.com/pyasn1/pyasn1/issues/124) [etingof/pyasn1#19](https://github.com/etingof/pyasn1/issues/19) [etingof/pyasn1#20](https://github.com/etingof/pyasn1/issues/20)
+* reading a Choice alternative must not deselect another ([6e5b40a](https://github.com/pysnmp/pyasn1/commit/6e5b40a2672675d3dc187858c1896c2e005bfd48)), closes [#122](https://github.com/pysnmp/pyasn1/issues/122)
+* report an ambiguous SEQUENCE schema instead of guessing a component ([a389f1e](https://github.com/pysnmp/pyasn1/commit/a389f1ed693eb7224a0aef35e4d857c92c0d466c)), closes [#120](https://github.com/pysnmp/pyasn1/issues/120) [pyasn1/pyasn1#84](https://github.com/pyasn1/pyasn1/issues/84)
+* **security:** bound OID arcs, tag numbers and Real conversion ([0ff4c73](https://github.com/pysnmp/pyasn1/commit/0ff4c73303f553362bf9bf98389f6e899e986f41)), closes [Hi#tag-number](https://github.com/Hi/issues/tag-number) [#110](https://github.com/pysnmp/pyasn1/issues/110)
+* **tests:** stop bulk decoding tests from exhausting runner memory ([9963994](https://github.com/pysnmp/pyasn1/commit/9963994c7778a8073258f0ce83d3d5c347d60794))
+
+
+### Features
+
+* add univ.RelativeOID (X.680 RELATIVE-OID, universal tag 13) ([9e274a0](https://github.com/pysnmp/pyasn1/commit/9e274a0bda1b0d945b8f7bebc52240d52f9234d1)), closes [#117](https://github.com/pysnmp/pyasn1/issues/117) [#110](https://github.com/pysnmp/pyasn1/issues/110)
+
 # [1.3.0-rc.3](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.2...v1.3.0-rc.3) (2026-09-05)
 
 
