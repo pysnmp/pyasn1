@@ -9,15 +9,15 @@ on:
     branches: [main, next]
     # `labeled` so that adding ci:full-matrix re-runs with macOS included.
     types: [opened, synchronize, reopened, labeled]
-  # main never releases on push (see the publish job's DRY). Cutting the GA
-  # release from main is a deliberate manual act; rcs come from next.
+  # No push releases anything (see the publish job's DRY). Both the rc from
+  # next and the GA from main are cut by dispatching this workflow by hand.
   workflow_dispatch:
 
-# One run per PR: a new push supersedes the one still in flight. Pushes to
-# main/next are never cancelled, they can cut a release.
+# One run per ref: a new push supersedes the one still in flight. A dispatch is
+# never cancelled, it is the only thing that can cut a release.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Read-only by default; the publish job raises what it needs and nothing else.
 permissions:
@@ -183,16 +183,15 @@ jobs:
   publish:
     name: Build Release
     # Semantic release cuts tags from a branch, so keep this to branch refs and
-    # it can never re-enter on a tag it created itself. A manual dispatch
-    # releases from main only; dispatching any other ref would set DRY false
-    # and cut a release from it.
-    if: >-
-      startsWith(github.ref, 'refs/heads/')
-      && (github.event_name != 'workflow_dispatch' || github.ref_name == 'main')
+    # it can never re-enter on a tag it created itself. The workflow only
+    # triggers on main and next, so a dispatch can only ever target one of them:
+    # next cuts the rc, main cuts the GA.
+    if: startsWith(github.ref, 'refs/heads/')
     env:
-      # next keeps auto-publishing rc on push. main only releases when a
-      # human dispatches this workflow; a plain push to main is a dry run.
-      DRY: ${{ github.event_name != 'workflow_dispatch' && github.ref_name == 'main' }}
+      # Releasing is a deliberate act on both branches. Every push — to next as
+      # much as to main — rehearses the release and stops; only a dispatch cuts
+      # one. Automatic rcs are what let next drift below a GA already on PyPI.
+      DRY: ${{ github.event_name != 'workflow_dispatch' }}
     needs:
       - build
       - run-unit-tests
@@ -227,11 +226,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SEMREL_TOKEN }}
 
-      # A push to main is a dry run: semantic-release works out the version that
-      # a dispatch would cut but tags nothing, and its prepare step (which is
-      # what normally builds) never runs. Build that version as a .devN instead
-      # and keep it as an artifact, so the GA candidate can be installed and
-      # exercised before anyone dispatches the real release.
+      # Every push is a dry run: semantic-release works out the version that a
+      # dispatch would cut but tags nothing, and its prepare step (which is what
+      # normally builds) never runs. Build that version as a .devN instead and
+      # keep it as an artifact, so what next would release as an rc, and what
+      # main would release as the GA, can be installed and exercised before
+      # anyone dispatches the real thing.
       - name: Build dev preview
         id: preview
         if: env.DRY == 'true'

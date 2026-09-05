@@ -14,12 +14,13 @@ Branches
 There are exactly two long-lived branches.
 
 ``next``
-    Where work integrates. Every pull request targets ``next``, and every
-    push to it cuts a release candidate automatically.
+    Where work integrates. Every pull request targets ``next``. It is
+    normal and expected for ``next`` to carry commits that ``main`` does
+    not.
 
 ``main``
     What has been released. It moves only when ``next`` is promoted into
-    it, and it never releases on push.
+    it.
 
 Maintenance branches matching ``N.x`` or ``N.M.x`` are configured but none
 exist yet.
@@ -27,6 +28,9 @@ exist yet.
 Do not open a pull request against ``main``. A fix merged there would be
 released without ever having existed as a release candidate, and ``next``
 would not contain it.
+
+Neither branch releases on push. Both the release candidate and the GA are
+cut by a human dispatching the workflow; see `Cutting a release`_.
 
 Commit messages
 ---------------
@@ -105,7 +109,8 @@ them.
     coverage.
 
 ``Build Release``
-    Runs semantic-release. On a pull request this job does not run at all.
+    Runs semantic-release. On a pull request this job does not run at
+    all; on a push it rehearses the release without cutting one.
 
 The test matrix
 ---------------
@@ -158,30 +163,54 @@ when the label is applied — no need to push again.
 Cutting a release
 -----------------
 
-Two things produce a release, and nothing else does.
+Nothing releases on push. Both kinds of release are cut by dispatching
+the ``CI`` workflow from the Actions tab and choosing the branch:
 
-**A push to** ``next`` **cuts a release candidate.** semantic-release
-works out the next version from the commits, writes it into
+``next``
+    Cuts a release candidate, ``X.Y.Z-rc.N``.
+
+``main``
+    Cuts the GA release, ``X.Y.Z``.
+
+semantic-release works out the version from the commits, writes it into
 ``pyproject.toml``, ``pyasn1/__init__.py`` and ``CHANGELOG.md``, commits
-that as ``chore(release): X.Y.Z-rc.N``, tags it, and publishes a GitHub
-release. This is automatic; merging a pull request into ``next`` is all it
-takes.
+that as ``chore(release): X.Y.Z``, tags it, and publishes a GitHub
+release. The tag is what reaches PyPI.
 
-**A manual dispatch from** ``main`` **cuts the GA release.** Promote
-``next`` into ``main`` with a pull request, wait for it to be green, then
-run the ``CI`` workflow from the Actions tab with ``main`` selected. The
-dispatch is deliberately manual: a plain push to ``main`` only rehearses
-the release.
+To ship a GA: promote ``next`` into ``main`` with a pull request, wait for
+it to be green, then dispatch the workflow against ``main``.
 
-A push to ``main`` that is not a dispatch is a dry run. semantic-release
-computes the version it *would* cut but tags nothing. Because its prepare
-step never runs, nothing is built either, so the workflow builds that
-version as ``X.Y.Z.devN`` and keeps it as an artifact for 14 days. That
-artifact is the release candidate for the GA: install it and exercise it
-before dispatching the real thing.
+Every push — to ``next`` as much as to ``main`` — is a dry run instead.
+semantic-release computes the version it *would* cut and tags nothing.
+Because its prepare step never runs, nothing is built either, so the
+workflow builds that version as ``X.Y.Z.devN`` and keeps it as an artifact
+for 14 days. Install that artifact and exercise it before dispatching the
+real release.
 
-The dispatch is restricted to ``main``. Dispatching the workflow from any
-other branch is refused rather than cutting a release from it.
+Releasing by hand rather than on every merge is deliberate. When ``next``
+released automatically, it kept cutting release candidates from whatever
+base its own history reached, which drifts below ``main`` as soon as a GA
+is cut there — see `Keeping next and main in step`_.
+
+Keeping next and main in step
+-----------------------------
+
+Promoting ``next`` into ``main`` and then releasing leaves the
+``chore(release):`` commit, and the tag on it, on ``main`` only. ``next``
+does not contain them, so as far as semantic-release can see from
+``next``, the newest release is still the last one that branch cut.
+
+Left alone this drifts. In pysmi it produced ``2.0.0-rc.15`` and
+``2.0.0-rc.16`` on PyPI *after* ``2.0.1`` had shipped: release candidates
+numbered below a released version, uploaded after it.
+
+So after cutting a GA on ``main``, merge ``main`` back into ``next``. This
+is the only direction in which ``main`` should ever be merged into
+``next``, and it carries nothing but the release commit.
+
+Commits on ``next`` that are not on ``main`` are the normal state of
+things and need no action: that is unreleased work waiting for the next
+promotion.
 
 Reaching PyPI
 -------------
@@ -245,11 +274,12 @@ cancelled. A run whose overall conclusion is ``cancelled`` while
 individual jobs report ``failure`` with exit code 143 was terminated from
 outside.
 
-**A release did not happen after merging to** ``next``. Check the commit
-subjects. Only ``fix``, ``feat``, ``perf`` and breaking changes produce a
-release; a branch of nothing but ``docs`` and ``chore`` commits correctly
-releases nothing. The ``Build Release`` job log states which commits it
-analysed and what it concluded.
+**A release did not happen after merging to** ``next``. Merging does not
+release; dispatch the workflow. If a dispatch also released nothing, check
+the commit subjects — only ``fix``, ``feat``, ``perf`` and breaking
+changes produce a release, so a branch of nothing but ``docs`` and
+``chore`` commits correctly releases nothing. The ``Build Release`` job
+log states which commits it analysed and what it concluded.
 
 **PyPI rejected the upload with 403.** The trusted publisher does not
 match. Confirm all four fields on the PyPI publishing settings page
