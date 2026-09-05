@@ -107,6 +107,17 @@ Download & Install
 
    /download
 
+Development
+-----------
+
+How changes reach a release: the branches, what CI runs, and how a
+version is cut and published.
+
+.. toctree::
+   :maxdepth: 2
+
+   /ci-and-releases
+
 Changes
 -------
 
