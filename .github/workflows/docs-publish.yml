@@ -47,7 +47,8 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Build docs
-        run: uv run sphinx-build -W -b html docs/source docs/build
+        # Doctrees go outside the output tree so the build cache is not published.
+        run: uv run sphinx-build -W -b html -d "${RUNNER_TEMP}/doctrees" docs/source docs/build
 
       - name: Check out gh-pages
         run: |
@@ -66,6 +67,8 @@ jobs:
           rm -rf "../site/${{ steps.tag.outputs.version }}"
           mkdir -p "../site/${{ steps.tag.outputs.version }}"
           cp -R docs/build/. "../site/${{ steps.tag.outputs.version }}/"
+          rm -rf "../site/${{ steps.tag.outputs.version }}/.doctrees" \
+                 "../site/${{ steps.tag.outputs.version }}/.buildinfo"
 
       - name: Rebuild aliases and version index
         run: uv run --with packaging .github/workflows/docs-publish.py ../site

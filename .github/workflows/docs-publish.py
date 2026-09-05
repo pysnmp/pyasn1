@@ -3,8 +3,8 @@
 
 Called after the freshly built HTML has been copied into ``<root>/<version>``.
 Rewrites the ``stable`` and ``latest`` aliases, the root redirect and
-``versions.json`` from whatever version directories are present, so a
-re-run repairs the site rather than depending on previous runs.
+``versions.json`` from whatever version directories are present, so a re-run
+repairs the site rather than depending on previous runs.
 """
 
 import json
@@ -30,6 +30,20 @@ REDIRECT = """<!doctype html>
 </html>
 """
 
+VERSION_REDIRECT = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pyasn1 documentation</title>
+<meta http-equiv="refresh" content="0; url=./{target}">
+<link rel="canonical" href="./{target}">
+</head>
+<body>
+<p>Redirecting to <a href="./{target}">the documentation</a>.</p>
+</body>
+</html>
+"""
+
 
 def discover(root: pathlib.Path) -> list[tuple[Version, pathlib.Path]]:
     """Return every version directory under *root*, newest first."""
@@ -49,6 +63,23 @@ def discover(root: pathlib.Path) -> list[tuple[Version, pathlib.Path]]:
     return found
 
 
+def ensure_index(directory: pathlib.Path) -> None:
+    """Give *directory* an index.html when Sphinx named the root page otherwise.
+
+    conf.py sets ``master_doc = "contents"``, so a build leaves contents.html
+    rather than index.html and a bare directory URL would 404.
+    """
+    if (directory / "index.html").exists():
+        return
+
+    for candidate in ("contents.html", "genindex.html"):
+        if (directory / candidate).exists():
+            (directory / "index.html").write_text(
+                VERSION_REDIRECT.format(target=candidate)
+            )
+            return
+
+
 def main() -> int:
     """Rebuild the aliases, root redirect and version index under the site root."""
     root = pathlib.Path(sys.argv[1])
@@ -57,6 +88,9 @@ def main() -> int:
     if not versions:
         print("no version directories found", file=sys.stderr)
         return 1
+
+    for _, path in versions:
+        ensure_index(path)
 
     latest = versions[0]
     finals = [pair for pair in versions if not pair[0].is_prerelease]
