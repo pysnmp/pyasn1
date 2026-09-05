@@ -183,10 +183,11 @@ jobs:
   publish:
     name: Build Release
     # Semantic release cuts tags from a branch, so keep this to branch refs and
-    # it can never re-enter on a tag it created itself. The workflow only
-    # triggers on main and next, so a dispatch can only ever target one of them:
-    # next cuts the rc, main cuts the GA.
-    if: startsWith(github.ref, 'refs/heads/')
+    # it can never re-enter on a tag it created itself. The push triggers are
+    # filtered to main and next, but a dispatch can name any branch, so name
+    # them again here: next cuts the rc, main cuts the GA, nothing else runs.
+    if: >-
+      github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
     env:
       # Releasing is a deliberate act on both branches. Every push — to next as
       # much as to main — rehearses the release and stops; only a dispatch cuts
