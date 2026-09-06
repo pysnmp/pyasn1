@@ -3,7 +3,47 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.1-rc.1](https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1-rc.1) (2026-09-06)
+
+### Bug Fixes
+
+* **ci:** publish docs from a branch, not a detached HEAD ([8e80d54](https://github.com/pysnmp/pyasn1/commit/8e80d5448f8e6f688fa83c6b6d9b5c72c690d2cc))
+* **ci:** publish docs from a branch, not a detached HEAD ([a41dbfa](https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350))
+* **type:** declare componentType on SequenceOf and SetOf ([2efb4c4](https://github.com/pysnmp/pyasn1/commit/2efb4c4da40e322abc6dffa6de971ff7e2138366))
+
 ## [2.0.0](https://github.com/pysnmp/pyasn1/compare/v1.3.0...v2.0.0) (2026-09-05)
+
+### ⚠ BREAKING CHANGES
+
+* footer, so the pending version is unchanged.
+
+Least privilege at the workflow level: contents: read rather than
+contents: write plus issues: write plus pull-requests: write. Nothing in
+the workflow writes with GITHUB_TOKEN — semantic-release authenticates
+with SEMREL_TOKEN and checks out with persist-credentials: false.
+
+Deliberately not adopted: pysnmp's release_type dispatch input, which
+sed-patches .releaserc to cut an rc from main. The next branch already
+cuts rcs, so that input exists to work around not having one.
+
+docs/source/ci-and-releases.rst documents the branches, commit-message
+conventions, what each job does, the matrix rules and why they are shaped
+that way, how a release is cut, Trusted Publishing, and the failure modes
+this repository actually hit.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+### Continuous Integration
+
+* reconcile with the pysmi and pysnmp workflows, document the process ([d4eb442](https://github.com/pysnmp/pyasn1/commit/d4eb442e6005e608dece0ce5a30ddf4475ab219f))
+
+## [2.0.0-rc.2](https://github.com/pysnmp/pyasn1/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2026-09-06)
+
+### Bug Fixes
+
+* **ci:** publish docs from a branch, not a detached HEAD ([a41dbfa](https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350))
+
+## [2.0.0-rc.1](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.3...v2.0.0-rc.1) (2026-09-06)
 
 ### ⚠ BREAKING CHANGES
 

@@ -78,19 +78,19 @@ class Encoder(encoder.Encoder):
 
 #: Turns ASN.1 object into DER octet stream.
 #:
-#: Takes any ASN.1 object (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
+#: Takes any ASN.1 object (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative)
 #: walks all its components recursively and produces a DER octet stream.
 #:
 #: Parameters
 #: ----------
-#: value: either a Python or pyasn1 object (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
+#: value: either a Python or pyasn1 object (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative)
 #:     A Python or pyasn1 object to encode. If Python object is given, `asnSpec`
 #:     parameter is required to guide the encoding process.
 #:
 #: Keyword Args
 #: ------------
 #: asn1Spec:
-#:     Optional ASN.1 schema or value object e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+#:     Optional ASN.1 schema or value object e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative
 #:
 #: Returns
 #: -------

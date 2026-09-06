@@ -271,7 +271,7 @@ class Encoder:
 
 #: Turns ASN.1 object into a Python built-in type object(s).
 #:
-#: Takes any ASN.1 object (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
+#: Takes any ASN.1 object (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative)
 #: walks all its components recursively and produces a Python built-in type or a tree
 #: of those.
 #:
@@ -280,7 +280,7 @@ class Encoder:
 #:
 #: Parameters
 #: ----------
-#  asn1Value: any pyasn1 object (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
+#  asn1Value: any pyasn1 object (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative)
 #:     pyasn1 object to encode (or a tree of them)
 #:
 #: Returns

@@ -77,7 +77,7 @@ jobs:
       # one push fixes them all. -n (nitpicky) is the goal but not yet reachable:
       # 136 docstring cross-references still resolve to nothing. See #155.
       - name: Build docs
-        run: uv run sphinx-build -W --keep-going -b html docs/source docs/build
+        run: uv run sphinx-build -n -W --keep-going -b html docs/source docs/build
 
   build:
     name: build
@@ -137,14 +137,11 @@ jobs:
           PY
 
   run-unit-tests:
-    name: test-unit
+    name: test-unit (py${{ matrix.python }} ${{ matrix.os }})
     strategy:
       matrix:
         include: ${{ fromJSON(needs.setup-matrix.outputs.include) }}
       fail-fast: false
-    # Windows has never run here, so it reports without blocking until it has a
-    # track record. Remove this once it does.
-    continue-on-error: ${{ matrix.os == 'windows-latest' }}
     runs-on: ${{ matrix.os }}
     needs:
       - build
@@ -194,6 +191,9 @@ jobs:
       # one. Automatic rcs are what let next drift below a GA already on PyPI.
       DRY: ${{ github.event_name != 'workflow_dispatch' }}
     needs:
+      - pre-commit
+      - lint
+      - docs
       - build
       - run-unit-tests
     runs-on: ubuntu-latest

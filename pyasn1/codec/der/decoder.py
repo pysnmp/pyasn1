@@ -132,7 +132,7 @@ class Decoder(decoder.Decoder):
 #: Turns DER octet stream into an ASN.1 object.
 #:
 #: Takes DER octet-stream and decode it into an ASN.1 object
-#: (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative) which
+#: (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative) which
 #: may be a scalar or an arbitrary nested structure.
 #:
 #: Parameters
@@ -142,7 +142,7 @@ class Decoder(decoder.Decoder):
 #:
 #: Keyword Args
 #: ------------
-#: asn1Spec: any pyasn1 type object e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+#: asn1Spec: any pyasn1 type object e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative
 #:     A pyasn1 type object to act as a template guiding the decoder. Depending on the ASN.1 structure
 #:     being decoded, *asn1Spec* may or may not be required. Most common reason for
 #:     it to require is that ASN.1 structure is encoded in *IMPLICIT* tagging mode.
@@ -150,7 +150,7 @@ class Decoder(decoder.Decoder):
 #: Returns
 #: -------
 #: : :py:class:`tuple`
-#:     A tuple of pyasn1 object recovered from DER substrate (:py:class:`~pyasn1.type.base.PyAsn1Item` derivative)
+#:     A tuple of pyasn1 object recovered from DER substrate (:py:class:`~pyasn1.type.base.Asn1Type` derivative)
 #:     and the unprocessed trailing portion of the *substrate* (may be empty)
 #:
 #: Raises
