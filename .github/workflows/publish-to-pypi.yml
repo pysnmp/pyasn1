@@ -1,45 +1,26 @@
 name: Publish to PyPI
 
+# build-test-release.yml cuts the release on a branch, tags it, and stops.
+# Uploading from the tag rather than from that run means a failed upload can be
+# re-run on its own, without re-running the release that produced it.
 on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-      # Prereleases cut from next, e.g. v1.2.0-rc.1. The pattern above is
+      # Prereleases cut from next, e.g. v1.3.0-rc.1. The pattern above is
       # anchored, so without this one the rc tags land on GitHub and never
       # reach PyPI.
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 
-# Add permissions needed for publishing
 permissions:
   contents: read
 
 jobs:
-  # First validate the tag matches the version in the files
-  validate-version:
-    name: Validate Version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Verify version matches tag
-        run: |
-          # Extract version from the tag (e.g., v1.2.3 -> 1.2.3)
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          # Get version from pyproject.toml
-          FILE_VERSION=$(grep -m 1 "version" pyproject.toml | sed -E 's/.*"(.*)"/\1/' | sed -E 's/.*'"'"'(.*)'"'"'/\1/')
-          echo "Tag version: $TAG_VERSION"
-          echo "File version: $FILE_VERSION"
-          # Verify versions match
-          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match version in pyproject.toml ($FILE_VERSION)"
-            exit 1
-          fi
-
-  # Pure-python (py3-none-any) package: one build serves every platform and version
+  # Pure-python (py3-none-any) package: one build serves every platform and
+  # version. A tag is all that triggers this, so check that what was built from
+  # it really is that version before any of it is uploaded.
   build-packages:
     name: Build package
-    needs: [validate-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -49,6 +30,36 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Build package
         run: uv build
+      # Read off the built distributions rather than out of pyproject.toml: this
+      # checks the artifact that will actually be uploaded, and holds whether
+      # the version is written there or derived. Compared as PEP 440 versions
+      # rather than as strings, since semantic-release tags 1.3.0-rc.1 and
+      # builds 1.3.0rc1 -- one version written two ways.
+      - name: Verify the built version matches the tag
+        run: |
+          uv run --no-project --with packaging python - "${GITHUB_REF#refs/tags/v}" <<'PY'
+          import pathlib
+          import sys
+
+          from packaging.utils import parse_sdist_filename, parse_wheel_filename
+          from packaging.version import Version
+
+          tag = Version(sys.argv[1])
+          dists = sorted(pathlib.Path("dist").glob("*"))
+          if not dists:
+              sys.exit("nothing was built")
+
+          for dist in dists:
+              if dist.name.endswith(".whl"):
+                  built = parse_wheel_filename(dist.name)[1]
+              elif dist.name.endswith(".tar.gz"):
+                  built = parse_sdist_filename(dist.name)[1]
+              else:
+                  continue
+              print(f"{dist.name}: {built} against tag {tag}")
+              if built != tag:
+                  sys.exit(f"{dist.name} is not the tagged version {tag}")
+          PY
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:

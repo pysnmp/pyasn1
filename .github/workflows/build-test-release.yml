@@ -194,6 +194,9 @@ jobs:
       # one. Automatic rcs are what let next drift below a GA already on PyPI.
       DRY: ${{ github.event_name != 'workflow_dispatch' }}
     needs:
+      - pre-commit
+      - lint
+      - docs
       - build
       - run-unit-tests
     runs-on: ubuntu-latest
