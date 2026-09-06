@@ -820,7 +820,7 @@ class RealDecoder(AbstractSimpleDecoder):
 
         # The grammar admits only a finite decimal, so as_tuple() cannot have
         # spelled the exponent with the letter it uses for a NaN or infinity.
-        assert isinstance(exponent, int)
+        assert isinstance(exponent, int)  # noqa: S101 - narrowing for the type checker, not a runtime check
 
         mantissa = int("".join(str(digit) for digit in digits))
 
