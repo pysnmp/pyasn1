@@ -47,8 +47,13 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Build docs
-        # Doctrees go outside the output tree so the build cache is not published.
-        run: uv run sphinx-build -W -b html -d "${RUNNER_TEMP}/doctrees" docs/source docs/build
+        # The same flags the CI docs job uses, so what is published cannot pass
+        # under looser settings than what gates a pull request. Doctrees go
+        # outside the output tree so the build cache is not published.
+        run: >
+          uv run --locked --group dev
+          sphinx-build -W --keep-going -b html
+          -d "${RUNNER_TEMP}/doctrees" docs/source docs/build
 
       - name: Check out gh-pages
         run: |
@@ -71,7 +76,11 @@ jobs:
                  "../site/${{ steps.tag.outputs.version }}/.buildinfo"
 
       - name: Rebuild aliases and version index
-        run: uv run --with packaging .github/workflows/docs-publish.py ../site
+        # The repository name titles the redirect pages, which is the only thing
+        # in this script that differs between the three repositories sharing it.
+        run: >
+          uv run --no-project --with packaging
+          .github/workflows/docs-publish.py ../site ${{ github.event.repository.name }}
 
       - name: Commit and push
         working-directory: ../site
