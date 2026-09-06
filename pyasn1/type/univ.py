@@ -2653,7 +2653,7 @@ class SequenceOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from
 
     #: Default :py:class:`~pyasn1.type.base.Asn1Type` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
-    componentType = None
+    componentType: typing.Any = None
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
@@ -2676,7 +2676,7 @@ class SetOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from the 
 
     #: Default :py:class:`~pyasn1.type.base.Asn1Type` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
-    componentType = None
+    componentType: typing.Any = None
 
     #: Set (on class, not on instance) or return a
     #: :py:class:`~pyasn1.type.constraint.ConstraintsIntersection` object
