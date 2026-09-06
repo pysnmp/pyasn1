@@ -3,6 +3,14 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.1](https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1) (2026-09-06)
+
+### Bug Fixes
+
+* **ci:** publish docs from a branch, not a detached HEAD ([8e80d54](https://github.com/pysnmp/pyasn1/commit/8e80d5448f8e6f688fa83c6b6d9b5c72c690d2cc))
+* **ci:** publish docs from a branch, not a detached HEAD ([a41dbfa](https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350))
+* **type:** declare componentType on SequenceOf and SetOf ([2efb4c4](https://github.com/pysnmp/pyasn1/commit/2efb4c4da40e322abc6dffa6de971ff7e2138366))
+
 ## [2.0.1-rc.1](https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1-rc.1) (2026-09-06)
 
 ### Bug Fixes
