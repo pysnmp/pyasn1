@@ -3097,8 +3097,10 @@ class InconsistentValueEncoderTestCase(BaseTestCase):
             univ.Set(),
         )
 
-        for value in values:
-            assert encoder.encode(value.clear()) in (b"0\x00", b"1\x00")
+        expected_encodings = (b"0\x00", b"1\x00", b"0\x00", b"1\x00")
+
+        for value, expected in zip(values, expected_encodings):
+            assert encoder.encode(value.clear()) == expected
 
     def testConstraintFailureKeepsItsDetail(self):
         s = univ.SequenceOf(
