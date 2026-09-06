@@ -2117,7 +2117,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
     Keyword Args
     ------------
-    componentType : :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+    componentType : :py:class:`~pyasn1.type.base.Asn1Type` derivative
         A pyasn1 object representing ASN.1 type allowed within |ASN.1| type
 
     tagSet: :py:class:`~pyasn1.type.tag.TagSet`
@@ -2290,12 +2290,12 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
         instantiate: :class:`bool`
             If :obj:`True` (default), inner component will be automatically instantiated.
-            If :obj:`False` either existing component or the :class:`NoValue` object will be
+            If :obj:`False` either existing component or the :class:`~pyasn1.type.base.NoValue` object will be
             returned.
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             Instantiate |ASN.1| component type or return existing component value
 
         Examples
@@ -2386,7 +2386,7 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
 
         Keyword Args
         ------------
-        value: :class:`object` or :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+        value: :class:`object` or :py:class:`~pyasn1.type.base.Asn1Type` derivative
             A Python value to initialize |ASN.1| component with (if *componentType* is set)
             or ASN.1 value object to assign to |ASN.1| component.
             If `value` is not given, schema object will be set as a component.
@@ -2651,7 +2651,7 @@ class SequenceOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from
         tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x10)
     )
 
-    #: Default :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+    #: Default :py:class:`~pyasn1.type.base.Asn1Type` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
     componentType = None
 
@@ -2674,7 +2674,7 @@ class SetOf(SequenceOfAndSetOfBase):  # noqa: D101 - docstring aliased from the 
         tag.Tag(tag.tagClassUniversal, tag.tagFormatConstructed, 0x11)
     )
 
-    #: Default :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+    #: Default :py:class:`~pyasn1.type.base.Asn1Type` derivative
     #: object representing ASN.1 type allowed within |ASN.1| type
     componentType = None
 
@@ -2945,12 +2945,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         instantiate: :class:`bool`
             If :obj:`True` (default), inner component will be automatically
             instantiated.
-            If :obj:`False` either existing component or the :class:`NoValue`
+            If :obj:`False` either existing component or the :class:`~pyasn1.type.base.NoValue`
             object will be returned.
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             Instantiate |ASN.1| component type or return existing
             component value
         """
@@ -2986,7 +2986,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
         Keyword Args
         ------------
-        value: :class:`object` or :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+        value: :class:`object` or :py:class:`~pyasn1.type.base.Asn1Type` derivative
             A Python value to initialize |ASN.1| component with (if *componentType* is set)
             or ASN.1 value object to assign to |ASN.1| component.
             If `value` is not given, schema object will be set as a component.
@@ -3040,12 +3040,12 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         instantiate: :class:`bool`
             If :obj:`True` (default), inner component will be automatically
             instantiated.
-            If :obj:`False` either existing component or the :class:`NoValue`
+            If :obj:`False` either existing component or the :class:`~pyasn1.type.base.NoValue`
             object will be returned.
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             a PyASN1 object
 
         Examples
@@ -3135,7 +3135,7 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
 
         Keyword Args
         ------------
-        value: :class:`object` or :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+        value: :class:`object` or :py:class:`~pyasn1.type.base.Asn1Type` derivative
             A Python value to initialize |ASN.1| component with (if *componentType* is set)
             or ASN.1 value object to assign to |ASN.1| component.
             If `value` is not given, schema object will be set as a component.
@@ -3467,12 +3467,12 @@ class Set(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base t
         instantiate: :class:`bool`
             If :obj:`True` (default), inner component will be automatically
             instantiated.
-            If :obj:`False` either existing component or the :class:`noValue`
+            If :obj:`False` either existing component or the :obj:`~pyasn1.type.base.noValue`
             object will be returned.
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             a pyasn1 object
         """
         componentValue = self.getComponentByPosition(
@@ -3506,7 +3506,7 @@ class Set(SequenceAndSetBase):  # noqa: D101 - docstring aliased from the base t
 
         Keyword Args
         ------------
-        value: :class:`object` or :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+        value: :class:`object` or :py:class:`~pyasn1.type.base.Asn1Type` derivative
             A Python value to initialize |ASN.1| component with (if *componentType* is set)
             or ASN.1 value object to assign to |ASN.1| component.
             If `value` is not given, schema object will be set as a component.
@@ -3751,12 +3751,12 @@ class Choice(Set):
         instantiate: :class:`bool`
             If :obj:`True` (default), inner component will be automatically
             instantiated.
-            If :obj:`False` either existing component or the :class:`NoValue`
+            If :obj:`False` either existing component or the :class:`~pyasn1.type.base.NoValue`
             object will be returned.
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             Instantiate |ASN.1| component type or return existing
             component value
         """
@@ -3789,7 +3789,7 @@ class Choice(Set):
 
         Keyword Args
         ------------
-        value: :class:`object` or :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+        value: :class:`object` or :py:class:`~pyasn1.type.base.Asn1Type` derivative
             A Python value to initialize |ASN.1| component with (if *componentType* is set)
             or ASN.1 value object to assign to |ASN.1| component. Once a new value is
             set to *idx* component, previous value is dropped.
@@ -3854,7 +3854,7 @@ class Choice(Set):
 
         Returns
         -------
-        : :py:class:`~pyasn1.type.base.PyAsn1Item`
+        : :py:class:`~pyasn1.type.base.Asn1Type`
             a PyASN1 object
         """
         if self._currentIdx is None:

@@ -9,7 +9,7 @@
 ------------
 
 .. autoclass:: pyasn1.type.univ.OctetString(value=NoValue(), tagSet=TagSet(), subtypeSpec=ConstraintsIntersection(), encoding='iso-8859-1', binValue=NoValue(),hexValue=NoValue())
-   :members: isValue, isSameTypeWith, isSuperTypeOf, tagSet, effectiveTagSet, tagMap, subtypeSpec, fromHexString, fromBinaryString
+   :members: isValue, isSameTypeWith, isSuperTypeOf, tagSet, effectiveTagSet, tagMap, subtypeSpec, fromHexString, fromBinaryString, asOctets
 
    .. note::
 
@@ -17,7 +17,7 @@
 
    .. deprecated:: 1.2.0
 
-        Calling :func:`str` on an |ASN.1| object decodes the payload as text
+        Calling :class:`str` on an |ASN.1| object decodes the payload as text
         using the `encoding` codec. This emits a :exc:`DeprecationWarning`; a
         future major release will return the hexadecimal representation
         instead. Use :meth:`~pyasn1.type.univ.OctetString.asOctets` for the

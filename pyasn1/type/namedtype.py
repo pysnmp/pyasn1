@@ -337,7 +337,7 @@ class NamedTypes:
 
         Parameters
         ----------
-        tagSet: :class:`~pysnmp.type.tag.TagSet`
+        tagSet: :class:`~pyasn1.type.tag.TagSet`
             ASN.1 tag set distinguishing one ASN.1 type from others.
 
         Returns
@@ -361,7 +361,7 @@ class NamedTypes:
 
         Parameters
         ----------
-        idx: :py:class:`idx`
+        idx: :py:class:`int`
             Field index
 
         Returns
@@ -494,7 +494,7 @@ class NamedTypes:
 
         Returns
         -------
-        : :class:`~pyasn1.type.tagset.TagSet`
+        : :class:`~pyasn1.type.tag.TagSet`
             Minimal TagSet among ASN.1 types in callee *NamedTypes*
         """
         return self.__minTagSet
