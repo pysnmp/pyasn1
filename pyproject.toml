@@ -69,7 +69,29 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PL", "RUF", "G", "LOG", "TRY", "BLE", "RSE", "D"]
+# The rule set pysmi and pysnmp share, so a contributor moving between the
+# three repositories meets the same lint. D in full is pyasn1's own: every
+# public thing here already carries a numpydoc docstring.
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "S",      # flake8-bandit (security)
+    "SIM",    # flake8-simplify
+    "BLE",    # flake8-blind-except
+    "G",      # flake8-logging-format (keep logging interpolation lazy)
+    "LOG",    # flake8-logging (logger misuse)
+    "FLY",    # flynt (static str.join -> f-string)
+    "C4",     # flake8-comprehensions
+    "RSE",    # flake8-raise
+    "RUF",    # ruff-specific rules
+    "PL",     # pylint
+    "TRY",    # tryceratops
+    "D",      # pydocstyle
+]
 ignore = [
     "E501",    # line-too-long — existing codebase has long lines
     "E721",    # type-comparison — existing pattern
@@ -112,10 +134,14 @@ ignore = [
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["B", "SIM", "PL", "RUF", "D"]  # relax rules for tests
+# Relax rules for tests. S101/S301/S311/S603: asserting, round-tripping
+# through pickle, seeding a non-cryptographic random and running a script in a
+# subprocess are what these tests do.
+"tests/**" = ["B", "SIM", "PL", "RUF", "D", "S101", "S301", "S311", "S603"]
 # Illustrative scripts, not public API: the numpy docstring convention would
-# bury the ASN.1 point of each example under boilerplate.
-"examples/**" = ["D"]
+# bury the ASN.1 point of each example under boilerplate, and each example
+# asserts what it just demonstrated so running it is its own check.
+"examples/**" = ["D", "S101"]
 
 [tool.mypy]
 python_version = "3.10"
