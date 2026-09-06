@@ -3,6 +3,12 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.0-rc.2](https://github.com/pysnmp/pyasn1/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2026-09-06)
+
+### Bug Fixes
+
+* **ci:** publish docs from a branch, not a detached HEAD ([a41dbfa](https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350))
+
 ## [2.0.0-rc.1](https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.3...v2.0.0-rc.1) (2026-09-06)
 
 ### ⚠ BREAKING CHANGES
