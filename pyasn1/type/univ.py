@@ -2612,15 +2612,13 @@ class SequenceOfAndSetOfBase(base.ConstructedAsn1Type):
             which callers raise. Never a bare :obj:`True`: the encoders and
             decoders raise whatever this returns.
         """
-        if self.componentType is noValue or not self.subtypeSpec:
-            return False
-
         if self._componentValues is noValue:
-            # A schema object carries no components at all, so the constraints
-            # cannot be satisfied and there is no constraint failure to report.
             return error.PyAsn1Error(
                 "Component values are not set", asn1Object=self.__class__.__name__
             )
+
+        if self.componentType is noValue or not self.subtypeSpec:
+            return False
 
         mapping = {}
 
@@ -3313,15 +3311,13 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
             which callers raise. Never a bare :obj:`True`: the encoders and
             decoders raise whatever this returns.
         """
-        if self.componentType is noValue or not self.subtypeSpec:
-            return False
-
         if self._componentValues is noValue:
-            # A schema object carries no components at all, so the constraints
-            # cannot be satisfied and there is no constraint failure to report.
             return error.PyAsn1Error(
                 "Component values are not set", asn1Object=self.__class__.__name__
             )
+
+        if self.componentType is noValue or not self.subtypeSpec:
+            return False
 
         mapping = {}
 

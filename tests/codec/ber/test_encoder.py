@@ -3077,6 +3077,29 @@ class InconsistentValueEncoderTestCase(BaseTestCase):
         else:
             assert False, "Inconsistent object encoded"
 
+    def testEveryConstructedSchemaRaisesWithoutAConstraint(self):
+        values = (
+            univ.SequenceOf(componentType=univ.Integer()),
+            univ.SetOf(componentType=univ.Integer()),
+            univ.Sequence(),
+            univ.Set(),
+        )
+
+        for value in values:
+            with self.assertRaises(PyAsn1Error):
+                encoder.encode(value)
+
+    def testClearedConstructedValuesEncodeAsEmpty(self):
+        values = (
+            univ.SequenceOf(componentType=univ.Integer()),
+            univ.SetOf(componentType=univ.Integer()),
+            univ.Sequence(),
+            univ.Set(),
+        )
+
+        for value in values:
+            assert encoder.encode(value.clear()) in (b"0\x00", b"1\x00")
+
     def testConstraintFailureKeepsItsDetail(self):
         s = univ.SequenceOf(
             componentType=univ.Integer(),

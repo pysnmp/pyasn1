@@ -2629,8 +2629,46 @@ class IsInconsistentContractTestCase(BaseTestCase):
 
         assert s.isInconsistent is False
 
-    def testUnconstrainedObjectReportsFalse(self):
-        assert univ.SequenceOf(componentType=univ.Integer()).isInconsistent is False
+    @staticmethod
+    def _constructedTypes(subtypeSpec=None):
+        options = {} if subtypeSpec is None else {"subtypeSpec": subtypeSpec}
+        return (
+            univ.SequenceOf(componentType=univ.Integer(), **options),
+            univ.SetOf(componentType=univ.Integer(), **options),
+            univ.Sequence(**options),
+            univ.Set(**options),
+        )
+
+    def testSchemaObjectsReportAnExceptionRegardlessOfConstraint(self):
+        constraints = (
+            None,
+            constraint.ValueSizeConstraint(0, 2),
+            constraint.ValueSizeConstraint(1, 2),
+        )
+
+        for subtypeSpec in constraints:
+            for value in self._constructedTypes(subtypeSpec):
+                assert not value.isValue
+                assert isinstance(value.isInconsistent, PyAsn1Error), (
+                    f"{value.__class__.__name__} schema with {subtypeSpec!r} "
+                    "was considered consistent"
+                )
+
+    def testClearedObjectsAreCheckedAsEmptyValues(self):
+        for value in self._constructedTypes():
+            value.clear()
+            assert value.isValue
+            assert value.isInconsistent is False
+
+        for value in self._constructedTypes(constraint.ValueSizeConstraint(0, 2)):
+            value.clear()
+            assert value.isValue
+            assert value.isInconsistent is False
+
+        for value in self._constructedTypes(constraint.ValueSizeConstraint(1, 2)):
+            value.clear()
+            assert value.isValue
+            assert isinstance(value.isInconsistent, error.ValueConstraintError)
 
     def testConstraintFailureKeepsItsDetail(self):
         # A genuine constraint failure must still surface the constraint that
