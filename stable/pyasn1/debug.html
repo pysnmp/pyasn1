@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Debugging and logging &#8212; ASN.1 types and codecs 2.0.0 documentation</title>
+    <title>Debugging and logging &#8212; ASN.1 types and codecs 2.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=f6a572b4" />
-    <script src="../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../_static/documentation_options.js?v=f5cff4aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -74,11 +74,11 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id2">1.3.0 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id8">1.3.0 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id7">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id14">1.2.0 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id40">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id47">1.1.0 (2021-11-24)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog-history.html">Historical changelog</a></li>
 </ul>
 <ul>
@@ -142,13 +142,13 @@
 <span id="pyasn1-debugging"></span><h1>Debugging and logging<a class="headerlink" href="#debugging-and-logging" title="Link to this heading">¶</a></h1>
 <p>pyasn1 is a library, so it never configures logging on behalf of the
 application that imports it. Importing pyasn1 attaches a
-<a class="reference external" href="https://docs.python.org/3.4/library/logging.handlers.html#logging.NullHandler" title="(in Python v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.NullHandler</span></code></a> to the <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> logger and does nothing
+<a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.NullHandler" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.NullHandler</span></code></a> to the <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> logger and does nothing
 else – no handler that writes anywhere, no level change, on the
 <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> logger or on any other. Debug output only appears once you
 ask for it.</p>
 <section id="turning-debugging-on">
 <h2>Turning debugging on<a class="headerlink" href="#turning-debugging-on" title="Link to this heading">¶</a></h2>
-<p>pyasn1 logs through <a class="reference external" href="https://docs.python.org/3.4/library/logging.html#module-logging" title="(in Python v3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> under the <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> namespace. There
+<p>pyasn1 logs through <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> under the <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> namespace. There
 is no pyasn1 API to call: raise the level the way you would for any
 other library.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -207,7 +207,7 @@ the encoders above <code class="docutils literal notranslate"><span class="pre">
 </section>
 <section id="records-carry-their-format-arguments">
 <h2>Records carry their format arguments<a class="headerlink" href="#records-carry-their-format-arguments" title="Link to this heading">¶</a></h2>
-<p>Trace points pass arguments to <a class="reference external" href="https://docs.python.org/3.4/library/logging.html#module-logging" title="(in Python v3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> rather than pre-rendering
+<p>Trace points pass arguments to <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> rather than pre-rendering
 them, so <code class="docutils literal notranslate"><span class="pre">record.msg</span></code> stays the format string and <code class="docutils literal notranslate"><span class="pre">record.args</span></code>
 holds the values:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'tag decoded into </span><span class="si">%s</span><span class="s1">, decoding length'</span><span class="p">,</span> <span class="n">tagSet</span><span class="p">)</span>
@@ -219,7 +219,7 @@ the arguments as fields, without parsing the rendered message.</p>
 <section id="cost-when-disabled">
 <h2>Cost when disabled<a class="headerlink" href="#cost-when-disabled" title="Link to this heading">¶</a></h2>
 <p>Every trace point is guarded with
-<a class="reference external" href="https://docs.python.org/3.4/library/logging.html#logging.Logger.isEnabledFor" title="(in Python v3.4)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">isEnabledFor()</span></code></a>, so disabled tracing costs one
+<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger.isEnabledFor" title="(in Python v3.14)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">isEnabledFor()</span></code></a>, so disabled tracing costs one
 level check per call site and neither formats a message nor builds its
 arguments. Leaving the guards in place in production is fine; enabling
 <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> on a hot decoding path is not, as the records embed hexdumps
@@ -227,10 +227,10 @@ of the substrate.</p>
 </section>
 <section id="deprecated-the-debug-switch">
 <span id="pyasn1-debug-deprecated"></span><h2>Deprecated: the Debug switch<a class="headerlink" href="#deprecated-the-debug-switch" title="Link to this heading">¶</a></h2>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">setLogger()</span></code> and
+<p><a class="reference internal" href="#pyasn1.debug.Debug" title="pyasn1.debug.Debug"><code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code></a>, <a class="reference internal" href="#pyasn1.debug.setLogger" title="pyasn1.debug.setLogger"><code class="xref py py-func docutils literal notranslate"><span class="pre">setLogger()</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">registerLoggee</span></code> predate the move to per-module loggers and are
 deprecated. They still work, and using them raises a
-<a class="reference external" href="https://docs.python.org/3.4/library/exceptions.html#DeprecationWarning" title="(in Python v3.4)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DeprecationWarning</span></code></a>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#DeprecationWarning" title="(in Python v3.14)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DeprecationWarning</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyasn1</span><span class="w"> </span><span class="kn">import</span> <span class="n">debug</span>
 
 <span class="n">debug</span><span class="o">.</span><span class="n">setLogger</span><span class="p">(</span><span class="n">debug</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">'all'</span><span class="p">))</span>   <span class="c1"># deprecated</span>
@@ -239,11 +239,84 @@ deprecated. They still work, and using them raises a
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">encoder</span></code>, <code class="docutils literal notranslate"><span class="pre">decoder</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code> and <code class="docutils literal notranslate"><span class="pre">none</span></code> flags map onto the
 loggers in the table above, and <code class="docutils literal notranslate"><span class="pre">!</span></code>/<code class="docutils literal notranslate"><span class="pre">~</span></code> still subtracts a category.
-While a <code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code> instance is installed,
-<code class="xref py py-func docutils literal notranslate"><span class="pre">setLogger()</span></code> drives the levels of the
+While a <a class="reference internal" href="#pyasn1.debug.Debug" title="pyasn1.debug.Debug"><code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code></a> instance is installed,
+<a class="reference internal" href="#pyasn1.debug.setLogger" title="pyasn1.debug.setLogger"><code class="xref py py-func docutils literal notranslate"><span class="pre">setLogger()</span></code></a> drives the levels of the
 <code class="docutils literal notranslate"><span class="pre">pyasn1.codec.*</span></code> loggers itself, overriding any level your
 application set on them; <code class="docutils literal notranslate"><span class="pre">setLogger(None)</span></code> puts them back.</p>
-<p>Prefer plain <a class="reference external" href="https://docs.python.org/3.4/library/logging.html#module-logging" title="(in Python v3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> configuration: it needs no pyasn1 import,
+<p>Both are still part of the public API while they remain deprecated, so they
+are documented here rather than only referred to.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.debug.Debug">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.debug.</span></span><span class="sig-name descname"><span class="pre">Debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.debug.Debug" title="Link to this definition">¶</a></dt>
+<dd><p>Deprecated switch for pyasn1 debug output.</p>
+<p>Configure <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> instead; see the module docstring.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyasn1.debug.Debug.defaultPrinter">
+<span class="sig-name descname"><span class="pre">defaultPrinter</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pyasn1.debug.Printer" title="pyasn1.debug.Printer"><span class="pre">Printer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyasn1.debug.Debug.defaultPrinter" title="Link to this definition">¶</a></dt>
+<dd><p>Printer shared by all <a class="reference internal" href="#pyasn1.debug.Debug" title="pyasn1.debug.Debug"><code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code></a> instances that were not given one.
+Built on first use, never at import time, so that merely importing
+pyasn1 never attaches a handler to anybody’s logger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.debug.Debug.printer">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">printer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pyasn1.debug.Debug.printer" title="Link to this definition">¶</a></dt>
+<dd><p>Where this instance sends rendered debug messages.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.debug.Debug.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyasn1.debug.Debug.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Forward <cite>msg</cite> to this instance’s printer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The message to log.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyasn1.debug.setLogger">
+<span class="sig-prename descclassname"><span class="pre">pyasn1.debug.</span></span><span class="sig-name descname"><span class="pre">setLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userLogger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyasn1.debug.Debug" title="pyasn1.debug.Debug"><span class="pre">Debug</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyasn1.debug.setLogger" title="Link to this definition">¶</a></dt>
+<dd><p>Turn pyasn1 debugging on or off. Deprecated.</p>
+<p>Passing a <a class="reference internal" href="#pyasn1.debug.Debug" title="pyasn1.debug.Debug"><code class="xref py py-class docutils literal notranslate"><span class="pre">Debug</span></code></a> instance raises the level of the loggers its
+flags name and, when needed, routes their records to the instance’s
+printer. Passing a false value puts every level back as it was.</p>
+<p>This overrides application-set levels on the <code class="docutils literal notranslate"><span class="pre">pyasn1.codec.*</span></code> loggers
+for as long as it is in effect. Configure <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> directly to
+avoid that.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyasn1.debug.Printer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyasn1.debug.</span></span><span class="sig-name descname"><span class="pre">Printer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.14)"><span class="pre">Logger</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Handler" title="(in Python v3.14)"><span class="pre">Handler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Formatter" title="(in Python v3.14)"><span class="pre">Formatter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyasn1.debug.Printer" title="Link to this definition">¶</a></dt>
+<dd><p>Emit pyasn1 debug records through <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a>.</p>
+<p>Only the library’s own <code class="docutils literal notranslate"><span class="pre">pyasn1</span></code> logger is configured here: it gets a
+level and a handler. A logger supplied by the caller is left exactly as
+found – no level change, and no handler unless the caller passed one –
+because that logger belongs to the application, not to pyasn1.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pyasn1.debug.Printer.logger">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">logger</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.14)"><span class="pre">Logger</span></a></span><a class="headerlink" href="#pyasn1.debug.Printer.logger" title="Link to this definition">¶</a></dt>
+<dd><p>The logger this printer writes to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyasn1.debug.Printer.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyasn1.debug.Printer.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Log <cite>msg</cite> to the wrapped logger at DEBUG level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The message to log.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Prefer plain <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> configuration: it needs no pyasn1 import,
 survives this deprecation, and addresses individual codec modules, which
 the flags cannot.</p>
 </section>
