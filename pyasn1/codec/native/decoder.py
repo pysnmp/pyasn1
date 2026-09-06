@@ -237,7 +237,7 @@ class Decoder:
 #: Turns Python objects of built-in types into ASN.1 objects.
 #:
 #: Takes Python objects of built-in types and turns them into a tree of
-#: ASN.1 objects (e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative) which
+#: ASN.1 objects (e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative) which
 #: may be a scalar or an arbitrary nested structure.
 #:
 #: Parameters
@@ -247,14 +247,14 @@ class Decoder:
 #:
 #: Keyword Args
 #: ------------
-#: asn1Spec: any pyasn1 type object e.g. :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+#: asn1Spec: any pyasn1 type object e.g. :py:class:`~pyasn1.type.base.Asn1Type` derivative
 #:     A pyasn1 type object to act as a template guiding the decoder. It is required
 #:     for successful interpretation of Python objects mapping into their ASN.1
 #:     representations.
 #:
 #: Returns
 #: -------
-#: : :py:class:`~pyasn1.type.base.PyAsn1Item` derivative
+#: : :py:class:`~pyasn1.type.base.Asn1Type` derivative
 #:     A scalar or constructed pyasn1 object
 #:
 #: Raises

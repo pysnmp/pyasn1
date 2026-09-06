@@ -326,8 +326,10 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"python": ("https://docs.python.org/3.4/", None)}
+# Refer to the Python standard library. Pinned at 3.4 until now, seven releases
+# below the 3.10 this package requires, so stdlib references such as
+# logging.Handler resolved to nothing under nitpicky mode.
+intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}
 
 # this merges constructor docstring with class docstring
 autoclass_content = "both"

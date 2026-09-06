@@ -4,6 +4,9 @@
 Constraints
 -----------
 
+.. module:: pyasn1.type.constraint
+
+
 ASN.1 standard has a built-in way of limiting the set of values
 a type can possibly have. Imposing value constraints on an ASN.1
 type, together with :ref:`tagging <type.tag>`, is a way of creating

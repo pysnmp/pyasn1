@@ -77,7 +77,7 @@ jobs:
       # one push fixes them all. -n (nitpicky) is the goal but not yet reachable:
       # 136 docstring cross-references still resolve to nothing. See #155.
       - name: Build docs
-        run: uv run sphinx-build -W --keep-going -b html docs/source docs/build
+        run: uv run sphinx-build -n -W --keep-going -b html docs/source docs/build
 
   build:
     name: build

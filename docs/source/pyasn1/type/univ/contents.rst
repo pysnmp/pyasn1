@@ -1,6 +1,8 @@
 
 .. _type.univ:
 
+.. module:: pyasn1.type.univ
+
 Universal types
 ---------------
 

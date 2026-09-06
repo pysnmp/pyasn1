@@ -113,6 +113,17 @@ While a :class:`~pyasn1.debug.Debug` instance is installed,
 ``pyasn1.codec.*`` loggers itself, overriding any level your
 application set on them; ``setLogger(None)`` puts them back.
 
+Both are still part of the public API while they remain deprecated, so they
+are documented here rather than only referred to.
+
+.. autoclass:: pyasn1.debug.Debug
+   :members:
+
+.. autofunction:: pyasn1.debug.setLogger
+
+.. autoclass:: pyasn1.debug.Printer
+   :members:
+
 Prefer plain :mod:`logging` configuration: it needs no pyasn1 import,
 survives this deprecation, and addresses individual codec modules, which
 the flags cannot.

@@ -72,7 +72,7 @@ class PyAsn1Error(Exception):
         Exception arguments, conventionally a single constant message.
 
     **context:
-        Structured data describing the failure. Kept as :attr:`context` and
+        Structured data describing the failure. Kept as :py:attr:`~pyasn1.error.PyAsn1Error.context` and
         appended to the formatted message on demand.
 
     Examples
@@ -89,6 +89,8 @@ class PyAsn1Error(Exception):
         # mix in UnicodeEncodeError/UnicodeDecodeError, which sit after this
         # class in their MRO and demand five arguments.
         Exception.__init__(self, *args)
+        #: Structured context passed as keyword arguments at raise time,
+        #: appended to the formatted message on demand.
         self.context: dict[str, Any] = context
 
     def __str__(self) -> str:
