@@ -3,6 +3,12 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.2](https://github.com/pysnmp/pyasn1/compare/v2.0.1...v2.0.2) (2026-09-09)
+
+### Bug Fixes
+
+* **type:** reject bare constructed schemas ([2734ea8](https://github.com/pysnmp/pyasn1/commit/2734ea8b977530574e2eacb8b5c1488bf7d70edb))
+
 ## [2.0.1](https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1) (2026-09-06)
 
 ### Bug Fixes
