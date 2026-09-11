@@ -50,13 +50,17 @@ tool:
 Though it may not work out as, as it stands now, asn1ate does not support
 all ASN.1 language constructs.
 
-Alternatively, you could check out the `pyasn1-modules <https://github.com/pysnmp/pyasn1-modules>`_
-package to see if it already has the ASN.1 spec you are looking for compiled and shipped
-there. Then just install the package, import the data structure you need and use it:
+Alternatively, you could check out the ``pyasn1-modules`` package to see if it
+already has the ASN.1 spec you are looking for compiled and shipped there. Then
+just install the package, import the data structure you need and use it:
 
 .. code-block:: bash
 
-    $ pip install pyasn1-modules
+    $ pip install pysnmp-pyasn1-modules
+
+`This fork of pyasn1-modules <https://github.com/pysnmp/pyasn1-modules>`_ is
+archived -- unlike pyasn1 itself, it is not maintained here, so the upstream
+``pyasn1-modules`` distribution is equally valid and may be newer.
 
 As a last resort, you could express ASN.1 in Python by hand. The end result
 should be a declarative Python code resembling original ASN.1 syntax like

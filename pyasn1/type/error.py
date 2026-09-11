@@ -2,7 +2,7 @@
 # This file is part of pyasn1 software.
 #
 # Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
-# License: http://snmplabs.com/pyasn1/license.html
+# License: https://github.com/pysnmp/pyasn1/blob/main/LICENSE.rst
 #
 """Exceptions raised by ASN.1 type value handling."""
 
