@@ -12,7 +12,15 @@ protocol (SNMP) but then generalized to be suitable for a wide range
 of protocols based on
 [ASN.1 specification](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-X.208-198811-W!!PDF-E&type=items).
 
-This project has been forked for ongoing maintenance and modernization.
+This project is a maintained fork of the original *pyasn1*, published to PyPI
+as `pysnmp-pyasn1`. The importable package name remains `pyasn1`, so existing
+code needs no changes.
+
+It is maintained in the [pysnmp organization](https://pysnmp.github.io/)
+because SNMP depends on it, and [pysnmp](https://pysnmp.github.io/pysnmp/)
+installs it for you — but nothing here is SNMP-specific.
+
+Documentation: <https://pysnmp.github.io/pyasn1/>
 
 Features
 --------
@@ -40,7 +48,7 @@ still rely on the 30+ years old technology. Including a number of
 high-profile Internet protocols and file formats.
 
 Quite a number of books cover the topic of ASN.1.
-[Communication between heterogeneous systems](http://www.oss.com/asn1/dubuisson.html)
+[Communication between heterogeneous systems](https://www.oss.com/asn1/dubuisson.html)
 by Olivier Dubuisson is one of those high quality books freely
 available on the Internet.
 
@@ -159,10 +167,11 @@ serialised forms. As of this moment, pyasn1 supports BER, DER, CER and
 Python built-ins codecs.
 
 More information on pyasn1 APIs can be found in the
-[documentation](https://github.com/pysnmp/pyasn1/tree/main/docs/source);
-compiled ASN.1 modules for different protocols and file formats
-could be found in the pyasn1-modules
-[repo](https://github.com/pysnmp/pyasn1-modules).
+[documentation](https://pysnmp.github.io/pyasn1/); compiled ASN.1 modules for
+different protocols and file formats are in `pyasn1-modules`, published here as
+[`pysnmp-pyasn1-modules`](https://pypi.org/project/pysnmp-pyasn1-modules/). Note
+that [this fork of it](https://github.com/pysnmp/pyasn1-modules) is archived —
+unlike pyasn1 itself, it is not maintained here.
 
 How to get pyasn1
 -----------------

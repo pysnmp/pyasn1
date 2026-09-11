@@ -6,13 +6,20 @@ ASN.1 library for Python
    :maxdepth: 1
 
 Abstract Syntax Notation One (`ASN.1
-<http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_1x>`_) is a
+<https://en.wikipedia.org/wiki/ASN.1>`_) is a
 technology for exchanging structured data in a universally understood,
 hardware agnostic way. Many industrial, security and telephony
 applications heavily rely on ASN.1.
 
 The `pysnmp-pyasn1 <https://pypi.org/project/pysnmp-pyasn1/>`_ library implements
 ASN.1 support in pure-Python.
+
+It is maintained in the `pysnmp organization <https://pysnmp.github.io/>`_
+because SNMP depends on it, and `pysnmp <https://pysnmp.github.io/pysnmp/>`_
+installs it for you -- but nothing here is SNMP-specific. LDAP, X.509, Kerberos
+and a long tail of other protocols are ASN.1 too, and this is a general
+implementation of the standard. You would come to it directly for one of those,
+or for anything else that has to read or write ASN.1.
 
 What is ASN.1
 -------------
@@ -75,7 +82,7 @@ ASN.1 gotchas
 
 Apparently, ASN.1 is hard to implement properly. Quality open-source
 ASN.1 tools are rare, but ad-hoc implementations are numerous. Judging from the
-`statistics <http://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=ASN.1>`_ on discovered
+`statistics <https://www.cve.org/CVERecord/SearchResults?query=ASN.1>`_ on discovered
 security vulnerabilities, many people have implemented ASN.1 parsers
 and oftentimes fell victim to its edge cases.
 
@@ -146,10 +153,13 @@ Getting help
 Please, file your `issues <https://github.com/pysnmp/pyasn1/issues>`_
 and `PRs <https://github.com/pysnmp/pyasn1/pulls>`_ at GitHub.
 Alternatively, you could ask for help at
-`Stack Overflow <http://stackoverflow.com/questions/tagged/pyasn1>`_
-or search
-`pyasn1-users <https://lists.sourceforge.net/lists/listinfo/pyasn1-users>`_
-mailing list archive.
+`Stack Overflow <https://stackoverflow.com/questions/tagged/pyasn1>`_.
+
+The `pyasn1-users
+<https://lists.sourceforge.net/lists/listinfo/pyasn1-users>`_ mailing list on
+SourceForge predates this fork and is not read here. Its archive is still
+worth searching for older questions; anything current belongs on the issue
+tracker.
 
 Books on ASN.1
 --------------
@@ -157,16 +167,19 @@ Books on ASN.1
 The pyasn1 implementation is largely based on reading up the following awesome
 books:
 
-* `ASN.1 - Communication between heterogeneous systems <http://www.oss.com/asn1/dubuisson.html>`_ by Olivier Dubuisson
-* `ASN.1 Complete <http://www.oss.com/asn1/resources/books-whitepapers-pubs/larmouth-asn1-book.pdf>`_ by Prof John Larmouth
+* `ASN.1 - Communication between heterogeneous systems <https://www.oss.com/asn1/dubuisson.html>`_ by Olivier Dubuisson
+* `ASN.1 Complete <https://www.oss.com/asn1/resources/books-whitepapers-pubs/larmouth-asn1-book.pdf>`_ by Prof John Larmouth
 
 Here you can get the official standards which is hard to read:
 
-* `ITU standards <http://www.itu.int/ITU-T/studygroups/com17/languages/X.680-X.693-0207w.zip>`_
+* `ITU standards <https://www.itu.int/ITU-T/studygroups/com17/languages/X.680-X.693-0207w.zip>`_
 
 On the other end of the readability spectrum, here is a quick and sweet write up:
 
-* `A Layman's Guide to a Subset of ASN.1, BER, and DER <ftp://ftp.rsasecurity.com/pub/pkcs/ascii/layman.asc>`_ by Burton S. Kaliski
+* `A Layman's Guide to a Subset of ASN.1, BER, and DER
+  <https://luca.ntop.org/Teaching/Appunti/asn1.html>`_ by Burton S. Kaliski.
+  RSA's own FTP copy is long gone, and browsers dropped FTP support; this is
+  the text as it is still served over HTTPS.
 
 If you are working with ASN.1, we'd highly recommend reading a proper
 book on the subject.
