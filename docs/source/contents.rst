@@ -14,6 +14,13 @@ applications heavily rely on ASN.1.
 The `pysnmp-pyasn1 <https://pypi.org/project/pysnmp-pyasn1/>`_ library implements
 ASN.1 support in pure-Python.
 
+It is maintained in the `pysnmp organization <https://pysnmp.github.io/>`_
+because SNMP depends on it, and `pysnmp <https://pysnmp.github.io/pysnmp/>`_
+installs it for you -- but nothing here is SNMP-specific. LDAP, X.509, Kerberos
+and a long tail of other protocols are ASN.1 too, and this is a general
+implementation of the standard. You would come to it directly for one of those,
+or for anything else that has to read or write ASN.1.
+
 What is ASN.1
 -------------
 
@@ -166,7 +173,10 @@ Here you can get the official standards which is hard to read:
 
 On the other end of the readability spectrum, here is a quick and sweet write up:
 
-* `A Layman's Guide to a Subset of ASN.1, BER, and DER <ftp://ftp.rsasecurity.com/pub/pkcs/ascii/layman.asc>`_ by Burton S. Kaliski
+* `A Layman's Guide to a Subset of ASN.1, BER, and DER
+  <https://luca.ntop.org/Teaching/Appunti/asn1.html>`_ by Burton S. Kaliski.
+  RSA's own FTP copy is long gone, and browsers dropped FTP support; this is
+  the text as it is still served over HTTPS.
 
 If you are working with ASN.1, we'd highly recommend reading a proper
 book on the subject.
