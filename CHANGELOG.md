@@ -3,6 +3,12 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.3](https://github.com/pysnmp/pyasn1/compare/v2.0.2...v2.0.3) (2026-09-19)
+
+### Bug Fixes
+
+* **type:** read NamedType's fields off the tuple, not through namedtuple ([6bdc644](https://github.com/pysnmp/pyasn1/commit/6bdc64434fef1ad9bac6824da9b9435edea30134)), closes [pysnmp/pysnmp#290](https://github.com/pysnmp/pysnmp/issues/290)
+
 ## [2.0.2](https://github.com/pysnmp/pyasn1/compare/v2.0.1...v2.0.2) (2026-09-09)
 
 ### Bug Fixes
