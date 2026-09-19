@@ -1,61 +1,301 @@
-<!DOCTYPE html>
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#"><link rel="search" title="Search" href="search.html">
+        <link rel="prefetch" href="_static/logo.svg" as="image">
+        <link rel="prefetch" href="_static/logo.svg" as="image">
 
-<html lang="en" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; ASN.1 types and codecs 2.0.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=f6a572b4" />
-    <script src="_static/documentation_options.js?v=c2377ec0"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <link rel="icon" href="_static/favicon.ico"/>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-  
-
-  </head><body>
-  <div class="document">
+    <link rel="shortcut icon" href="_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 --><title>Index - ASN.1 types and codecs 2.0.3 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="contents.html">
-    <img class="logo" src="_static/logo.svg" alt="Logo" />
     
-  </a>
-</p>
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
 
 
-<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="contents.html"><div class="brand">ASN.1 types and codecs 2.0.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="contents.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/logo.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyasn1/contents.html">Library documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pyasn1/contents.html">Library documentation</a><input aria-label="Toggle navigation of Library documentation" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/base/contents.html">ASN.1 type system</a><input aria-label="Toggle navigation of ASN.1 type system" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/asn1type.html">Asn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/simpleasn1type.html">SimpleAsn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/constructedasn1type.html">ConstructedAsn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/novalue.html">NoValue sentinel</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/univ/contents.html">Universal types</a><input aria-label="Toggle navigation of Universal types" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/integer.html">Integer type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/boolean.html">Boolean type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/bitstring.html">BitString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/octetstring.html">OctetString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/null.html">Null type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/objectidentifier.html">ObjectIdentifier type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/relativeoid.html">RelativeOID type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/real.html">Real type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/enumerated.html">Enumerated type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/any.html">Any type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/setof.html">SetOf type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/sequenceof.html">SequenceOf type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/set.html">Set type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/sequence.html">Sequence type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/choice.html">Choice type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/char/contents.html">Character types</a><input aria-label="Toggle navigation of Character types" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/numericstring.html">NumericString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/printablestring.html">PrintableString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/teletexstring.html">TeletexString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/t61string.html">T61String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/videotexstring.html">VideotexString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/ia5string.html">IA5String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/graphicstring.html">GraphicString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/visiblestring.html">VisibleString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/iso646string.html">ISO646String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/generalstring.html">GeneralString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/universalstring.html">UniversalString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/bmpstring.html">BMPString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/utf8string.html">UTF8String type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/useful/contents.html">Useful types</a><input aria-label="Toggle navigation of Useful types" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/objectdescriptor.html">ObjectDescriptor type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/generalizedtime.html">GeneralizedTime type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/utctime.html">UTCTime type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/tag/contents.html">Tags</a><input aria-label="Toggle navigation of Tags" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tag.html">Solitary tag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tagset.html">Tag set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tagmap.html">Tag-&gt;type map</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/constraint/contents.html">Constraints</a><input aria-label="Toggle navigation of Constraints" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/singlevalue.html">Single value constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/containedsubtype.html">Contained subtype constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/valuerange.html">Value range constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/valuesize.html">Value size constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/permittedalphabet.html">Permitted alphabet constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/withcomponents.html">WITH COMPONENTS constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsintersection.html">Constraints intersection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsunion.html">Constraints union</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsexclusion.html">Constraints exclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/namedtype/contents.html">Fields of constructed types</a><input aria-label="Toggle navigation of Fields of constructed types" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/namedtype.html">NamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/optionalnamedtype.html">OptionalNamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/defaultednamedtype.html">DefaultedNamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/namedtypes.html">NamedTypes</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/opentype/contents.html">Dynamic or open type</a><input aria-label="Toggle navigation of Dynamic or open type" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/opentype/opentype.html">OpenType</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/namedval/contents.html">Enumerating numbers</a><input aria-label="Toggle navigation of Enumerating numbers" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedval/namedval.html">NamedValues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/ber/contents.html">Basic Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/cer/contents.html">Canonical Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/der/contents.html">Distinguished Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/native/contents.html">Native Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html">Structured error context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1error">PyAsn1Error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#valueconstrainterror">ValueConstraintError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#substrateunderrunerror">SubstrateUnderrunError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodeerror">PyAsn1UnicodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodedecodeerror">PyAsn1UnicodeDecodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodeencodeerror">PyAsn1UnicodeEncodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/debug.html">Debugging and logging</a></li>
+</ul>
+</li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="example-use-case.html">Example use case</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="example-use-case.html">Example use case</a><input aria-label="Toggle navigation of Example use case" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
+</ul>
+</li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="download.html">Download &amp; Install</a></li>
@@ -65,11 +305,11 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id10">1.3.0 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id12">1.3.0 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id16">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id18">1.2.0 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
@@ -85,1308 +325,1351 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id49">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id51">1.1.0 (2021-11-24)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog-history.html">Historical changelog</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="contents.html">Documentation overview</a><ul>
-  </ul></li>
-</ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- <a href="#_"><strong>_</strong></a>
- | <a href="#A"><strong>A</strong></a>
- | <a href="#B"><strong>B</strong></a>
- | <a href="#C"><strong>C</strong></a>
- | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
- | <a href="#G"><strong>G</strong></a>
- | <a href="#H"><strong>H</strong></a>
- | <a href="#I"><strong>I</strong></a>
- | <a href="#K"><strong>K</strong></a>
- | <a href="#L"><strong>L</strong></a>
- | <a href="#M"><strong>M</strong></a>
- | <a href="#N"><strong>N</strong></a>
- | <a href="#O"><strong>O</strong></a>
- | <a href="#P"><strong>P</strong></a>
- | <a href="#R"><strong>R</strong></a>
- | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
- | <a href="#V"><strong>V</strong></a>
- | <a href="#W"><strong>W</strong></a>
- 
 </div>
-<h2 id="_">_</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.__call__">__call__() (pyasn1.debug.Debug method)</a>
 
-      <ul>
-        <li><a href="pyasn1/debug.html#pyasn1.debug.Printer.__call__">(pyasn1.debug.Printer method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType.__new__">__new__() (pyasn1.type.namedtype.NamedType static method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.Tag.__new__">(pyasn1.type.tag.Tag static method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.__repr__">__repr__() (pyasn1.error.PyAsn1Error method)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.__str__">__str__() (pyasn1.error.PyAsn1Error method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="A">A</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any">Any (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asBinary">asBinary() (pyasn1.type.univ.BitString method)</a>
-</li>
-      <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.asDateTime">asDateTime (pyasn1.type.useful.GeneralizedTime property)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.asDateTime">(pyasn1.type.useful.UTCTime property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asInteger">asInteger() (pyasn1.type.univ.BitString method)</a>
-</li>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type">Asn1Type (class in pyasn1.type.base)</a>
-</li>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asNumbers">asNumbers() (pyasn1.type.univ.BitString method)</a>
-</li>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asOctets">asOctets() (pyasn1.type.univ.BitString method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.asOctets">(pyasn1.type.univ.OctetString method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="B">B</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.baseTag">baseTag (pyasn1.type.tag.TagSet property)</a>
-</li>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString">BitString (class in pyasn1.type.univ)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString">BMPString (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean">Boolean (class in pyasn1.type.univ)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice">Choice (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.clear">clear() (pyasn1.type.namedval.NamedValues method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.clear">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.clear">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.clear">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.clear">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.clear">(pyasn1.type.univ.SetOf method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.clone">clone() (pyasn1.type.char.BMPString method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.clone">(pyasn1.type.char.GeneralString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.clone">(pyasn1.type.char.GraphicString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.clone">(pyasn1.type.char.IA5String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.clone">(pyasn1.type.char.ISO646String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.clone">(pyasn1.type.char.NumericString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.clone">(pyasn1.type.char.PrintableString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.clone">(pyasn1.type.char.T61String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.clone">(pyasn1.type.char.TeletexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.clone">(pyasn1.type.char.UniversalString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.clone">(pyasn1.type.char.UTF8String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.clone">(pyasn1.type.char.VideotexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.clone">(pyasn1.type.char.VisibleString method)</a>
-</li>
-        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.clone">(pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.clone">(pyasn1.type.namedval.NamedValues method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.clone">(pyasn1.type.univ.Any method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.clone">(pyasn1.type.univ.BitString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.clone">(pyasn1.type.univ.Boolean method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.clone">(pyasn1.type.univ.Choice method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.clone">(pyasn1.type.univ.Enumerated method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.clone">(pyasn1.type.univ.Integer method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.clone">(pyasn1.type.univ.Null method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.clone">(pyasn1.type.univ.ObjectIdentifier method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.clone">(pyasn1.type.univ.OctetString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.clone">(pyasn1.type.univ.Real method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.clone">(pyasn1.type.univ.RelativeOID method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.clone">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.clone">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.clone">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.clone">(pyasn1.type.univ.SetOf method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.clone">(pyasn1.type.useful.GeneralizedTime method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.clone">(pyasn1.type.useful.ObjectDescriptor method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.clone">(pyasn1.type.useful.UTCTime method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.ComponentAbsentConstraint">ComponentAbsentConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.ComponentPresentConstraint">ComponentPresentConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.componentType">componentType (pyasn1.type.univ.Choice attribute)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.componentType">(pyasn1.type.univ.Sequence attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.componentType">(pyasn1.type.univ.SequenceOf attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.componentType">(pyasn1.type.univ.Set attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.componentType">(pyasn1.type.univ.SetOf attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/constraint/constraintsexclusion.html#pyasn1.type.constraint.ConstraintsExclusion">ConstraintsExclusion (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection">ConstraintsIntersection (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/constraintsunion.html#pyasn1.type.constraint.ConstraintsUnion">ConstraintsUnion (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type">ConstructedAsn1Type (class in pyasn1.type.base)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/containedsubtype.html#pyasn1.type.constraint.ContainedSubtypeConstraint">ContainedSubtypeConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.context">context (pyasn1.error.PyAsn1Error attribute)</a>
-</li>
-      <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.copy">copy() (pyasn1.type.opentype.OpenType method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="D">D</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Debug">Debug (class in pyasn1.debug)</a>
-</li>
-      <li><a href="pyasn1/codec/ber/contents.html#pyasn1.codec.ber.decoder.decode">decode() (in module pyasn1.codec.ber.decoder)</a>
-
-      <ul>
-        <li><a href="pyasn1/codec/cer/contents.html#pyasn1.codec.cer.decoder.decode">(in module pyasn1.codec.cer.decoder)</a>
-</li>
-        <li><a href="pyasn1/codec/der/contents.html#pyasn1.codec.der.decoder.decode">(in module pyasn1.codec.der.decoder)</a>
-</li>
-        <li><a href="pyasn1/codec/native/contents.html#pyasn1.codec.native.decoder.decode">(in module pyasn1.codec.native.decoder)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/defaultednamedtype.html#pyasn1.type.namedtype.DefaultedNamedType">DefaultedNamedType (class in pyasn1.type.namedtype)</a>
-</li>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.defaultPrinter">defaultPrinter (pyasn1.debug.Debug attribute)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.defaultType">defaultType (pyasn1.type.tagmap.TagMap property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.effectiveTagSet">effectiveTagSet (pyasn1.type.base.Asn1Type property)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.effectiveTagSet">(pyasn1.type.base.ConstructedAsn1Type property)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.effectiveTagSet">(pyasn1.type.base.SimpleAsn1Type property)</a>
-</li>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.effectiveTagSet">(pyasn1.type.char.BMPString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.effectiveTagSet">(pyasn1.type.char.GeneralString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.effectiveTagSet">(pyasn1.type.char.GraphicString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.effectiveTagSet">(pyasn1.type.char.IA5String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.effectiveTagSet">(pyasn1.type.char.ISO646String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.effectiveTagSet">(pyasn1.type.char.NumericString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.effectiveTagSet">(pyasn1.type.char.PrintableString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.effectiveTagSet">(pyasn1.type.char.T61String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.effectiveTagSet">(pyasn1.type.char.TeletexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.effectiveTagSet">(pyasn1.type.char.UniversalString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.effectiveTagSet">(pyasn1.type.char.UTF8String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.effectiveTagSet">(pyasn1.type.char.VideotexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.effectiveTagSet">(pyasn1.type.char.VisibleString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.effectiveTagSet">(pyasn1.type.univ.Any property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.effectiveTagSet">(pyasn1.type.univ.BitString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.effectiveTagSet">(pyasn1.type.univ.Boolean property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.effectiveTagSet">(pyasn1.type.univ.Choice property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.effectiveTagSet">(pyasn1.type.univ.Enumerated property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.effectiveTagSet">(pyasn1.type.univ.Integer property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.effectiveTagSet">(pyasn1.type.univ.Null property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.effectiveTagSet">(pyasn1.type.univ.ObjectIdentifier property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.effectiveTagSet">(pyasn1.type.univ.OctetString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.effectiveTagSet">(pyasn1.type.univ.Real property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.effectiveTagSet">(pyasn1.type.univ.RelativeOID property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.effectiveTagSet">(pyasn1.type.univ.Sequence property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.effectiveTagSet">(pyasn1.type.univ.SequenceOf property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.effectiveTagSet">(pyasn1.type.univ.Set property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.effectiveTagSet">(pyasn1.type.univ.SetOf property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/codec/ber/contents.html#pyasn1.codec.ber.encoder.encode">encode() (in module pyasn1.codec.ber.encoder)</a>
-
-      <ul>
-        <li><a href="pyasn1/codec/cer/contents.html#pyasn1.codec.cer.encoder.encode">(in module pyasn1.codec.cer.encoder)</a>
-</li>
-        <li><a href="pyasn1/codec/der/contents.html#pyasn1.codec.der.encoder.encode">(in module pyasn1.codec.der.encoder)</a>
-</li>
-        <li><a href="pyasn1/codec/native/contents.html#pyasn1.codec.native.encoder.encode">(in module pyasn1.codec.native.encoder)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated">Enumerated (class in pyasn1.type.univ)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromBinaryString">fromBinaryString() (pyasn1.type.univ.BitString class method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.fromBinaryString">(pyasn1.type.univ.OctetString static method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.fromDateTime">fromDateTime() (pyasn1.type.useful.GeneralizedTime class method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.fromDateTime">(pyasn1.type.useful.UTCTime class method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromHexString">fromHexString() (pyasn1.type.univ.BitString class method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.fromHexString">(pyasn1.type.univ.OctetString static method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromOctetString">fromOctetString() (pyasn1.type.univ.BitString class method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="G">G</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime">GeneralizedTime (class in pyasn1.type.useful)</a>
-</li>
-      <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString">GeneralString (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.get">get() (pyasn1.type.opentype.OpenType method)</a>
-</li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponent">getComponent() (pyasn1.type.univ.Choice method)</a>
-</li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByName">getComponentByName() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.getComponentByName">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByName">(pyasn1.type.univ.Set method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByPosition">getComponentByPosition() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.getComponentByPosition">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.getComponentByPosition">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByPosition">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.getComponentByPosition">(pyasn1.type.univ.SetOf method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByType">getComponentByType() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByType">(pyasn1.type.univ.Set method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getName">getName() (pyasn1.type.univ.Choice method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getNameByPosition">getNameByPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionByName">getPositionByName() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionByType">getPositionByType() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionNearType">getPositionNearType() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getTagMapNearPosition">getTagMapNearPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getTypeByPosition">getTypeByPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
-</li>
-      <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString">GraphicString (class in pyasn1.type.char)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="H">H</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.hasOpenTypes">hasOpenTypes (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.hasOptionalOrDefault">hasOptionalOrDefault (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String">IA5String (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer">Integer (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isInconsistent">isInconsistent (pyasn1.type.univ.Choice property)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isInconsistent">(pyasn1.type.univ.Sequence property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isInconsistent">(pyasn1.type.univ.SequenceOf property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isInconsistent">(pyasn1.type.univ.Set property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isInconsistent">(pyasn1.type.univ.SetOf property)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isInf">isInf (pyasn1.type.univ.Real property)</a>
-</li>
-      <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isMinusInf">isMinusInf (pyasn1.type.univ.Real property)</a>
-</li>
-      <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String">ISO646String (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isPlusInf">isPlusInf (pyasn1.type.univ.Real property)</a>
-</li>
-      <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isPrefixOf">isPrefixOf() (pyasn1.type.univ.ObjectIdentifier method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isPrefixOf">(pyasn1.type.univ.RelativeOID method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.isSameTypeWith">isSameTypeWith() (pyasn1.type.base.Asn1Type method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.isSameTypeWith">(pyasn1.type.base.ConstructedAsn1Type method)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isSameTypeWith">(pyasn1.type.base.SimpleAsn1Type method)</a>
-</li>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isSameTypeWith">(pyasn1.type.char.BMPString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isSameTypeWith">(pyasn1.type.char.GeneralString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isSameTypeWith">(pyasn1.type.char.GraphicString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isSameTypeWith">(pyasn1.type.char.IA5String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isSameTypeWith">(pyasn1.type.char.ISO646String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isSameTypeWith">(pyasn1.type.char.NumericString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isSameTypeWith">(pyasn1.type.char.PrintableString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isSameTypeWith">(pyasn1.type.char.T61String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isSameTypeWith">(pyasn1.type.char.TeletexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isSameTypeWith">(pyasn1.type.char.UniversalString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isSameTypeWith">(pyasn1.type.char.UTF8String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isSameTypeWith">(pyasn1.type.char.VideotexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isSameTypeWith">(pyasn1.type.char.VisibleString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isSameTypeWith">(pyasn1.type.univ.Any method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isSameTypeWith">(pyasn1.type.univ.BitString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isSameTypeWith">(pyasn1.type.univ.Boolean method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isSameTypeWith">(pyasn1.type.univ.Choice method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isSameTypeWith">(pyasn1.type.univ.Enumerated method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isSameTypeWith">(pyasn1.type.univ.Integer method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isSameTypeWith">(pyasn1.type.univ.Null method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isSameTypeWith">(pyasn1.type.univ.ObjectIdentifier method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isSameTypeWith">(pyasn1.type.univ.OctetString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isSameTypeWith">(pyasn1.type.univ.Real method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isSameTypeWith">(pyasn1.type.univ.RelativeOID method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isSameTypeWith">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isSameTypeWith">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isSameTypeWith">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isSameTypeWith">(pyasn1.type.univ.SetOf method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isSameTypeWith">(pyasn1.type.useful.GeneralizedTime method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isSameTypeWith">(pyasn1.type.useful.ObjectDescriptor method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isSameTypeWith">(pyasn1.type.useful.UTCTime method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.isSuperTagSetOf">isSuperTagSetOf() (pyasn1.type.tag.TagSet method)</a>
-</li>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.isSuperTypeOf">isSuperTypeOf() (pyasn1.type.base.Asn1Type method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.isSuperTypeOf">(pyasn1.type.base.ConstructedAsn1Type method)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isSuperTypeOf">(pyasn1.type.base.SimpleAsn1Type method)</a>
-</li>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isSuperTypeOf">(pyasn1.type.char.BMPString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isSuperTypeOf">(pyasn1.type.char.GeneralString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isSuperTypeOf">(pyasn1.type.char.GraphicString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isSuperTypeOf">(pyasn1.type.char.IA5String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isSuperTypeOf">(pyasn1.type.char.ISO646String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isSuperTypeOf">(pyasn1.type.char.NumericString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isSuperTypeOf">(pyasn1.type.char.PrintableString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isSuperTypeOf">(pyasn1.type.char.T61String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isSuperTypeOf">(pyasn1.type.char.TeletexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isSuperTypeOf">(pyasn1.type.char.UniversalString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isSuperTypeOf">(pyasn1.type.char.UTF8String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isSuperTypeOf">(pyasn1.type.char.VideotexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isSuperTypeOf">(pyasn1.type.char.VisibleString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isSuperTypeOf">(pyasn1.type.univ.Any method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isSuperTypeOf">(pyasn1.type.univ.BitString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isSuperTypeOf">(pyasn1.type.univ.Boolean method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isSuperTypeOf">(pyasn1.type.univ.Choice method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isSuperTypeOf">(pyasn1.type.univ.Enumerated method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isSuperTypeOf">(pyasn1.type.univ.Integer method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isSuperTypeOf">(pyasn1.type.univ.Null method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isSuperTypeOf">(pyasn1.type.univ.ObjectIdentifier method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isSuperTypeOf">(pyasn1.type.univ.OctetString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isSuperTypeOf">(pyasn1.type.univ.Real method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isSuperTypeOf">(pyasn1.type.univ.RelativeOID method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isSuperTypeOf">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isSuperTypeOf">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isSuperTypeOf">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isSuperTypeOf">(pyasn1.type.univ.SetOf method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isSuperTypeOf">(pyasn1.type.useful.GeneralizedTime method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isSuperTypeOf">(pyasn1.type.useful.ObjectDescriptor method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isSuperTypeOf">(pyasn1.type.useful.UTCTime method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isValue">isValue (pyasn1.type.base.SimpleAsn1Type property)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isValue">(pyasn1.type.char.BMPString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isValue">(pyasn1.type.char.GeneralString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isValue">(pyasn1.type.char.GraphicString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isValue">(pyasn1.type.char.IA5String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isValue">(pyasn1.type.char.ISO646String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isValue">(pyasn1.type.char.NumericString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isValue">(pyasn1.type.char.PrintableString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isValue">(pyasn1.type.char.T61String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isValue">(pyasn1.type.char.TeletexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isValue">(pyasn1.type.char.UniversalString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isValue">(pyasn1.type.char.UTF8String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isValue">(pyasn1.type.char.VideotexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isValue">(pyasn1.type.char.VisibleString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isValue">(pyasn1.type.univ.Any property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isValue">(pyasn1.type.univ.BitString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isValue">(pyasn1.type.univ.Boolean property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isValue">(pyasn1.type.univ.Choice property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isValue">(pyasn1.type.univ.Enumerated property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isValue">(pyasn1.type.univ.Integer property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isValue">(pyasn1.type.univ.Null property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isValue">(pyasn1.type.univ.ObjectIdentifier property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isValue">(pyasn1.type.univ.OctetString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isValue">(pyasn1.type.univ.Real property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isValue">(pyasn1.type.univ.RelativeOID property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isValue">(pyasn1.type.univ.Sequence property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isValue">(pyasn1.type.univ.SequenceOf property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isValue">(pyasn1.type.univ.Set property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isValue">(pyasn1.type.univ.SetOf property)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isValue">(pyasn1.type.useful.GeneralizedTime property)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isValue">(pyasn1.type.useful.ObjectDescriptor property)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isValue">(pyasn1.type.useful.UTCTime property)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.items">items() (pyasn1.type.namedtype.NamedTypes method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.items">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.keys">keys() (pyasn1.type.namedtype.NamedTypes method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.keys">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="L">L</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Printer.logger">logger (pyasn1.debug.Printer property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.minTagSet">minTagSet (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-      <li>
-    module
-
-      <ul>
-        <li><a href="pyasn1/codec/native/contents.html#module-pyasn1.codec.native">pyasn1.codec.native</a>
-</li>
-        <li><a href="pyasn1/type/constraint/contents.html#module-pyasn1.type.constraint">pyasn1.type.constraint</a>
-</li>
-        <li><a href="pyasn1/type/tag/tag.html#module-pyasn1.type.tag">pyasn1.type.tag</a>
-</li>
-        <li><a href="pyasn1/type/univ/contents.html#module-pyasn1.type.univ">pyasn1.type.univ</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="N">N</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType">NamedType (class in pyasn1.type.namedtype)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes">NamedTypes (class in pyasn1.type.namedtype)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.namedTypes">namedTypes (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.PostponedError">NamedTypes.PostponedError (class in pyasn1.type.namedtype)</a>
-</li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues">NamedValues (class in pyasn1.type.namedval)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.namedValues">namedValues (pyasn1.type.univ.Enumerated attribute)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.namedValues">(pyasn1.type.univ.Integer attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/base/novalue.html#pyasn1.type.base.NoValue">NoValue (class in pyasn1.type.base)</a>
-</li>
-      <li><a href="pyasn1/type/base/novalue.html#pyasn1.type.base.noValue">noValue (in module pyasn1.type.base)</a>
-</li>
-      <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null">Null (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString">NumericString (class in pyasn1.type.char)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="O">O</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor">ObjectDescriptor (class in pyasn1.type.useful)</a>
-</li>
-      <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier">ObjectIdentifier (class in pyasn1.type.univ)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString">OctetString (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType">OpenType (class in pyasn1.type.opentype)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/optionalnamedtype.html#pyasn1.type.namedtype.OptionalNamedType">OptionalNamedType (class in pyasn1.type.namedtype)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/constraint/permittedalphabet.html#pyasn1.type.constraint.PermittedAlphabetConstraint">PermittedAlphabetConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.pop">pop() (pyasn1.type.namedval.NamedValues method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.pop">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.popitem">popitem() (pyasn1.type.namedval.NamedValues method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.popitem">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.presentTypes">presentTypes (pyasn1.type.tagmap.TagMap property)</a>
-</li>
-      <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString">PrintableString (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Printer">Printer (class in pyasn1.debug)</a>
-</li>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.printer">printer (pyasn1.debug.Debug property)</a>
-</li>
-      <li>
-    pyasn1.codec.native
-
-      <ul>
-        <li><a href="pyasn1/codec/native/contents.html#module-pyasn1.codec.native">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    pyasn1.type.constraint
-
-      <ul>
-        <li><a href="pyasn1/type/constraint/contents.html#module-pyasn1.type.constraint">module</a>
-</li>
-      </ul></li>
-      <li>
-    pyasn1.type.tag
-
-      <ul>
-        <li><a href="pyasn1/type/tag/tag.html#module-pyasn1.type.tag">module</a>
-</li>
-      </ul></li>
-      <li>
-    pyasn1.type.univ
-
-      <ul>
-        <li><a href="pyasn1/type/univ/contents.html#module-pyasn1.type.univ">module</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error">PyAsn1Error (class in pyasn1.error)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeDecodeError">PyAsn1UnicodeDecodeError (class in pyasn1.error)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeEncodeError">PyAsn1UnicodeEncodeError (class in pyasn1.error)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeError">PyAsn1UnicodeError (class in pyasn1.error)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="R">R</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real">Real (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID">RelativeOID (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.requiredComponents">requiredComponents (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.reset">reset() (pyasn1.type.univ.Sequence method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.reset">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.reset">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.reset">(pyasn1.type.univ.SetOf method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="S">S</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence">Sequence (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf">SequenceOf (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set">Set (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByName">setComponentByName() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.setComponentByName">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByName">(pyasn1.type.univ.Set method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByPosition">setComponentByPosition() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.setComponentByPosition">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.setComponentByPosition">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByPosition">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.setComponentByPosition">(pyasn1.type.univ.SetOf method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByType">setComponentByType() (pyasn1.type.univ.Choice method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByType">(pyasn1.type.univ.Set method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.setdefault">setdefault() (pyasn1.type.namedval.NamedValues method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.setdefault">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/debug.html#pyasn1.debug.setLogger">setLogger() (in module pyasn1.debug)</a>
-</li>
-      <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf">SetOf (class in pyasn1.type.univ)</a>
-</li>
-      <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type">SimpleAsn1Type (class in pyasn1.type.base)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/singlevalue.html#pyasn1.type.constraint.SingleValueConstraint">SingleValueConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.skipTypes">skipTypes (pyasn1.type.tagmap.TagMap property)</a>
-</li>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.SubstrateUnderrunError">SubstrateUnderrunError (class in pyasn1.error)</a>
-</li>
-      <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.subtype">subtype() (pyasn1.type.char.BMPString method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.subtype">(pyasn1.type.char.GeneralString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.subtype">(pyasn1.type.char.GraphicString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.subtype">(pyasn1.type.char.IA5String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.subtype">(pyasn1.type.char.ISO646String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.subtype">(pyasn1.type.char.NumericString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.subtype">(pyasn1.type.char.PrintableString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.subtype">(pyasn1.type.char.T61String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.subtype">(pyasn1.type.char.TeletexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.subtype">(pyasn1.type.char.UniversalString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.subtype">(pyasn1.type.char.UTF8String method)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.subtype">(pyasn1.type.char.VideotexString method)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.subtype">(pyasn1.type.char.VisibleString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.subtype">(pyasn1.type.univ.Any method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.subtype">(pyasn1.type.univ.BitString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.subtype">(pyasn1.type.univ.Boolean method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.subtype">(pyasn1.type.univ.Choice method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.subtype">(pyasn1.type.univ.Enumerated method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.subtype">(pyasn1.type.univ.Integer method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.subtype">(pyasn1.type.univ.Null method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.subtype">(pyasn1.type.univ.ObjectIdentifier method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.subtype">(pyasn1.type.univ.OctetString method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.subtype">(pyasn1.type.univ.Real method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.subtype">(pyasn1.type.univ.RelativeOID method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.subtype">(pyasn1.type.univ.Sequence method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.subtype">(pyasn1.type.univ.SequenceOf method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.subtype">(pyasn1.type.univ.Set method)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.subtype">(pyasn1.type.univ.SetOf method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.subtype">(pyasn1.type.useful.GeneralizedTime method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.subtype">(pyasn1.type.useful.ObjectDescriptor method)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.subtype">(pyasn1.type.useful.UTCTime method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.subtypeSpec">subtypeSpec (pyasn1.type.base.Asn1Type attribute)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.subtypeSpec">(pyasn1.type.base.ConstructedAsn1Type attribute)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.subtypeSpec">(pyasn1.type.base.SimpleAsn1Type attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.subtypeSpec">(pyasn1.type.univ.Any attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.subtypeSpec">(pyasn1.type.univ.BitString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.subtypeSpec">(pyasn1.type.univ.Boolean attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.subtypeSpec">(pyasn1.type.univ.Choice attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.subtypeSpec">(pyasn1.type.univ.Enumerated attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.subtypeSpec">(pyasn1.type.univ.Integer attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.subtypeSpec">(pyasn1.type.univ.Null attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.subtypeSpec">(pyasn1.type.univ.ObjectIdentifier attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.subtypeSpec">(pyasn1.type.univ.OctetString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.subtypeSpec">(pyasn1.type.univ.Real attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.subtypeSpec">(pyasn1.type.univ.RelativeOID attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.subtypeSpec">(pyasn1.type.univ.Sequence attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.subtypeSpec">(pyasn1.type.univ.SequenceOf attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.subtypeSpec">(pyasn1.type.univ.Set attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.subtypeSpec">(pyasn1.type.univ.SetOf attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.superTags">superTags (pyasn1.type.tag.TagSet property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String">T61String (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.Tag">Tag (class in pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassApplication">tagClassApplication (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassContext">tagClassContext (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassPrivate">tagClassPrivate (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassUniversal">tagClassUniversal (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.tagExplicitly">tagExplicitly() (pyasn1.type.tag.TagSet method)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagFormatConstructed">tagFormatConstructed (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagFormatSimple">tagFormatSimple (in module pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.tagImplicitly">tagImplicitly() (pyasn1.type.tag.TagSet method)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap">TagMap (class in pyasn1.type.tagmap)</a>
-</li>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.tagMap">tagMap (pyasn1.type.base.Asn1Type property)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.tagMap">(pyasn1.type.base.ConstructedAsn1Type property)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.tagMap">(pyasn1.type.base.SimpleAsn1Type property)</a>
-</li>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.tagMap">(pyasn1.type.char.BMPString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.tagMap">(pyasn1.type.char.GeneralString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.tagMap">(pyasn1.type.char.GraphicString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.tagMap">(pyasn1.type.char.IA5String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.tagMap">(pyasn1.type.char.ISO646String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.tagMap">(pyasn1.type.char.NumericString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.tagMap">(pyasn1.type.char.PrintableString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.tagMap">(pyasn1.type.char.T61String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.tagMap">(pyasn1.type.char.TeletexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.tagMap">(pyasn1.type.char.UniversalString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.tagMap">(pyasn1.type.char.UTF8String property)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.tagMap">(pyasn1.type.char.VideotexString property)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.tagMap">(pyasn1.type.char.VisibleString property)</a>
-</li>
-        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.tagMap">(pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.tagMap">(pyasn1.type.univ.Any property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.tagMap">(pyasn1.type.univ.BitString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.tagMap">(pyasn1.type.univ.Boolean property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.tagMap">(pyasn1.type.univ.Choice property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.tagMap">(pyasn1.type.univ.Enumerated property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.tagMap">(pyasn1.type.univ.Integer property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.tagMap">(pyasn1.type.univ.Null property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.tagMap">(pyasn1.type.univ.ObjectIdentifier property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.tagMap">(pyasn1.type.univ.OctetString property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.tagMap">(pyasn1.type.univ.Real property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.tagMap">(pyasn1.type.univ.RelativeOID property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.tagMap">(pyasn1.type.univ.Sequence property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.tagMap">(pyasn1.type.univ.SequenceOf property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.tagMap">(pyasn1.type.univ.Set property)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.tagMap">(pyasn1.type.univ.SetOf property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.tagMapUnique">tagMapUnique (pyasn1.type.namedtype.NamedTypes property)</a>
-</li>
-      <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet">TagSet (class in pyasn1.type.tag)</a>
-</li>
-      <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.tagSet">tagSet (pyasn1.type.base.Asn1Type attribute)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.tagSet">(pyasn1.type.base.ConstructedAsn1Type attribute)</a>
-</li>
-        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.tagSet">(pyasn1.type.base.SimpleAsn1Type attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.tagSet">(pyasn1.type.char.BMPString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.tagSet">(pyasn1.type.char.GeneralString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.tagSet">(pyasn1.type.char.GraphicString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.tagSet">(pyasn1.type.char.IA5String attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.tagSet">(pyasn1.type.char.ISO646String attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.tagSet">(pyasn1.type.char.NumericString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.tagSet">(pyasn1.type.char.PrintableString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.tagSet">(pyasn1.type.char.T61String attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.tagSet">(pyasn1.type.char.TeletexString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.tagSet">(pyasn1.type.char.UniversalString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.tagSet">(pyasn1.type.char.UTF8String attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.tagSet">(pyasn1.type.char.VideotexString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.tagSet">(pyasn1.type.char.VisibleString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.tagSet">(pyasn1.type.univ.Any attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.tagSet">(pyasn1.type.univ.BitString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.tagSet">(pyasn1.type.univ.Boolean attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.tagSet">(pyasn1.type.univ.Choice attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.tagSet">(pyasn1.type.univ.Enumerated attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.tagSet">(pyasn1.type.univ.Integer attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.tagSet">(pyasn1.type.univ.Null attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.tagSet">(pyasn1.type.univ.ObjectIdentifier attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.tagSet">(pyasn1.type.univ.OctetString attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.tagSet">(pyasn1.type.univ.Real attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.tagSet">(pyasn1.type.univ.RelativeOID attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.tagSet">(pyasn1.type.univ.Sequence attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.tagSet">(pyasn1.type.univ.SequenceOf attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.tagSet">(pyasn1.type.univ.Set attribute)</a>
-</li>
-        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.tagSet">(pyasn1.type.univ.SetOf attribute)</a>
-</li>
-        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.tagSet">(pyasn1.type.useful.GeneralizedTime attribute)</a>
-</li>
-        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.tagSet">(pyasn1.type.useful.ObjectDescriptor attribute)</a>
-</li>
-        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.tagSet">(pyasn1.type.useful.UTCTime attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString">TeletexString (class in pyasn1.type.char)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString">UniversalString (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.update">update() (pyasn1.type.namedval.NamedValues method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.update">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime">UTCTime (class in pyasn1.type.useful)</a>
-</li>
-      <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String">UTF8String (class in pyasn1.type.char)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="V">V</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/error/contents.html#pyasn1.error.ValueConstraintError">ValueConstraintError (class in pyasn1.error)</a>
-</li>
-      <li><a href="pyasn1/type/constraint/valuerange.html#pyasn1.type.constraint.ValueRangeConstraint">ValueRangeConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.values">values() (pyasn1.type.namedtype.NamedTypes method)</a>
-
-      <ul>
-        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.values">(pyasn1.type.opentype.OpenType method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/constraint/valuesize.html#pyasn1.type.constraint.ValueSizeConstraint">ValueSizeConstraint (class in pyasn1.type.constraint)</a>
-</li>
-      <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString">VideotexString (class in pyasn1.type.char)</a>
-</li>
-      <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString">VisibleString (class in pyasn1.type.char)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.WithComponentsConstraint">WithComponentsConstraint (class in pyasn1.type.constraint)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-
-
-          </div>
-          
-        </div>
       </div>
-    <div class="clearer"></div>
-  </div>
-    <div class="footer">
-      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
       
     </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.__call__">__call__() (pyasn1.debug.Debug method)</a>
 
-    
+        <ul>
+          <li><a href="pyasn1/debug.html#pyasn1.debug.Printer.__call__">(pyasn1.debug.Printer method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType.__new__">__new__() (pyasn1.type.namedtype.NamedType static method)</a>
 
-    
-  </body>
+        <ul>
+          <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.Tag.__new__">(pyasn1.type.tag.Tag static method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.__repr__">__repr__() (pyasn1.error.PyAsn1Error method)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.__str__">__str__() (pyasn1.error.PyAsn1Error method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any">Any (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asBinary">asBinary() (pyasn1.type.univ.BitString method)</a>
+</li>
+        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.asDateTime">asDateTime (pyasn1.type.useful.GeneralizedTime property)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.asDateTime">(pyasn1.type.useful.UTCTime property)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asInteger">asInteger() (pyasn1.type.univ.BitString method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType.asn1Object">asn1Object (pyasn1.type.namedtype.NamedType property)</a>
+</li>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type">Asn1Type (class in pyasn1.type.base)</a>
+</li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asNumbers">asNumbers() (pyasn1.type.univ.BitString method)</a>
+</li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.asOctets">asOctets() (pyasn1.type.univ.BitString method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.asOctets">(pyasn1.type.univ.OctetString method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.baseTag">baseTag (pyasn1.type.tag.TagSet property)</a>
+</li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString">BitString (class in pyasn1.type.univ)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString">BMPString (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean">Boolean (class in pyasn1.type.univ)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice">Choice (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.clear">clear() (pyasn1.type.namedval.NamedValues method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.clear">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.clear">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.clear">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.clear">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.clear">(pyasn1.type.univ.SetOf method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.clone">clone() (pyasn1.type.char.BMPString method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.clone">(pyasn1.type.char.GeneralString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.clone">(pyasn1.type.char.GraphicString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.clone">(pyasn1.type.char.IA5String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.clone">(pyasn1.type.char.ISO646String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.clone">(pyasn1.type.char.NumericString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.clone">(pyasn1.type.char.PrintableString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.clone">(pyasn1.type.char.T61String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.clone">(pyasn1.type.char.TeletexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.clone">(pyasn1.type.char.UniversalString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.clone">(pyasn1.type.char.UTF8String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.clone">(pyasn1.type.char.VideotexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.clone">(pyasn1.type.char.VisibleString method)</a>
+</li>
+          <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.clone">(pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+          <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.clone">(pyasn1.type.namedval.NamedValues method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.clone">(pyasn1.type.univ.Any method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.clone">(pyasn1.type.univ.BitString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.clone">(pyasn1.type.univ.Boolean method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.clone">(pyasn1.type.univ.Choice method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.clone">(pyasn1.type.univ.Enumerated method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.clone">(pyasn1.type.univ.Integer method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.clone">(pyasn1.type.univ.Null method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.clone">(pyasn1.type.univ.ObjectIdentifier method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.clone">(pyasn1.type.univ.OctetString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.clone">(pyasn1.type.univ.Real method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.clone">(pyasn1.type.univ.RelativeOID method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.clone">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.clone">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.clone">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.clone">(pyasn1.type.univ.SetOf method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.clone">(pyasn1.type.useful.GeneralizedTime method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.clone">(pyasn1.type.useful.ObjectDescriptor method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.clone">(pyasn1.type.useful.UTCTime method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.ComponentAbsentConstraint">ComponentAbsentConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.ComponentPresentConstraint">ComponentPresentConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.componentType">componentType (pyasn1.type.univ.Choice attribute)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.componentType">(pyasn1.type.univ.Sequence attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.componentType">(pyasn1.type.univ.SequenceOf attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.componentType">(pyasn1.type.univ.Set attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.componentType">(pyasn1.type.univ.SetOf attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/constraint/constraintsexclusion.html#pyasn1.type.constraint.ConstraintsExclusion">ConstraintsExclusion (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/constraintsintersection.html#pyasn1.type.constraint.ConstraintsIntersection">ConstraintsIntersection (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/constraintsunion.html#pyasn1.type.constraint.ConstraintsUnion">ConstraintsUnion (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type">ConstructedAsn1Type (class in pyasn1.type.base)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/containedsubtype.html#pyasn1.type.constraint.ContainedSubtypeConstraint">ContainedSubtypeConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error.context">context (pyasn1.error.PyAsn1Error attribute)</a>
+</li>
+        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.copy">copy() (pyasn1.type.opentype.OpenType method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Debug">Debug (class in pyasn1.debug)</a>
+</li>
+        <li><a href="pyasn1/codec/ber/contents.html#pyasn1.codec.ber.decoder.decode">decode() (in module pyasn1.codec.ber.decoder)</a>
+
+        <ul>
+          <li><a href="pyasn1/codec/cer/contents.html#pyasn1.codec.cer.decoder.decode">(in module pyasn1.codec.cer.decoder)</a>
+</li>
+          <li><a href="pyasn1/codec/der/contents.html#pyasn1.codec.der.decoder.decode">(in module pyasn1.codec.der.decoder)</a>
+</li>
+          <li><a href="pyasn1/codec/native/contents.html#pyasn1.codec.native.decoder.decode">(in module pyasn1.codec.native.decoder)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/defaultednamedtype.html#pyasn1.type.namedtype.DefaultedNamedType">DefaultedNamedType (class in pyasn1.type.namedtype)</a>
+</li>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.defaultPrinter">defaultPrinter (pyasn1.debug.Debug attribute)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.defaultType">defaultType (pyasn1.type.tagmap.TagMap property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.effectiveTagSet">effectiveTagSet (pyasn1.type.base.Asn1Type property)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.effectiveTagSet">(pyasn1.type.base.ConstructedAsn1Type property)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.effectiveTagSet">(pyasn1.type.base.SimpleAsn1Type property)</a>
+</li>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.effectiveTagSet">(pyasn1.type.char.BMPString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.effectiveTagSet">(pyasn1.type.char.GeneralString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.effectiveTagSet">(pyasn1.type.char.GraphicString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.effectiveTagSet">(pyasn1.type.char.IA5String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.effectiveTagSet">(pyasn1.type.char.ISO646String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.effectiveTagSet">(pyasn1.type.char.NumericString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.effectiveTagSet">(pyasn1.type.char.PrintableString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.effectiveTagSet">(pyasn1.type.char.T61String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.effectiveTagSet">(pyasn1.type.char.TeletexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.effectiveTagSet">(pyasn1.type.char.UniversalString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.effectiveTagSet">(pyasn1.type.char.UTF8String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.effectiveTagSet">(pyasn1.type.char.VideotexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.effectiveTagSet">(pyasn1.type.char.VisibleString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.effectiveTagSet">(pyasn1.type.univ.Any property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.effectiveTagSet">(pyasn1.type.univ.BitString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.effectiveTagSet">(pyasn1.type.univ.Boolean property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.effectiveTagSet">(pyasn1.type.univ.Choice property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.effectiveTagSet">(pyasn1.type.univ.Enumerated property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.effectiveTagSet">(pyasn1.type.univ.Integer property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.effectiveTagSet">(pyasn1.type.univ.Null property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.effectiveTagSet">(pyasn1.type.univ.ObjectIdentifier property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.effectiveTagSet">(pyasn1.type.univ.OctetString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.effectiveTagSet">(pyasn1.type.univ.Real property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.effectiveTagSet">(pyasn1.type.univ.RelativeOID property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.effectiveTagSet">(pyasn1.type.univ.Sequence property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.effectiveTagSet">(pyasn1.type.univ.SequenceOf property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.effectiveTagSet">(pyasn1.type.univ.Set property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.effectiveTagSet">(pyasn1.type.univ.SetOf property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/codec/ber/contents.html#pyasn1.codec.ber.encoder.encode">encode() (in module pyasn1.codec.ber.encoder)</a>
+
+        <ul>
+          <li><a href="pyasn1/codec/cer/contents.html#pyasn1.codec.cer.encoder.encode">(in module pyasn1.codec.cer.encoder)</a>
+</li>
+          <li><a href="pyasn1/codec/der/contents.html#pyasn1.codec.der.encoder.encode">(in module pyasn1.codec.der.encoder)</a>
+</li>
+          <li><a href="pyasn1/codec/native/contents.html#pyasn1.codec.native.encoder.encode">(in module pyasn1.codec.native.encoder)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated">Enumerated (class in pyasn1.type.univ)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromBinaryString">fromBinaryString() (pyasn1.type.univ.BitString class method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.fromBinaryString">(pyasn1.type.univ.OctetString static method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.fromDateTime">fromDateTime() (pyasn1.type.useful.GeneralizedTime class method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.fromDateTime">(pyasn1.type.useful.UTCTime class method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromHexString">fromHexString() (pyasn1.type.univ.BitString class method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.fromHexString">(pyasn1.type.univ.OctetString static method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.fromOctetString">fromOctetString() (pyasn1.type.univ.BitString class method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime">GeneralizedTime (class in pyasn1.type.useful)</a>
+</li>
+        <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString">GeneralString (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.get">get() (pyasn1.type.opentype.OpenType method)</a>
+</li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponent">getComponent() (pyasn1.type.univ.Choice method)</a>
+</li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByName">getComponentByName() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.getComponentByName">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByName">(pyasn1.type.univ.Set method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByPosition">getComponentByPosition() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.getComponentByPosition">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.getComponentByPosition">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByPosition">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.getComponentByPosition">(pyasn1.type.univ.SetOf method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getComponentByType">getComponentByType() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.getComponentByType">(pyasn1.type.univ.Set method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.getName">getName() (pyasn1.type.univ.Choice method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getNameByPosition">getNameByPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionByName">getPositionByName() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionByType">getPositionByType() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getPositionNearType">getPositionNearType() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getTagMapNearPosition">getTagMapNearPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.getTypeByPosition">getTypeByPosition() (pyasn1.type.namedtype.NamedTypes method)</a>
+</li>
+        <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString">GraphicString (class in pyasn1.type.char)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.hasOpenTypes">hasOpenTypes (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.hasOptionalOrDefault">hasOptionalOrDefault (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String">IA5String (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer">Integer (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isInconsistent">isInconsistent (pyasn1.type.univ.Choice property)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isInconsistent">(pyasn1.type.univ.Sequence property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isInconsistent">(pyasn1.type.univ.SequenceOf property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isInconsistent">(pyasn1.type.univ.Set property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isInconsistent">(pyasn1.type.univ.SetOf property)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isInf">isInf (pyasn1.type.univ.Real property)</a>
+</li>
+        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isMinusInf">isMinusInf (pyasn1.type.univ.Real property)</a>
+</li>
+        <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String">ISO646String (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isPlusInf">isPlusInf (pyasn1.type.univ.Real property)</a>
+</li>
+        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isPrefixOf">isPrefixOf() (pyasn1.type.univ.ObjectIdentifier method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isPrefixOf">(pyasn1.type.univ.RelativeOID method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.isSameTypeWith">isSameTypeWith() (pyasn1.type.base.Asn1Type method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.isSameTypeWith">(pyasn1.type.base.ConstructedAsn1Type method)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isSameTypeWith">(pyasn1.type.base.SimpleAsn1Type method)</a>
+</li>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isSameTypeWith">(pyasn1.type.char.BMPString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isSameTypeWith">(pyasn1.type.char.GeneralString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isSameTypeWith">(pyasn1.type.char.GraphicString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isSameTypeWith">(pyasn1.type.char.IA5String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isSameTypeWith">(pyasn1.type.char.ISO646String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isSameTypeWith">(pyasn1.type.char.NumericString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isSameTypeWith">(pyasn1.type.char.PrintableString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isSameTypeWith">(pyasn1.type.char.T61String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isSameTypeWith">(pyasn1.type.char.TeletexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isSameTypeWith">(pyasn1.type.char.UniversalString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isSameTypeWith">(pyasn1.type.char.UTF8String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isSameTypeWith">(pyasn1.type.char.VideotexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isSameTypeWith">(pyasn1.type.char.VisibleString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isSameTypeWith">(pyasn1.type.univ.Any method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isSameTypeWith">(pyasn1.type.univ.BitString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isSameTypeWith">(pyasn1.type.univ.Boolean method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isSameTypeWith">(pyasn1.type.univ.Choice method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isSameTypeWith">(pyasn1.type.univ.Enumerated method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isSameTypeWith">(pyasn1.type.univ.Integer method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isSameTypeWith">(pyasn1.type.univ.Null method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isSameTypeWith">(pyasn1.type.univ.ObjectIdentifier method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isSameTypeWith">(pyasn1.type.univ.OctetString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isSameTypeWith">(pyasn1.type.univ.Real method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isSameTypeWith">(pyasn1.type.univ.RelativeOID method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isSameTypeWith">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isSameTypeWith">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isSameTypeWith">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isSameTypeWith">(pyasn1.type.univ.SetOf method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isSameTypeWith">(pyasn1.type.useful.GeneralizedTime method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isSameTypeWith">(pyasn1.type.useful.ObjectDescriptor method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isSameTypeWith">(pyasn1.type.useful.UTCTime method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.isSuperTagSetOf">isSuperTagSetOf() (pyasn1.type.tag.TagSet method)</a>
+</li>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.isSuperTypeOf">isSuperTypeOf() (pyasn1.type.base.Asn1Type method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.isSuperTypeOf">(pyasn1.type.base.ConstructedAsn1Type method)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isSuperTypeOf">(pyasn1.type.base.SimpleAsn1Type method)</a>
+</li>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isSuperTypeOf">(pyasn1.type.char.BMPString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isSuperTypeOf">(pyasn1.type.char.GeneralString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isSuperTypeOf">(pyasn1.type.char.GraphicString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isSuperTypeOf">(pyasn1.type.char.IA5String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isSuperTypeOf">(pyasn1.type.char.ISO646String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isSuperTypeOf">(pyasn1.type.char.NumericString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isSuperTypeOf">(pyasn1.type.char.PrintableString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isSuperTypeOf">(pyasn1.type.char.T61String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isSuperTypeOf">(pyasn1.type.char.TeletexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isSuperTypeOf">(pyasn1.type.char.UniversalString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isSuperTypeOf">(pyasn1.type.char.UTF8String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isSuperTypeOf">(pyasn1.type.char.VideotexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isSuperTypeOf">(pyasn1.type.char.VisibleString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isSuperTypeOf">(pyasn1.type.univ.Any method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isSuperTypeOf">(pyasn1.type.univ.BitString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isSuperTypeOf">(pyasn1.type.univ.Boolean method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isSuperTypeOf">(pyasn1.type.univ.Choice method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isSuperTypeOf">(pyasn1.type.univ.Enumerated method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isSuperTypeOf">(pyasn1.type.univ.Integer method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isSuperTypeOf">(pyasn1.type.univ.Null method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isSuperTypeOf">(pyasn1.type.univ.ObjectIdentifier method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isSuperTypeOf">(pyasn1.type.univ.OctetString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isSuperTypeOf">(pyasn1.type.univ.Real method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isSuperTypeOf">(pyasn1.type.univ.RelativeOID method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isSuperTypeOf">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isSuperTypeOf">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isSuperTypeOf">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isSuperTypeOf">(pyasn1.type.univ.SetOf method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isSuperTypeOf">(pyasn1.type.useful.GeneralizedTime method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isSuperTypeOf">(pyasn1.type.useful.ObjectDescriptor method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isSuperTypeOf">(pyasn1.type.useful.UTCTime method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.isValue">isValue (pyasn1.type.base.SimpleAsn1Type property)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.isValue">(pyasn1.type.char.BMPString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.isValue">(pyasn1.type.char.GeneralString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.isValue">(pyasn1.type.char.GraphicString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.isValue">(pyasn1.type.char.IA5String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.isValue">(pyasn1.type.char.ISO646String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.isValue">(pyasn1.type.char.NumericString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.isValue">(pyasn1.type.char.PrintableString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.isValue">(pyasn1.type.char.T61String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.isValue">(pyasn1.type.char.TeletexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.isValue">(pyasn1.type.char.UniversalString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.isValue">(pyasn1.type.char.UTF8String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.isValue">(pyasn1.type.char.VideotexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.isValue">(pyasn1.type.char.VisibleString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.isValue">(pyasn1.type.univ.Any property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.isValue">(pyasn1.type.univ.BitString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.isValue">(pyasn1.type.univ.Boolean property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.isValue">(pyasn1.type.univ.Choice property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.isValue">(pyasn1.type.univ.Enumerated property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.isValue">(pyasn1.type.univ.Integer property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.isValue">(pyasn1.type.univ.Null property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.isValue">(pyasn1.type.univ.ObjectIdentifier property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.isValue">(pyasn1.type.univ.OctetString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.isValue">(pyasn1.type.univ.Real property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.isValue">(pyasn1.type.univ.RelativeOID property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.isValue">(pyasn1.type.univ.Sequence property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.isValue">(pyasn1.type.univ.SequenceOf property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.isValue">(pyasn1.type.univ.Set property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.isValue">(pyasn1.type.univ.SetOf property)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.isValue">(pyasn1.type.useful.GeneralizedTime property)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.isValue">(pyasn1.type.useful.ObjectDescriptor property)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.isValue">(pyasn1.type.useful.UTCTime property)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.items">items() (pyasn1.type.namedtype.NamedTypes method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.items">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.keys">keys() (pyasn1.type.namedtype.NamedTypes method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.keys">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Printer.logger">logger (pyasn1.debug.Printer property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.minTagSet">minTagSet (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="pyasn1/codec/native/contents.html#module-pyasn1.codec.native">pyasn1.codec.native</a>
+</li>
+          <li><a href="pyasn1/type/constraint/contents.html#module-pyasn1.type.constraint">pyasn1.type.constraint</a>
+</li>
+          <li><a href="pyasn1/type/tag/tag.html#module-pyasn1.type.tag">pyasn1.type.tag</a>
+</li>
+          <li><a href="pyasn1/type/univ/contents.html#module-pyasn1.type.univ">pyasn1.type.univ</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType.name">name (pyasn1.type.namedtype.NamedType property)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType">NamedType (class in pyasn1.type.namedtype)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes">NamedTypes (class in pyasn1.type.namedtype)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.namedTypes">namedTypes (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.PostponedError">NamedTypes.PostponedError (class in pyasn1.type.namedtype)</a>
+</li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues">NamedValues (class in pyasn1.type.namedval)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.namedValues">namedValues (pyasn1.type.univ.Enumerated attribute)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.namedValues">(pyasn1.type.univ.Integer attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/base/novalue.html#pyasn1.type.base.NoValue">NoValue (class in pyasn1.type.base)</a>
+</li>
+        <li><a href="pyasn1/type/base/novalue.html#pyasn1.type.base.noValue">noValue (in module pyasn1.type.base)</a>
+</li>
+        <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null">Null (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString">NumericString (class in pyasn1.type.char)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor">ObjectDescriptor (class in pyasn1.type.useful)</a>
+</li>
+        <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier">ObjectIdentifier (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString">OctetString (class in pyasn1.type.univ)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType">OpenType (class in pyasn1.type.opentype)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtype.html#pyasn1.type.namedtype.NamedType.openType">openType (pyasn1.type.namedtype.NamedType property)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/optionalnamedtype.html#pyasn1.type.namedtype.OptionalNamedType">OptionalNamedType (class in pyasn1.type.namedtype)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/constraint/permittedalphabet.html#pyasn1.type.constraint.PermittedAlphabetConstraint">PermittedAlphabetConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.pop">pop() (pyasn1.type.namedval.NamedValues method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.pop">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.popitem">popitem() (pyasn1.type.namedval.NamedValues method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.popitem">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.presentTypes">presentTypes (pyasn1.type.tagmap.TagMap property)</a>
+</li>
+        <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString">PrintableString (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Printer">Printer (class in pyasn1.debug)</a>
+</li>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.Debug.printer">printer (pyasn1.debug.Debug property)</a>
+</li>
+        <li>
+    pyasn1.codec.native
+
+        <ul>
+          <li><a href="pyasn1/codec/native/contents.html#module-pyasn1.codec.native">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    pyasn1.type.constraint
+
+        <ul>
+          <li><a href="pyasn1/type/constraint/contents.html#module-pyasn1.type.constraint">module</a>
+</li>
+        </ul></li>
+        <li>
+    pyasn1.type.tag
+
+        <ul>
+          <li><a href="pyasn1/type/tag/tag.html#module-pyasn1.type.tag">module</a>
+</li>
+        </ul></li>
+        <li>
+    pyasn1.type.univ
+
+        <ul>
+          <li><a href="pyasn1/type/univ/contents.html#module-pyasn1.type.univ">module</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1Error">PyAsn1Error (class in pyasn1.error)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeDecodeError">PyAsn1UnicodeDecodeError (class in pyasn1.error)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeEncodeError">PyAsn1UnicodeEncodeError (class in pyasn1.error)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.PyAsn1UnicodeError">PyAsn1UnicodeError (class in pyasn1.error)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real">Real (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID">RelativeOID (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.requiredComponents">requiredComponents (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.reset">reset() (pyasn1.type.univ.Sequence method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.reset">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.reset">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.reset">(pyasn1.type.univ.SetOf method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence">Sequence (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf">SequenceOf (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set">Set (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByName">setComponentByName() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.setComponentByName">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByName">(pyasn1.type.univ.Set method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByPosition">setComponentByPosition() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.setComponentByPosition">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.setComponentByPosition">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByPosition">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.setComponentByPosition">(pyasn1.type.univ.SetOf method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.setComponentByType">setComponentByType() (pyasn1.type.univ.Choice method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.setComponentByType">(pyasn1.type.univ.Set method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.setdefault">setdefault() (pyasn1.type.namedval.NamedValues method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.setdefault">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/debug.html#pyasn1.debug.setLogger">setLogger() (in module pyasn1.debug)</a>
+</li>
+        <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf">SetOf (class in pyasn1.type.univ)</a>
+</li>
+        <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type">SimpleAsn1Type (class in pyasn1.type.base)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/singlevalue.html#pyasn1.type.constraint.SingleValueConstraint">SingleValueConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap.skipTypes">skipTypes (pyasn1.type.tagmap.TagMap property)</a>
+</li>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.SubstrateUnderrunError">SubstrateUnderrunError (class in pyasn1.error)</a>
+</li>
+        <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.subtype">subtype() (pyasn1.type.char.BMPString method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.subtype">(pyasn1.type.char.GeneralString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.subtype">(pyasn1.type.char.GraphicString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.subtype">(pyasn1.type.char.IA5String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.subtype">(pyasn1.type.char.ISO646String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.subtype">(pyasn1.type.char.NumericString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.subtype">(pyasn1.type.char.PrintableString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.subtype">(pyasn1.type.char.T61String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.subtype">(pyasn1.type.char.TeletexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.subtype">(pyasn1.type.char.UniversalString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.subtype">(pyasn1.type.char.UTF8String method)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.subtype">(pyasn1.type.char.VideotexString method)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.subtype">(pyasn1.type.char.VisibleString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.subtype">(pyasn1.type.univ.Any method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.subtype">(pyasn1.type.univ.BitString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.subtype">(pyasn1.type.univ.Boolean method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.subtype">(pyasn1.type.univ.Choice method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.subtype">(pyasn1.type.univ.Enumerated method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.subtype">(pyasn1.type.univ.Integer method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.subtype">(pyasn1.type.univ.Null method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.subtype">(pyasn1.type.univ.ObjectIdentifier method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.subtype">(pyasn1.type.univ.OctetString method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.subtype">(pyasn1.type.univ.Real method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.subtype">(pyasn1.type.univ.RelativeOID method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.subtype">(pyasn1.type.univ.Sequence method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.subtype">(pyasn1.type.univ.SequenceOf method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.subtype">(pyasn1.type.univ.Set method)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.subtype">(pyasn1.type.univ.SetOf method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.subtype">(pyasn1.type.useful.GeneralizedTime method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.subtype">(pyasn1.type.useful.ObjectDescriptor method)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.subtype">(pyasn1.type.useful.UTCTime method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.subtypeSpec">subtypeSpec (pyasn1.type.base.Asn1Type attribute)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.subtypeSpec">(pyasn1.type.base.ConstructedAsn1Type attribute)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.subtypeSpec">(pyasn1.type.base.SimpleAsn1Type attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.subtypeSpec">(pyasn1.type.univ.Any attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.subtypeSpec">(pyasn1.type.univ.BitString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.subtypeSpec">(pyasn1.type.univ.Boolean attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.subtypeSpec">(pyasn1.type.univ.Choice attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.subtypeSpec">(pyasn1.type.univ.Enumerated attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.subtypeSpec">(pyasn1.type.univ.Integer attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.subtypeSpec">(pyasn1.type.univ.Null attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.subtypeSpec">(pyasn1.type.univ.ObjectIdentifier attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.subtypeSpec">(pyasn1.type.univ.OctetString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.subtypeSpec">(pyasn1.type.univ.Real attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.subtypeSpec">(pyasn1.type.univ.RelativeOID attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.subtypeSpec">(pyasn1.type.univ.Sequence attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.subtypeSpec">(pyasn1.type.univ.SequenceOf attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.subtypeSpec">(pyasn1.type.univ.Set attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.subtypeSpec">(pyasn1.type.univ.SetOf attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.superTags">superTags (pyasn1.type.tag.TagSet property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String">T61String (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.Tag">Tag (class in pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassApplication">tagClassApplication (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassContext">tagClassContext (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassPrivate">tagClassPrivate (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagClassUniversal">tagClassUniversal (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.tagExplicitly">tagExplicitly() (pyasn1.type.tag.TagSet method)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagFormatConstructed">tagFormatConstructed (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tag.html#pyasn1.type.tag.tagFormatSimple">tagFormatSimple (in module pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet.tagImplicitly">tagImplicitly() (pyasn1.type.tag.TagSet method)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagmap.html#pyasn1.type.tagmap.TagMap">TagMap (class in pyasn1.type.tagmap)</a>
+</li>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.tagMap">tagMap (pyasn1.type.base.Asn1Type property)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.tagMap">(pyasn1.type.base.ConstructedAsn1Type property)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.tagMap">(pyasn1.type.base.SimpleAsn1Type property)</a>
+</li>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.tagMap">(pyasn1.type.char.BMPString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.tagMap">(pyasn1.type.char.GeneralString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.tagMap">(pyasn1.type.char.GraphicString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.tagMap">(pyasn1.type.char.IA5String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.tagMap">(pyasn1.type.char.ISO646String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.tagMap">(pyasn1.type.char.NumericString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.tagMap">(pyasn1.type.char.PrintableString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.tagMap">(pyasn1.type.char.T61String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.tagMap">(pyasn1.type.char.TeletexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.tagMap">(pyasn1.type.char.UniversalString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.tagMap">(pyasn1.type.char.UTF8String property)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.tagMap">(pyasn1.type.char.VideotexString property)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.tagMap">(pyasn1.type.char.VisibleString property)</a>
+</li>
+          <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.tagMap">(pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.tagMap">(pyasn1.type.univ.Any property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.tagMap">(pyasn1.type.univ.BitString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.tagMap">(pyasn1.type.univ.Boolean property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.tagMap">(pyasn1.type.univ.Choice property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.tagMap">(pyasn1.type.univ.Enumerated property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.tagMap">(pyasn1.type.univ.Integer property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.tagMap">(pyasn1.type.univ.Null property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.tagMap">(pyasn1.type.univ.ObjectIdentifier property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.tagMap">(pyasn1.type.univ.OctetString property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.tagMap">(pyasn1.type.univ.Real property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.tagMap">(pyasn1.type.univ.RelativeOID property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.tagMap">(pyasn1.type.univ.Sequence property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.tagMap">(pyasn1.type.univ.SequenceOf property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.tagMap">(pyasn1.type.univ.Set property)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.tagMap">(pyasn1.type.univ.SetOf property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.tagMapUnique">tagMapUnique (pyasn1.type.namedtype.NamedTypes property)</a>
+</li>
+        <li><a href="pyasn1/type/tag/tagset.html#pyasn1.type.tag.TagSet">TagSet (class in pyasn1.type.tag)</a>
+</li>
+        <li><a href="pyasn1/type/base/asn1type.html#pyasn1.type.base.Asn1Type.tagSet">tagSet (pyasn1.type.base.Asn1Type attribute)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/base/constructedasn1type.html#pyasn1.type.base.ConstructedAsn1Type.tagSet">(pyasn1.type.base.ConstructedAsn1Type attribute)</a>
+</li>
+          <li><a href="pyasn1/type/base/simpleasn1type.html#pyasn1.type.base.SimpleAsn1Type.tagSet">(pyasn1.type.base.SimpleAsn1Type attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/bmpstring.html#pyasn1.type.char.BMPString.tagSet">(pyasn1.type.char.BMPString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/generalstring.html#pyasn1.type.char.GeneralString.tagSet">(pyasn1.type.char.GeneralString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/graphicstring.html#pyasn1.type.char.GraphicString.tagSet">(pyasn1.type.char.GraphicString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/ia5string.html#pyasn1.type.char.IA5String.tagSet">(pyasn1.type.char.IA5String attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/iso646string.html#pyasn1.type.char.ISO646String.tagSet">(pyasn1.type.char.ISO646String attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/numericstring.html#pyasn1.type.char.NumericString.tagSet">(pyasn1.type.char.NumericString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/printablestring.html#pyasn1.type.char.PrintableString.tagSet">(pyasn1.type.char.PrintableString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/t61string.html#pyasn1.type.char.T61String.tagSet">(pyasn1.type.char.T61String attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString.tagSet">(pyasn1.type.char.TeletexString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString.tagSet">(pyasn1.type.char.UniversalString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String.tagSet">(pyasn1.type.char.UTF8String attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString.tagSet">(pyasn1.type.char.VideotexString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString.tagSet">(pyasn1.type.char.VisibleString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/any.html#pyasn1.type.univ.Any.tagSet">(pyasn1.type.univ.Any attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/bitstring.html#pyasn1.type.univ.BitString.tagSet">(pyasn1.type.univ.BitString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/boolean.html#pyasn1.type.univ.Boolean.tagSet">(pyasn1.type.univ.Boolean attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/choice.html#pyasn1.type.univ.Choice.tagSet">(pyasn1.type.univ.Choice attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/enumerated.html#pyasn1.type.univ.Enumerated.tagSet">(pyasn1.type.univ.Enumerated attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/integer.html#pyasn1.type.univ.Integer.tagSet">(pyasn1.type.univ.Integer attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/null.html#pyasn1.type.univ.Null.tagSet">(pyasn1.type.univ.Null attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/objectidentifier.html#pyasn1.type.univ.ObjectIdentifier.tagSet">(pyasn1.type.univ.ObjectIdentifier attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/octetstring.html#pyasn1.type.univ.OctetString.tagSet">(pyasn1.type.univ.OctetString attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/real.html#pyasn1.type.univ.Real.tagSet">(pyasn1.type.univ.Real attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/relativeoid.html#pyasn1.type.univ.RelativeOID.tagSet">(pyasn1.type.univ.RelativeOID attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequence.html#pyasn1.type.univ.Sequence.tagSet">(pyasn1.type.univ.Sequence attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/sequenceof.html#pyasn1.type.univ.SequenceOf.tagSet">(pyasn1.type.univ.SequenceOf attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/set.html#pyasn1.type.univ.Set.tagSet">(pyasn1.type.univ.Set attribute)</a>
+</li>
+          <li><a href="pyasn1/type/univ/setof.html#pyasn1.type.univ.SetOf.tagSet">(pyasn1.type.univ.SetOf attribute)</a>
+</li>
+          <li><a href="pyasn1/type/useful/generalizedtime.html#pyasn1.type.useful.GeneralizedTime.tagSet">(pyasn1.type.useful.GeneralizedTime attribute)</a>
+</li>
+          <li><a href="pyasn1/type/useful/objectdescriptor.html#pyasn1.type.useful.ObjectDescriptor.tagSet">(pyasn1.type.useful.ObjectDescriptor attribute)</a>
+</li>
+          <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime.tagSet">(pyasn1.type.useful.UTCTime attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pyasn1/type/char/teletexstring.html#pyasn1.type.char.TeletexString">TeletexString (class in pyasn1.type.char)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/char/universalstring.html#pyasn1.type.char.UniversalString">UniversalString (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/namedval/namedval.html#pyasn1.type.namedval.NamedValues.update">update() (pyasn1.type.namedval.NamedValues method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.update">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/useful/utctime.html#pyasn1.type.useful.UTCTime">UTCTime (class in pyasn1.type.useful)</a>
+</li>
+        <li><a href="pyasn1/type/char/utf8string.html#pyasn1.type.char.UTF8String">UTF8String (class in pyasn1.type.char)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/error/contents.html#pyasn1.error.ValueConstraintError">ValueConstraintError (class in pyasn1.error)</a>
+</li>
+        <li><a href="pyasn1/type/constraint/valuerange.html#pyasn1.type.constraint.ValueRangeConstraint">ValueRangeConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/namedtype/namedtypes.html#pyasn1.type.namedtype.NamedTypes.values">values() (pyasn1.type.namedtype.NamedTypes method)</a>
+
+        <ul>
+          <li><a href="pyasn1/type/opentype/opentype.html#pyasn1.type.opentype.OpenType.values">(pyasn1.type.opentype.OpenType method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/constraint/valuesize.html#pyasn1.type.constraint.ValueSizeConstraint">ValueSizeConstraint (class in pyasn1.type.constraint)</a>
+</li>
+        <li><a href="pyasn1/type/char/videotexstring.html#pyasn1.type.char.VideotexString">VideotexString (class in pyasn1.type.char)</a>
+</li>
+        <li><a href="pyasn1/type/char/visiblestring.html#pyasn1.type.char.VisibleString">VisibleString (class in pyasn1.type.char)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pyasn1/type/constraint/withcomponents.html#pyasn1.type.constraint.WithComponentsConstraint">WithComponentsConstraint (class in pyasn1.type.constraint)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc.
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=76c8fe14"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
 </html>

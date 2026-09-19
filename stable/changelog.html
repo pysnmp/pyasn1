@@ -1,64 +1,303 @@
-<!DOCTYPE html>
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Historical changelog" href="changelog-history.html"><link rel="prev" title="Continuous integration and releases" href="ci-and-releases.html">
+        <link rel="prefetch" href="_static/logo.svg" as="image">
+        <link rel="prefetch" href="_static/logo.svg" as="image">
 
-<html lang="en" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Changelog &#8212; ASN.1 types and codecs 2.0.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=f6a572b4" />
-    <script src="_static/documentation_options.js?v=c2377ec0"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <link rel="icon" href="_static/favicon.ico"/>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Historical changelog" href="changelog-history.html" />
-    <link rel="prev" title="Continuous integration and releases" href="ci-and-releases.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-  
-
-  </head><body>
-  <div class="document">
+    <link rel="shortcut icon" href="_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Changelog - ASN.1 types and codecs 2.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="contents.html">
-    <img class="logo" src="_static/logo.svg" alt="Logo" />
     
-  </a>
-</p>
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
 
 
-<p class="blurb"><p align=left><i><b>Brewing free software for the greater good</i></b></p></p>
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=pysnmp&repo=pyasn1&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="contents.html"><div class="brand">ASN.1 types and codecs 2.0.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="contents.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/logo.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyasn1/contents.html">Library documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pyasn1/contents.html">Library documentation</a><input aria-label="Toggle navigation of Library documentation" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/base/contents.html">ASN.1 type system</a><input aria-label="Toggle navigation of ASN.1 type system" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/asn1type.html">Asn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/simpleasn1type.html">SimpleAsn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/constructedasn1type.html">ConstructedAsn1Type type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/base/novalue.html">NoValue sentinel</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/univ/contents.html">Universal types</a><input aria-label="Toggle navigation of Universal types" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/integer.html">Integer type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/boolean.html">Boolean type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/bitstring.html">BitString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/octetstring.html">OctetString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/null.html">Null type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/objectidentifier.html">ObjectIdentifier type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/relativeoid.html">RelativeOID type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/real.html">Real type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/enumerated.html">Enumerated type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/any.html">Any type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/setof.html">SetOf type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/sequenceof.html">SequenceOf type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/set.html">Set type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/sequence.html">Sequence type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/univ/choice.html">Choice type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/char/contents.html">Character types</a><input aria-label="Toggle navigation of Character types" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/numericstring.html">NumericString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/printablestring.html">PrintableString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/teletexstring.html">TeletexString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/t61string.html">T61String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/videotexstring.html">VideotexString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/ia5string.html">IA5String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/graphicstring.html">GraphicString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/visiblestring.html">VisibleString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/iso646string.html">ISO646String type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/generalstring.html">GeneralString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/universalstring.html">UniversalString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/bmpstring.html">BMPString type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/char/utf8string.html">UTF8String type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/useful/contents.html">Useful types</a><input aria-label="Toggle navigation of Useful types" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/objectdescriptor.html">ObjectDescriptor type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/generalizedtime.html">GeneralizedTime type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/useful/utctime.html">UTCTime type</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/tag/contents.html">Tags</a><input aria-label="Toggle navigation of Tags" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tag.html">Solitary tag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tagset.html">Tag set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/tag/tagmap.html">Tag-&gt;type map</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/constraint/contents.html">Constraints</a><input aria-label="Toggle navigation of Constraints" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/singlevalue.html">Single value constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/containedsubtype.html">Contained subtype constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/valuerange.html">Value range constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/valuesize.html">Value size constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/permittedalphabet.html">Permitted alphabet constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/withcomponents.html">WITH COMPONENTS constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsintersection.html">Constraints intersection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsunion.html">Constraints union</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/constraint/constraintsexclusion.html">Constraints exclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/namedtype/contents.html">Fields of constructed types</a><input aria-label="Toggle navigation of Fields of constructed types" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/namedtype.html">NamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/optionalnamedtype.html">OptionalNamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/defaultednamedtype.html">DefaultedNamedType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedtype/namedtypes.html">NamedTypes</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/opentype/contents.html">Dynamic or open type</a><input aria-label="Toggle navigation of Dynamic or open type" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/opentype/opentype.html">OpenType</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pyasn1/type/namedval/contents.html">Enumerating numbers</a><input aria-label="Toggle navigation of Enumerating numbers" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyasn1/type/namedval/namedval.html">NamedValues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/ber/contents.html">Basic Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/cer/contents.html">Canonical Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/der/contents.html">Distinguished Encoding Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/codec/native/contents.html">Native Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html">Structured error context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1error">PyAsn1Error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#valueconstrainterror">ValueConstraintError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#substrateunderrunerror">SubstrateUnderrunError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodeerror">PyAsn1UnicodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodedecodeerror">PyAsn1UnicodeDecodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/error/contents.html#pyasn1unicodeencodeerror">PyAsn1UnicodeEncodeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyasn1/debug.html">Debugging and logging</a></li>
+</ul>
+</li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="example-use-case.html">Example use case</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="example-use-case.html">Example use case</a><input aria-label="Toggle navigation of Example use case" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
+</ul>
+</li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="download.html">Download &amp; Install</a></li>
@@ -67,12 +306,12 @@
 <li class="toctree-l1"><a class="reference internal" href="ci-and-releases.html">Continuous integration and releases</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#id10">1.3.0 (2026-09-05)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id12">1.3.0 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#id16">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id18">1.2.0 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
@@ -88,65 +327,79 @@
 <li class="toctree-l1"><a class="reference internal" href="#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#id49">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id51">1.1.0 (2021-11-24)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog-history.html">Historical changelog</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="contents.html">Documentation overview</a><ul>
-      <li>Previous: <a href="ci-and-releases.html" title="previous chapter">Continuous integration and releases</a></li>
-      <li>Next: <a href="changelog-history.html" title="next chapter">Historical changelog</a></li>
-  </ul></li>
-</ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+</div>
 
-
-
-
-
-
-
-
-        </div>
       </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-  <section id="changelog">
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/pysnmp/pyasn1/blob/main/docs/source/changelog.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/pysnmp/pyasn1/edit/main/docs/source/changelog.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>Generated from the commit history at release time. The narrative history
 through 1.3.0 is in <a class="reference external" href="https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst">CHANGES.rst</a>.</p>
 <section id="id1">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.1...v2.0.2">2.0.2</a> (2026-09-09)<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.2...v2.0.3">2.0.3</a> (2026-09-19)<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <section id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>type:</strong> read NamedType’s fields off the tuple, not through namedtuple (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6bdc64434fef1ad9bac6824da9b9435edea30134">6bdc644</a>), closes <a class="reference external" href="https://github.com/pysnmp/pysnmp/issues/290">pysnmp/pysnmp#290</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.1...v2.0.2">2.0.2</a> (2026-09-09)<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h3>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>type:</strong> reject bare constructed schemas (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/2734ea8b977530574e2eacb8b5c1488bf7d70edb">2734ea8</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id2">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1">2.0.1</a> (2026-09-06)<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
-<section id="id3">
-<h3>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<section id="id4">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1">2.0.1</a> (2026-09-06)<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="id5">
+<h3>Bug Fixes<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ci:</strong> publish docs from a branch, not a detached HEAD (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/8e80d5448f8e6f688fa83c6b6d9b5c72c690d2cc">8e80d54</a>)</p></li>
 <li><p><strong>ci:</strong> publish docs from a branch, not a detached HEAD (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350">a41dbfa</a>)</p></li>
@@ -156,8 +409,8 @@ through 1.3.0 is in <a class="reference external" href="https://github.com/pysnm
 </section>
 <section id="rc-1-2026-09-06">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1-rc.1">2.0.1-rc.1</a> (2026-09-06)<a class="headerlink" href="#rc-1-2026-09-06" title="Link to this heading">¶</a></h2>
-<section id="id4">
-<h3>Bug Fixes<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<section id="id6">
+<h3>Bug Fixes<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ci:</strong> publish docs from a branch, not a detached HEAD (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/8e80d5448f8e6f688fa83c6b6d9b5c72c690d2cc">8e80d54</a>)</p></li>
 <li><p><strong>ci:</strong> publish docs from a branch, not a detached HEAD (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350">a41dbfa</a>)</p></li>
@@ -165,8 +418,8 @@ through 1.3.0 is in <a class="reference external" href="https://github.com/pysnm
 </ul>
 </section>
 </section>
-<section id="id5">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0...v2.0.0">2.0.0</a> (2026-09-05)<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0...v2.0.0">2.0.0</a> (2026-09-05)<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
 <section id="breaking-changes">
 <h3>⚠ BREAKING CHANGES<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
@@ -194,17 +447,17 @@ this repository actually hit.</p>
 </section>
 <section id="rc-2-2026-09-06">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v2.0.0-rc.1...v2.0.0-rc.2">2.0.0-rc.2</a> (2026-09-06)<a class="headerlink" href="#rc-2-2026-09-06" title="Link to this heading">¶</a></h2>
-<section id="id6">
-<h3>Bug Fixes<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<section id="id8">
+<h3>Bug Fixes<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ci:</strong> publish docs from a branch, not a detached HEAD (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a41dbfaa420a591095ee47656078fc27c4189350">a41dbfa</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id7">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.3...v2.0.0-rc.1">2.0.0-rc.1</a> (2026-09-06)<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
-<section id="id8">
-<h3>⚠ BREAKING CHANGES<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<section id="id9">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.3...v2.0.0-rc.1">2.0.0-rc.1</a> (2026-09-06)<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<section id="id10">
+<h3>⚠ BREAKING CHANGES<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>footer, so the pending version is unchanged.</p></li>
 </ul>
@@ -221,18 +474,18 @@ that way, how a release is cut, Trusted Publishing, and the failure modes
 this repository actually hit.</p>
 <p>Co-Authored-By: Claude Opus 5 (1M context) <a class="reference external" href="mailto:noreply&#37;&#52;&#48;anthropic&#46;com">noreply<span>&#64;</span>anthropic<span>&#46;</span>com</a></p>
 </section>
-<section id="id9">
-<h3>Continuous Integration<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<section id="id11">
+<h3>Continuous Integration<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>reconcile with the pysmi and pysnmp workflows, document the process (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d4eb442e6005e608dece0ce5a30ddf4475ab219f">d4eb442</a>)</p></li>
 </ul>
 </section>
 </section>
 </section>
-<section id="id10">
-<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0">1.3.0</a> (2026-09-05)<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h1>
-<section id="id11">
-<h2>Bug Fixes<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<section id="id12">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0">1.3.0</a> (2026-09-05)<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h1>
+<section id="id13">
+<h2>Bug Fixes<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>docs:</strong> give each published version an index.html (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c03832908a0d115d9a26b31f4fee23f132b02537">c038329</a>)</p></li>
 <li><p>encode a present OPTIONAL component even when it is empty (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/69f4b80e9f195018f0d84929b3b3265a7344c531">69f4b80</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/119">#119</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/112">#112</a></p></li>
@@ -258,8 +511,8 @@ this repository actually hit.</p>
 </section>
 <section id="rc-3-2026-09-05">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.2...v1.3.0-rc.3">1.3.0-rc.3</a> (2026-09-05)<a class="headerlink" href="#rc-3-2026-09-05" title="Link to this heading">¶</a></h1>
-<section id="id12">
-<h2>Bug Fixes<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<section id="id14">
+<h2>Bug Fixes<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>docs:</strong> give each published version an index.html (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c03832908a0d115d9a26b31f4fee23f132b02537">c038329</a>)</p></li>
 <li><p><strong>tests:</strong> stop bulk decoding tests from exhausting runner memory (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/9963994c7778a8073258f0ce83d3d5c347d60794">9963994</a>)</p></li>
@@ -268,8 +521,8 @@ this repository actually hit.</p>
 </section>
 <section id="rc-2-2026-09-05">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.3.0-rc.1...v1.3.0-rc.2">1.3.0-rc.2</a> (2026-09-05)<a class="headerlink" href="#rc-2-2026-09-05" title="Link to this heading">¶</a></h1>
-<section id="id13">
-<h2>Bug Fixes<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h2>Bug Fixes<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>keep the BER decoder’s substrateFun path inside PyAsn1Error (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/26c12316a2d240817a2aacc71d0c0920f9f67dfc">26c1231</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/140">#140</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/142">#142</a></p></li>
 </ul>
@@ -277,8 +530,8 @@ this repository actually hit.</p>
 </section>
 <section id="rc-1-2026-09-05">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0...v1.3.0-rc.1">1.3.0-rc.1</a> (2026-09-05)<a class="headerlink" href="#rc-1-2026-09-05" title="Link to this heading">¶</a></h1>
-<section id="id14">
-<h2>Bug Fixes<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<section id="id16">
+<h2>Bug Fixes<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>encode a present OPTIONAL component even when it is empty (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/69f4b80e9f195018f0d84929b3b3265a7344c531">69f4b80</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/119">#119</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/112">#112</a></p></li>
 <li><p>encoder must not instantiate absent DEFAULT components (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/2e7abff0d7110695c669cfa0c43d85d44e31a89a">2e7abff</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/112">#112</a></p></li>
@@ -292,68 +545,15 @@ this repository actually hit.</p>
 <li><p><strong>security:</strong> bound OID arcs, tag numbers and Real conversion (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0ff4c73303f553362bf9bf98389f6e899e986f41">0ff4c73</a>), closes <a class="reference external" href="https://github.com/Hi/issues/tag-number">Hi#tag-number</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/110">#110</a></p></li>
 </ul>
 </section>
-<section id="id15">
-<h2>Features<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
+<section id="id17">
+<h2>Features<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>add univ.RelativeOID (X.680 RELATIVE-OID, universal tag 13) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/9e274a0bda1b0d945b8f7bebc52240d52f9234d1">9e274a0</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/117">#117</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/110">#110</a></p></li>
 </ul>
 </section>
 </section>
-<section id="id16">
-<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0">1.2.0</a> (2026-09-03)<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h1>
-<section id="id17">
-<h2>Bug Fixes<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
-<li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
-<li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
-<li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
-<li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
-<li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
-<li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
-<li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
-<li><p>ci for build (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dbd35ebd7656a2951f7babe9e59666139e439664">dbd35eb</a>)</p></li>
-<li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
-<li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
-<li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
-<li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
-<li><p>cleanup imports (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f92083a04c312f9efed6aad0188b324c66c3e5a">3f92083</a>)</p></li>
-<li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
-<li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
-<li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
-<li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
-<li><p><strong>decoder:</strong> reject encodings clause 8 makes structurally impossible (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dfcec5937508b00b59d2652c6c62fcf0f0d5ca29">dfcec59</a>)</p></li>
-<li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
-<li><p>import and flake8 reported issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/eafee061ee715d5ee1cccdff8cd66b98a147e246">eafee06</a>)</p></li>
-<li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
-<li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
-<li><p><strong>real:</strong> decode NOT-A-NUMBER and minus zero per X.690 8.5.9 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c29d30a4ec341fd816a6d317c0da60b65416b72d">c29d30a</a>)</p></li>
-<li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
-<li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
-<li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
-<li><p><strong>type:</strong> render BitString as bits rather than a decimal integer (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/861089c280bfab7139742d38507499512da6e381">861089c</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/98">#98</a></p></li>
-<li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
-<li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
-<li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
-</ul>
-</section>
 <section id="id18">
-<h2>Features<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
-<li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
-<li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
-<li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
-<li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
-<li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
-<li><p><strong>typing:</strong> annotate pyasn1.type.namedtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7ea6a2f635d97072f9e185ab02ba677b39122a05">7ea6a2f</a>)</p></li>
-<li><p><strong>typing:</strong> annotate pyasn1.type.univ, completing the codebase (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/08feeb152256165f9740ef040802abc19ed16472">08feeb1</a>)</p></li>
-<li><p><strong>typing:</strong> annotate tag, constraint, namedval and opentype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4750ec56cc0ca455b04467a4a67c98dbd6004b48">4750ec5</a>)</p></li>
-</ul>
-</section>
-</section>
-<section id="rc-1-2026-09-03">
-<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0-rc.1">1.2.0-rc.1</a> (2026-09-03)<a class="headerlink" href="#rc-1-2026-09-03" title="Link to this heading">¶</a></h1>
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0">1.2.0</a> (2026-09-03)<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h1>
 <section id="id19">
 <h2>Bug Fixes<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -405,14 +605,41 @@ this repository actually hit.</p>
 </ul>
 </section>
 </section>
-<section id="beta-14-2026-09-02">
-<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.13...v1.2.0-beta.14">1.2.0-beta.14</a> (2026-09-02)<a class="headerlink" href="#beta-14-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="rc-1-2026-09-03">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.3...v1.2.0-rc.1">1.2.0-rc.1</a> (2026-09-03)<a class="headerlink" href="#rc-1-2026-09-03" title="Link to this heading">¶</a></h1>
 <section id="id21">
 <h2>Bug Fixes<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
 <ul class="simple">
+<li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
+<li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
+<li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
+<li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
+<li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
+<li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
+<li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
+<li><p>ci for build (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dbd35ebd7656a2951f7babe9e59666139e439664">dbd35eb</a>)</p></li>
+<li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
+<li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
+<li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
+<li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
+<li><p>cleanup imports (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f92083a04c312f9efed6aad0188b324c66c3e5a">3f92083</a>)</p></li>
+<li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
+<li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
+<li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
+<li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
+<li><p><strong>decoder:</strong> reject encodings clause 8 makes structurally impossible (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/dfcec5937508b00b59d2652c6c62fcf0f0d5ca29">dfcec59</a>)</p></li>
+<li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
+<li><p>import and flake8 reported issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/eafee061ee715d5ee1cccdff8cd66b98a147e246">eafee06</a>)</p></li>
+<li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
 <li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
+<li><p><strong>real:</strong> decode NOT-A-NUMBER and minus zero per X.690 8.5.9 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c29d30a4ec341fd816a6d317c0da60b65416b72d">c29d30a</a>)</p></li>
 <li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
+<li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
+<li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
+<li><p><strong>type:</strong> render BitString as bits rather than a decimal integer (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/861089c280bfab7139742d38507499512da6e381">861089c</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/98">#98</a></p></li>
 <li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
+<li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
 <li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
 </ul>
 </section>
@@ -420,13 +647,39 @@ this repository actually hit.</p>
 <h2>Features<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
+<li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
+<li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
+<li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
+<li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.namedtype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/7ea6a2f635d97072f9e185ab02ba677b39122a05">7ea6a2f</a>)</p></li>
+<li><p><strong>typing:</strong> annotate pyasn1.type.univ, completing the codebase (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/08feeb152256165f9740ef040802abc19ed16472">08feeb1</a>)</p></li>
+<li><p><strong>typing:</strong> annotate tag, constraint, namedval and opentype (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4750ec56cc0ca455b04467a4a67c98dbd6004b48">4750ec5</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="beta-14-2026-09-02">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.13...v1.2.0-beta.14">1.2.0-beta.14</a> (2026-09-02)<a class="headerlink" href="#beta-14-2026-09-02" title="Link to this heading">¶</a></h1>
+<section id="id23">
+<h2>Bug Fixes<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>real,useful:</strong> hold decimal REAL to its declared ISO 6093 form (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/04bc59d9aae7734bd3e7f1a04c945953af821e92">04bc59d</a>)</p></li>
+<li><p><strong>real:</strong> keep the base 10 mantissa exact and integral (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/43221c8351a4f3122685d2e3187b54c7a6895c9b">43221c8</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/78">#78</a></p></li>
+<li><p><strong>type:</strong> stop shadowing pyasn1.error.ValueConstraintError (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/99c3b86917d165b76bf283ce8474d4ac31e27e0e">99c3b86</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/103">#103</a></p></li>
+<li><p><strong>useful:</strong> correct time conversion and render times as timestamps (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/565919718a81c806594dee34781afbe338c666f1">5659197</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/73">#73</a></p></li>
+</ul>
+</section>
+<section id="id24">
+<h2>Features<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>char:</strong> ship opt-in per-type permitted alphabets (X.680 41) (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/6b6a72650b1616ba48aaa3ed62650f77c8066d4b">6b6a726</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/74">#74</a></p></li>
 </ul>
 </section>
 </section>
 <section id="beta-13-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.12...v1.2.0-beta.13">1.2.0-beta.13</a> (2026-09-02)<a class="headerlink" href="#beta-13-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id23">
-<h2>Bug Fixes<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h2>Bug Fixes<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> require minimal length and tag identifier forms (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27fdd0db928ab012b55b84352e750e27c9582372">27fdd0d</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/57">#57</a></p></li>
 <li><p><strong>type:</strong> check component presence in InnerTypeConstraint (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/640b67ee3ad44f38357e4907ed573154caf7c589">640b67e</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/77">#77</a></p></li>
@@ -436,8 +689,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-12-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.11...v1.2.0-beta.12">1.2.0-beta.12</a> (2026-09-02)<a class="headerlink" href="#beta-12-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id24">
-<h2>Bug Fixes<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
+<section id="id26">
+<h2>Bug Fixes<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> enforce the string encoding forms of X.690 9.1, 9.2 and 10.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/59959fcd0fbed6f28660c10d349c58e392c9c526">59959fc</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/96">#96</a> <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/97">#97</a></p></li>
 <li><p><strong>cer:</strong> budget the BIT STRING unused-bits octet when segmenting (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5c9500beff60df7a885a9e7b3f10fad70019e579">5c9500b</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/95">#95</a></p></li>
@@ -446,8 +699,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-11-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.10...v1.2.0-beta.11">1.2.0-beta.11</a> (2026-09-02)<a class="headerlink" href="#beta-11-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id25">
-<h2>Bug Fixes<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h2>Bug Fixes<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> enforce canonical REAL form per X.690 11.3 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3b49e2abf104464ae8cc16f45a6f544f98251546">3b49e2a</a>)</p></li>
 </ul>
@@ -455,8 +708,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-10-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.9...v1.2.0-beta.10">1.2.0-beta.10</a> (2026-09-02)<a class="headerlink" href="#beta-10-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id26">
-<h2>Bug Fixes<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h2>
+<section id="id28">
+<h2>Bug Fixes<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> reject non-minimal INTEGER encodings per X.690 8.3.2 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/d37aae110a95e0fbc9234c9f451a0804f6114653">d37aae1</a>)</p></li>
 </ul>
@@ -464,8 +717,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-9-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.8...v1.2.0-beta.9">1.2.0-beta.9</a> (2026-09-02)<a class="headerlink" href="#beta-9-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id27">
-<h2>Bug Fixes<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h2>
+<section id="id29">
+<h2>Bug Fixes<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> enforce canonical GeneralizedTime and UTCTime (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ae8e39b1872570284ef07582d8daa84e253027ce">ae8e39b</a>)</p></li>
 </ul>
@@ -473,8 +726,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-8-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.7...v1.2.0-beta.8">1.2.0-beta.8</a> (2026-09-02)<a class="headerlink" href="#beta-8-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id28">
-<h2>Bug Fixes<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h2>
+<section id="id30">
+<h2>Bug Fixes<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>cer,der:</strong> install strict decoders on the schema-guided path (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/44e2ea2e6fd14b37668164246c9841cbb6811e37">44e2ea2</a>)</p></li>
 <li><p><strong>cer,der:</strong> require zero unused bits in BIT STRING per X.690 11.2.1 (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0768eb133978983b7b209470d532c722ed7c2739">0768eb1</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/61">#61</a></p></li>
@@ -485,8 +738,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-7-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.6...v1.2.0-beta.7">1.2.0-beta.7</a> (2026-09-02)<a class="headerlink" href="#beta-7-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id29">
-<h2>Bug Fixes<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h2>
+<section id="id31">
+<h2>Bug Fixes<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>encoder:</strong> emit INTEGER in the fewest octets X.690 8.3.2 allows (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/95befaa9f901b44615962323a87aa6e525603178">95befaa</a>), closes <a class="reference external" href="https://github.com/pysnmp/pyasn1/issues/63">#63</a></p></li>
 </ul>
@@ -494,8 +747,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-6-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.5...v1.2.0-beta.6">1.2.0-beta.6</a> (2026-09-02)<a class="headerlink" href="#beta-6-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id30">
-<h2>Features<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h2>
+<section id="id32">
+<h2>Features<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>error:</strong> carry structured context on exceptions (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/0b533533d38372e2d51bf75ac801881f337e296a">0b53353</a>)</p></li>
 </ul>
@@ -503,8 +756,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-5-2026-09-02">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.4...v1.2.0-beta.5">1.2.0-beta.5</a> (2026-09-02)<a class="headerlink" href="#beta-5-2026-09-02" title="Link to this heading">¶</a></h1>
-<section id="id31">
-<h2>Bug Fixes<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h2>
+<section id="id33">
+<h2>Bug Fixes<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>remove duplicate tag helpers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5fb3905477e7ef134512e7c57ca6e281e256946c">5fb3905</a>)</p></li>
 </ul>
@@ -512,8 +765,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-4-2026-09-01">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.3...v1.2.0-beta.4">1.2.0-beta.4</a> (2026-09-01)<a class="headerlink" href="#beta-4-2026-09-01" title="Link to this heading">¶</a></h1>
-<section id="id32">
-<h2>Bug Fixes<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h2>Bug Fixes<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>debug:</strong> stop configuring logging at import time (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/da55169a0b9bc7386d021526072c98869d5d0d4e">da55169</a>)</p></li>
 <li><p><strong>debug:</strong> stop mutating caller-named loggers, guard lazy printer init (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4d7f9745b597cb875767cf87ae7f1538bbd32fd2">4d7f974</a>)</p></li>
@@ -522,15 +775,15 @@ this repository actually hit.</p>
 </section>
 <section id="beta-3-2026-09-01">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.2...v1.2.0-beta.3">1.2.0-beta.3</a> (2026-09-01)<a class="headerlink" href="#beta-3-2026-09-01" title="Link to this heading">¶</a></h1>
-<section id="id33">
-<h2>Bug Fixes<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h2>
+<section id="id35">
+<h2>Bug Fixes<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>constraint:</strong> make ContainedSubtypeConstraint a union, ratchet mypy (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1591f4aa238f3db9a0959e604c85aa1444c4fcef">1591f4a</a>)</p></li>
 <li><p><strong>univ:</strong> align Real comparison params with base, add advisory ty check (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f66b2e37a083f256a98c695bd2aeec6c0b538dc">5f66b2e</a>)</p></li>
 </ul>
 </section>
-<section id="id34">
-<h2>Features<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h2>
+<section id="id36">
+<h2>Features<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>typing:</strong> annotate codec modules and leaf types (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/662a9870f4ee51e2e306f99ba14cb704b23d5f11">662a987</a>)</p></li>
 <li><p><strong>typing:</strong> annotate pyasn1.type.base (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b86258d6ab6030d354fdc15291282bf577bf47fb">b86258d</a>)</p></li>
@@ -542,8 +795,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-2-2026-09-01">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.2.0-beta.1...v1.2.0-beta.2">1.2.0-beta.2</a> (2026-09-01)<a class="headerlink" href="#beta-2-2026-09-01" title="Link to this heading">¶</a></h1>
-<section id="id35">
-<h2>Features<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h2>
+<section id="id37">
+<h2>Features<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>typing:</strong> add mypy gate, py.typed marker, and baseline annotations (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5a83791eb246b97f0d86407c8cc2f123fd00b976">5a83791</a>)</p></li>
 </ul>
@@ -551,16 +804,16 @@ this repository actually hit.</p>
 </section>
 <section id="beta-1-2026-09-01">
 <h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.8...v1.2.0-beta.1">1.2.0-beta.1</a> (2026-09-01)<a class="headerlink" href="#beta-1-2026-09-01" title="Link to this heading">¶</a></h1>
-<section id="id36">
-<h2>Features<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h2>
+<section id="id38">
+<h2>Features<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>deprecate text decoding in OctetString.<strong>str</strong>() (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/88864fa80ab283891e560e124c6aa3934f9eaf20">88864fa</a>)</p></li>
 </ul>
 </section>
 <section id="beta-8-2026-09-01">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.7...v1.1.4-beta.8">1.1.4-beta.8</a> (2026-09-01)<a class="headerlink" href="#beta-8-2026-09-01" title="Link to this heading">¶</a></h2>
-<section id="id37">
-<h3>Bug Fixes<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h3>
+<section id="id39">
+<h3>Bug Fixes<a class="headerlink" href="#id39" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ci:</strong> keep uv.lock in step with the released version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/91becfbdf112a725f47cb9de21b3acc39e5b8004">91becfb</a>)</p></li>
 </ul>
@@ -568,8 +821,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-7-2026-09-01">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.6...v1.1.4-beta.7">1.1.4-beta.7</a> (2026-09-01)<a class="headerlink" href="#beta-7-2026-09-01" title="Link to this heading">¶</a></h2>
-<section id="id38">
-<h3>Bug Fixes<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h3>
+<section id="id40">
+<h3>Bug Fixes<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>make schema-object comparison consistent, rewrite NoValue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/086b46c6b40b31024e0b87b4f0db75920400b68c">086b46c</a>)</p></li>
 </ul>
@@ -577,8 +830,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-6-2026-09-01">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.5...v1.1.4-beta.6">1.1.4-beta.6</a> (2026-09-01)<a class="headerlink" href="#beta-6-2026-09-01" title="Link to this heading">¶</a></h2>
-<section id="id39">
-<h3>Bug Fixes<a class="headerlink" href="#id39" title="Link to this heading">¶</a></h3>
+<section id="id41">
+<h3>Bug Fixes<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>correct IndentationError in ber/decoder.py nesting level logic (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/5f8022e8508ea88ad58e83453d1b7870b553cb02">5f8022e</a>)</p></li>
 </ul>
@@ -586,8 +839,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-5-2026-09-01">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.4...v1.1.4-beta.5">1.1.4-beta.5</a> (2026-09-01)<a class="headerlink" href="#beta-5-2026-09-01" title="Link to this heading">¶</a></h2>
-<section id="id40">
-<h3>Bug Fixes<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h3>
+<section id="id42">
+<h3>Bug Fixes<a class="headerlink" href="#id42" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ci:</strong> pin Black version in lint environment (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/27aa7465247a643b5955981060d19278ac3f9751">27aa746</a>)</p></li>
 </ul>
@@ -595,8 +848,8 @@ this repository actually hit.</p>
 </section>
 <section id="beta-4-2025-05-20">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.3...v1.1.4-beta.4">1.1.4-beta.4</a> (2025-05-20)<a class="headerlink" href="#beta-4-2025-05-20" title="Link to this heading">¶</a></h2>
-<section id="id41">
-<h3>Bug Fixes<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
+<section id="id43">
+<h3>Bug Fixes<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>ci publish (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b5decec4509809c664ca2a345bfc0f01d42f0db5">b5decec</a>)</p></li>
 </ul>
@@ -604,17 +857,17 @@ this repository actually hit.</p>
 </section>
 <section id="beta-3-2025-05-20">
 <h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.4-beta.2...v1.1.4-beta.3">1.1.4-beta.3</a> (2025-05-20)<a class="headerlink" href="#beta-3-2025-05-20" title="Link to this heading">¶</a></h2>
-<section id="id42">
-<h3>Bug Fixes<a class="headerlink" href="#id42" title="Link to this heading">¶</a></h3>
+<section id="id44">
+<h3>Bug Fixes<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>ci issue (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/add11e0f1a0cad332462026c504026e6502775c0">add11e0</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id43">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.2...v1.1.3">1.1.3</a> (2023-02-21)<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h2>
-<section id="id44">
-<h3>Bug Fixes<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h3>
+<section id="id45">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.2...v1.1.3">1.1.3</a> (2023-02-21)<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h2>
+<section id="id46">
+<h3>Bug Fixes<a class="headerlink" href="#id46" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>bring back missing ints2octs and ensureString (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/bc81772d2048a00bc327691771123ca6f0e867c4">bc81772</a>)</p></li>
 <li><p>bring back missing ints2octs and ensureString (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c92da9958eb238baede01c1f8317ab6cae3318a4">c92da99</a>)</p></li>
@@ -628,100 +881,100 @@ this repository actually hit.</p>
 </ul>
 </section>
 </section>
-<section id="id45">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.1...v1.1.2">1.1.2</a> (2021-11-24)<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h2>
-<section id="id46">
-<h3>Bug Fixes<a class="headerlink" href="#id46" title="Link to this heading">¶</a></h3>
+<section id="id47">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.1...v1.1.2">1.1.2</a> (2021-11-24)<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h2>
+<section id="id48">
+<h3>Bug Fixes<a class="headerlink" href="#id48" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>cleanup old code (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c92b584ba8380430f6cfa7fc265119f87d40705e">c92b584</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id47">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.0...v1.1.1">1.1.1</a> (2021-11-24)<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h2>
-<section id="id48">
-<h3>Bug Fixes<a class="headerlink" href="#id48" title="Link to this heading">¶</a></h3>
+<section id="id49">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.1.0...v1.1.1">1.1.1</a> (2021-11-24)<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h2>
+<section id="id50">
+<h3>Bug Fixes<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>remove shadow (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/57a2495606a1d9b4b8a7c599176096de4484d863">57a2495</a>)</p></li>
 </ul>
 </section>
 </section>
 </section>
-<section id="id49">
-<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.3...v1.1.0">1.1.0</a> (2021-11-24)<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h1>
-<section id="id50">
-<h2>Bug Fixes<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h2>
+<section id="id51">
+<h1><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.3...v1.1.0">1.1.0</a> (2021-11-24)<a class="headerlink" href="#id51" title="Link to this heading">¶</a></h1>
+<section id="id52">
+<h2>Bug Fixes<a class="headerlink" href="#id52" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>format issues (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b935c31188693a2e268d0fee4231ff8361fb45af">b935c31</a>)</p></li>
 <li><p>remove dead code (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/3f21cc6e7d4e4d868f08f8ff394303f3008ef996">3f21cc6</a>)</p></li>
 </ul>
 </section>
-<section id="id51">
-<h2>Features<a class="headerlink" href="#id51" title="Link to this heading">¶</a></h2>
+<section id="id53">
+<h2>Features<a class="headerlink" href="#id53" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>format with black (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/1824a3a80885040d288e3ddbd6b6cdba9aec71b2">1824a3a</a>)</p></li>
 </ul>
 </section>
-<section id="id52">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.2...v1.0.3">1.0.3</a> (2021-11-17)<a class="headerlink" href="#id52" title="Link to this heading">¶</a></h2>
-<section id="id53">
-<h3>Bug Fixes<a class="headerlink" href="#id53" title="Link to this heading">¶</a></h3>
+<section id="id54">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.2...v1.0.3">1.0.3</a> (2021-11-17)<a class="headerlink" href="#id54" title="Link to this heading">¶</a></h2>
+<section id="id55">
+<h3>Bug Fixes<a class="headerlink" href="#id55" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>bump (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/ec35ee198b80f285df472c3b4059bb59ca056d7f">ec35ee1</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id54">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.1...v1.0.2">1.0.2</a> (2021-11-13)<a class="headerlink" href="#id54" title="Link to this heading">¶</a></h2>
-<section id="id55">
-<h3>Bug Fixes<a class="headerlink" href="#id55" title="Link to this heading">¶</a></h3>
+<section id="id56">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.1...v1.0.2">1.0.2</a> (2021-11-13)<a class="headerlink" href="#id56" title="Link to this heading">¶</a></h2>
+<section id="id57">
+<h3>Bug Fixes<a class="headerlink" href="#id57" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>bump version (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/a6d7a5eff6b5b4875ada2abc2c3d928d1f0d9fae">a6d7a5e</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id56">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.0...v1.0.1">1.0.1</a> (2021-11-13)<a class="headerlink" href="#id56" title="Link to this heading">¶</a></h2>
-<section id="id57">
-<h3>Bug Fixes<a class="headerlink" href="#id57" title="Link to this heading">¶</a></h3>
+<section id="id58">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v1.0.0...v1.0.1">1.0.1</a> (2021-11-13)<a class="headerlink" href="#id58" title="Link to this heading">¶</a></h2>
+<section id="id59">
+<h3>Bug Fixes<a class="headerlink" href="#id59" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>bump (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/970e15d47e33906020735242eea6bb2ad1f53af0">970e15d</a>)
 <strong>Full Changelog</strong>: https://github.com/pysnmp/pyasn1/compare/0.4.8…v1.0.0</p></li>
 </ul>
 </section>
 </section>
-<section id="id58">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.11...v0.4.12">0.4.12</a> (2021-11-13)<a class="headerlink" href="#id58" title="Link to this heading">¶</a></h2>
-<section id="id59">
-<h3>Bug Fixes<a class="headerlink" href="#id59" title="Link to this heading">¶</a></h3>
+<section id="id60">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.11...v0.4.12">0.4.12</a> (2021-11-13)<a class="headerlink" href="#id60" title="Link to this heading">¶</a></h2>
+<section id="id61">
+<h3>Bug Fixes<a class="headerlink" href="#id61" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Update doc links (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/9cabd9b0a273a3f5afaeb36387f6bb4cf92a7802">9cabd9b</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id60">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.10...v0.4.11">0.4.11</a> (2021-11-13)<a class="headerlink" href="#id60" title="Link to this heading">¶</a></h2>
-<section id="id61">
-<h3>Bug Fixes<a class="headerlink" href="#id61" title="Link to this heading">¶</a></h3>
+<section id="id62">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.10...v0.4.11">0.4.11</a> (2021-11-13)<a class="headerlink" href="#id62" title="Link to this heading">¶</a></h2>
+<section id="id63">
+<h3>Bug Fixes<a class="headerlink" href="#id63" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>correct badges (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/4cbde5679aa15835372a9cec6c9ccd7503168229">4cbde56</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id62">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.9...v0.4.10">0.4.10</a> (2021-11-13)<a class="headerlink" href="#id62" title="Link to this heading">¶</a></h2>
-<section id="id63">
-<h3>Bug Fixes<a class="headerlink" href="#id63" title="Link to this heading">¶</a></h3>
+<section id="id64">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.9...v0.4.10">0.4.10</a> (2021-11-13)<a class="headerlink" href="#id64" title="Link to this heading">¶</a></h2>
+<section id="id65">
+<h3>Bug Fixes<a class="headerlink" href="#id65" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>correct readme ref (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/732a4a69a54e018dc3ef0493b7d07af23aeb8cc4">732a4a6</a>)</p></li>
 <li><p>update classifiers (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/b3fa5d6aff60d2b677c99d46d29b4dabf06b69ef">b3fa5d6</a>)</p></li>
 </ul>
 </section>
 </section>
-<section id="id64">
-<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.8...v0.4.9">0.4.9</a> (2021-11-13)<a class="headerlink" href="#id64" title="Link to this heading">¶</a></h2>
-<section id="id65">
-<h3>Bug Fixes<a class="headerlink" href="#id65" title="Link to this heading">¶</a></h3>
+<section id="id66">
+<h2><a class="reference external" href="https://github.com/pysnmp/pyasn1/compare/v0.4.8...v0.4.9">0.4.9</a> (2021-11-13)<a class="headerlink" href="#id66" title="Link to this heading">¶</a></h2>
+<section id="id67">
+<h3>Bug Fixes<a class="headerlink" href="#id67" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>update gitignore (<a class="reference external" href="https://github.com/pysnmp/pyasn1/commit/c8f0be6885a3984032325d449838370052f9cfd4">c8f0be6</a>)</p></li>
 </ul>
@@ -735,20 +988,261 @@ this repository actually hit.</p>
 </section>
 </section>
 
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="changelog-history.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Historical changelog</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ci-and-releases.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Continuous integration and releases</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc.
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#id1">2.0.3 (2026-09-19)</a><ul>
+<li><a class="reference internal" href="#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">2.0.2 (2026-09-09)</a><ul>
+<li><a class="reference internal" href="#id3">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">2.0.1 (2026-09-06)</a><ul>
+<li><a class="reference internal" href="#id5">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-1-2026-09-06">2.0.1-rc.1 (2026-09-06)</a><ul>
+<li><a class="reference internal" href="#id6">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">2.0.0 (2026-09-05)</a><ul>
+<li><a class="reference internal" href="#breaking-changes">⚠ BREAKING CHANGES</a></li>
+<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-2-2026-09-06">2.0.0-rc.2 (2026-09-06)</a><ul>
+<li><a class="reference internal" href="#id8">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9">2.0.0-rc.1 (2026-09-06)</a><ul>
+<li><a class="reference internal" href="#id10">⚠ BREAKING CHANGES</a></li>
+<li><a class="reference internal" href="#id11">Continuous Integration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">1.3.0 (2026-09-05)</a><ul>
+<li><a class="reference internal" href="#id13">Bug Fixes</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a><ul>
+<li><a class="reference internal" href="#id14">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a><ul>
+<li><a class="reference internal" href="#id15">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a><ul>
+<li><a class="reference internal" href="#id16">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id17">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id18">1.2.0 (2026-09-03)</a><ul>
+<li><a class="reference internal" href="#id19">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id20">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a><ul>
+<li><a class="reference internal" href="#id21">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id22">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id23">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id24">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id25">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-12-2026-09-02">1.2.0-beta.12 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id26">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-11-2026-09-02">1.2.0-beta.11 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id27">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-10-2026-09-02">1.2.0-beta.10 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id28">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-9-2026-09-02">1.2.0-beta.9 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id29">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-8-2026-09-02">1.2.0-beta.8 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id30">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-7-2026-09-02">1.2.0-beta.7 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id31">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-6-2026-09-02">1.2.0-beta.6 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id32">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-5-2026-09-02">1.2.0-beta.5 (2026-09-02)</a><ul>
+<li><a class="reference internal" href="#id33">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-4-2026-09-01">1.2.0-beta.4 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id34">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id35">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id36">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id37">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id38">Features</a></li>
+<li><a class="reference internal" href="#beta-8-2026-09-01">1.1.4-beta.8 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id39">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-7-2026-09-01">1.1.4-beta.7 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id40">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-6-2026-09-01">1.1.4-beta.6 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id41">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-5-2026-09-01">1.1.4-beta.5 (2026-09-01)</a><ul>
+<li><a class="reference internal" href="#id42">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-4-2025-05-20">1.1.4-beta.4 (2025-05-20)</a><ul>
+<li><a class="reference internal" href="#id43">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beta-3-2025-05-20">1.1.4-beta.3 (2025-05-20)</a><ul>
+<li><a class="reference internal" href="#id44">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id45">1.1.3 (2023-02-21)</a><ul>
+<li><a class="reference internal" href="#id46">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id47">1.1.2 (2021-11-24)</a><ul>
+<li><a class="reference internal" href="#id48">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id49">1.1.1 (2021-11-24)</a><ul>
+<li><a class="reference internal" href="#id50">Bug Fixes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id51">1.1.0 (2021-11-24)</a><ul>
+<li><a class="reference internal" href="#id52">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id53">Features</a></li>
+<li><a class="reference internal" href="#id54">1.0.3 (2021-11-17)</a><ul>
+<li><a class="reference internal" href="#id55">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id56">1.0.2 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id57">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id58">1.0.1 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id59">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id60">0.4.12 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id61">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id62">0.4.11 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id63">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id64">0.4.10 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id65">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id66">0.4.9 (2021-11-13)</a><ul>
+<li><a class="reference internal" href="#id67">Bug Fixes</a></li>
+<li><a class="reference internal" href="#reverts">Reverts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
           </div>
-          
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
-    <div class="footer">
-      &#169;2005-2019, Ilya Etingof; 2021-, Ryan Faircloth; 2023, Splunk Inc..
       
-    </div>
-
-    
-
-    
-  </body>
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=76c8fe14"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
 </html>
