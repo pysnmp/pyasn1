@@ -104,6 +104,69 @@ class NamedTypeStdlibIntegrationTestCase(BaseTestCase):
         nt = namedtype.NamedType("x", univ.Integer(), openType={"k": "v"})
         assert pickle.loads(pickle.dumps(nt)).openType == {"k": "v"}
 
+    def testFieldAccessDoesNotGoThroughGetitem(self):
+        """Reading a field must not depend on what namedtuple generated.
+
+        How a namedtuple exposes its fields is an implementation detail of
+        the interpreter: CPython builds _tuplegetter, which reads the tuple
+        slot in C, and PyPy builds property(operator.itemgetter(n)), which
+        calls __getitem__. NamedType overrides __getitem__ to expose two
+        items rather than three, so a field read that went through it
+        recursed forever on .name and raised IndexError on .openType -- and
+        importing any module declaring a Choice or a Sequence did exactly
+        that on PyPy.
+
+        The accessors this class defines are what makes the two interpreters
+        agree, and this simulates PyPy's on whichever one is running so the
+        guard holds everywhere.
+        """
+        import operator
+
+        class PyPyStyleNamedType(namedtype.NamedType):
+            """NamedType with the field accessors PyPy would generate."""
+
+            __slots__ = ()
+
+            name = property(operator.itemgetter(0))
+            asn1Object = property(operator.itemgetter(1))
+            openType = property(operator.itemgetter(2))
+
+        pypy_style = PyPyStyleNamedType("x", univ.Integer(0), openType={"k": "v"})
+
+        # Whatever the accessors do, the class's own reads must terminate and
+        # must produce the same three values.
+        assert namedtype.NamedType.name.fget(pypy_style) == "x"
+        assert namedtype.NamedType.asn1Object.fget(pypy_style) == univ.Integer(0)
+        assert namedtype.NamedType.openType.fget(pypy_style) == {"k": "v"}
+
+        # And the accessors are the reason: overridden ones that route back
+        # through __getitem__ cannot serve openType at all.
+        try:
+            pypy_style.openType
+        except IndexError:
+            pass
+        else:  # pragma: no cover - only if a future interpreter changes this
+            assert pypy_style.openType == {"k": "v"}
+
+    def testImportingAModuleWithAChoiceWorks(self):
+        """The failure this guards was an import, not a field read.
+
+        A Choice's NamedTypes computes its minimum tag set at class creation
+        time by reading .asn1Object off every field, so a field accessor that
+        does not terminate takes the import down with it.
+        """
+
+        class Syntax(univ.Choice):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("integer-value", univ.Integer()),
+                namedtype.NamedType("string-value", univ.OctetString()),
+                namedtype.NamedType("objectID-value", univ.ObjectIdentifier()),
+            )
+
+        field = Syntax().componentType["string-value"]
+        assert field.name == "string-value"
+        assert isinstance(field.asn1Object, univ.OctetString)
+
 
 class NamedTypesCaseBase(BaseTestCase):
     def setUp(self):
