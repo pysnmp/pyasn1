@@ -46,6 +46,41 @@ class NamedType(_NamedTypeBase):
         """Construct a *NamedType* from *name*, *asn1Object* and optional *openType*."""
         return super().__new__(cls, name, asn1Object, openType)
 
+    # The three fields are read straight off the tuple rather than left to
+    # the accessors namedtuple generates, and that is load-bearing rather
+    # than a style choice.
+    #
+    # How a namedtuple exposes its fields is not part of the language.
+    # CPython builds _tuplegetter, which reads the tuple slot in C and never
+    # enters this class; PyPy builds property(operator.itemgetter(n)), which
+    # calls __getitem__. This class overrides __getitem__ -- to expose two
+    # items rather than three, which is the duck-type this type has always
+    # had -- so on PyPy .name recursed into the accessor that called it until
+    # the stack ran out, and .openType asked __getitem__ for an index it
+    # answers with IndexError. Importing any module that declares a Choice or
+    # a Sequence, which is every non-trivial ASN.1 module, raised
+    # RecursionError there.
+    #
+    # Reading the slot here settles both, and settles them the same way on
+    # every interpreter: field access no longer depends on what namedtuple
+    # generated, and __getitem__ stays free to expose the two-item interface
+    # that __iter__ and __len__ agree on.
+
+    @property
+    def name(self) -> str:
+        """The field's name."""
+        return tuple.__getitem__(self, 0)
+
+    @property
+    def asn1Object(self) -> Any:
+        """The ASN.1 type this field holds."""
+        return tuple.__getitem__(self, 1)
+
+    @property
+    def openType(self) -> Any:
+        """The open type map for this field, or ``None``."""
+        return tuple.__getitem__(self, 2)
+
     def __repr__(self) -> str:
         representation = f"{self.name}={self.asn1Object!r}"
 
@@ -58,14 +93,14 @@ class NamedType(_NamedTypeBase):
     # (name, asn1Object), matching the original 2-tuple duck-type behaviour.
     # The openType field is accessible only via the .openType property.
     def __iter__(self) -> Iterator[Any]:
-        yield self.name
-        yield self.asn1Object
+        yield tuple.__getitem__(self, 0)
+        yield tuple.__getitem__(self, 1)
 
     def __getitem__(self, idx: Any) -> Any:
         if idx == 0:
-            return self.name
+            return tuple.__getitem__(self, 0)
         elif idx == 1:
-            return self.asn1Object
+            return tuple.__getitem__(self, 1)
         else:
             raise IndexError("tuple index out of range")
 
