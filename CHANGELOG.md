@@ -3,6 +3,17 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.4](https://github.com/pysnmp/pyasn1/compare/v2.0.3...v2.0.4) (2026-09-20)
+
+### Bug Fixes
+
+* **decoder:** snapshot the debug flag per frame, so the scope stack balances ([eca2f6c](https://github.com/pysnmp/pyasn1/commit/eca2f6cd67f9d88ef6e3517112f7cfaf8904de78))
+
+### Performance Improvements
+
+* **decoder:** re-read the debug flag once per decode, not at every site ([30ee7cd](https://github.com/pysnmp/pyasn1/commit/30ee7cde8010cd8072e7c07be71f12e12b953825)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **encoder:** split the public entry from the recursion, read the flag once ([1292721](https://github.com/pysnmp/pyasn1/commit/1292721a42f121fd5d5e8b49b6f9c0c987f315bb)), closes [#188](https://github.com/pysnmp/pyasn1/issues/188) [#187](https://github.com/pysnmp/pyasn1/issues/187)
+
 ## [2.0.3](https://github.com/pysnmp/pyasn1/compare/v2.0.2...v2.0.3) (2026-09-19)
 
 ### Bug Fixes
