@@ -8,7 +8,7 @@
         <link rel="prefetch" href="../_static/logo.svg" as="image">
 
     <link rel="shortcut icon" href="../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Debugging and logging - ASN.1 types and codecs 2.0.3 documentation</title>
+        <title>Debugging and logging - ASN.1 types and codecs 2.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -163,7 +163,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../contents.html"><div class="brand">ASN.1 types and codecs 2.0.3 documentation</div></a>
+      <a href="../contents.html"><div class="brand">ASN.1 types and codecs 2.0.4 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -188,7 +188,7 @@
     <img class="sidebar-logo only-dark" src="../_static/logo.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.3 documentation</span>
+  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.4 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -307,11 +307,11 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id12">1.3.0 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id14">1.3.0 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id18">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id20">1.2.0 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
@@ -327,7 +327,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id51">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html#id53">1.1.0 (2021-11-24)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog-history.html">Historical changelog</a></li>
 </ul>
 <ul>
@@ -456,12 +456,37 @@ the arguments as fields, without parsing the rendered message.</p>
 </section>
 <section id="cost-when-disabled">
 <h2>Cost when disabled<a class="headerlink" href="#cost-when-disabled" title="Link to this heading">¶</a></h2>
-<p>Every trace point is guarded with
-<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger.isEnabledFor" title="(in Python v3.14)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">isEnabledFor()</span></code></a>, so disabled tracing costs one
-level check per call site and neither formats a message nor builds its
-arguments. Leaving the guards in place in production is fine; enabling
-<code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> on a hot decoding path is not, as the records embed hexdumps
-of the substrate.</p>
+<p>Disabled tracing costs <strong>one</strong> <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger.isEnabledFor" title="(in Python v3.14)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">isEnabledFor()</span></code></a> call per
+<em>operation</em> – per <a class="reference internal" href="codec/ber/contents.html#pyasn1.codec.ber.decoder.decode" title="pyasn1.codec.ber.decoder.decode"><code class="xref py py-func docutils literal notranslate"><span class="pre">decode()</span></code></a> or
+<a class="reference internal" href="codec/ber/contents.html#pyasn1.codec.ber.encoder.encode" title="pyasn1.codec.ber.encoder.encode"><code class="xref py py-func docutils literal notranslate"><span class="pre">encode()</span></code></a> call, not per ASN.1 component. Both
+BER codecs read the level once on entry, into a module-level flag that the
+trace points then test.</p>
+<p>That distinction is the whole reason the flag exists. The guards used to
+evaluate <code class="docutils literal notranslate"><span class="pre">isEnabledFor</span></code> at each site, which is sound advice applied at a
+granularity a codec cannot afford: decoding a ten-binding SNMPv2c response
+asked the question 551 times and encoding one asked it 337 times, getting the
+same answer every time, for several per cent of the operation – paid by every
+installation, for output nobody had enabled.</p>
+<p>The flag is re-read per operation rather than settled at import, so the
+<code class="docutils literal notranslate"><span class="pre">setLevel()</span></code> calls above keep working: a level change is picked up by the
+next decode or encode, with no pyasn1-specific API to call.</p>
+<p>The guards themselves stay, and earn their keep: they are what stops the
+<code class="docutils literal notranslate"><span class="pre">extra</span></code> dicts and the substrate hexdumps from being built when nothing will
+print them. Only the placement of the <em>check</em> changed.</p>
+<p>Enabling <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> on a hot codec path is still not something to run with.
+<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.LogRecord</span></code></a> construction calls <code class="docutils literal notranslate"><span class="pre">findCaller()</span></code>, which walks
+the stack for every record, and a codec emitting hundreds of records per
+message is not usable at that rate. The capability is for diagnosis, not for
+production.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The rule these placements follow is written down once, for pyasn1, pysmi
+and pysnmp together, as pysnmp’s <a class="reference external" href="https://docs.lextudio.com/pysnmp/docs/observability-contract">logging and tracing contract</a>: <em>what an
+observability mechanism costs must be proportional to the granularity of
+the thing it observes.</em> It also covers why nothing below the PDU boundary
+may reach a production telemetry pipeline, and how to measure a change of
+this kind. Read it before adding a trace point to a hot path.</p>
+</div>
 </section>
 <section id="deprecated-the-debug-switch">
 <span id="pyasn1-debug-deprecated"></span><h2>Deprecated: the Debug switch<a class="headerlink" href="#deprecated-the-debug-switch" title="Link to this heading">¶</a></h2>
@@ -664,7 +689,7 @@ contain decoding:</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=76c8fe14"></script>
+</div><script src="../_static/documentation_options.js?v=93d6c989"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
