@@ -124,9 +124,11 @@ class DebugFlagScopeTestCase(BaseTestCase):
     leaks an entry, and a pop with no push raises ``IndexError`` on an empty
     list, out of an ordinary decode.
 
-    Released 2.0.3 evaluated ``Logger.isEnabledFor`` at each guard separately
-    and could do exactly that; a logger whose answer alternates reproduces it
-    deterministically, without threads.
+    ``_DEBUG`` is a module global refreshed by whichever decode is at nesting
+    level zero, so another thread starting a decode can move it under a frame
+    that is midway between its push and its pop. That is the window the frame
+    local closes, and it is what the first test below drives, by flipping the
+    global from inside ``debug.scope.push`` rather than by running threads.
     """
 
     def setUp(self):
@@ -144,32 +146,49 @@ class DebugFlagScopeTestCase(BaseTestCase):
         del debug.scope._list[self.scopeDepth :]
         BaseTestCase.tearDown(self)
 
-    def testScopeBalancesWhenTheAnswerKeepsChanging(self):
-        class Alternating:
-            """A logger that says yes, then no, then yes..."""
-
-            def __init__(self):
-                self.answers = 0
+    def testScopeBalancesWhenTheFlagFlipsMidDecode(self):
+        class Enabled:
+            """A logger that is on, so the frame takes the guarded path."""
 
             def isEnabledFor(self, level):
-                self.answers += 1
-                return self.answers % 2 == 1
+                return True
 
             def debug(self, *args, **kwargs):
                 pass
 
-        decoder.LOG = Alternating()
+        decoder.LOG = Enabled()
 
-        for _ in range(16):
+        realPush = debug.scope.push
+
+        def flippingPush(token):
+            # Stand in for another thread reaching nesting level zero and
+            # refreshing the module flag, landing exactly between this
+            # frame's push and the pop that has to match it.
+            realPush(token)
+            decoder._DEBUG = False
+
+        debug.scope.push = flippingPush
+
+        try:
             decoder.decode(self.octets, asn1Spec=univ.Integer())
+
+        finally:
+            del debug.scope.push
 
         self.assertEqual(
             self.scopeDepth,
             len(debug.scope._list),
-            "debug.scope did not return to its starting depth: a push went unmatched",
+            "debug.scope did not return to its starting depth: the flag moved "
+            "between the push and the pop, and the pop was skipped",
         )
 
     def testTheFlagIsReadOncePerDecode(self):
+        """Pins what #188 bought, which no test of its own covers.
+
+        This one holds on the parent commit too, deliberately: it guards the
+        hoist out of the per-component path, not the frame local above it.
+        """
+
         class Counting:
             def __init__(self):
                 self.answers = 0
