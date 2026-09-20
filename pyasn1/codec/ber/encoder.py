@@ -35,6 +35,20 @@ __all__ = ["encode"]
 
 LOG = logging.getLogger(__name__)
 
+#: Whether the debug sites below should build and emit their messages.
+#:
+#: Read once per top-level encode rather than at each site. The guards run
+#: per ASN.1 component -- 337 times to encode a ten-binding SNMPv2c response
+#: -- and a Logger.isEnabledFor() call at each of them is worth several per
+#: cent of the operation, paid by everyone, for output that is off wherever
+#: nobody asked for it. Refreshing per operation rather than caching at
+#: import keeps logging.setLevel() working: the next encode picks it up.
+#:
+#: Unlike the decoder's, this flag needs no per-frame snapshot: nothing here
+#: pushes onto debug.scope, so there is no push/pop pair for a mid-frame
+#: change to split.
+_DEBUG = False
+
 
 class AbstractItemEncoder:
     supportIndefLenMode = True
@@ -123,7 +137,7 @@ class AbstractItemEncoder:
                         "Error encoding value", value=value, cause=exc
                     ) from exc
 
-                if LOG.isEnabledFor(logging.DEBUG):
+                if _DEBUG:
                     LOG.debug(
                         "encoded value",
                         extra={
@@ -139,14 +153,14 @@ class AbstractItemEncoder:
                 if not isConstructed:
                     defModeOverride = True
 
-                    if LOG.isEnabledFor(logging.DEBUG):
+                    if _DEBUG:
                         LOG.debug(
                             "overridden encoding mode into definitive for primitive type"
                         )
 
             header = self.encodeTag(singleTag, isConstructed)
 
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug(
                     "encoded tag",
                     extra={
@@ -158,7 +172,7 @@ class AbstractItemEncoder:
 
             header += self.encodeLength(len(substrate), defModeOverride)
 
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug(
                     "encoded octets into header",
                     extra={
@@ -209,7 +223,7 @@ class IntegerEncoder(AbstractItemEncoder):
         self, value: Any, asn1Spec: Any, encodeFun: Any, **options: Any
     ) -> tuple[Any, bool, bool]:
         if value == 0:
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug(
                     "encoding payload for zero INTEGER",
                     extra={"supportCompactZero": self.supportCompactZero},
@@ -252,7 +266,7 @@ class BitStringEncoder(AbstractItemEncoder):
             substrate = alignedValue.asOctets()
             return bytes((len(substrate) * 8 - valueLength,)) + substrate, False, True
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug("encoding into chunks", extra={"maxChunkSize": maxChunkSize})
 
         baseTag = value.tagSet.baseTag
@@ -294,7 +308,7 @@ class OctetStringEncoder(AbstractItemEncoder):
         if not maxChunkSize or len(substrate) <= maxChunkSize:
             return substrate, False, True
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug("encoding into chunks", extra={"maxChunkSize": maxChunkSize})
 
         # 8.23.3 encodes a character string as if it were an implicitly tagged
@@ -494,7 +508,7 @@ class RealEncoder(AbstractItemEncoder):
                 m = int(mantissa[i])
                 encbase = encBase[i]
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug(
                 "automatically chosen REAL encoding base",
                 extra={"encBase": encbase, "sign": sign, "mantissa": m, "exponent": e},
@@ -613,7 +627,7 @@ class RealEncoder(AbstractItemEncoder):
             return b"", False, True
 
         if b == 10:
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug("encoding REAL into character form")
 
             return self._encodeCharacter(m, e), False, True
@@ -637,7 +651,7 @@ class SequenceEncoder(AbstractItemEncoder):
 
         omitEmptyOptionals = options.get("omitEmptyOptionals", self.omitEmptyOptionals)
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug(
                 "encoding empty OPTIONAL components",
                 extra={"omitEmptyOptionals": omitEmptyOptionals},
@@ -666,7 +680,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         component = namedType.asn1Object
 
                     if namedType.isOptional and not component.isValue:
-                        if LOG.isEnabledFor(logging.DEBUG):
+                        if _DEBUG:
                             LOG.debug(
                                 "not encoding OPTIONAL component",
                                 extra={"namedType": namedType},
@@ -674,7 +688,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         continue
 
                     if namedType.isDefaulted and component == namedType.asn1Object:
-                        if LOG.isEnabledFor(logging.DEBUG):
+                        if _DEBUG:
                             LOG.debug(
                                 "not encoding DEFAULT component",
                                 extra={"namedType": namedType},
@@ -704,7 +718,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         else:
                             substrate += encodeFun(chunk, wrapType, **options)
 
-                            if LOG.isEnabledFor(logging.DEBUG):
+                            if _DEBUG:
                                 LOG.debug(
                                     "wrapped with wrap type",
                                     extra={"wrapType": wrapType},
@@ -727,7 +741,7 @@ class SequenceEncoder(AbstractItemEncoder):
                     ) from exc
 
                 if namedType.isOptional and namedType.name not in value:
-                    if LOG.isEnabledFor(logging.DEBUG):
+                    if _DEBUG:
                         LOG.debug(
                             "not encoding OPTIONAL component",
                             extra={"namedType": namedType},
@@ -735,7 +749,7 @@ class SequenceEncoder(AbstractItemEncoder):
                     continue
 
                 if namedType.isDefaulted and component == namedType.asn1Object:
-                    if LOG.isEnabledFor(logging.DEBUG):
+                    if _DEBUG:
                         LOG.debug(
                             "not encoding DEFAULT component",
                             extra={"namedType": namedType},
@@ -768,7 +782,7 @@ class SequenceEncoder(AbstractItemEncoder):
                         else:
                             substrate += encodeFun(chunk, componentSpec, **options)
 
-                            if LOG.isEnabledFor(logging.DEBUG):
+                            if _DEBUG:
                                 LOG.debug(
                                     "wrapped with wrap type",
                                     extra={"wrapType": componentSpec},
@@ -803,7 +817,7 @@ class SequenceOfEncoder(AbstractItemEncoder):
                 # wrap encoded value with wrapper container (e.g. ANY)
                 chunk = encodeFun(chunk, wrapType, **options)
 
-                if LOG.isEnabledFor(logging.DEBUG):
+                if _DEBUG:
                     LOG.debug("wrapped with wrap type", extra={"wrapType": wrapType})
 
             chunks.append(chunk)
@@ -939,8 +953,29 @@ class Encoder:
     ) -> None:
         self.__tagMap = tagMap
         self.__typeMap = typeMap if typeMap is not None else {}
+        # Bound once, because it is handed to a concrete encoder at every
+        # level of the recursion and `self.__encode` would rebuild the bound
+        # method each time.
+        self.__encodeFun = self.__encode
 
     def __call__(self, value: Any, asn1Spec: Any = None, **options: Any) -> bytes:
+        """Encode one value. This is the public entry, entered once.
+
+        It exists separately from the recursion below so that there is
+        somewhere to put work that belongs to the operation rather than to
+        the component -- here, re-reading the debug flag.
+
+        Concrete encoders re-enter the codec through ``__encode``, handed to
+        them as ``encodeFun``, never through this method. That is what makes
+        "once per encode" true; ``Encoder`` used to be its own ``encodeFun``,
+        so there was no point in the call graph that ran exactly once.
+        """
+        global _DEBUG
+        _DEBUG = LOG.isEnabledFor(logging.DEBUG)
+
+        return self.__encode(value, asn1Spec, **options)
+
+    def __encode(self, value: Any, asn1Spec: Any = None, **options: Any) -> bytes:
         try:
             if asn1Spec is None:
                 typeId = value.typeId
@@ -955,7 +990,7 @@ class Encoder:
                 value=value,
             ) from exc
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug(
                 "encoder called",
                 extra={
@@ -987,7 +1022,7 @@ class Encoder:
         if tagSet != baseTagSet:
             concreteEncoder = self.__tagMap.get(tagSet)
 
-            if concreteEncoder and LOG.isEnabledFor(logging.DEBUG):
+            if concreteEncoder and _DEBUG:
                 LOG.debug(
                     "using value codec chosen by complete tagSet",
                     extra={
@@ -1000,7 +1035,7 @@ class Encoder:
             if concreteEncoder is None:
                 concreteEncoder = self.__typeMap[typeId]
 
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug(
                     "using value codec chosen by type ID",
                     extra={
@@ -1019,7 +1054,7 @@ class Encoder:
                     "No encoder for value", value=value, tagSet=tagSet
                 ) from exc
 
-            if LOG.isEnabledFor(logging.DEBUG):
+            if _DEBUG:
                 LOG.debug(
                     "using value codec chosen by tagSet",
                     extra={
@@ -1028,9 +1063,9 @@ class Encoder:
                     },
                 )
 
-        substrate = concreteEncoder.encode(value, asn1Spec, self, **options)
+        substrate = concreteEncoder.encode(value, asn1Spec, self.__encodeFun, **options)
 
-        if LOG.isEnabledFor(logging.DEBUG):
+        if _DEBUG:
             LOG.debug(
                 "codec built substrate",
                 extra={
