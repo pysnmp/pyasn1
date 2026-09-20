@@ -11,6 +11,8 @@ import sys
 import unittest
 
 from pyasn1 import debug
+from pyasn1.codec.ber import decoder, encoder
+from pyasn1.type import univ
 from tests.base import BaseTestCase
 
 LOG_METHODS = frozenset(
@@ -111,6 +113,81 @@ class ContextFormatterTestCase(BaseTestCase):
 
         assert text == "decoding substrate=04 02 0c", text
         assert "\n" not in text, f"a record must render on one line: {text!r}"
+
+
+class DebugFlagScopeTestCase(BaseTestCase):
+    """The debug flag is snapshotted per frame, so debug.scope stays balanced.
+
+    ``Decoder.__call__`` pushes onto the module-level ``debug.scope`` near its
+    start and pops at its end, both under the debug guard. If the guard can
+    change its mind in between, the stack goes out of step: a push with no pop
+    leaks an entry, and a pop with no push raises ``IndexError`` on an empty
+    list, out of an ordinary decode.
+
+    Released 2.0.3 evaluated ``Logger.isEnabledFor`` at each guard separately
+    and could do exactly that; a logger whose answer alternates reproduces it
+    deterministically, without threads.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.octets = encoder.encode(univ.Integer(42))
+        self.realLog = decoder.LOG
+        self.realDebug = decoder._DEBUG
+
+    def tearDown(self):
+        decoder.LOG = self.realLog
+        decoder._DEBUG = self.realDebug
+        del debug.scope._list[:]
+        BaseTestCase.tearDown(self)
+
+    def testScopeBalancesWhenTheAnswerKeepsChanging(self):
+        class Alternating:
+            """A logger that says yes, then no, then yes..."""
+
+            def __init__(self):
+                self.answers = 0
+
+            def isEnabledFor(self, level):
+                self.answers += 1
+                return self.answers % 2 == 1
+
+            def debug(self, *args, **kwargs):
+                pass
+
+        decoder.LOG = Alternating()
+
+        for _ in range(16):
+            decoder.decode(self.octets, asn1Spec=univ.Integer())
+
+        self.assertEqual(
+            [],
+            debug.scope._list,
+            "debug.scope did not return to empty: a push went unmatched",
+        )
+
+    def testTheFlagIsReadOncePerDecode(self):
+        class Counting:
+            def __init__(self):
+                self.answers = 0
+
+            def isEnabledFor(self, level):
+                self.answers += 1
+                return False
+
+            def debug(self, *args, **kwargs):
+                pass
+
+        counting = Counting()
+        decoder.LOG = counting
+
+        decoder.decode(self.octets, asn1Spec=univ.Integer())
+
+        self.assertEqual(
+            1,
+            counting.answers,
+            "the guard is being evaluated more than once per decode",
+        )
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
