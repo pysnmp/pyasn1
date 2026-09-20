@@ -82,12 +82,42 @@ the arguments as fields, without parsing the rendered message.
 Cost when disabled
 ------------------
 
-Every trace point is guarded with
-:meth:`~logging.Logger.isEnabledFor`, so disabled tracing costs one
-level check per call site and neither formats a message nor builds its
-arguments. Leaving the guards in place in production is fine; enabling
-``DEBUG`` on a hot decoding path is not, as the records embed hexdumps
-of the substrate.
+Disabled tracing costs **one** :meth:`~logging.Logger.isEnabledFor` call per
+*operation* -- per :func:`~pyasn1.codec.ber.decoder.decode` or
+:func:`~pyasn1.codec.ber.encoder.encode` call, not per ASN.1 component. Both
+BER codecs read the level once on entry, into a module-level flag that the
+trace points then test.
+
+That distinction is the whole reason the flag exists. The guards used to
+evaluate ``isEnabledFor`` at each site, which is sound advice applied at a
+granularity a codec cannot afford: decoding a ten-binding SNMPv2c response
+asked the question 551 times and encoding one asked it 337 times, getting the
+same answer every time, for several per cent of the operation -- paid by every
+installation, for output nobody had enabled.
+
+The flag is re-read per operation rather than settled at import, so the
+``setLevel()`` calls above keep working: a level change is picked up by the
+next decode or encode, with no pyasn1-specific API to call.
+
+The guards themselves stay, and earn their keep: they are what stops the
+``extra`` dicts and the substrate hexdumps from being built when nothing will
+print them. Only the placement of the *check* changed.
+
+Enabling ``DEBUG`` on a hot codec path is still not something to run with.
+:class:`logging.LogRecord` construction calls ``findCaller()``, which walks
+the stack for every record, and a codec emitting hundreds of records per
+message is not usable at that rate. The capability is for diagnosis, not for
+production.
+
+.. note::
+
+   The rule these placements follow is written down once, for pyasn1, pysmi
+   and pysnmp together, as pysnmp's `logging and tracing contract
+   <https://docs.lextudio.com/pysnmp/docs/observability-contract>`_: *what an
+   observability mechanism costs must be proportional to the granularity of
+   the thing it observes.* It also covers why nothing below the PDU boundary
+   may reach a production telemetry pipeline, and how to measure a change of
+   this kind. Read it before adding a trace point to a hot path.
 
 .. _pyasn1-debug-deprecated:
 

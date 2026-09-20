@@ -212,6 +212,113 @@ class DebugFlagScopeTestCase(BaseTestCase):
         )
 
 
+class EncoderDebugFlagTestCase(BaseTestCase):
+    """The encoder reads the debug flag once per encode, not per component.
+
+    This is only expressible because ``Encoder.__call__`` -- the public entry
+    -- is separate from the recursion beneath it. Concrete encoders re-enter
+    the codec through the bound ``encodeFun`` they are handed, not through
+    ``__call__``. Before the split, ``Encoder`` was its own ``encodeFun``, so
+    no point in the call graph ran exactly once per operation and there was
+    nowhere to put the flag read.
+
+    The earlier attempt threaded a re-entrancy marker through the encoder's
+    ``**options`` chain instead, and measured 13% *slower* than the calls it
+    removed, because the key then rides through ~65 nested expansions per
+    encode. Hence the structural split rather than a marker.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        # Nested on purpose: a flat value would recurse once and make
+        # "once per operation" indistinguishable from "once per component".
+        self.value = univ.SequenceOf(componentType=univ.Integer())
+        self.value.extend(range(8))
+        self.realLog = encoder.LOG
+        self.realDebug = encoder._DEBUG
+
+    def tearDown(self):
+        encoder.LOG = self.realLog
+        encoder._DEBUG = self.realDebug
+        BaseTestCase.tearDown(self)
+
+    def testTheFlagIsReadOncePerEncode(self):
+        class Counting:
+            def __init__(self):
+                self.answers = 0
+
+            def isEnabledFor(self, level):
+                self.answers += 1
+                return False
+
+            def debug(self, *args, **kwargs):
+                pass
+
+        counting = Counting()
+        encoder.LOG = counting
+
+        encoder.encode(self.value)
+
+        self.assertEqual(
+            1,
+            counting.answers,
+            "the guard is being evaluated more than once per encode",
+        )
+
+    def testTheRecursionDoesNotReenterThePublicEntry(self):
+        """Pins the split itself, which counting the guard alone would not.
+
+        A refactor that routed ``encodeFun`` back through ``__call__`` would
+        restore the per-component flag read, and the count above would only
+        notice because the flag happens to be read there.
+        """
+        entries = []
+        realCall = encoder.Encoder.__call__
+
+        def countingCall(self, value, asn1Spec=None, **options):
+            entries.append(value)
+            return realCall(self, value, asn1Spec, **options)
+
+        encoder.Encoder.__call__ = countingCall
+
+        try:
+            octets = encoder.encode(self.value)
+
+        finally:
+            encoder.Encoder.__call__ = realCall
+
+        self.assertEqual(
+            1,
+            len(entries),
+            f"the public entry was re-entered {len(entries)} times; concrete "
+            "encoders must recurse through encodeFun, not through __call__",
+        )
+        self.assertEqual(octets, encoder.encode(self.value))
+
+    def testSetLevelIsPickedUpByTheNextEncode(self):
+        """The documented way of enabling debugging must keep working.
+
+        pyasn1 tells people to call
+        ``logging.getLogger("pyasn1").setLevel(logging.DEBUG)``. A flag read
+        at import would be faster still and would silently ignore exactly
+        that, so the refresh belongs per operation.
+        """
+        log = logging.getLogger("pyasn1.codec.ber.encoder")
+        wasLevel = log.level
+
+        try:
+            log.setLevel(logging.DEBUG)
+            encoder.encode(self.value)
+            self.assertTrue(encoder._DEBUG, "setLevel(DEBUG) was not picked up")
+
+            log.setLevel(logging.WARNING)
+            encoder.encode(self.value)
+            self.assertFalse(encoder._DEBUG, "the flag did not turn back off")
+
+        finally:
+            log.setLevel(wasLevel)
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
