@@ -1924,6 +1924,13 @@ class Decoder:
             global _DEBUG
             _DEBUG = LOG.isEnabledFor(logging.DEBUG)
 
+        # One snapshot for this frame. `debug.scope` is a module-level stack,
+        # and the push below has to be matched by the pop at the end of the
+        # same call: re-reading the flag in between could push without popping
+        # (a leaked scope) or pop without pushing (IndexError on an empty
+        # stack) if the level moved. A local also reads faster than a global.
+        debugging = _DEBUG
+
         if _nestingLevel > MAX_NESTING_DEPTH:
             raise error.PyAsn1Error(
                 "ASN.1 structure nesting depth exceeds limit",
@@ -1931,7 +1938,7 @@ class Decoder:
             )
         options["_nestingLevel"] = _nestingLevel + 1
 
-        if _DEBUG:
+        if debugging:
             LOG.debug(
                 "decoder called, working with substrate",
                 extra={
@@ -1946,7 +1953,7 @@ class Decoder:
         # Look for end-of-octets sentinel
         if allowEoo and self.supportIndefLength:
             if substrate[:2] == self.__eooSentinel:
-                if _DEBUG:
+                if debugging:
                     LOG.debug("end-of-octets sentinel found")
                 return eoo.endOfOctets, substrate[2:]
 
@@ -2054,7 +2061,7 @@ class Decoder:
 
                 state = stDecodeLength
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug("tag decoded, decoding length", extra={"tagSet": tagSet})
 
             if state is stDecodeLength:
@@ -2142,7 +2149,7 @@ class Decoder:
 
                 state = stGetValueDecoder
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "value length decoded, decoding payload",
                         extra={
@@ -2197,7 +2204,7 @@ class Decoder:
                     else:
                         state = stTryAsExplicitTag
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "codec chosen by a built-in type",
                         extra={
@@ -2221,7 +2228,7 @@ class Decoder:
                     except KeyError:
                         chosenSpec = None
 
-                    if _DEBUG:
+                    if debugging:
                         LOG.debug(
                             "candidate ASN.1 spec is a map of",
                             extra={"presentTypes": asn1Spec.presentTypes},
@@ -2245,7 +2252,7 @@ class Decoder:
 
                 elif tagSet == asn1Spec.tagSet or tagSet in asn1Spec.tagMap:
                     chosenSpec = asn1Spec
-                    if _DEBUG:
+                    if debugging:
                         LOG.debug(
                             "candidate ASN.1 spec found",
                             extra={"asn1Spec": asn1Spec.__class__.__name__},
@@ -2259,7 +2266,7 @@ class Decoder:
                         # ambiguous type or just faster codec lookup
                         concreteDecoder = typeMap[chosenSpec.typeId]
 
-                        if _DEBUG:
+                        if debugging:
                             LOG.debug(
                                 "value decoder chosen for an ambiguous type by type ID",
                                 extra={"typeId": chosenSpec.typeId},
@@ -2274,7 +2281,7 @@ class Decoder:
                             # base type or tagged subtype
                             concreteDecoder = tagMap[baseTagSet]
 
-                            if _DEBUG:
+                            if debugging:
                                 LOG.debug(
                                     "value decoder chosen by base tag set",
                                     extra={"baseTagSet": baseTagSet},
@@ -2294,7 +2301,7 @@ class Decoder:
                     concreteDecoder = None
                     state = stTryAsExplicitTag
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "codec chosen by ASN.1 spec",
                         extra={
@@ -2340,7 +2347,7 @@ class Decoder:
                         **options,
                     )
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "codec yielded value, decoding remaining substrate",
                         extra={
@@ -2377,7 +2384,7 @@ class Decoder:
                     concreteDecoder = None
                     state = self.defaultErrorState
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "codec chosen",
                         extra={
@@ -2391,7 +2398,7 @@ class Decoder:
             if state is stDumpRawValue:
                 concreteDecoder = self.defaultRawDecoder
 
-                if _DEBUG:
+                if debugging:
                     LOG.debug(
                         "codec chosen, decoding value",
                         extra={"codec": concreteDecoder.__class__.__name__},
@@ -2404,7 +2411,7 @@ class Decoder:
                     "TagSet not in asn1Spec", tagSet=tagSet, asn1Spec=asn1Spec
                 )
 
-        if _DEBUG:
+        if debugging:
             debug.scope.pop()
             LOG.debug(
                 "decoder left scope, call completed", extra={"scope": str(debug.scope)}
