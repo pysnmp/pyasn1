@@ -134,11 +134,14 @@ class DebugFlagScopeTestCase(BaseTestCase):
         self.octets = encoder.encode(univ.Integer(42))
         self.realLog = decoder.LOG
         self.realDebug = decoder._DEBUG
+        # debug.scope is a module-level stack other tests have pushed onto,
+        # so what matters is that a decode leaves it as it found it.
+        self.scopeDepth = len(debug.scope._list)
 
     def tearDown(self):
         decoder.LOG = self.realLog
         decoder._DEBUG = self.realDebug
-        del debug.scope._list[:]
+        del debug.scope._list[self.scopeDepth :]
         BaseTestCase.tearDown(self)
 
     def testScopeBalancesWhenTheAnswerKeepsChanging(self):
@@ -161,9 +164,9 @@ class DebugFlagScopeTestCase(BaseTestCase):
             decoder.decode(self.octets, asn1Spec=univ.Integer())
 
         self.assertEqual(
-            [],
-            debug.scope._list,
-            "debug.scope did not return to empty: a push went unmatched",
+            self.scopeDepth,
+            len(debug.scope._list),
+            "debug.scope did not return to its starting depth: a push went unmatched",
         )
 
     def testTheFlagIsReadOncePerDecode(self):
