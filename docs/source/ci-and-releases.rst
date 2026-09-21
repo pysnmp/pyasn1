@@ -196,19 +196,19 @@ rather than different work at different speeds.
      - 1.3.0
      - 2.0.3
      - 2.0.6
-     - change
+     - 0.4.12 → 2.0.6
    * - ``decode_message_with_spec``
      - 9,912
      - 9,837
      - 9,917
      - 8,633
-     - −13.3%
+     - −12.9%
    * - ``encode_message``
      - 3,198
      - 5,155
      - 5,238
      - 3,913
-     - +14.7%
+     - +22.4%
    * - ``clone``
      - 21,730
      - 21,723
@@ -220,15 +220,15 @@ rather than different work at different speeds.
      - 9,656
      - 9,696
      - 9,714
-     - +2.6%
+     - −11.8%
 
 Two things in that table are worth keeping, because neither was visible
 before there was anything to measure them with.
 
-``encode_message`` costs more today than it did on 0.4.12. The step is
-between 1.0.3 and 1.3.0, where it went from 3.2M instructions to 5.2M
-and stayed there for six releases; 2.0.4 and 2.0.6 have since recovered
-most of it. Nothing here says the 1.3.0 change was wrong — it may well
+``encode_message`` costs 22% more at 2.0.6 than it did on 0.4.12. The
+step is between 1.0.3 and 1.3.0, where it went from 3.2M instructions to
+5.2M and stayed there for six releases; 2.0.4 and 2.0.6 recovered about
+two thirds of the excess, leaving the rest. Nothing here says the 1.3.0 change was wrong — it may well
 have bought correctness worth the cost — only that the cost was paid and
 nobody counted it at the time.
 
