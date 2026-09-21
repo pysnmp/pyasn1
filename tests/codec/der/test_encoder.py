@@ -674,6 +674,34 @@ class EmptyInnerFieldOfSequenceEncoderTestCase(BaseTestCase):
         assert encoder.encode(self.s) == bytes((48, 0))
 
 
+class DefaultedSchemaObjectTestCase(BaseTestCase):
+    """DER inherits CER's SetEncoder, so it inherits this behaviour too."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class SetWithDefaulted(univ.Set):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.DefaultedNamedType("y", univ.Integer(42)),
+            )
+
+        self.SetWithDefaulted = SetWithDefaulted
+
+    def testDefaultedHoldingAnExplicitSchemaObject(self):
+        s = self.SetWithDefaulted()
+        s["x"] = 1
+        s.setComponentByPosition(1, univ.Integer())
+
+        assert encoder.encode(s) == bytes.fromhex("3103020101")
+
+    def testDefaultedLeftAlone(self):
+        s = self.SetWithDefaulted()
+        s["x"] = 1
+
+        assert encoder.encode(s) == bytes.fromhex("3103020101")
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

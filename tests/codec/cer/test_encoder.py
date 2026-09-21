@@ -1380,35 +1380,34 @@ class NestedOptionalSequenceOfEncoderTestCase(BaseTestCase):
 class DefaultedSchemaObjectTestCase(BaseTestCase):
     """A DEFAULT slot handed a schema object is treated as carrying the default.
 
-    Storing a schema object outright is not the same as instantiating a
-    DEFAULT component on access, which stores the default *value*. The schema
-    object is not a value, so it says no more about what to encode than an
-    empty slot does.
+    The type here is a Set, deliberately. The change this pins lives in CER's
+    own :class:`SetEncoder`; a Sequence would be encoded by the BER sequence
+    encoder it inherits, so it would pass whatever CER did.
     """
 
     def setUp(self):
         BaseTestCase.setUp(self)
 
-        class WithDefaulted(univ.Sequence):
+        class SetWithDefaulted(univ.Set):
             componentType = namedtype.NamedTypes(
                 namedtype.NamedType("x", univ.Integer()),
                 namedtype.DefaultedNamedType("y", univ.Integer(42)),
             )
 
-        self.WithDefaulted = WithDefaulted
+        self.SetWithDefaulted = SetWithDefaulted
 
     def testDefaultedHoldingAnExplicitSchemaObject(self):
-        s = self.WithDefaulted()
+        s = self.SetWithDefaulted()
         s["x"] = 1
         s.setComponentByPosition(1, univ.Integer())
 
-        assert encoder.encode(s) == bytes.fromhex("30800201010000")
+        assert encoder.encode(s) == bytes.fromhex("31800201010000")
 
     def testDefaultedLeftAlone(self):
-        s = self.WithDefaulted()
+        s = self.SetWithDefaulted()
         s["x"] = 1
 
-        assert encoder.encode(s) == bytes.fromhex("30800201010000")
+        assert encoder.encode(s) == bytes.fromhex("31800201010000")
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
