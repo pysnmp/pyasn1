@@ -74,6 +74,20 @@ class Asn1Type(Asn1Item):
     _readOnly: dict[str, Any]
 
     def __init__(self, **kwargs: Any) -> None:
+        """Set this object's initializer attributes, and seal them.
+
+        Every keyword argument becomes an attribute of the object and joins
+        the set ``__setattr__`` then refuses to overwrite -- ``tagSet`` and
+        ``subtypeSpec`` always, defaulting to the class's own, plus whatever a
+        subclass adds. That is what makes an |ASN.1| object immutable in the
+        sense its documentation claims.
+
+        Keyword Args
+        ------------
+        kwargs:
+            Initializer attributes. ``tagSet`` and ``subtypeSpec`` fall back
+            to the class attributes of the same name when not given.
+        """
         if "tagSet" in kwargs and "subtypeSpec" in kwargs:
             # Already complete, so the defaults below would all be overwritten.
             # Every object a decode builds arrives this way, through clone()
