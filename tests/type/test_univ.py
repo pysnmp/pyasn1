@@ -2974,6 +2974,25 @@ class ValuesNotInstantiatingTestCase(BaseTestCase):
 
         assert list(s.valuesNotInstantiating()) == [univ.noValue] * 3
 
+    def testAnObjectResetToASchemaReportsEveryComponentAbsent(self):
+        # reset() turns a value object back into a schema object, and drops
+        # _componentValues to noValue rather than emptying it. That is a
+        # different state from "constructed and never written to", which holds
+        # an empty list, and it has its own path through the iteration.
+        s = self.Outer()
+        s["x"] = 1
+        s["inner"]["a"] = 5
+        s.reset()
+
+        assert s._componentValues is univ.noValue
+        assert list(s.valuesNotInstantiating()) == [univ.noValue] * 3
+
+    def testAnObjectWithNoComponentTypeYieldsNothing(self):
+        s = univ.Sequence()
+
+        assert s._componentValues is univ.noValue
+        assert list(s.valuesNotInstantiating()) == []
+
     def testAgreesWithValuesWhereEveryComponentIsSet(self):
         s = self.Outer()
         s["x"] = 1
