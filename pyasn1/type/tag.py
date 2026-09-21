@@ -192,6 +192,18 @@ class TagSet:
         # Built on first use by .baseTagSet, not here: constructing it eagerly
         # would recurse, since the thing being built is itself a TagSet.
         self.__baseTagSet: TagSet | None = None
+        # Whether this tag set is anything more than its own base tag, which is
+        # the question the encoder asks of every component it writes: only a
+        # tag set that has been tagged beyond its base can have a custom codec
+        # registered against it. The answer cannot change, because a TagSet is
+        # immutable, so it is settled here. Asking becomes one attribute load
+        # instead of building the base tag set and comparing against it.
+        if baseTag:
+            self.differsFromBaseTagSet = self.__superTagsClassId != (
+                (baseTag.tagClass, baseTag.tagId),
+            )
+        else:
+            self.differsFromBaseTagSet = bool(self.__superTagsClassId)
 
     def __repr__(self) -> str:
         if not self.__superTags:
@@ -217,9 +229,22 @@ class TagSet:
             return self.__superTags[i]
 
     def __eq__(self, other: object) -> bool:
+        # Reading the other tag set's class id costs one attribute load and
+        # saves a whole comparison: `self.__superTagsClassId == other` with a
+        # TagSet on the right compares a tuple against a TagSet, which returns
+        # NotImplemented and sends Python round again through the reflected
+        # TagSet.__eq__ -- two calls where one will do. Anything that is not a
+        # TagSet still compares against the class id directly, which is what
+        # lets a TagSet equal a plain tuple of (class, id) pairs.
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId == other.__superTagsClassId
+
         return self.__superTagsClassId == other
 
     def __ne__(self, other: object) -> bool:
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId != other.__superTagsClassId
+
         return self.__superTagsClassId != other
 
     def __lt__(self, other: Any) -> bool:

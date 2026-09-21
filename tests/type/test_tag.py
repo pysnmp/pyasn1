@@ -206,6 +206,99 @@ class HugeTagIdReprTestCase(BaseTestCase):
         assert ":12]" in rendering, f"Unexpected rendering {rendering!r}"
 
 
+class DiffersFromBaseTagSetTestCase(BaseTestCase):
+    """`differsFromBaseTagSet` must answer exactly what comparing would."""
+
+    def testAgreesWithComparingAgainstBaseTagSet(self):
+        # The encoder reads the cached flag instead of building the base tag
+        # set and comparing, so the two have to agree for every shape of tag
+        # set there is -- untagged, base-only, implicitly and explicitly
+        # tagged, and several layers deep.
+        untagged = tag.TagSet()
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+        implicit = base.tagImplicitly(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
+        )
+        explicit = base.tagExplicitly(
+            tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+        )
+        deep = explicit.tagExplicitly(
+            tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 5)
+        )
+
+        for tagSet in (untagged, base, implicit, explicit, deep):
+            assert tagSet.differsFromBaseTagSet == (tagSet != tagSet.baseTagSet), (
+                f"{tagSet!r} flag {tagSet.differsFromBaseTagSet} disagrees with "
+                f"comparison {tagSet != tagSet.baseTagSet}"
+            )
+
+    def testBaseOnlyTagSetDoesNotDiffer(self):
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+        assert base.differsFromBaseTagSet is False
+
+    def testImplicitlyTaggedTagSetDiffers(self):
+        # A character string type is this shape: one super tag, but a base tag
+        # that survived from the OctetString it was tagged out of. The length
+        # is 1 either way, so only the tags themselves tell them apart.
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+        implicit = base.tagImplicitly(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
+        )
+
+        assert len(implicit) == 1
+        assert implicit.differsFromBaseTagSet is True
+
+
+class TagSetComparisonTestCase(BaseTestCase):
+    """Comparing tag sets must keep working against non-TagSet operands."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.t = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+    def testEqualsAnotherTagSet(self):
+        same = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+        assert self.t == same
+        assert not self.t != same
+
+    def testDiffersFromAnotherTagSet(self):
+        other = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 5),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 5),
+        )
+
+        assert self.t != other
+        assert not self.t == other
+
+    def testStillComparesAgainstAPlainTupleOfClassAndId(self):
+        # A TagSet compares equal to the tuple of (tagClass, tagId) pairs it
+        # holds. Reading `other.__superTagsClassId` has to fall back to this,
+        # or every caller comparing against a bare tuple breaks.
+        assert self.t == ((tag.tagClassUniversal, 4),)
+        assert self.t != ((tag.tagClassUniversal, 5),)
+
+    def testComparingAgainstAnUnrelatedObjectIsNotEqual(self):
+        assert self.t != object()
+        assert self.t != None  # noqa: E711
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

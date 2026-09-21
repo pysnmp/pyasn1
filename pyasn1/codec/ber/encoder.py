@@ -1030,10 +1030,9 @@ class Encoder:
         # codec. Base tags are deliberately excluded here: several built-in
         # types share them (e.g. SEQUENCE and SEQUENCE OF) and must use the
         # faster, unambiguous type ID dispatch below.
-        baseTagSet = tagSet.baseTagSet
         concreteEncoder = None
 
-        if tagSet != baseTagSet:
+        if tagSet.differsFromBaseTagSet:
             concreteEncoder = self.__tagMap.get(tagSet)
 
             if concreteEncoder and _DEBUG:
@@ -1061,7 +1060,7 @@ class Encoder:
         except KeyError:
             # use base type for codec lookup to recover untagged types
             try:
-                concreteEncoder = self.__tagMap[baseTagSet]
+                concreteEncoder = self.__tagMap[tagSet.baseTagSet]
 
             except KeyError as exc:
                 raise error.PyAsn1Error(
