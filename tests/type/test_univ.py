@@ -2278,6 +2278,43 @@ class Choice(BaseTestCase):
         self.s1.setComponentByName("name", univ.OctetString("abc"))
         assert self.s1 == _str2octs("abc"), "__cmp__() fails"
 
+    def testNotEqual(self):
+        self.s1.setComponentByName("name", univ.OctetString("abc"))
+        assert self.s1 != _str2octs("def"), "__ne__() fails"
+        assert not (self.s1 != _str2octs("abc")), "__ne__() fails"
+
+    def testComparisonWhenUnsetIsNotImplemented(self):
+        """A CHOICE that knows its components but holds none defers.
+
+        Such an object carries an empty component list rather than noValue,
+        so both comparisons hand the question back to the other operand
+        instead of raising the schema-object error.
+        """
+        assert self.s1.__eq__(_str2octs("abc")) is NotImplemented
+        assert self.s1.__ne__(_str2octs("abc")) is NotImplemented
+
+    def testComparisonAfterResetRaises(self):
+        self.s1.setComponentByName("name", univ.OctetString("abc"))
+        self.s1.reset()
+
+        try:
+            self.s1 == _str2octs("abc")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "__eq__() on a reset CHOICE does not raise"
+
+        try:
+            self.s1 != _str2octs("abc")
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "__ne__() on a reset CHOICE does not raise"
+
     def testGetComponent(self):
         self.s1.setComponentByType(univ.OctetString.tagSet, "abc")
         assert self.s1.getComponent() == _str2octs("abc"), "getComponent() fails"
