@@ -2275,9 +2275,7 @@ class Decoder:
 
                     except KeyError:
                         # use base type for codec lookup to recover untagged types
-                        baseTagSet = tag.TagSet(
-                            chosenSpec.tagSet.baseTag, chosenSpec.tagSet.baseTag
-                        )
+                        baseTagSet = chosenSpec.tagSet.baseTagSet
                         try:
                             # base type or tagged subtype
                             concreteDecoder = tagMap[baseTagSet]

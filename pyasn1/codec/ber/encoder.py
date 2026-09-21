@@ -269,16 +269,8 @@ class BitStringEncoder(AbstractItemEncoder):
         if _DEBUG:
             LOG.debug("encoding into chunks", extra={"maxChunkSize": maxChunkSize})
 
-        baseTag = value.tagSet.baseTag
-
         # strip off explicit tags
-        if baseTag:
-            tagSet = tag.TagSet(baseTag, baseTag)
-
-        else:
-            tagSet = tag.TagSet()
-
-        alignedValue = alignedValue.clone(tagSet=tagSet)
+        alignedValue = alignedValue.clone(tagSet=value.tagSet.baseTagSet)
 
         stop = 0
         substrate = b""
@@ -1013,10 +1005,7 @@ class Encoder:
         # codec. Base tags are deliberately excluded here: several built-in
         # types share them (e.g. SEQUENCE and SEQUENCE OF) and must use the
         # faster, unambiguous type ID dispatch below.
-        if tagSet.baseTag:
-            baseTagSet = tag.TagSet(tagSet.baseTag, tagSet.baseTag)
-        else:
-            baseTagSet = tag.TagSet()
+        baseTagSet = tagSet.baseTagSet
         concreteEncoder = None
 
         if tagSet != baseTagSet:

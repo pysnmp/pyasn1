@@ -189,6 +189,9 @@ class TagSet:
         )
         self.__lenOfSuperTags = len(superTags)
         self.__hash = hash(self.__superTagsClassId)
+        # Built on first use by .baseTagSet, not here: constructing it eagerly
+        # would recurse, since the thing being built is itself a TagSet.
+        self.__baseTagSet: TagSet | None = None
 
     def __repr__(self) -> str:
         if not self.__superTags:
@@ -247,6 +250,37 @@ class TagSet:
             Base tag of this *TagSet*
         """
         return self.__baseTag
+
+    @property
+    def baseTagSet(self) -> "TagSet":
+        """Return this tag set reduced to its base tag alone.
+
+        That is ``TagSet(baseTag, baseTag)``, or an empty *TagSet* when there
+        is no base tag -- what the codecs fall back to when looking a codec up
+        by the complete tag set has failed, to recover an untagged type.
+
+        Cached, because both codecs want it per ASN.1 component while it
+        depends only on ``baseTag``, which never changes: the BER encoder was
+        building one per component, and building one is not free -- it walks
+        the super tags and hashes the result. TagSet objects belong to types
+        and outlive any one message, so after warm-up this costs an attribute
+        read.
+
+        Returns
+        -------
+        : :class:`~pyasn1.type.tag.TagSet`
+            This tag set with its super tags stripped down to the base tag.
+        """
+        baseTagSet = self.__baseTagSet
+
+        if baseTagSet is None:
+            baseTag = self.__baseTag
+            baseTagSet = (
+                self.__class__(baseTag, baseTag) if baseTag else self.__class__()
+            )
+            self.__baseTagSet = baseTagSet
+
+        return baseTagSet
 
     @property
     def superTags(self) -> tuple[Tag, ...]:
