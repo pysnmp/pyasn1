@@ -269,16 +269,8 @@ class BitStringEncoder(AbstractItemEncoder):
         if _DEBUG:
             LOG.debug("encoding into chunks", extra={"maxChunkSize": maxChunkSize})
 
-        baseTag = value.tagSet.baseTag
-
         # strip off explicit tags
-        if baseTag:
-            tagSet = tag.TagSet(baseTag, baseTag)
-
-        else:
-            tagSet = tag.TagSet()
-
-        alignedValue = alignedValue.clone(tagSet=tagSet)
+        alignedValue = alignedValue.clone(tagSet=value.tagSet.baseTagSet)
 
         stop = 0
         substrate = b""
@@ -976,6 +968,31 @@ class Encoder:
         return self.__encode(value, asn1Spec, **options)
 
     def __encode(self, value: Any, asn1Spec: Any = None, **options: Any) -> bytes:
+        """Encode one component, and every component beneath it.
+
+        This is the recursion. Concrete encoders are handed it as
+        ``encodeFun`` and re-enter here, never through ``__call__``, which is
+        what keeps per-operation work out of the per-component path.
+
+        Parameters
+        ----------
+        value:
+            A Python or pyasn1 object to encode.
+        asn1Spec:
+            Optional ASN.1 schema guiding the encoding, required when *value*
+            is a plain Python object.
+
+        Keyword Args
+        ------------
+        options:
+            Encoding options, threaded down the recursion unchanged apart
+            from the fixed-length and chunk-size settings applied below.
+
+        Returns
+        -------
+        : :py:class:`bytes`
+            The BER substrate for *value*.
+        """
         try:
             if asn1Spec is None:
                 typeId = value.typeId
@@ -1013,10 +1030,7 @@ class Encoder:
         # codec. Base tags are deliberately excluded here: several built-in
         # types share them (e.g. SEQUENCE and SEQUENCE OF) and must use the
         # faster, unambiguous type ID dispatch below.
-        if tagSet.baseTag:
-            baseTagSet = tag.TagSet(tagSet.baseTag, tagSet.baseTag)
-        else:
-            baseTagSet = tag.TagSet()
+        baseTagSet = tagSet.baseTagSet
         concreteEncoder = None
 
         if tagSet != baseTagSet:

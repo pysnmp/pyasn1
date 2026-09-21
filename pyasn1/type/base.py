@@ -67,6 +67,12 @@ class Asn1Type(Asn1Item):
     # Disambiguation ASN.1 types identification
     typeId: Any = None
 
+    #: The initializer attributes __setattr__ refuses to overwrite. Declared
+    #: rather than assigned: __init__ writes it straight into __dict__, so
+    #: there is nothing here for the annotation to bind to, and a class-level
+    #: assignment would put a shared dict on every subclass.
+    _readOnly: dict[str, Any]
+
     def __init__(self, **kwargs: Any) -> None:
         readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
 
@@ -74,7 +80,11 @@ class Asn1Type(Asn1Item):
 
         self.__dict__.update(readOnly)
 
-        self._readOnly = readOnly
+        # Straight into __dict__ rather than through __setattr__, which would
+        # call back into Python only to find a leading underscore and skip its
+        # own guard. This is the constructor setting the very dict that guard
+        # consults, and it runs once per ASN.1 object built.
+        self.__dict__["_readOnly"] = readOnly
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name[0] != "_" and name in self._readOnly:
@@ -464,9 +474,14 @@ class SimpleAsn1Type(Asn1Type):
 
             value = self._value
 
-        initializers = self.readOnly.copy()
-        initializers.update(kwargs)
+        initializers = self._readOnly
 
+        if kwargs:
+            initializers = {**initializers, **kwargs}
+
+        # Not copied when kwargs is empty, which is every clone a decode makes:
+        # the ** expansion below already builds the callee's own dict, and
+        # __init__ merges into a dict of its own rather than into this one.
         return self.__class__(value, **initializers)
 
     def subtype(self, value: Any = noValue, **kwargs: Any) -> Any:
