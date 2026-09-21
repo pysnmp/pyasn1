@@ -458,9 +458,16 @@ class Scope:
     described a path through no single message: confidently wrong, and read
     by somebody debugging a malformed PDU.
 
-    A new thread starts from an empty context and so from an empty trail; a
-    task started inside a decode inherits the trail as it stood, which is
-    what you want, since that is where the task began.
+    A new thread starts from an empty context and so from an empty trail.
+
+    An asyncio task inherits the trail as it stood when it was created, which
+    is right while it runs inside that decode and wrong once it outlives it:
+    the creating frame's pop does not reach the task's context, so a task that
+    is still running afterwards keeps a prefix that has ceased to be true.
+    Reaching that needs debugging on *and* a task created part-way through a
+    decode, which pyasn1 never does itself. It is recorded here rather than
+    designed around, because the alternative -- resetting the trail at decode
+    entry -- would break nested decodes, which are ordinary.
     """
 
     def __str__(self) -> str:
