@@ -192,6 +192,18 @@ class TagSet:
         # Built on first use by .baseTagSet, not here: constructing it eagerly
         # would recurse, since the thing being built is itself a TagSet.
         self.__baseTagSet: TagSet | None = None
+        # Whether this tag set is anything more than its own base tag, which is
+        # the question the encoder asks of every component it writes: only a
+        # tag set that has been tagged beyond its base can have a custom codec
+        # registered against it. The answer cannot change, because a TagSet is
+        # immutable, so it is settled here. Asking becomes one attribute load
+        # instead of building the base tag set and comparing against it.
+        if baseTag:
+            self.differsFromBaseTagSet = self.__superTagsClassId != (
+                (baseTag.tagClass, baseTag.tagId),
+            )
+        else:
+            self.differsFromBaseTagSet = bool(self.__superTagsClassId)
 
     def __repr__(self) -> str:
         if not self.__superTags:

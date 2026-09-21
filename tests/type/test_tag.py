@@ -206,6 +206,59 @@ class HugeTagIdReprTestCase(BaseTestCase):
         assert ":12]" in rendering, f"Unexpected rendering {rendering!r}"
 
 
+class DiffersFromBaseTagSetTestCase(BaseTestCase):
+    """`differsFromBaseTagSet` must answer exactly what comparing would."""
+
+    def testAgreesWithComparingAgainstBaseTagSet(self):
+        # The encoder reads the cached flag instead of building the base tag
+        # set and comparing, so the two have to agree for every shape of tag
+        # set there is -- untagged, base-only, implicitly and explicitly
+        # tagged, and several layers deep.
+        untagged = tag.TagSet()
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+        implicit = base.tagImplicitly(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
+        )
+        explicit = base.tagExplicitly(
+            tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3)
+        )
+        deep = explicit.tagExplicitly(
+            tag.Tag(tag.tagClassApplication, tag.tagFormatSimple, 5)
+        )
+
+        for tagSet in (untagged, base, implicit, explicit, deep):
+            assert tagSet.differsFromBaseTagSet == (tagSet != tagSet.baseTagSet), (
+                f"{tagSet!r} flag {tagSet.differsFromBaseTagSet} disagrees with "
+                f"comparison {tagSet != tagSet.baseTagSet}"
+            )
+
+    def testBaseOnlyTagSetDoesNotDiffer(self):
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+        assert base.differsFromBaseTagSet is False
+
+    def testImplicitlyTaggedTagSetDiffers(self):
+        # A character string type is this shape: one super tag, but a base tag
+        # that survived from the OctetString it was tagged out of. The length
+        # is 1 either way, so only the tags themselves tell them apart.
+        base = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+        implicit = base.tagImplicitly(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12)
+        )
+
+        assert len(implicit) == 1
+        assert implicit.differsFromBaseTagSet is True
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
