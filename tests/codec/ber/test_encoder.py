@@ -3198,6 +3198,36 @@ class EncodingSchemaOnlyComponentsTestCase(BaseTestCase):
 
         assert encoder.encode(s) == bytes.fromhex("300b0201013006020105020106")
 
+    def testDefaultedHoldingAnExplicitSchemaObjectIsOmitted(self):
+        # A DEFAULT slot can be handed a schema object outright, which is not
+        # the same as instantiating it on access: that stores the default
+        # *value*. A schema object there is not a value, and says no more
+        # about what to encode than an empty slot, so it is left out.
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s.setComponentByPosition(1, univ.Integer())
+
+        # The slot really does hold a non-value; it is not simply empty.
+        stored = list(s.valuesNotInstantiating())[1]
+        assert stored is not univ.noValue
+        assert stored.isValue is False
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testDefaultedHoldingItsDefaultValueIsOmitted(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s["y"] = 42
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testDefaultedHoldingSomethingElseIsEncoded(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s["y"] = 7
+
+        assert encoder.encode(s) == bytes.fromhex("3006020101020107")
+
     def testMandatoryPresentAsSchemaObjectStillRaises(self):
         class AllMandatory(univ.Sequence):
             componentType = namedtype.NamedTypes(

@@ -679,7 +679,15 @@ class SequenceEncoder(AbstractItemEncoder):
                             )
                         continue
 
-                    if namedType.isDefaulted and component == namedType.asn1Object:
+                    # A DEFAULT component is left out when it carries the
+                    # default, and equally when it is not a value at all --
+                    # a slot that was handed a schema object says no more
+                    # about what to encode than one never written to.
+                    # Reading isValue first also keeps the comparison below
+                    # off schema objects.
+                    if namedType.isDefaulted and (
+                        not component.isValue or component == namedType.asn1Object
+                    ):
                         if _DEBUG:
                             LOG.debug(
                                 "not encoding DEFAULT component",

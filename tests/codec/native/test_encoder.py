@@ -145,6 +145,40 @@ class AnyEncoderTestCase(BaseTestCase):
         assert encoder.encode(self.s) == _str2octs("fox")
 
 
+class DefaultedSchemaObjectTestCase(BaseTestCase):
+    """A DEFAULT slot handed a schema object is treated as carrying the default.
+
+    Storing a schema object outright is not the same as instantiating a
+    DEFAULT component on access, which stores the default *value*. The schema
+    object is not a value, so it says no more about what to encode than an
+    empty slot does.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class WithDefaulted(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.DefaultedNamedType("y", univ.Integer(42)),
+            )
+
+        self.WithDefaulted = WithDefaulted
+
+    def testDefaultedHoldingAnExplicitSchemaObject(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s.setComponentByPosition(1, univ.Integer())
+
+        assert encoder.encode(s) == {"x": 1, "y": 42}
+
+    def testDefaultedLeftAlone(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+
+        assert encoder.encode(s) == {"x": 1, "y": 42}
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
