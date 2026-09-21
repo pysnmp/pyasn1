@@ -968,6 +968,31 @@ class Encoder:
         return self.__encode(value, asn1Spec, **options)
 
     def __encode(self, value: Any, asn1Spec: Any = None, **options: Any) -> bytes:
+        """Encode one component, and every component beneath it.
+
+        This is the recursion. Concrete encoders are handed it as
+        ``encodeFun`` and re-enter here, never through ``__call__``, which is
+        what keeps per-operation work out of the per-component path.
+
+        Parameters
+        ----------
+        value:
+            A Python or pyasn1 object to encode.
+        asn1Spec:
+            Optional ASN.1 schema guiding the encoding, required when *value*
+            is a plain Python object.
+
+        Keyword Args
+        ------------
+        options:
+            Encoding options, threaded down the recursion unchanged apart
+            from the fixed-length and chunk-size settings applied below.
+
+        Returns
+        -------
+        : :py:class:`bytes`
+            The BER substrate for *value*.
+        """
         try:
             if asn1Spec is None:
                 typeId = value.typeId
