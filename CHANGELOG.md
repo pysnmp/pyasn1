@@ -3,6 +3,12 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.5](https://github.com/pysnmp/pyasn1/compare/v2.0.4...v2.0.5) (2026-09-21)
+
+### Bug Fixes
+
+* **debug:** give each context its own scope trail ([2d1470f](https://github.com/pysnmp/pyasn1/commit/2d1470f46d736535248f140075b47c6f0ff865a0)), closes [#191](https://github.com/pysnmp/pyasn1/issues/191)
+
 ## [2.0.4](https://github.com/pysnmp/pyasn1/compare/v2.0.3...v2.0.4) (2026-09-20)
 
 ### Bug Fixes
