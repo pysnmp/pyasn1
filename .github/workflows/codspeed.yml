@@ -1,0 +1,50 @@
+name: CodSpeed
+
+on:
+  push:
+    branches:
+      - "main"
+      - "next"
+  # Benchmarks run on every pull request so CodSpeed can report the change
+  # against the base branch.
+  pull_request:
+    branches: [main, next]
+  # Lets CodSpeed trigger a run by hand, which is how it backfills the
+  # baseline for a branch it has no data for yet.
+  workflow_dispatch:
+
+# A new push to a ref supersedes the benchmark run still in flight for it:
+# only the tip is worth measuring.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # OpenID Connect authentication with CodSpeed; no token to keep in secrets.
+  id-token: write
+
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      # The benchmarks import pyasn1 and pytest-codspeed, both of which the
+      # locked dev group pins; --locked fails rather than silently resolving
+      # something else, so a run measures what the lockfile says.
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@v5
+        with:
+          mode: simulation
+          run: uv run --no-sync pytest benchmarks --codspeed

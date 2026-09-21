@@ -4,6 +4,7 @@ ASN.1 library for Python
 [![PyPI](https://img.shields.io/pypi/v/pysnmp-pyasn1.svg?maxAge=2592000)](https://pypi.org/project/pysnmp-pyasn1)
 [![Python Versions](https://img.shields.io/pypi/pyversions/pysnmp-pyasn1.svg)](https://pypi.org/project/pysnmp-pyasn1/)
 [![CI](https://github.com/pysnmp/pyasn1/actions/workflows/build-test-release.yml/badge.svg)](https://github.com/pysnmp/pyasn1/actions/workflows/build-test-release.yml)
+[![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://app.codspeed.io/pysnmp/pyasn1?utm_source=badge)
 [![GitHub license](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/pysnmp/pyasn1/blob/main/LICENSE.rst)
 
 This is a free and open source implementation of ASN.1 types and codecs
