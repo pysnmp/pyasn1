@@ -2899,6 +2899,91 @@ class RelativeOID(BaseTestCase):
         assert not univ.RelativeOID().isSameTypeWith(univ.ObjectIdentifier())
 
 
+class ValuesNotInstantiatingTestCase(BaseTestCase):
+    """What the encoders iterate: absent stays absent, set stays as it is."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class Inner(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("a", univ.Integer()),
+                namedtype.NamedType("b", univ.Integer()),
+            )
+
+        class Outer(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.OptionalNamedType("y", univ.Integer()),
+                namedtype.NamedType("inner", Inner()),
+            )
+
+        self.Inner = Inner
+        self.Outer = Outer
+
+    def testAbsentComponentsAreNoValue(self):
+        s = self.Outer()
+        s["x"] = 1
+
+        values = list(s.valuesNotInstantiating())
+
+        assert values[0] == 1
+        assert values[1] is univ.noValue
+        assert values[2] is univ.noValue
+
+    def testDoesNotInstantiateAbsentComponents(self):
+        # The whole point of the method: iterating must not alter which
+        # components the object holds.
+        s = self.Outer()
+        s["x"] = 1
+
+        list(s.valuesNotInstantiating())
+
+        assert s.getComponentByPosition(1, instantiate=False) is univ.noValue
+        assert s.getComponentByPosition(2, instantiate=False) is univ.noValue
+
+    def testASetComponentIsHandedBackEvenAsASchemaObject(self):
+        # A component that was set is reported as set, schema object or not.
+        # The encoders rely on this: they decide for themselves what an
+        # OPTIONAL non-value means, and filtering it out here would hide a
+        # mandatory one that is set from the encoder that must reject it.
+        s = self.Outer()
+        s["x"] = 1
+        s.getComponentByPosition(1, instantiate=True)
+
+        values = list(s.valuesNotInstantiating())
+
+        assert values[1] is not univ.noValue
+        assert values[1].isValue is False
+
+    def testAPartiallyPopulatedConstructedComponentIsStillReported(self):
+        # This is the case the recursion used to be spent on: `inner` is set
+        # but not a value, because a mandatory child of it is missing.
+        s = self.Outer()
+        s["x"] = 1
+        s["inner"]["a"] = 5
+
+        values = list(s.valuesNotInstantiating())
+
+        assert values[2] is not univ.noValue
+        assert values[2].isValue is False
+        assert values[2]["a"] == 5
+
+    def testAnEmptyObjectReportsEveryComponentAbsent(self):
+        s = self.Outer()
+
+        assert list(s.valuesNotInstantiating()) == [univ.noValue] * 3
+
+    def testAgreesWithValuesWhereEveryComponentIsSet(self):
+        s = self.Outer()
+        s["x"] = 1
+        s["y"] = 2
+        s["inner"]["a"] = 5
+        s["inner"]["b"] = 6
+
+        assert list(s.valuesNotInstantiating()) == list(s.values())
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
