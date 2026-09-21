@@ -30,6 +30,7 @@ import sys
 import threading
 import warnings
 from collections.abc import Callable
+from contextvars import ContextVar
 from typing import Any, Final
 
 from pyasn1 import __version__, error
@@ -435,18 +436,80 @@ def hexdump(octets: bytes) -> str:
     )
 
 
+#: The scope trail of the decode running in the current context.
+#:
+#: A ContextVar rather than an attribute on :class:`Scope`, because the
+#: trail belongs to one decode and :data:`scope` is shared by every decode in
+#: the process. Held as a tuple, not a list: a ContextVar's value is shared by
+#: every context that inherits it, so a mutable list would be appended to by
+#: the very tasks the variable is meant to separate. Rebinding on each push
+#: and pop gives each context its own.
+_scopeTrail: Final[ContextVar[tuple[str, ...]]] = ContextVar(
+    "pyasn1.debug.scope", default=()
+)
+
+
 class Scope:
-    def __init__(self) -> None:
-        self._list: list[str] = []
+    """Where in a message the decode currently is, for debug records.
+
+    Each thread and each asyncio task keeps its own trail. The trail used to
+    live on this object, which is a module-level singleton, so concurrent
+    decodes pushed onto one stack and every record's ``scope`` field
+    described a path through no single message: confidently wrong, and read
+    by somebody debugging a malformed PDU.
+
+    A new thread starts from an empty context and so from an empty trail.
+
+    An asyncio task inherits the trail as it stood when it was created, which
+    is right while it runs inside that decode and wrong once it outlives it:
+    the creating frame's pop does not reach the task's context, so a task that
+    is still running afterwards keeps a prefix that has ceased to be true.
+    Reaching that needs debugging on *and* a task created part-way through a
+    decode, which pyasn1 never does itself. It is recorded here rather than
+    designed around, because the alternative -- resetting the trail at decode
+    entry -- would break nested decodes, which are ordinary.
+    """
 
     def __str__(self) -> str:
-        return ".".join(self._list)
+        return ".".join(_scopeTrail.get())
+
+    def __len__(self) -> int:
+        """How deep the current context's trail is."""
+        return len(_scopeTrail.get())
 
     def push(self, token: str) -> None:
-        self._list.append(token)
+        """Enter `token`.
+
+        Parameters
+        ----------
+        token: :py:class:`str`
+            Name of the component being entered.
+        """
+        _scopeTrail.set(_scopeTrail.get() + (token,))
 
     def pop(self) -> str:
-        return self._list.pop()
+        """Leave the innermost component and return its name.
+
+        Returns the empty string, rather than raising, when the trail is
+        already empty. This is bookkeeping for debug output: an unbalanced
+        pop is a defect in whoever is pushing, and it should show up as a
+        wrong scope string rather than as an ``IndexError`` thrown out of an
+        ordinary decode. Released 2.0.3 and below did raise, which is how a
+        logging level moving mid-decode used to kill a decode loop.
+
+        Returns
+        -------
+        : :py:class:`str`
+            The name of the component left, or ``""`` if there was none.
+        """
+        trail = _scopeTrail.get()
+
+        if not trail:
+            return ""
+
+        _scopeTrail.set(trail[:-1])
+
+        return trail[-1]
 
 
 scope: Final = Scope()

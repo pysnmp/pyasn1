@@ -1924,11 +1924,12 @@ class Decoder:
             global _DEBUG
             _DEBUG = LOG.isEnabledFor(logging.DEBUG)
 
-        # One snapshot for this frame. `debug.scope` is a module-level stack,
-        # and the push below has to be matched by the pop at the end of the
-        # same call: re-reading the flag in between could push without popping
-        # (a leaked scope) or pop without pushing (IndexError on an empty
-        # stack) if the level moved. A local also reads faster than a global.
+        # One snapshot for this frame. The push below has to be matched by
+        # the pop at the end of the same call: re-reading the flag in between
+        # could push without popping, or pop without pushing, if the level
+        # moved. debug.scope keeps a trail per context, so an imbalance now
+        # shows up as a wrong scope string rather than as an exception, but
+        # it is still wrong. A local also reads faster than a global.
         debugging = _DEBUG
 
         if _nestingLevel > MAX_NESTING_DEPTH:

@@ -8,6 +8,7 @@ import ast
 import logging
 import pathlib
 import sys
+import threading
 import unittest
 
 from pyasn1 import debug
@@ -136,14 +137,15 @@ class DebugFlagScopeTestCase(BaseTestCase):
         self.octets = encoder.encode(univ.Integer(42))
         self.realLog = decoder.LOG
         self.realDebug = decoder._DEBUG
-        # debug.scope is a module-level stack other tests have pushed onto,
-        # so what matters is that a decode leaves it as it found it.
-        self.scopeDepth = len(debug.scope._list)
+        # Other tests in this context have pushed onto the trail, so what
+        # matters is that a decode leaves it at the depth it found it.
+        self.scopeDepth = len(debug.scope)
 
     def tearDown(self):
         decoder.LOG = self.realLog
         decoder._DEBUG = self.realDebug
-        del debug.scope._list[self.scopeDepth :]
+        while len(debug.scope) > self.scopeDepth:
+            debug.scope.pop()
         BaseTestCase.tearDown(self)
 
     def testScopeBalancesWhenTheFlagFlipsMidDecode(self):
@@ -177,7 +179,7 @@ class DebugFlagScopeTestCase(BaseTestCase):
 
         self.assertEqual(
             self.scopeDepth,
-            len(debug.scope._list),
+            len(debug.scope),
             "debug.scope did not return to its starting depth: the flag moved "
             "between the push and the pop, and the pop was skipped",
         )
@@ -317,6 +319,130 @@ class EncoderDebugFlagTestCase(BaseTestCase):
 
         finally:
             log.setLevel(wasLevel)
+
+
+class ScopeIsolationTestCase(BaseTestCase):
+    """Concurrent decodes each keep their own debug.scope trail.
+
+    ``debug.scope`` is one object for the whole process, so when the trail
+    lived on it every decode pushed onto the same stack. With more than one
+    decode in flight the ``scope`` field on each record described a path
+    through no single message -- which is worse than no trail at all, because
+    the whole point of it is to say where in *this* message a record came
+    from, and somebody debugging a malformed PDU will follow it.
+
+    The trail is now a ContextVar, so a thread and an asyncio task each get
+    their own. These tests drive that with explicit synchronisation rather
+    than by racing, so a failure means the isolation is gone rather than that
+    the machine was busy.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.octets = encoder.encode(univ.Integer(42))
+        self.scopeDepth = len(debug.scope)
+
+    def tearDown(self):
+        while len(debug.scope) > self.scopeDepth:
+            debug.scope.pop()
+        BaseTestCase.tearDown(self)
+
+    def testAThreadDoesNotInheritAnotherThreadsTrail(self):
+        debug.scope.push("MAIN")
+        seen = []
+
+        def look():
+            seen.append((len(debug.scope), str(debug.scope)))
+
+        thread = threading.Thread(target=look)
+        thread.start()
+        thread.join()
+
+        self.assertEqual(
+            [(0, "")],
+            seen,
+            "a thread started with another thread's scope trail",
+        )
+
+    def testConcurrentTrailsDoNotInterleave(self):
+        """Forced interleaving: both threads are inside their push at once."""
+        bothPushed = threading.Barrier(2, timeout=10)
+        seen = {}
+
+        def decodeUnder(token):
+            debug.scope.push(token)
+            try:
+                bothPushed.wait()
+                seen[token] = str(debug.scope)
+
+            finally:
+                debug.scope.pop()
+
+        threads = [
+            threading.Thread(target=decodeUnder, args=(token,)) for token in ("A", "B")
+        ]
+
+        for thread in threads:
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        self.assertEqual(
+            {"A": "A", "B": "B"},
+            seen,
+            "the threads saw each other's scope tokens",
+        )
+
+    def testDecodeRecordsDoNotCarryAnotherThreadsScope(self):
+        """The realistic shape of the bug: a decode inheriting a stale trail."""
+
+        class Enabled:
+            def isEnabledFor(self, level):
+                return True
+
+            def debug(self, *args, **kwargs):
+                scopes.append(kwargs.get("extra", {}).get("scope"))
+
+        scopes = []
+        realLog = decoder.LOG
+        realDebug = decoder._DEBUG
+        decoder.LOG = Enabled()
+
+        debug.scope.push("SOMEONE_ELSES_MESSAGE")
+
+        try:
+            thread = threading.Thread(
+                target=lambda: decoder.decode(self.octets, asn1Spec=univ.Integer())
+            )
+            thread.start()
+            thread.join()
+
+        finally:
+            decoder.LOG = realLog
+            decoder._DEBUG = realDebug
+
+        self.assertTrue(scopes, "the decode emitted no scope at all")
+        polluted = [text for text in scopes if text and "SOMEONE_ELSES" in text]
+        self.assertEqual(
+            [],
+            polluted,
+            f"{len(polluted)} of {len(scopes)} records carried another thread's scope",
+        )
+
+    def testPoppingAnEmptyTrailDoesNotRaise(self):
+        """Debug bookkeeping must not throw out of an ordinary decode.
+
+        Released 2.0.3 and below popped a bare list, so an unbalanced pop
+        raised IndexError from inside the decoder. An imbalance is still a
+        defect, but it should read as a wrong scope string, not a crash.
+        """
+        while len(debug.scope):
+            debug.scope.pop()
+
+        self.assertEqual("", debug.scope.pop())
+        self.assertEqual("", str(debug.scope))
+        self.assertEqual(0, len(debug.scope))
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
