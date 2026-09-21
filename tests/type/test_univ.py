@@ -2586,9 +2586,28 @@ class LateBoundComponentTypeTestCase(BaseTestCase):
 
         s = ParentSequence(componentType=namedtype.NamedTypes())
 
-        del s.__dict__["_componentTypeExplicit"]
+        s.__dict__.pop("_componentTypeExplicit", None)
 
         assert len(s.clone().componentType) == 0
+
+    def testUnpickledImplicitObjectKeepsItsSnapshot(self):
+        # The same guarantee for an object whose componentType came from the
+        # class: pickled before the flag existed, it too must be treated as
+        # explicit and keep its snapshot rather than re-resolving.
+        class ParentSequence(univ.Sequence):
+            componentType = namedtype.NamedTypes()
+
+        s = ParentSequence()
+
+        assert s.__dict__.pop("_componentTypeExplicit", None) is False
+
+        ParentSequence.componentType = namedtype.NamedTypes(
+            namedtype.NamedType("name", univ.OctetString())
+        )
+        try:
+            assert len(s.clone().componentType) == 0
+        finally:
+            ParentSequence.componentType = namedtype.NamedTypes()
 
     def testInheritedComponentTypeSnapshotIsStable(self):
         class ParentSequence(univ.Sequence):

@@ -708,10 +708,19 @@ class ConstructedAsn1Type(Asn1Type):
             ...
 
     def __init__(self, **kwargs: Any) -> None:
-        # Whether componentType was supplied by the caller rather than picked
-        # up from the class. Only a class-derived placeholder may be discarded
-        # on clone(); see _cloneInitializers().
-        self._componentTypeExplicit = "componentType" in kwargs
+        # Records that componentType came from the class rather than from the
+        # caller, so that only a class-derived placeholder is discarded on
+        # clone(); see _cloneInitializers(). The attribute is written only in
+        # that case: both readers default to True when it is absent, which is
+        # also what an object unpickled from a release predating the flag
+        # needs. Writing it unconditionally would add a key to the instance
+        # dictionary of every constructed value, which on CPython 3.11 and
+        # 3.12 costs more on the comparison and decode paths than the flag is
+        # worth. 3.13 changed how instance attributes are stored and the
+        # difference disappears there; writing it conditionally is free on
+        # every version either way.
+        if "componentType" not in kwargs:
+            self._componentTypeExplicit = False
 
         readOnly = {"componentType": self.componentType}
 
