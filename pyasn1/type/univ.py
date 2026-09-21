@@ -3659,15 +3659,25 @@ class Choice(Set):
     def __eq__(self, other: object) -> bool:
         if self is other:
             return True
-        if self._cmpComponents("__eq__"):
-            return self._componentValues[self._currentIdx] == other
+        components = self._componentValues
+        if components is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        if components:
+            return components[self._currentIdx] == other
         return NotImplemented
 
     def __ne__(self, other: object) -> bool:
         if self is other:
             return False
-        if self._cmpComponents("__ne__"):
-            return self._componentValues[self._currentIdx] != other
+        components = self._componentValues
+        if components is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        if components:
+            return components[self._currentIdx] != other
         return NotImplemented
 
     def __lt__(self, other: typing.Any) -> bool:
