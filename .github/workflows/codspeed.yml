@@ -29,7 +29,19 @@ jobs:
     name: Run benchmarks
     runs-on: ubuntu-latest
     steps:
+      # persist-credentials: false, as build-test-release.yml already does.
+      # Checkout otherwise writes the job's token into .git/config, and the
+      # install step below runs third-party build backends -- arbitrary code,
+      # at install time, with that file readable. `uv sync --locked` here
+      # resolves the whole default group rather than a benchmark-only one, so
+      # the surface is every dev dependency, not just pytest-codspeed.
+      #
+      # Nothing in this job needs git authentication once the checkout is
+      # done: CodSpeed reads the commit from the environment rather than
+      # fetching. pysnmp/pysnmp#341 made the same change to its copy.
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Setup python
         uses: actions/setup-python@v7
         with:
