@@ -229,9 +229,22 @@ class TagSet:
             return self.__superTags[i]
 
     def __eq__(self, other: object) -> bool:
+        # Reading the other tag set's class id costs one attribute load and
+        # saves a whole comparison: `self.__superTagsClassId == other` with a
+        # TagSet on the right compares a tuple against a TagSet, which returns
+        # NotImplemented and sends Python round again through the reflected
+        # TagSet.__eq__ -- two calls where one will do. Anything that is not a
+        # TagSet still compares against the class id directly, which is what
+        # lets a TagSet equal a plain tuple of (class, id) pairs.
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId == other.__superTagsClassId
+
         return self.__superTagsClassId == other
 
     def __ne__(self, other: object) -> bool:
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId != other.__superTagsClassId
+
         return self.__superTagsClassId != other
 
     def __lt__(self, other: Any) -> bool:

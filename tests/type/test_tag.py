@@ -259,6 +259,46 @@ class DiffersFromBaseTagSetTestCase(BaseTestCase):
         assert implicit.differsFromBaseTagSet is True
 
 
+class TagSetComparisonTestCase(BaseTestCase):
+    """Comparing tag sets must keep working against non-TagSet operands."""
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.t = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+    def testEqualsAnotherTagSet(self):
+        same = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 4),
+        )
+
+        assert self.t == same
+        assert not self.t != same
+
+    def testDiffersFromAnotherTagSet(self):
+        other = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 5),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 5),
+        )
+
+        assert self.t != other
+        assert not self.t == other
+
+    def testStillComparesAgainstAPlainTupleOfClassAndId(self):
+        # A TagSet compares equal to the tuple of (tagClass, tagId) pairs it
+        # holds. Reading `other.__superTagsClassId` has to fall back to this,
+        # or every caller comparing against a bare tuple breaks.
+        assert self.t == ((tag.tagClassUniversal, 4),)
+        assert self.t != ((tag.tagClassUniversal, 5),)
+
+    def testComparingAgainstAnUnrelatedObjectIsNotEqual(self):
+        assert self.t != object()
+        assert self.t != None  # noqa: E711
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":
