@@ -3,6 +3,14 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.6](https://github.com/pysnmp/pyasn1/compare/v2.0.5...v2.0.6) (2026-09-21)
+
+### Performance Improvements
+
+* **base:** skip the defaults dict when the caller already supplied both ([5d4b3a2](https://github.com/pysnmp/pyasn1/commit/5d4b3a2e4e3d85888c8e2848c4f95f449ecd1328)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **base:** stop copying the initializer dict on every clone ([1531a8a](https://github.com/pysnmp/pyasn1/commit/1531a8a04256ba1799184685f65166b0e39ff009)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **tag:** cache a tag set's base tag set instead of rebuilding it per component ([530d8f1](https://github.com/pysnmp/pyasn1/commit/530d8f1501b6cf2cf9a5ce4306a7397ec2f378de)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+
 ## [2.0.5](https://github.com/pysnmp/pyasn1/compare/v2.0.4...v2.0.5) (2026-09-21)
 
 ### Bug Fixes
