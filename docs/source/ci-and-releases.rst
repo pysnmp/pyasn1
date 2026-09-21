@@ -128,11 +128,46 @@ them.
     Runs semantic-release. On a pull request this job does not run at
     all; on a push it rehearses the release without cutting one.
 
-One check runs outside that workflow. ``Commit conventions``
+Two checks run outside that workflow. ``Commit conventions``
 (``.github/workflows/commit-conventions.yml``) lints the commit messages
 of a pull request and runs on pull requests only, so it is not part of
-the release path. Like the ``CI`` jobs, it gates a merge only where
-branch protection names it as a required check.
+the release path. ``CodSpeed``
+(``.github/workflows/codspeed.yml``) measures the benchmarks; see
+`Benchmarks`_. Like the ``CI`` jobs, both gate a merge only where branch
+protection names them as a required check.
+
+Benchmarks
+----------
+
+The ``benchmarks`` directory holds a `pytest-codspeed
+<https://docs.codspeed.io/benchmarks/python/>`_ suite covering the BER,
+CER, DER and native codecs and the type machinery underneath them. The
+``CodSpeed`` workflow runs it on every push to ``main`` and ``next`` and
+on every pull request against them, and `CodSpeed
+<https://app.codspeed.io/pysnmp/pyasn1>`_ comments the difference
+against the base branch.
+
+Measurements are taken under CPU simulation rather than by timing a wall
+clock, so what is reported is work done — instructions, cache behaviour —
+and not how loaded the runner happened to be. That is what makes a two
+percent change on a shared CI machine meaningful.
+
+The suite is deliberately outside ``tests``: ``tests/conftest.py`` runs
+every test it collects with pyasn1 debugging on and every debug record
+rendered, which is the opposite of what a measurement wants. It is also
+outside ``testpaths``, so a plain ``pytest`` does not collect it. Run it
+by naming the directory::
+
+    uv run pytest benchmarks              # check the benchmarks still work
+    uv run pytest benchmarks --codspeed   # measure them
+
+Adding a benchmark is adding a ``test_*`` function that takes the
+``benchmark`` fixture and hands it the callable to measure. Build the
+input outside the measured call, and keep the measured call to one unit
+of work. Operations too small to measure on their own -- a tag set
+comparison is a few nanoseconds -- are looped in
+``benchmarks/test_types.py`` through its ``repeat`` helper, so the loop,
+and not the harness, is what is timed.
 
 The test matrix
 ---------------
