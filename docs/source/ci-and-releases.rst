@@ -169,6 +169,79 @@ comparison is a few nanoseconds -- are looped in
 ``benchmarks/test_types.py`` through its ``repeat`` helper, so the loop,
 and not the harness, is what is timed.
 
+Where the library has been
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CodSpeed answers one question: is this pull request slower than the
+commit it would merge into. That is the right question for a pull
+request, and it says nothing about the releases behind it. Its history
+begins with the commit that added these benchmarks, and nothing can
+extend it backwards, because the benchmarks did not exist at the earlier
+commits to be run there.
+
+So it was measured once, separately. Every release from 0.4.12 to 2.0.6
+was installed from PyPI in turn and driven through the equivalent of
+four of the benchmarks below, counting instructions retired under
+callgrind on CPython 3.11 — the same quantity CodSpeed's simulation mode
+reports. Each version was checked to encode the shared schemas to
+byte-identical octets first, so the columns describe the same work
+rather than different work at different speeds.
+
+.. list-table:: Instructions retired per benchmark call, thousands
+   :header-rows: 1
+   :widths: 34 14 14 14 14 12
+
+   * - case
+     - 0.4.12
+     - 1.3.0
+     - 2.0.3
+     - 2.0.6
+     - change
+   * - ``decode_message_with_spec``
+     - 9,912
+     - 9,837
+     - 9,917
+     - 8,633
+     - −13.3%
+   * - ``encode_message``
+     - 3,198
+     - 5,155
+     - 5,238
+     - 3,913
+     - +14.7%
+   * - ``clone``
+     - 21,730
+     - 21,723
+     - 21,717
+     - 17,712
+     - −18.5%
+   * - ``tag_set_is_super_tag_set_of``
+     - 11,011
+     - 9,656
+     - 9,696
+     - 9,714
+     - +2.6%
+
+Two things in that table are worth keeping, because neither was visible
+before there was anything to measure them with.
+
+``encode_message`` costs more today than it did on 0.4.12. The step is
+between 1.0.3 and 1.3.0, where it went from 3.2M instructions to 5.2M
+and stayed there for six releases; 2.0.4 and 2.0.6 have since recovered
+most of it. Nothing here says the 1.3.0 change was wrong — it may well
+have bought correctness worth the cost — only that the cost was paid and
+nobody counted it at the time.
+
+``clone`` drops 18% at 2.0.6, which is the initializer-dict work in that
+release doing exactly what it was meant to do. That is the same
+measurement read the other way round: a table like this is how an
+optimisation gets to show that it worked, rather than only that it was
+intended.
+
+This was a one-off, and the numbers above are a snapshot rather than
+something the repository can regenerate. Going forward CodSpeed covers
+it, which is the point of having it.
+
 The test matrix
 ---------------
 
