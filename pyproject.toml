@@ -34,6 +34,16 @@ classifiers = [
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    # What lets a test be `async def` and a fixture be an async generator.
+    # pyasn1 has no event loop of its own, but it makes a claim about one:
+    # debug.Scope keeps its trail in a ContextVar so that a thread *and an
+    # asyncio task* each get their own (#194), and until now only the thread
+    # half of that was tested. The asyncio half needs a loop to test at all.
+    #
+    # It is also what pysnmp and pysmi use, on the same settings, so an async
+    # test reads the same in all three repositories -- as with the shared ruff
+    # rule set above.
+    "pytest-asyncio>=1.0,<2.0.0",
     "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
     "mypy>=2.3.1",
@@ -178,6 +188,15 @@ disallow_incomplete_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+# An `async def` test runs, rather than needing a marker to say so, and gets a
+# loop of its own -- as does an async fixture. Nothing is carried from one test
+# to the next, which is what the scope-isolation tests in
+# tests/test_logging_contract.py depend on: a trail that survived into the next
+# test would make them pass for the wrong reason.
+asyncio_mode = "auto"
+asyncio_default_test_loop_scope = "function"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "no_debug_records: skip the autouse fixture that runs pyasn1 at DEBUG (see tests/conftest.py)",
 ]
