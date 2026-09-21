@@ -422,10 +422,24 @@ class SimpleAsn1Type(Asn1Type):
         return self._value
 
     def __eq__(self, other: object) -> bool:
-        return self is other or self._cmpValue("__eq__") == other
+        if self is other:
+            return True
+        value = self._value
+        if value is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        return value == other
 
     def __ne__(self, other: object) -> bool:
-        return self is not other and self._cmpValue("__ne__") != other
+        if self is other:
+            return False
+        value = self._value
+        if value is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        return value != other
 
     def __lt__(self, other: Any) -> bool:
         return self._cmpValue("__lt__") < other
@@ -737,10 +751,22 @@ class ConstructedAsn1Type(Asn1Type):
         return self.components
 
     def __eq__(self, other: object) -> bool:
-        return self is other or self._cmpComponents("__eq__") == other
+        if self is other:
+            return True
+        if self._componentValues is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        return self.components == other
 
     def __ne__(self, other: object) -> bool:
-        return self is not other and self._cmpComponents("__ne__") != other
+        if self is other:
+            return False
+        if self._componentValues is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        return self.components != other
 
     def __lt__(self, other: Any) -> bool:
         return self._cmpComponents("__lt__") < other
