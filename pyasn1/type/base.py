@@ -74,9 +74,18 @@ class Asn1Type(Asn1Item):
     _readOnly: dict[str, Any]
 
     def __init__(self, **kwargs: Any) -> None:
-        readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
+        if "tagSet" in kwargs and "subtypeSpec" in kwargs:
+            # Already complete, so the defaults below would all be overwritten.
+            # Every object a decode builds arrives this way, through clone()
+            # expanding the read-only dict it was cloned from. kwargs is this
+            # call's own dict, built by the ** at the call site, so keeping it
+            # aliases nothing.
+            readOnly = kwargs
 
-        readOnly.update(kwargs)
+        else:
+            readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
+
+            readOnly.update(kwargs)
 
         self.__dict__.update(readOnly)
 
