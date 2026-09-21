@@ -5,6 +5,7 @@
 # License: https://github.com/pysnmp/pyasn1/blob/main/LICENSE.rst
 #
 import ast
+import asyncio
 import logging
 import pathlib
 import sys
@@ -443,6 +444,100 @@ class ScopeIsolationTestCase(BaseTestCase):
         self.assertEqual("", debug.scope.pop())
         self.assertEqual("", str(debug.scope))
         self.assertEqual(0, len(debug.scope))
+
+
+# --- the asyncio half of the same claim ------------------------------------
+#
+# Scope's docstring says a thread *and an asyncio task* each keep their own
+# trail, and everything above covers threads. These cover the task half.
+#
+# They are plain functions rather than methods on a TestCase because
+# pytest-asyncio drives coroutine functions and leaves unittest classes to
+# unittest; the stdlib answer for a TestCase is IsolatedAsyncioTestCase, which
+# would mean two ways of writing an async test in one file. The `suite` at the
+# bottom loads TestCase classes and so does not see these; pytest, which is what
+# runs this file in CI, does. Each runs in a task of its own, so what it pushes
+# cannot reach the trail this module's other tests see.
+
+
+def emptyTrail():
+    """Start from an empty trail, whatever the context this task copied held."""
+    while len(debug.scope):
+        debug.scope.pop()
+
+
+async def testATaskDoesNotSeeTheTrailOfTheTaskBesideIt():
+    """The asyncio shape of the interleaving bug: both tasks inside their push.
+
+    Forced rather than raced -- neither task leaves its push until both have
+    pushed -- so a failure means the isolation is gone rather than that the
+    machine was busy.
+    """
+    emptyTrail()
+
+    bothPushed = asyncio.Event()
+    seen = {}
+
+    async def decodeUnder(token, isSecond):
+        debug.scope.push(token)
+
+        try:
+            if isSecond:
+                bothPushed.set()
+            else:
+                await bothPushed.wait()
+
+            seen[token] = str(debug.scope)
+
+        finally:
+            debug.scope.pop()
+
+    await asyncio.gather(decodeUnder("A", False), decodeUnder("B", True))
+
+    assert {"A": "A", "B": "B"} == seen, "the tasks saw each other's scope tokens"
+
+
+async def testATasksTrailDoesNotReachTheTaskThatStartedIt():
+    """A task's pushes stay in the task, so an outer decode's trail survives it."""
+    emptyTrail()
+    debug.scope.push("OUTER")
+
+    try:
+
+        async def pushDeeper():
+            debug.scope.push("INNER")
+            return str(debug.scope)
+
+        assert "OUTER.INNER" == await asyncio.create_task(pushDeeper())
+        assert "OUTER" == str(debug.scope), "the task's push escaped into its parent"
+
+    finally:
+        debug.scope.pop()
+
+
+async def testATaskStartsFromTheTrailAsItStoodWhenItWasCreated():
+    """The documented trade, pinned: inheritance is by context copy.
+
+    A task created part-way through a decode carries the trail that decode had
+    reached, which is what makes its records readable while it runs inside that
+    decode. Scope's docstring records the other side of it -- a task outliving
+    the decode keeps a prefix that has ceased to be true -- and resetting the
+    trail at decode entry, which is the only way to avoid it, would break the
+    nested decodes that are ordinary. So this is behaviour to notice changing,
+    not behaviour to rely on.
+    """
+    emptyTrail()
+    debug.scope.push("OUTER")
+
+    async def look():
+        return str(debug.scope)
+
+    try:
+        started = asyncio.create_task(look())
+    finally:
+        debug.scope.pop()
+
+    assert "OUTER" == await started
 
 
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
