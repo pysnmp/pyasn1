@@ -3,6 +3,12 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.8](https://github.com/pysnmp/pyasn1/compare/v2.0.7...v2.0.8) (2026-09-22)
+
+### Performance Improvements
+
+* **tag:** settle differsFromBaseTagSet without building a tuple ([169f96c](https://github.com/pysnmp/pyasn1/commit/169f96cbf29f1a3d9e4f0a1d868390bb6233e310)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198) [#213](https://github.com/pysnmp/pyasn1/issues/213)
+
 ## [2.0.7](https://github.com/pysnmp/pyasn1/compare/v2.0.6...v2.0.7) (2026-09-22)
 
 ### Bug Fixes
