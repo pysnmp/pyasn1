@@ -3,6 +3,23 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.7](https://github.com/pysnmp/pyasn1/compare/v2.0.6...v2.0.7) (2026-09-22)
+
+### Bug Fixes
+
+* **codec:** keep omitting a DEFAULT component that holds a schema object ([c91d2b4](https://github.com/pysnmp/pyasn1/commit/c91d2b4613af71cab63c114f71df09bd61f4b9cb))
+
+### Performance Improvements
+
+* **base:** ask the schema guard without a method call per component ([15afcd6](https://github.com/pysnmp/pyasn1/commit/15afcd6a9290e532c24fc01680fa81c01bfac4a7)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198)
+* **cer:** check the string fragment rules during the decode, not before it ([75519a0](https://github.com/pysnmp/pyasn1/commit/75519a0c5eceabeb631c2ac8f767e82ad5fdf7da))
+* **cer:** test the cheap half of the 9.1 guard first ([3399689](https://github.com/pysnmp/pyasn1/commit/339968979b41ddfbbee8d4a50e8bead42307a1c3))
+* **tag:** compare tag sets without building one to throw away ([ffb4a7a](https://github.com/pysnmp/pyasn1/commit/ffb4a7ad3d97f226a2f563d86b799ec8ef517bb4)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198) [#198](https://github.com/pysnmp/pyasn1/issues/198) [#203](https://github.com/pysnmp/pyasn1/issues/203) [#203](https://github.com/pysnmp/pyasn1/issues/203)
+* **tag:** compare tag sets without the reflected round trip ([80e378f](https://github.com/pysnmp/pyasn1/commit/80e378f7dc87db0f1c7f9b19c90ba4b9b6f90611))
+* **tag:** settle whether a tag set differs from its base tag set once ([259d321](https://github.com/pysnmp/pyasn1/commit/259d321a6de949fd7c30302d0e94f97a5c836596))
+* **univ:** ask Choice's schema guard without a method call per component ([0cb17be](https://github.com/pysnmp/pyasn1/commit/0cb17bef79f1da971e3e84a21332dc9efd73d1ce)), closes [#205](https://github.com/pysnmp/pyasn1/issues/205) [#205](https://github.com/pysnmp/pyasn1/issues/205) [#198](https://github.com/pysnmp/pyasn1/issues/198) [#205](https://github.com/pysnmp/pyasn1/issues/205)
+* **univ:** stop re-validating every subtree once per level during encode ([119ec22](https://github.com/pysnmp/pyasn1/commit/119ec22a20594fb0627b039080ec4db20c6ec4aa))
+
 ## [2.0.6](https://github.com/pysnmp/pyasn1/compare/v2.0.5...v2.0.6) (2026-09-21)
 
 ### Performance Improvements
