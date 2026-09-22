@@ -383,6 +383,11 @@ class TagSet:
         """
         if len(tagSet) < self.__lenOfSuperTags:
             return False
+        if isinstance(tagSet, TagSet):
+            # Slicing a TagSet builds a whole new TagSet, whose __init__ has
+            # settled differsFromBaseTagSet eagerly since #198. Comparing the
+            # underlying tuples answers the same question without it.
+            return self.__superTags == tagSet.__superTags[: self.__lenOfSuperTags]
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
 
 

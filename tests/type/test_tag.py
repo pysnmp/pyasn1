@@ -128,6 +128,24 @@ class SuperTagSetTestCase(TagSetTestCaseBase):
             tag.TagSet((), tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12))
         ), "isSuperTagSetOf() fails"
 
+    def testSuperTagCheckAcceptsPlainTuple(self):
+        # isSuperTagSetOf() accepts anything sliceable, not only a TagSet, and
+        # the two paths must agree.
+        superset = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12),
+        )
+        assert self.ts1.isSuperTagSetOf(tuple(superset)) == self.ts1.isSuperTagSetOf(
+            superset
+        ), "isSuperTagSetOf() disagrees between a TagSet and its tuple"
+
+    def testSuperTagCheckRejectsPlainTuple(self):
+        other = tag.TagSet(
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 12),
+            tag.Tag(tag.tagClassUniversal, tag.tagFormatSimple, 13),
+        )
+        assert not self.ts1.isSuperTagSetOf(tuple(other)), "isSuperTagSetOf() fails"
+
 
 class TagStdlibIntegrationTestCase(TagTestCaseBase):
     """Verify Tag behaves as a namedtuple / tuple subtype."""
