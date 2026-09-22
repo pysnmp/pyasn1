@@ -233,10 +233,13 @@ class CanonicalStringDecoderMixIn:
         # it already contradicts 9.1 whatever its fragments turn out to hold.
         # A decoder that bars the constructed form outright, as DER does under
         # 10.2, has a more specific complaint to make, so defer to it.
+        # substrateFun first: a fragment decode always passes one, so the
+        # common path leaves here on the cheapest test rather than after an
+        # attribute lookup.
         if (
-            getattr(self, "supportConstructedForm", True)
-            and not substrateFun
+            not substrateFun
             and tagSet
+            and getattr(self, "supportConstructedForm", True)
             and tagSet[0].tagFormat != tag.tagFormatSimple
         ):
             raise error.PyAsn1Error(
