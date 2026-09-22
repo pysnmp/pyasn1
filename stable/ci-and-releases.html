@@ -8,7 +8,7 @@
         <link rel="prefetch" href="_static/logo.svg" as="image">
 
     <link rel="shortcut icon" href="_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Continuous integration and releases - ASN.1 types and codecs 2.0.6 documentation</title>
+        <title>Continuous integration and releases - ASN.1 types and codecs 2.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -163,7 +163,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="contents.html"><div class="brand">ASN.1 types and codecs 2.0.6 documentation</div></a>
+      <a href="contents.html"><div class="brand">ASN.1 types and codecs 2.0.7 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -188,7 +188,7 @@
     <img class="sidebar-logo only-dark" src="_static/logo.svg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.6 documentation</span>
+  <span class="sidebar-brand-text">ASN.1 types and codecs 2.0.7 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -307,11 +307,11 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id18">1.3.0 (2026-09-05)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id21">1.3.0 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-3-2026-09-05">1.3.0-rc.3 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-2-2026-09-05">1.3.0-rc.2 (2026-09-05)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-1-2026-09-05">1.3.0-rc.1 (2026-09-05)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id24">1.2.0 (2026-09-03)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id27">1.2.0 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#rc-1-2026-09-03">1.2.0-rc.1 (2026-09-03)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-14-2026-09-02">1.2.0-beta.14 (2026-09-02)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-13-2026-09-02">1.2.0-beta.13 (2026-09-02)</a></li>
@@ -327,7 +327,7 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-3-2026-09-01">1.2.0-beta.3 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-2-2026-09-01">1.2.0-beta.2 (2026-09-01)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html#beta-1-2026-09-01">1.2.0-beta.1 (2026-09-01)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html#id57">1.1.0 (2021-11-24)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html#id60">1.1.0 (2021-11-24)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog-history.html">Historical changelog</a></li>
 </ul>
 <ul>
@@ -497,11 +497,125 @@ coverage.</p>
 all; on a push it rehearses the release without cutting one.</p>
 </dd>
 </dl>
-<p>One check runs outside that workflow. <code class="docutils literal notranslate"><span class="pre">Commit</span> <span class="pre">conventions</span></code>
+<p>Two checks run outside that workflow. <code class="docutils literal notranslate"><span class="pre">Commit</span> <span class="pre">conventions</span></code>
 (<code class="docutils literal notranslate"><span class="pre">.github/workflows/commit-conventions.yml</span></code>) lints the commit messages
 of a pull request and runs on pull requests only, so it is not part of
-the release path. Like the <code class="docutils literal notranslate"><span class="pre">CI</span></code> jobs, it gates a merge only where
-branch protection names it as a required check.</p>
+the release path. <code class="docutils literal notranslate"><span class="pre">CodSpeed</span></code>
+(<code class="docutils literal notranslate"><span class="pre">.github/workflows/codspeed.yml</span></code>) measures the benchmarks; see
+<a class="reference internal" href="#benchmarks">Benchmarks</a>. Like the <code class="docutils literal notranslate"><span class="pre">CI</span></code> jobs, both gate a merge only where branch
+protection names them as a required check.</p>
+</section>
+<section id="benchmarks">
+<h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">benchmarks</span></code> directory holds a <a class="reference external" href="https://docs.codspeed.io/benchmarks/python/">pytest-codspeed</a> suite covering the BER,
+CER, DER and native codecs and the type machinery underneath them. The
+<code class="docutils literal notranslate"><span class="pre">CodSpeed</span></code> workflow runs it on every push to <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">next</span></code> and
+on every pull request against them, and <a class="reference external" href="https://app.codspeed.io/pysnmp/pyasn1">CodSpeed</a> comments the difference
+against the base branch.</p>
+<p>Measurements are taken under CPU simulation rather than by timing a wall
+clock, so what is reported is work done — instructions, cache behaviour —
+and not how loaded the runner happened to be. That is what makes a two
+percent change on a shared CI machine meaningful.</p>
+<p>The suite is deliberately outside <code class="docutils literal notranslate"><span class="pre">tests</span></code>: <code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code> runs
+every test it collects with pyasn1 debugging on and every debug record
+rendered, which is the opposite of what a measurement wants. It is also
+outside <code class="docutils literal notranslate"><span class="pre">testpaths</span></code>, so a plain <code class="docutils literal notranslate"><span class="pre">pytest</span></code> does not collect it. Run it
+by naming the directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">benchmarks</span>              <span class="c1"># check the benchmarks still work</span>
+<span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">benchmarks</span> <span class="o">--</span><span class="n">codspeed</span>   <span class="c1"># measure them</span>
+</pre></div>
+</div>
+<p>Adding a benchmark is adding a <code class="docutils literal notranslate"><span class="pre">test_*</span></code> function that takes the
+<code class="docutils literal notranslate"><span class="pre">benchmark</span></code> fixture and hands it the callable to measure. Build the
+input outside the measured call, and keep the measured call to one unit
+of work. Operations too small to measure on their own – a tag set
+comparison is a few nanoseconds – are looped in
+<code class="docutils literal notranslate"><span class="pre">benchmarks/test_types.py</span></code> through its <code class="docutils literal notranslate"><span class="pre">repeat</span></code> helper, so the loop,
+and not the harness, is what is timed.</p>
+<section id="where-the-library-has-been">
+<h3>Where the library has been<a class="headerlink" href="#where-the-library-has-been" title="Link to this heading">¶</a></h3>
+<p>CodSpeed answers one question: is this pull request slower than the
+commit it would merge into. That is the right question for a pull
+request, and it says nothing about the releases behind it. Its history
+begins with the commit that added these benchmarks, and nothing can
+extend it backwards, because the benchmarks did not exist at the earlier
+commits to be run there.</p>
+<p>So it was measured once, separately. Every release from 0.4.12 to 2.0.6
+was installed from PyPI in turn and driven through the equivalent of
+four of the benchmarks below, counting instructions retired under
+callgrind on CPython 3.11 — the same quantity CodSpeed’s simulation mode
+reports. Each version was checked to encode the shared schemas to
+byte-identical octets first, so the columns describe the same work
+rather than different work at different speeds.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id1">
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Instructions retired per benchmark call, thousands</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 13.7%" />
+<col style="width: 13.7%" />
+<col style="width: 13.7%" />
+<col style="width: 13.7%" />
+<col style="width: 11.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>case</p></th>
+<th class="head"><p>0.4.12</p></th>
+<th class="head"><p>1.3.0</p></th>
+<th class="head"><p>2.0.3</p></th>
+<th class="head"><p>2.0.6</p></th>
+<th class="head"><p>0.4.12 → 2.0.6</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">decode_message_with_spec</span></code></p></td>
+<td><p>9,912</p></td>
+<td><p>9,837</p></td>
+<td><p>9,917</p></td>
+<td><p>8,633</p></td>
+<td><p>−12.9%</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">encode_message</span></code></p></td>
+<td><p>3,198</p></td>
+<td><p>5,155</p></td>
+<td><p>5,238</p></td>
+<td><p>3,913</p></td>
+<td><p>+22.4%</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">clone</span></code></p></td>
+<td><p>21,730</p></td>
+<td><p>21,723</p></td>
+<td><p>21,717</p></td>
+<td><p>17,712</p></td>
+<td><p>−18.5%</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tag_set_is_super_tag_set_of</span></code></p></td>
+<td><p>11,011</p></td>
+<td><p>9,656</p></td>
+<td><p>9,696</p></td>
+<td><p>9,714</p></td>
+<td><p>−11.8%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Two things in that table are worth keeping, because neither was visible
+before there was anything to measure them with.</p>
+<p><code class="docutils literal notranslate"><span class="pre">encode_message</span></code> costs 22% more at 2.0.6 than it did on 0.4.12. The
+step is between 1.0.3 and 1.3.0, where it went from 3.2M instructions to
+5.2M and stayed there for six releases; 2.0.4 and 2.0.6 recovered about
+two thirds of the excess, leaving the rest. Nothing here says the 1.3.0 change was wrong — it may well
+have bought correctness worth the cost — only that the cost was paid and
+nobody counted it at the time.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clone</span></code> drops 18% at 2.0.6, which is the initializer-dict work in that
+release doing exactly what it was meant to do. That is the same
+measurement read the other way round: a table like this is how an
+optimisation gets to show that it worked, rather than only that it was
+intended.</p>
+<p>This was a one-off, and the numbers above are a snapshot rather than
+something the repository can regenerate. Going forward CodSpeed covers
+it, which is the point of having it.</p>
+</section>
 </section>
 <section id="the-test-matrix">
 <h2>The test matrix<a class="headerlink" href="#the-test-matrix" title="Link to this heading">¶</a></h2>
@@ -737,6 +851,10 @@ wrong.</p>
 <li><a class="reference internal" href="#branches">Branches</a></li>
 <li><a class="reference internal" href="#commit-messages">Commit messages</a></li>
 <li><a class="reference internal" href="#what-runs-on-a-pull-request">What runs on a pull request</a></li>
+<li><a class="reference internal" href="#benchmarks">Benchmarks</a><ul>
+<li><a class="reference internal" href="#where-the-library-has-been">Where the library has been</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#the-test-matrix">The test matrix</a></li>
 <li><a class="reference internal" href="#cutting-a-release">Cutting a release</a></li>
 <li><a class="reference internal" href="#keeping-next-and-main-in-step">Keeping next and main in step</a></li>
@@ -754,7 +872,7 @@ wrong.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=5a496901"></script>
+</div><script src="_static/documentation_options.js?v=3e86b945"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
