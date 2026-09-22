@@ -198,9 +198,18 @@ class TagSet:
         # registered against it. The answer cannot change, because a TagSet is
         # immutable, so it is settled here. Asking becomes one attribute load
         # instead of building the base tag set and comparing against it.
+        #
+        # Compared element-wise rather than against a one-tuple built for the
+        # purpose: every TagSet construction would allocate that tuple, and
+        # tagImplicitly(), tagExplicitly() and subtype() do nothing but
+        # construct. A class id tuple holding other than one pair cannot equal
+        # a single base tag, which is what the length test settles first.
         if baseTag:
-            self.differsFromBaseTagSet = self.__superTagsClassId != (
-                (baseTag.tagClass, baseTag.tagId),
+            classId = self.__superTagsClassId
+            self.differsFromBaseTagSet = (
+                self.__lenOfSuperTags != 1
+                or classId[0][0] != baseTag.tagClass
+                or classId[0][1] != baseTag.tagId
             )
         else:
             self.differsFromBaseTagSet = bool(self.__superTagsClassId)
