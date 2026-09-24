@@ -2859,9 +2859,36 @@ class SequenceAndSetBase(base.ConstructedAsn1Type):
         :obj:`~pyasn1.type.univ.noValue` rather than being instantiated on
         access. Encoders iterate this way so that encoding an object does not
         alter which of its components are present.
+
+        Absent means absent -- never set, or beyond what this object holds. A
+        component that *is* set is handed back as it stands, even when it is
+        still a schema object, which is what :meth:`values` did before this
+        method existed and what the encoders expect: they decide for
+        themselves what an OPTIONAL component that is not a value means, and a
+        mandatory one that is set is theirs to reject.
+
+        Reading ``_componentValues`` here rather than calling
+        :meth:`getComponentByPosition` is what keeps that true, and is also
+        what makes it cheap. That method additionally asks each component
+        whether it ``isValue``, and on a constructed component that question
+        walks its whole subtree -- so an encode that recursed n levels asked
+        the same subtree n times, once per level above it.
         """
-        for idx in range(self._componentTypeLen or len(self._dynamicNames)):
-            yield self.getComponentByPosition(idx, instantiate=False)
+        componentValues = self._componentValues
+        count = self._componentTypeLen or len(self._dynamicNames)
+
+        if componentValues is noValue:
+            for _ in range(count):
+                yield noValue
+
+            return
+
+        for idx in range(count):
+            try:
+                yield componentValues[idx]
+
+            except IndexError:
+                yield noValue
 
     def keys(self) -> typing.Any:
         """Return an iterator over the component names."""
@@ -3632,15 +3659,25 @@ class Choice(Set):
     def __eq__(self, other: object) -> bool:
         if self is other:
             return True
-        if self._cmpComponents("__eq__"):
-            return self._componentValues[self._currentIdx] == other
+        components = self._componentValues
+        if components is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        if components:
+            return components[self._currentIdx] == other
         return NotImplemented
 
     def __ne__(self, other: object) -> bool:
         if self is other:
             return False
-        if self._cmpComponents("__ne__"):
-            return self._componentValues[self._currentIdx] != other
+        components = self._componentValues
+        if components is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        if components:
+            return components[self._currentIdx] != other
         return NotImplemented
 
     def __lt__(self, other: typing.Any) -> bool:

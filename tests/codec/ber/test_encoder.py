@@ -3121,6 +3121,134 @@ class InconsistentValueEncoderTestCase(BaseTestCase):
             assert False, "Over-long object encoded"
 
 
+class EncodingSchemaOnlyComponentsTestCase(BaseTestCase):
+    """Encoding must not change over which components count as present.
+
+    These outcomes are the same in pyasn1 1.x, in 2.0.6 and here. They are
+    pinned because `valuesNotInstantiating` no longer asks each component
+    whether it is a value, and the encoders' own handling of OPTIONAL,
+    DEFAULT and mandatory components is now the only thing deciding them.
+    """
+
+    def setUp(self):
+        BaseTestCase.setUp(self)
+
+        class Inner(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("a", univ.Integer()),
+                namedtype.NamedType("b", univ.Integer()),
+            )
+
+        class WithOptional(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.OptionalNamedType("y", univ.Integer()),
+            )
+
+        class WithDefaulted(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.DefaultedNamedType("y", univ.Integer(42)),
+            )
+
+        class WithOptionalInner(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("x", univ.Integer()),
+                namedtype.OptionalNamedType("inner", Inner()),
+            )
+
+        self.Inner = Inner
+        self.WithOptional = WithOptional
+        self.WithDefaulted = WithDefaulted
+        self.WithOptionalInner = WithOptionalInner
+
+    def testOptionalPresentAsSchemaObjectIsOmitted(self):
+        s = self.WithOptional()
+        s["x"] = 1
+        s.getComponentByPosition(1, instantiate=True)
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testOptionalAbsentIsOmitted(self):
+        s = self.WithOptional()
+        s["x"] = 1
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testDefaultedLeftAloneIsOmitted(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testOptionalConstructedPartiallyPopulatedIsOmitted(self):
+        # `inner` is set but not a value, so it is not encoded -- and the
+        # bytes are exactly those of the object that never set it at all.
+        s = self.WithOptionalInner()
+        s["x"] = 1
+        s["inner"]["a"] = 5
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testOptionalConstructedFullyPopulatedIsEncoded(self):
+        s = self.WithOptionalInner()
+        s["x"] = 1
+        s["inner"]["a"] = 5
+        s["inner"]["b"] = 6
+
+        assert encoder.encode(s) == bytes.fromhex("300b0201013006020105020106")
+
+    def testDefaultedHoldingAnExplicitSchemaObjectIsOmitted(self):
+        # A DEFAULT slot can be handed a schema object outright, which is not
+        # the same as instantiating it on access: that stores the default
+        # *value*. A schema object there is not a value, and says no more
+        # about what to encode than an empty slot, so it is left out.
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s.setComponentByPosition(1, univ.Integer())
+
+        # The slot really does hold a non-value; it is not simply empty.
+        stored = list(s.valuesNotInstantiating())[1]
+        assert stored is not univ.noValue
+        assert stored.isValue is False
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testDefaultedHoldingItsDefaultValueIsOmitted(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s["y"] = 42
+
+        assert encoder.encode(s) == bytes.fromhex("3003020101")
+
+    def testDefaultedHoldingSomethingElseIsEncoded(self):
+        s = self.WithDefaulted()
+        s["x"] = 1
+        s["y"] = 7
+
+        assert encoder.encode(s) == bytes.fromhex("3006020101020107")
+
+    def testMandatoryPresentAsSchemaObjectStillRaises(self):
+        class AllMandatory(univ.Sequence):
+            componentType = namedtype.NamedTypes(
+                namedtype.NamedType("a", univ.Integer()),
+                namedtype.NamedType("b", univ.Integer()),
+            )
+
+        obj = AllMandatory()
+        obj["a"] = 1
+        obj.getComponentByPosition(1, instantiate=True)
+
+        try:
+            encoder.encode(obj)
+
+        except PyAsn1Error:
+            pass
+
+        else:
+            assert False, "encoding a mandatory schema-only component must raise"
+
+
 suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
 
 if __name__ == "__main__":

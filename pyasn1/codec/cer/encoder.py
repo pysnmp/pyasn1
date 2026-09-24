@@ -235,7 +235,11 @@ class SetEncoder(encoder.SequenceEncoder):
                     if namedType.isOptional and not component.isValue:
                         continue
 
-                    if namedType.isDefaulted and component == namedType.asn1Object:
+                    # As in the BER encoder: a DEFAULT slot holding a schema
+                    # object is no more encodable than an absent one.
+                    if namedType.isDefaulted and (
+                        not component.isValue or component == namedType.asn1Object
+                    ):
                         continue
 
                     compsMap[id(component)] = namedType

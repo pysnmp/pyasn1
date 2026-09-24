@@ -189,6 +189,30 @@ class TagSet:
         )
         self.__lenOfSuperTags = len(superTags)
         self.__hash = hash(self.__superTagsClassId)
+        # Built on first use by .baseTagSet, not here: constructing it eagerly
+        # would recurse, since the thing being built is itself a TagSet.
+        self.__baseTagSet: TagSet | None = None
+        # Whether this tag set is anything more than its own base tag, which is
+        # the question the encoder asks of every component it writes: only a
+        # tag set that has been tagged beyond its base can have a custom codec
+        # registered against it. The answer cannot change, because a TagSet is
+        # immutable, so it is settled here. Asking becomes one attribute load
+        # instead of building the base tag set and comparing against it.
+        #
+        # Compared element-wise rather than against a one-tuple built for the
+        # purpose: every TagSet construction would allocate that tuple, and
+        # tagImplicitly(), tagExplicitly() and subtype() do nothing but
+        # construct. A class id tuple holding other than one pair cannot equal
+        # a single base tag, which is what the length test settles first.
+        if baseTag:
+            classId = self.__superTagsClassId
+            self.differsFromBaseTagSet = (
+                self.__lenOfSuperTags != 1
+                or classId[0][0] != baseTag.tagClass
+                or classId[0][1] != baseTag.tagId
+            )
+        else:
+            self.differsFromBaseTagSet = bool(self.__superTagsClassId)
 
     def __repr__(self) -> str:
         if not self.__superTags:
@@ -214,9 +238,22 @@ class TagSet:
             return self.__superTags[i]
 
     def __eq__(self, other: object) -> bool:
+        # Reading the other tag set's class id costs one attribute load and
+        # saves a whole comparison: `self.__superTagsClassId == other` with a
+        # TagSet on the right compares a tuple against a TagSet, which returns
+        # NotImplemented and sends Python round again through the reflected
+        # TagSet.__eq__ -- two calls where one will do. Anything that is not a
+        # TagSet still compares against the class id directly, which is what
+        # lets a TagSet equal a plain tuple of (class, id) pairs.
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId == other.__superTagsClassId
+
         return self.__superTagsClassId == other
 
     def __ne__(self, other: object) -> bool:
+        if isinstance(other, TagSet):
+            return self.__superTagsClassId != other.__superTagsClassId
+
         return self.__superTagsClassId != other
 
     def __lt__(self, other: Any) -> bool:
@@ -247,6 +284,37 @@ class TagSet:
             Base tag of this *TagSet*
         """
         return self.__baseTag
+
+    @property
+    def baseTagSet(self) -> "TagSet":
+        """Return this tag set reduced to its base tag alone.
+
+        That is ``TagSet(baseTag, baseTag)``, or an empty *TagSet* when there
+        is no base tag -- what the codecs fall back to when looking a codec up
+        by the complete tag set has failed, to recover an untagged type.
+
+        Cached, because both codecs want it per ASN.1 component while it
+        depends only on ``baseTag``, which never changes: the BER encoder was
+        building one per component, and building one is not free -- it walks
+        the super tags and hashes the result. TagSet objects belong to types
+        and outlive any one message, so after warm-up this costs an attribute
+        read.
+
+        Returns
+        -------
+        : :class:`~pyasn1.type.tag.TagSet`
+            This tag set with its super tags stripped down to the base tag.
+        """
+        baseTagSet = self.__baseTagSet
+
+        if baseTagSet is None:
+            baseTag = self.__baseTag
+            baseTagSet = (
+                self.__class__(baseTag, baseTag) if baseTag else self.__class__()
+            )
+            self.__baseTagSet = baseTagSet
+
+        return baseTagSet
 
     @property
     def superTags(self) -> tuple[Tag, ...]:
@@ -324,6 +392,11 @@ class TagSet:
         """
         if len(tagSet) < self.__lenOfSuperTags:
             return False
+        if isinstance(tagSet, TagSet):
+            # Slicing a TagSet builds a whole new TagSet, whose __init__ has
+            # settled differsFromBaseTagSet eagerly since #198. Comparing the
+            # underlying tuples answers the same question without it.
+            return self.__superTags == tagSet.__superTags[: self.__lenOfSuperTags]
         return self.__superTags == tagSet[: self.__lenOfSuperTags]
 
 

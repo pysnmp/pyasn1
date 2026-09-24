@@ -233,10 +233,13 @@ class CanonicalStringDecoderMixIn:
         # it already contradicts 9.1 whatever its fragments turn out to hold.
         # A decoder that bars the constructed form outright, as DER does under
         # 10.2, has a more specific complaint to make, so defer to it.
+        # substrateFun first: a fragment decode always passes one, so the
+        # common path leaves here on the cheapest test rather than after an
+        # attribute lookup.
         if (
-            getattr(self, "supportConstructedForm", True)
-            and not substrateFun
+            not substrateFun
             and tagSet
+            and getattr(self, "supportConstructedForm", True)
             and tagSet[0].tagFormat != tag.tagFormatSimple
         ):
             raise error.PyAsn1Error(
@@ -268,51 +271,63 @@ class CanonicalStringDecoderMixIn:
     ) -> tuple[Any, bytes]:
         # A caller collecting raw substrate is assembling an outer value and
         # never sees the fragments as such, so leave those to their own decode.
-        if not substrateFun and decodeFun:
-            self._verifyFragments(substrate, decodeFun, options)
+        if substrateFun or not decodeFun:
+            return super().indefLenValueDecoder(  # type: ignore[misc]
+                substrate,
+                asn1Spec,
+                tagSet,
+                length,
+                state,
+                decodeFun,
+                substrateFun,
+                **options,
+            )
 
-        return super().indefLenValueDecoder(  # type: ignore[misc]
-            substrate,
-            asn1Spec,
-            tagSet,
-            length,
-            state,
-            decodeFun,
-            substrateFun,
-            **options,
-        )
+        # The base decoder already walks the fragments to assemble the value.
+        # Measuring them in a pass of our own decoded every octet twice, so
+        # ride that walk instead: this wrapper sees each fragment as it is
+        # decoded and records what 9.2 needs to be checked against.
+        sizes: list[int] = []
 
-    def _verifyFragments(
-        self, substrate: bytes, decodeFun: Any, options: dict[str, Any]
-    ) -> None:
-        sizes = []
-
-        while substrate:
+        def recordingDecodeFun(fragment: bytes, *args: Any, **kwargs: Any) -> Any:
             # 9.2 admits primitive fragments only, so a constructed identifier
             # octet is wrong however well formed the encoding beneath it is.
-            if substrate[0] & 0x20:
+            if fragment and fragment[0] & 0x20:
                 raise error.PyAsn1Error(
                     "String fragment must use the primitive encoding form",
                     decoder=self.__class__.__name__,
                 )
 
-            component, substrate = decodeFun(
-                substrate,
-                self.fragmentComponent,  # type: ignore[attr-defined]
-                substrateFun=self.substrateCollector,  # type: ignore[attr-defined]
-                allowEoo=True,
-                **options,
-            )
+            component, remainder = decodeFun(fragment, *args, **kwargs)
 
-            if component is eoo.endOfOctets:
-                break
+            if component is not eoo.endOfOctets:
+                sizes.append(len(component))
 
-            sizes.append(len(component))
+            return component, remainder
 
-        else:
-            # Nothing closed the encoding; the base decoder reports that.
-            return
+        asn1Object, tail = super().indefLenValueDecoder(  # type: ignore[misc]
+            substrate,
+            asn1Spec,
+            tagSet,
+            length,
+            state,
+            recordingDecodeFun,
+            substrateFun,
+            **options,
+        )
 
+        self._verifySizes(sizes)
+
+        return asn1Object, tail
+
+    def _verifySizes(self, sizes: list[int]) -> None:
+        """Check the fragment lengths 9.2 admits, given what the decode saw.
+
+        Reached only once the base decoder has assembled the value, so an
+        encoding that never closed has already been reported and cannot arrive
+        here. An empty ``sizes`` therefore means a constructed encoding holding
+        no fragments at all, which the length rule below rejects on its own.
+        """
         # One fragment carries no more than 1000 octets, which 9.2 requires to
         # have been sent primitively. Two is the shortest conforming split.
         if len(sizes) < 2:
