@@ -526,6 +526,54 @@ class StringEncodingFormTestCase(BaseTestCase):
         with self.assertRaises(error.PyAsn1Error):
             cer_decoder.decode(substrate)
 
+    def testCerSkipsFragmentCheckWhenCollectingSubstrate(self):
+        # A caller collecting raw substrate is assembling an outer value and
+        # never sees the fragments as such, so the 9.2 check belongs to their
+        # own decode rather than this one. The same substrate is rejected when
+        # decoded on its own account, which is what makes this a skip and not
+        # a hole.
+        decoder_ = cer_decoder.OctetStringDecoder()
+        substrate = b"\x04\x82\x03\xe7" + b"x" * 999 + b"\x04\x01y" + b"\x00\x00"
+
+        collected, _ = decoder_.indefLenValueDecoder(
+            substrate,
+            univ.OctetString(),
+            univ.OctetString.tagSet,
+            None,
+            None,
+            ber_decoder.decode,
+            decoder_.substrateCollector,
+        )
+
+        assert len(collected) == 1000
+
+        with self.assertRaises(error.PyAsn1Error):
+            decoder_.indefLenValueDecoder(
+                substrate,
+                univ.OctetString(),
+                univ.OctetString.tagSet,
+                None,
+                None,
+                ber_decoder.decode,
+                None,
+            )
+
+    def testCerRefusesEmptyConstructedString(self):
+        # 9.2 admits the constructed form only for a string past 1000 octets,
+        # so a constructed encoding holding no fragments at all has no
+        # conforming reading: the value it carries is empty, and an empty
+        # string must be sent primitively.
+        substrate = b"\x24\x80" + b"\x00\x00"
+
+        with self.assertRaises(error.PyAsn1Error):
+            cer_decoder.decode(substrate)
+
+    def testCerAcceptsEmptyPrimitiveString(self):
+        decoded, remainder = cer_decoder.decode(b"\x04\x00")
+
+        assert remainder == b""
+        assert decoded == univ.OctetString(b"")
+
     def testCerAcceptsConformingSegmentation(self):
         substrate = self._constructed(
             0x04, [b"x" * 1000, b"y" * 1000, b"z" * 500], definite=False

@@ -67,14 +67,47 @@ class Asn1Type(Asn1Item):
     # Disambiguation ASN.1 types identification
     typeId: Any = None
 
-    def __init__(self, **kwargs: Any) -> None:
-        readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
+    #: The initializer attributes __setattr__ refuses to overwrite. Declared
+    #: rather than assigned: __init__ writes it straight into __dict__, so
+    #: there is nothing here for the annotation to bind to, and a class-level
+    #: assignment would put a shared dict on every subclass.
+    _readOnly: dict[str, Any]
 
-        readOnly.update(kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        """Set this object's initializer attributes, and seal them.
+
+        Every keyword argument becomes an attribute of the object and joins
+        the set ``__setattr__`` then refuses to overwrite -- ``tagSet`` and
+        ``subtypeSpec`` always, defaulting to the class's own, plus whatever a
+        subclass adds. That is what makes an |ASN.1| object immutable in the
+        sense its documentation claims.
+
+        Keyword Args
+        ------------
+        kwargs:
+            Initializer attributes. ``tagSet`` and ``subtypeSpec`` fall back
+            to the class attributes of the same name when not given.
+        """
+        if "tagSet" in kwargs and "subtypeSpec" in kwargs:
+            # Already complete, so the defaults below would all be overwritten.
+            # Every object a decode builds arrives this way, through clone()
+            # expanding the read-only dict it was cloned from. kwargs is this
+            # call's own dict, built by the ** at the call site, so keeping it
+            # aliases nothing.
+            readOnly = kwargs
+
+        else:
+            readOnly = {"tagSet": self.tagSet, "subtypeSpec": self.subtypeSpec}
+
+            readOnly.update(kwargs)
 
         self.__dict__.update(readOnly)
 
-        self._readOnly = readOnly
+        # Straight into __dict__ rather than through __setattr__, which would
+        # call back into Python only to find a leading underscore and skip its
+        # own guard. This is the constructor setting the very dict that guard
+        # consults, and it runs once per ASN.1 object built.
+        self.__dict__["_readOnly"] = readOnly
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name[0] != "_" and name in self._readOnly:
@@ -389,10 +422,24 @@ class SimpleAsn1Type(Asn1Type):
         return self._value
 
     def __eq__(self, other: object) -> bool:
-        return self is other or self._cmpValue("__eq__") == other
+        if self is other:
+            return True
+        value = self._value
+        if value is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        return value == other
 
     def __ne__(self, other: object) -> bool:
-        return self is not other and self._cmpValue("__ne__") != other
+        if self is other:
+            return False
+        value = self._value
+        if value is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        return value != other
 
     def __lt__(self, other: Any) -> bool:
         return self._cmpValue("__lt__") < other
@@ -464,9 +511,14 @@ class SimpleAsn1Type(Asn1Type):
 
             value = self._value
 
-        initializers = self.readOnly.copy()
-        initializers.update(kwargs)
+        initializers = self._readOnly
 
+        if kwargs:
+            initializers = {**initializers, **kwargs}
+
+        # Not copied when kwargs is empty, which is every clone a decode makes:
+        # the ** expansion below already builds the callee's own dict, and
+        # __init__ merges into a dict of its own rather than into this one.
         return self.__class__(value, **initializers)
 
     def subtype(self, value: Any = noValue, **kwargs: Any) -> Any:
@@ -699,10 +751,22 @@ class ConstructedAsn1Type(Asn1Type):
         return self.components
 
     def __eq__(self, other: object) -> bool:
-        return self is other or self._cmpComponents("__eq__") == other
+        if self is other:
+            return True
+        if self._componentValues is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__eq__"
+            )
+        return self.components == other
 
     def __ne__(self, other: object) -> bool:
-        return self is not other and self._cmpComponents("__ne__") != other
+        if self is other:
+            return False
+        if self._componentValues is noValue:
+            raise error.PyAsn1Error(
+                "Attempted operation on ASN.1 schema object", operation="__ne__"
+            )
+        return self.components != other
 
     def __lt__(self, other: Any) -> bool:
         return self._cmpComponents("__lt__") < other

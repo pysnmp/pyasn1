@@ -3,6 +3,66 @@
 Generated from the commit history at release time. The narrative history
 through 1.3.0 is in [CHANGES.rst](https://github.com/pysnmp/pyasn1/blob/main/CHANGES.rst).
 
+## [2.0.8](https://github.com/pysnmp/pyasn1/compare/v2.0.7...v2.0.8) (2026-09-22)
+
+### Performance Improvements
+
+* **tag:** settle differsFromBaseTagSet without building a tuple ([169f96c](https://github.com/pysnmp/pyasn1/commit/169f96cbf29f1a3d9e4f0a1d868390bb6233e310)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198) [#213](https://github.com/pysnmp/pyasn1/issues/213)
+
+## [2.0.7](https://github.com/pysnmp/pyasn1/compare/v2.0.6...v2.0.7) (2026-09-22)
+
+### Bug Fixes
+
+* **codec:** keep omitting a DEFAULT component that holds a schema object ([c91d2b4](https://github.com/pysnmp/pyasn1/commit/c91d2b4613af71cab63c114f71df09bd61f4b9cb))
+
+### Performance Improvements
+
+* **base:** ask the schema guard without a method call per component ([15afcd6](https://github.com/pysnmp/pyasn1/commit/15afcd6a9290e532c24fc01680fa81c01bfac4a7)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198)
+* **cer:** check the string fragment rules during the decode, not before it ([75519a0](https://github.com/pysnmp/pyasn1/commit/75519a0c5eceabeb631c2ac8f767e82ad5fdf7da))
+* **cer:** test the cheap half of the 9.1 guard first ([3399689](https://github.com/pysnmp/pyasn1/commit/339968979b41ddfbbee8d4a50e8bead42307a1c3))
+* **tag:** compare tag sets without building one to throw away ([ffb4a7a](https://github.com/pysnmp/pyasn1/commit/ffb4a7ad3d97f226a2f563d86b799ec8ef517bb4)), closes [#198](https://github.com/pysnmp/pyasn1/issues/198) [#198](https://github.com/pysnmp/pyasn1/issues/198) [#203](https://github.com/pysnmp/pyasn1/issues/203) [#203](https://github.com/pysnmp/pyasn1/issues/203)
+* **tag:** compare tag sets without the reflected round trip ([80e378f](https://github.com/pysnmp/pyasn1/commit/80e378f7dc87db0f1c7f9b19c90ba4b9b6f90611))
+* **tag:** settle whether a tag set differs from its base tag set once ([259d321](https://github.com/pysnmp/pyasn1/commit/259d321a6de949fd7c30302d0e94f97a5c836596))
+* **univ:** ask Choice's schema guard without a method call per component ([0cb17be](https://github.com/pysnmp/pyasn1/commit/0cb17bef79f1da971e3e84a21332dc9efd73d1ce)), closes [#205](https://github.com/pysnmp/pyasn1/issues/205) [#205](https://github.com/pysnmp/pyasn1/issues/205) [#198](https://github.com/pysnmp/pyasn1/issues/198) [#205](https://github.com/pysnmp/pyasn1/issues/205)
+* **univ:** stop re-validating every subtree once per level during encode ([119ec22](https://github.com/pysnmp/pyasn1/commit/119ec22a20594fb0627b039080ec4db20c6ec4aa))
+
+## [2.0.6](https://github.com/pysnmp/pyasn1/compare/v2.0.5...v2.0.6) (2026-09-21)
+
+### Performance Improvements
+
+* **base:** skip the defaults dict when the caller already supplied both ([5d4b3a2](https://github.com/pysnmp/pyasn1/commit/5d4b3a2e4e3d85888c8e2848c4f95f449ecd1328)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **base:** stop copying the initializer dict on every clone ([1531a8a](https://github.com/pysnmp/pyasn1/commit/1531a8a04256ba1799184685f65166b0e39ff009)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **tag:** cache a tag set's base tag set instead of rebuilding it per component ([530d8f1](https://github.com/pysnmp/pyasn1/commit/530d8f1501b6cf2cf9a5ce4306a7397ec2f378de)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+
+## [2.0.5](https://github.com/pysnmp/pyasn1/compare/v2.0.4...v2.0.5) (2026-09-21)
+
+### Bug Fixes
+
+* **debug:** give each context its own scope trail ([2d1470f](https://github.com/pysnmp/pyasn1/commit/2d1470f46d736535248f140075b47c6f0ff865a0)), closes [#191](https://github.com/pysnmp/pyasn1/issues/191)
+
+## [2.0.4](https://github.com/pysnmp/pyasn1/compare/v2.0.3...v2.0.4) (2026-09-20)
+
+### Bug Fixes
+
+* **decoder:** snapshot the debug flag per frame, so the scope stack balances ([eca2f6c](https://github.com/pysnmp/pyasn1/commit/eca2f6cd67f9d88ef6e3517112f7cfaf8904de78))
+
+### Performance Improvements
+
+* **decoder:** re-read the debug flag once per decode, not at every site ([30ee7cd](https://github.com/pysnmp/pyasn1/commit/30ee7cde8010cd8072e7c07be71f12e12b953825)), closes [#187](https://github.com/pysnmp/pyasn1/issues/187)
+* **encoder:** split the public entry from the recursion, read the flag once ([1292721](https://github.com/pysnmp/pyasn1/commit/1292721a42f121fd5d5e8b49b6f9c0c987f315bb)), closes [#188](https://github.com/pysnmp/pyasn1/issues/188) [#187](https://github.com/pysnmp/pyasn1/issues/187)
+
+## [2.0.3](https://github.com/pysnmp/pyasn1/compare/v2.0.2...v2.0.3) (2026-09-19)
+
+### Bug Fixes
+
+* **type:** read NamedType's fields off the tuple, not through namedtuple ([6bdc644](https://github.com/pysnmp/pyasn1/commit/6bdc64434fef1ad9bac6824da9b9435edea30134)), closes [pysnmp/pysnmp#290](https://github.com/pysnmp/pysnmp/issues/290)
+
+## [2.0.2](https://github.com/pysnmp/pyasn1/compare/v2.0.1...v2.0.2) (2026-09-09)
+
+### Bug Fixes
+
+* **type:** reject bare constructed schemas ([2734ea8](https://github.com/pysnmp/pyasn1/commit/2734ea8b977530574e2eacb8b5c1488bf7d70edb))
+
 ## [2.0.1](https://github.com/pysnmp/pyasn1/compare/v2.0.0...v2.0.1) (2026-09-06)
 
 ### Bug Fixes

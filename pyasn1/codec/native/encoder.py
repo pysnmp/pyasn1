@@ -98,6 +98,12 @@ class SetEncoder(AbstractItemEncoder):
                 elif namedType.isOptional and not subValue.isValue:
                     continue
 
+                elif namedType.isDefaulted and not subValue.isValue:
+                    # A DEFAULT slot holding a schema object is not a value
+                    # either, so it carries the default exactly as an absent
+                    # one does rather than being handed to the encoder.
+                    subValue = namedType.asn1Object
+
             else:
                 key = value.getNameByPosition(idx)
 

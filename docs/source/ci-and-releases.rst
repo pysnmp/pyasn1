@@ -128,11 +128,119 @@ them.
     Runs semantic-release. On a pull request this job does not run at
     all; on a push it rehearses the release without cutting one.
 
-One check runs outside that workflow. ``Commit conventions``
+Two checks run outside that workflow. ``Commit conventions``
 (``.github/workflows/commit-conventions.yml``) lints the commit messages
 of a pull request and runs on pull requests only, so it is not part of
-the release path. Like the ``CI`` jobs, it gates a merge only where
-branch protection names it as a required check.
+the release path. ``CodSpeed``
+(``.github/workflows/codspeed.yml``) measures the benchmarks; see
+`Benchmarks`_. Like the ``CI`` jobs, both gate a merge only where branch
+protection names them as a required check.
+
+Benchmarks
+----------
+
+The ``benchmarks`` directory holds a `pytest-codspeed
+<https://docs.codspeed.io/benchmarks/python/>`_ suite covering the BER,
+CER, DER and native codecs and the type machinery underneath them. The
+``CodSpeed`` workflow runs it on every push to ``main`` and ``next`` and
+on every pull request against them, and `CodSpeed
+<https://app.codspeed.io/pysnmp/pyasn1>`_ comments the difference
+against the base branch.
+
+Measurements are taken under CPU simulation rather than by timing a wall
+clock, so what is reported is work done — instructions, cache behaviour —
+and not how loaded the runner happened to be. That is what makes a two
+percent change on a shared CI machine meaningful.
+
+The suite is deliberately outside ``tests``: ``tests/conftest.py`` runs
+every test it collects with pyasn1 debugging on and every debug record
+rendered, which is the opposite of what a measurement wants. It is also
+outside ``testpaths``, so a plain ``pytest`` does not collect it. Run it
+by naming the directory::
+
+    uv run pytest benchmarks              # check the benchmarks still work
+    uv run pytest benchmarks --codspeed   # measure them
+
+Adding a benchmark is adding a ``test_*`` function that takes the
+``benchmark`` fixture and hands it the callable to measure. Build the
+input outside the measured call, and keep the measured call to one unit
+of work. Operations too small to measure on their own -- a tag set
+comparison is a few nanoseconds -- are looped in
+``benchmarks/test_types.py`` through its ``repeat`` helper, so the loop,
+and not the harness, is what is timed.
+
+Where the library has been
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CodSpeed answers one question: is this pull request slower than the
+commit it would merge into. That is the right question for a pull
+request, and it says nothing about the releases behind it. Its history
+begins with the commit that added these benchmarks, and nothing can
+extend it backwards, because the benchmarks did not exist at the earlier
+commits to be run there.
+
+So it was measured once, separately. Every release from 0.4.12 to 2.0.6
+was installed from PyPI in turn and driven through the equivalent of
+four of the benchmarks below, counting instructions retired under
+callgrind on CPython 3.11 — the same quantity CodSpeed's simulation mode
+reports. Each version was checked to encode the shared schemas to
+byte-identical octets first, so the columns describe the same work
+rather than different work at different speeds.
+
+.. list-table:: Instructions retired per benchmark call, thousands
+   :header-rows: 1
+   :widths: 34 14 14 14 14 12
+
+   * - case
+     - 0.4.12
+     - 1.3.0
+     - 2.0.3
+     - 2.0.6
+     - 0.4.12 → 2.0.6
+   * - ``decode_message_with_spec``
+     - 9,912
+     - 9,837
+     - 9,917
+     - 8,633
+     - −12.9%
+   * - ``encode_message``
+     - 3,198
+     - 5,155
+     - 5,238
+     - 3,913
+     - +22.4%
+   * - ``clone``
+     - 21,730
+     - 21,723
+     - 21,717
+     - 17,712
+     - −18.5%
+   * - ``tag_set_is_super_tag_set_of``
+     - 11,011
+     - 9,656
+     - 9,696
+     - 9,714
+     - −11.8%
+
+Two things in that table are worth keeping, because neither was visible
+before there was anything to measure them with.
+
+``encode_message`` costs 22% more at 2.0.6 than it did on 0.4.12. The
+step is between 1.0.3 and 1.3.0, where it went from 3.2M instructions to
+5.2M and stayed there for six releases; 2.0.4 and 2.0.6 recovered about
+two thirds of the excess, leaving the rest. Nothing here says the 1.3.0 change was wrong — it may well
+have bought correctness worth the cost — only that the cost was paid and
+nobody counted it at the time.
+
+``clone`` drops 18% at 2.0.6, which is the initializer-dict work in that
+release doing exactly what it was meant to do. That is the same
+measurement read the other way round: a table like this is how an
+optimisation gets to show that it worked, rather than only that it was
+intended.
+
+This was a one-off, and the numbers above are a snapshot rather than
+something the repository can regenerate. Going forward CodSpeed covers
+it, which is the point of having it.
 
 The test matrix
 ---------------
