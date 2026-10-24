@@ -275,7 +275,7 @@ jobs:
           node-version: "24"
       - name: Semantic Release
         id: semrel
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v8
         with:
           semantic_version: 25
           dry_run: ${{ env.DRY }}
